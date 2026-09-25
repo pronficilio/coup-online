@@ -1,26 +1,103 @@
-.PlayerBoardItem{
-    background-color: #73C373;
-    margin-bottom: 20px;
-    padding: 5px;
-    display: inline-block;
-    margin-right: 10px;
-    margin-left: 10px;
-    border-radius: 5px;
-}
-
-.PlayerBoardItem h2{
-    margin-top: 10px;
-    font-weight: lighter;
-    color: white;
-    line-height: 80%;
-}
-
-.PlayerBoardItem p{
-    line-height: 50%;
-    font-weight: regular;
-    color: white;
-}
-
 .PlayerBoardContainer {
-    
+    position: relative;
+    width: min(100%, 900px);
+    aspect-ratio: 1;
+    margin: 12px auto;
+    box-sizing: border-box;
+}
+
+.PlayerBoardSeat {
+    position: absolute;
+    z-index: 1;
+    width: 154px;
+    max-width: 42%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 2px solid var(--player-color, #707070);
+    border-radius: 14px;
+    background: #fff;
+    color: #252525;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    text-align: center;
+    transform: translate(-50%, -50%);
+}
+
+.PlayerBoardSeatName {
+    overflow: hidden;
+    margin: 0;
+    color: #252525;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.PlayerBoardSeatCoins {
+    margin: 3px 0 8px;
+    color: #555;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.PlayerBoardSeatInfluences {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.PlayerInfluenceSlot {
+    display: inline-flex;
+    width: 48px;
+    height: 64px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #858585;
+    border-radius: 7px;
+    font-size: 0.72rem;
+    line-height: 1.1;
+    text-align: center;
+}
+
+.PlayerInfluenceSlot--face {
+    padding: 3px;
+    background: #fff;
+    color: #252525;
+    text-transform: capitalize;
+}
+
+.PlayerInfluenceSlot--back {
+    background-color: #555;
+    background-image: repeating-linear-gradient(
+        45deg,
+        #555 0,
+        #555 5px,
+        #666 5px,
+        #666 10px
+    );
+}
+
+.PlayerInfluenceSlot--inactive {
+    border-style: dashed;
+    border-color: #c8c8c8;
+    background: #f4f4f4;
+}
+
+.PlayerBoardSeat--current .PlayerInfluenceSlot:not(.PlayerInfluenceSlot--inactive) {
+    border: 3px solid #ff2947;
+    box-shadow: 0 0 8px #ff1744, 0 0 16px rgba(255, 23, 68, 0.72);
+}
+
+@media only screen and (max-width: 460px) {
+    .PlayerBoardSeat {
+        width: 106px;
+        padding: 6px;
+    }
+
+    .PlayerInfluenceSlot {
+        width: 42px;
+        height: 58px;
+    }
 }

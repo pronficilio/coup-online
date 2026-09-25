@@ -1,6 +1,6 @@
 # Plan: tablero circular de Coup — issue #5
 
-**Estado:** `ACTIVE`
+**Estado:** `WAITING_ORCHESTRATOR`
 
 **Unidad:** https://github.com/pronficilio/coup-online/issues/5
 
@@ -57,7 +57,7 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 ## Fases de ejecución
 
-### F1 — Fijar asientos estables y contrato visual (`READY`)
+### F1 — Fijar asientos estables y contrato visual (`CLOSED`)
 
 **Pregunta:** ¿pueden los datos actuales asignarse de forma determinista a las posiciones de 2 a 6 sin mover a los eliminados ni revelar cartas ajenas?
 
@@ -127,4 +127,4 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 ## Siguiente acción
 
-Agente Alquimista: issue #5 reclamada y worktree confirmado; ejecutar F1 según el handoff activo. El Orquestador conserva la revisión final.
+Agente Alquimista: F1 cerrada con reporte y commit de fase. El Orquestador revisa este checkpoint; F2 y F3 siguen pendientes.

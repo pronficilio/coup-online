@@ -6,13 +6,13 @@
 
 **Bitácora exacta:** `docs/plans/log/issue-5.jsonl`
 
-**Estado:** `ACTIVE`
+**Estado:** `WAITING_ORCHESTRATOR`
 
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`
 
 **Verifier requerido ahora:** no; invocarlo al final, antes de integrar.
 
-**Fase sugerida:** F1, asientos estables y contrato visual. Sigue porque el tablero actual es una fila y el cliente filtra eliminados.
+**Fase cerrada:** F1, asientos estables y contrato visual. F2 y F3 siguen pendientes.
 
 **Branch destino de toda la issue:** `issue/5-circular-board`
 
@@ -24,7 +24,7 @@
 
 ## Reclamo y aislamiento
 
-El reclamo está confirmado: issue abierta, asignada a `pronficilio`, rereleída sin reclamo incompatible y sin PR previo. Branch y worktree canónicos se crearon desde `origin/master` en `febec397`. El plan, la bitácora y este handoff se copiaron al worktree; este handoff ya está en `docs/plans/active/`. `claim` y `worktree_confirmed` están registrados en la bitácora. Confirma el control antes de empezar F1. No trabajes desde `master` ni abras ramas por fase.
+El reclamo está confirmado: issue abierta, asignada a `pronficilio`, rereleída sin reclamo incompatible y sin PR previo. Branch y worktree canónicos se crearon desde `origin/master` en `febec397`. El plan, la bitácora y este handoff se copiaron al worktree; este handoff ya está en `docs/plans/active/`. `claim` y `worktree_confirmed` están registrados en la bitácora. El control se confirmó antes de F1. No trabajes desde `master` ni abras ramas por fase.
 
 Los tres documentos nuevos de #5 (plan, handoff y bitácora) están inicialmente sin seguimiento en el checkout raíz, no aparecen automáticamente en otro worktree. Tras confirmar el reclamo, cópialos desde `E:\dev\coup` al worktree de #5 antes de mover el handoff a `active/`; conserva intactos los originales hasta confirmar que el primer commit de control del branch contiene las copias. La issue remota reproduce el alcance si necesitas contrastar las copias.
 
@@ -32,7 +32,7 @@ El checkout raíz `master` tiene dos commits locales de reglas y WebP y está di
 
 ## Primera subtarea y fases
 
-- **F1 READY:** definir orden estable con observador abajo, geometrías 2/3/4 especiales y 5/6 por fórmula; construir piezas de tablero/asiento y dos espacios de cartas. Nunca poner el nombre de una influencia rival oculta en el DOM de la carta. Registrar tabla de asientos y tratamiento de eliminados. `COMMIT_REQUIRED`: `feat(board): issue 5 F1 CLOSED advance_f2`.
+- **F1 CLOSED:** tabla y tratamiento de eliminados documentados en `docs/plans/circular-board/report_issue_5_F1.md`; el cierre está en `feat(board): issue 5 F1 CLOSED advance_f2`.
 - **F2 PENDING:** conectar la mesa a `Coup`; mazo central convertido de `fotos/deck.png` a `coup-client/src/assets/deck.webp`; color/monedas/turno rojo neón; controles existentes accesibles. Solo WebP nuevo del mazo en Git. `COMMIT_REQUIRED`: `feat(board): issue 5 F2 CLOSED advance_f3`.
 - **F3 PENDING:** revisar y ajustar 2..6 en escritorio/móvil, cambios de turno y eliminación; dejar matriz visual y capturas. `COMMIT_REQUIRED`: `feat(board): issue 5 F3 CLOSED ready_review`.
 
@@ -43,6 +43,10 @@ Cada cierre de fase incluye su `report_issue_5_F*.md`, código/evidencia y event
 Cumplir los seis criterios del plan: posiciones exactas de 2, 3 y 4; cálculo estable de 5 y 6; cartas propias/ajenas correctas; asientos persistentes; resaltado del turno; centro y WebP; controles accesibles; estructura apta para futuras animaciones sin animarlas ahora. Deja capturas de escritorio/móvil, tabla 2..6, inspección del diff de assets y comprobación del flujo de decisiones. Usa comandos de validación solo cuando resuelvan un riesgo concreto; el build disponible es `npm run build` en `coup-client`.
 
 **Pregunta de falsificación para Verifier:** ¿hay n entre 2 y 6 o una transición de turno/pérdida/eliminación que mueva un asiento, revele una carta ajena en la interfaz, tape controles o descentre el mazo? El Verifier revisa de forma independiente el head final y emite `PASS`, `FAIL` o `BLOCKED` sin implementar.
+
+## Checkpoint después de F1
+
+F1 está cerrada con reporte de evidencia y commit de fase. F2 permanece `PENDING` y no se inició en este checkpoint. El issue sigue abierto y no hay PR. Siguiente dueño: Orquestador, para revisar F1 y decidir el inicio de F2.
 
 ## Alcance y límites
 
