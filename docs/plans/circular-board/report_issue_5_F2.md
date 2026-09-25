@@ -21,6 +21,7 @@ Los seis WebP ingleses (`duke`, `captain`, `assassin`, `contessa`, `ambassador`,
 ## Evidencia y validación
 
 - [Captura del `PlayerBoard` de tres jugadores](preview_issue_5_F2_3players.png): el navegador cargó el componente React real con props de muestra. Muestra el mazo centrado, los asientos arriba/derecha/abajo, caras propias, reversos rivales y el borde neón rojo. La ruta temporal de preview se retiró después de capturarla.
+- [Captura del `PlayerBoard` de dos jugadores](preview_issue_5_F2_2players.png): preview React local con exactamente dos props; observador Rojo abajo, rival Azul arriba, turno resaltado en Rojo, reversos rivales y mazo al centro. La ruta temporal se retiró después de capturarla.
 - `npm run start-pc`: el cliente compiló. Emitió advertencias preexistentes por imports sin uso en `App.js` y `Coup.js`; F2 no modificó esos archivos.
 - `git diff --check`: pasó.
 - La capa central no intercepta entradas (`pointer-events: none`) y queda debajo de los asientos; el área de decisiones permanece en `Coup.js` sin cambios. No se ejecutó una partida con socket ni se hizo clic en una decisión: la herramienta CUA falló dos veces antes de abrir el navegador (`helper_unknown_error: setup refresh had errors`). La captura se hizo con Edge headless sobre el preview local del componente.
