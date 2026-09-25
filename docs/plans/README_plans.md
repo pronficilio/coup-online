@@ -6,5 +6,11 @@ Este directorio es el plano de control del proyecto, siguiendo `docs/agentes/ORQ
 - `log/` contiene bitácoras JSONL append-only, una por unidad.
 - `inbox/` contiene handoffs listos para el Ejecutor.
 - `active/` contiene planes de unidades en curso.
+- `blocked/` contiene handoffs en espera de una dependencia o resolución explícita.
 
-GitHub Issues es la fuente de estado de las unidades: la [issue #1](https://github.com/pronficilio/coup-online/issues/1) cerró el trabajo inicial del checkout; la [issue #3](https://github.com/pronficilio/coup-online/issues/3) registra el chequeo de seguridad. Cada unidad tiene su propio plan y bitácora en este plano de control.
+La unidad inicial fue la issue [#1](https://github.com/pronficilio/coup-online/issues/1), ya integrada y cerrada. GitHub es el tracker canónico; consulta el estado remoto antes de reclamar o reanudar cualquiera de las unidades.
+
+## Unidades abiertas
+
+- [#5 — tablero circular](https://github.com/pronficilio/coup-online/issues/5): issue `OPEN`, F2 `READY`, sin PR todavía; rama/worktree canónicos `issue/5-circular-board` / `.worktrees/issue-5-circular-board`. Plan: `docs/plans/circular-board/plan_circular_board.md`.
+- [#6 — panel de acciones del turno](https://github.com/pronficilio/coup-online/issues/6): `ACTIVE`, F1 en curso; F2 espera la integración de #5 a `master`. Plan: `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; handoff activo en `docs/plans/active/issue_6_turn_actions_panel.md`; bitácora `docs/plans/log/issue-6.jsonl`.
