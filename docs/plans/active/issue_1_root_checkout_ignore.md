@@ -1,6 +1,6 @@
 # Issue #1: preparar checkout raíz y reglas de exclusión
 
-**Estado:** `ACTIVE`  
+**Estado:** `WAITING_ORCHESTRATOR`  
 **Issue:** https://github.com/pronficilio/coup-online/issues/1  
 **Plan:** `docs/plans/active/issue_1_root_checkout_ignore.md`  
 **Handoff:** `docs/plans/active/handoff_issue_1_root_checkout_ignore.md`  
@@ -41,7 +41,7 @@ Dejar el fork ya creado de `https://github.com/Cheneth/coup-online` con su conte
 
 ### Desconocidos
 
-- El pull request y el cierre de F1 todavía deben completarse.
+- El veredicto del Verifier independiente está pendiente.
 
 ## Alcance y aceptación
 
@@ -53,7 +53,7 @@ Dejar el fork ya creado de `https://github.com/Cheneth/coup-online` con su conte
 
 ## Fase funcional prevista
 
-### F1 — Preparar el checkout raíz y excluir datos locales (`ACTIVE`)
+### F1 — Preparar el checkout raíz y excluir datos locales (`CLOSED`)
 
 - **Pregunta:** ¿el checkout del fork quedó en la raíz con las dos carpetas locales protegidas por `.gitignore`?
 - **Cierre:** repositorio e historial disponibles en la raíz; remotos correctos; reglas de ignore efectivas; contenido local preservado; PR abierto desde una rama asociada a la issue.
@@ -65,4 +65,4 @@ La creación del fork y el acceso al tracker ya están resueltos; el checkout en
 
 ## Estado y siguiente acción
 
-El claim quedó registrado en la issue #1 y en la bitácora; el handoff está en `docs/plans/active/`. La rama y el worktree canónicos están confirmados. Sigue pendiente completar el commit de cierre y abrir el PR a `master`.
+F1 cerró en `859696e` (`chore(fork-setup): issue 1 F1 CLOSED advance_review`). El PR [#2](https://github.com/pronficilio/coup-online/pull/2) está abierto desde `issue/1-root-checkout-ignore` hacia `master`; el claim y las rutas activas constan en la issue #1 y en la bitácora. Sigue pendiente la verificación independiente. Siguiente dueño: Verifier y después Orquestador.
