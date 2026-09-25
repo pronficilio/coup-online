@@ -1,0 +1,37 @@
+# Deuda técnica — issue #3: revisión estática de seguridad
+
+Este registro conserva el reporte aceptado y las remediaciones pendientes; no contiene fixes.
+
+**Estado de fase:** `CLOSED — READY_FOR_FINAL_VERIFIER`
+**Unidad:** issue #3 — Perform a quick read-only security review
+**Fecha:** 2026-09-25
+**Branch/worktree:** `issue/3-quick-security-check` / `.worktrees/issue-3-quick-security-check`
+**Base revisada:** `origin/master` (`61a43a6d8f577ae507e95e8b7cd80a757f3c2b32`)
+
+## Resumen
+
+La revisión estática encontró riesgos demostrables en la confidencialidad de cartas privadas y en la autorización de acciones de juego. `npm audit` reportó vulnerabilidades conocidas en ambos árboles de dependencias, incluidas seis críticas en el cliente. Estos resultados justifican correcciones separadas; F1 no cambia código ni dependencias. La unidad queda pendiente del Verifier independiente exigido por el plan.
+
+## Matriz de revisión
+
+| Área | Estado | Evidencia y evaluación |
+|---|---|---|
+| Eventos de juego: identidad, autorización y validación | `FINDING` — **Alto** | En [server/game/coup.js](../../server/game/coup.js#L52), `g-deductCoins` obtiene el jugador desde `res.source` y resta `res.amount` sin enlazarlos con `socket.id`, validar importe/saldo ni comprobar turno. `g-actionDecision` consume la acción declarada por el cliente (líneas 60–70). Las decisiones de influencia/intercambio también resuelven el jugador a partir de `res.playerName` (líneas 206–233). Además, [server/index.js](../../server/index.js#L111-L115) inicia una partida con el arreglo `players` recibido del cliente, sin comprobar que el socket sea el líder ni validar el roster enviado. Un participante conectado a la partida puede enviar eventos manipulados para afectar estado de otros jugadores o alterar el flujo. **Recomendación:** derivar actor/turno del socket autenticado y estado del servidor; validar roster, forma, rango, fase y permisos de cada mensaje antes de mutar estado. No se realizó explotación activa. |
+| Confidencialidad de influencias privadas | `FINDING` — **Alto** | `buildPlayers` asigna `influences` ([server/game/utils.js](../../server/game/utils.js#L59-L72)); `exportPlayers` únicamente borra `socketID` ([server/game/utils.js](../../server/game/utils.js#L75-L80)); `updatePlayers` emite el resultado con `gameSocket.emit('g-updatePlayers', ...)` a toda la namespace ([server/game/coup.js](../../server/game/coup.js#L240-L242)). `start()` llama a `updatePlayers` al iniciar ([server/game/coup.js](../../server/game/coup.js#L427-L432)). El evento incluye las influencias de cada jugador y las entrega a todos los sockets de la sala. **Impacto:** cualquier jugador puede conocer las cartas ocultas de sus oponentes. **Recomendación:** construir vistas públicas que omitan cartas ajenas y enviar la mano propia por socket individual. |
+| Entradas HTTP, creación de salas, CORS y nombres/códigos | `FINDING` — **Medio** | [server/index.js](../../server/index.js#L7) usa `cors()` sin configuración de origen; `/createNamespace` es un `GET` público que crea una namespace y la guarda en `namespaces` (líneas 30–39); `/exists/:namespace` expone si un código existe (línea 42). `setName` valida duplicado, sala llena y partida iniciada, pero no aplica validación de tipo/formato/longitud del lado servidor (líneas 78–103); el máximo de longitud se ve solo en los controles de React ([JoinGame.js](../../coup-client/src/components/JoinGame.js#L164-L177)). **Impacto:** cualquier origen puede invocar endpoints de sala desde un navegador y no hay límites de frecuencia visibles; entradas arbitrarias llegan al flujo de eventos. El cleanup periódico reduce persistencia de namespaces vacías, por lo que no se afirma una fuga permanente. **Recomendación:** limitar CORS a orígenes previstos, limitar frecuencia y cuotas de creación, usar método semántico apropiado, y validar/normalizar cada campo en servidor. |
+| Dependencias servidor | `FINDING` — **Alto** | `npm audit --json` en `server/` (2026-09-25): **15** vulnerabilidades: 7 `high`, 4 `moderate`, 4 `low`, 0 `critical`. Incluye avisos transitivos de `express`, `engine.io`, `engine.io-client`, `socket.io-parser`, `ws`, entre otros; el comando reportó disponibilidad de fixes para dependencias afectadas. **Recomendación:** priorizar actualización compatible de Express/Socket.IO y lockfile, revisar advisories y regresiones en una issue de remediación. |
+| Dependencias cliente | `FINDING` — **Crítico** | `npm audit --json` en `coup-client/` (2026-09-25): **81** vulnerabilidades: 6 `critical`, 35 `high`, 25 `moderate`, 15 `low`. Entre las rutas críticas listadas están `webpack`, `form-data`, `shell-quote`, `openssl`, `websocket-driver` y `@babel/traverse`. El cliente declara dependencias de compilación y prueba en `dependencies`, así que el resultado incluye el árbol completo resuelto por el lockfile; no determina por sí solo exposición en runtime desplegado. **Recomendación:** revisar procedencia/uso de `openssl`, actualizar el toolchain/lockfile y documentar el análisis de producción frente a dependencias de desarrollo/build. |
+| Secretos/configuración versionada revisada | `PASS` (alcance estático) | En los archivos revisados no se observó secreto literal. El cliente lee `REACT_APP_BACKEND_URL` y `REACT_APP_GOOGLE_TRACKING_ID` ([CreateGame.js](../../coup-client/src/components/CreateGame.js#L7), [App.js](../../coup-client/src/App.js#L16)); son configuración expuesta al bundle, no secretos. No se inspeccionaron configuraciones de despliegue fuera del checkout. |
+| Renderizado de entradas no confiables en cliente | `PASS` (búsqueda acotada) | La búsqueda estática no encontró `innerHTML`, `dangerouslySetInnerHTML` ni `eval` en `server/` o `coup-client/src/`; las vistas revisadas usan JSX. Esto no certifica dependencias ni todos los contextos de salida fuera del alcance inspeccionado. |
+| Servicio desplegado, TLS/headers efectivos, abuso operativo y explotación | `NOT_CHECKED` | Expresamente fuera de alcance: no se accedió al servicio público, no se enviaron mensajes de prueba ni se realizó explotación activa. No se verificó configuración real de hosting, proxy, TLS, headers, secretos de entorno, rate limits ni respuesta HTTP/Socket.IO desplegada. |
+
+## Método y límites
+
+- Lectura estática de `server/index.js`, `server/game/coup.js`, `server/game/utils.js`, `server/utilities/`, componentes y eventos Socket.IO de `coup-client/src/`, y ambos `package.json`/lockfiles.
+- Auditoría de dependencias con `npm audit --json` ejecutada desde `server/` y `coup-client/` del worktree. Se registran los conteos que devolvió el registro al ejecutarse el comando; no se instalaron ni actualizaron dependencias.
+- No se ejecutaron pruebas, no se levantó el servicio y no se contactó el despliegue público.
+- Este chequeo no es una certificación de seguridad ni establece explotabilidad de cada advisory en el entorno de producción.
+
+## Entrega a verificación
+
+La afirmación principal para refutar es: **el servidor revela las influencias privadas de todos los jugadores mediante `g-updatePlayers` difundido a la namespace y acepta decisiones de juego cuyo actor/datos relevantes proceden del payload del cliente sin autorización suficiente**. El Verifier debe revisar el código y los números de línea citados, comprobar que el broadcast incluye cartas privadas y evaluar si la falta de asociación actor/socket permite manipulación por participantes de la sala. Debe emitir `PASS`, `FAIL` o `BLOCKED` sin implementar fixes.
