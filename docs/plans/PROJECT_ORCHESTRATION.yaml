@@ -41,7 +41,7 @@ profile_notes:
   fork: https://github.com/pronficilio/coup-online
   fork_created: true
   fork_issues_enabled: true
-  local_repository: not_initialized
+  local_repository: initialized_at_workspace_root
   github_cli_account: pronficilio
   github_cli_authentication: valid
   log_mechanism: append_only_jsonl

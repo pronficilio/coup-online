@@ -1,6 +1,6 @@
 # Handoff — Issue #1: checkout raíz y reglas de exclusión
 
-**Estado:** `WAITING_ORCHESTRATOR`  
+**Estado:** `COMPLETE`
 **Issue:** https://github.com/pronficilio/coup-online/issues/1  
 **Plan largo:** `docs/plans/active/issue_1_root_checkout_ignore.md`  
 **Bitácora:** `docs/plans/log/issue-1.jsonl`
@@ -19,10 +19,12 @@
 - **Remotos:** `origin=https://github.com/pronficilio/coup-online.git`; `upstream=https://github.com/Cheneth/coup-online.git`.
 - **Commit de cierre:** `859696e` (`chore(fork-setup): issue 1 F1 CLOSED advance_review`).
 - **PR:** https://github.com/pronficilio/coup-online/pull/2 hacia `master`.
-- **Head previo a corrección:** `6df6397`; el Verifier emitió `FAIL` por el inventario documental. Este commit docs-only deja descritas las seis rutas del PR; revalidar el HEAD resultante de la rama.
-- **Integración:** un PR hacia `master`, asociado a issue #1. El Ejecutor no integra ni cierra la issue.
+- **Merge:** `af48570ac136e40fd2d9cfc1de2f4a838d8be563`; el PR #2 quedó integrado y la issue #1 cerrada.
+- **Veredicto final:** `PASS` sobre el head `158ca5bf6b286a85fe018871b950648dfa108cea`.
+- **Devolución y corrección:** el Verifier emitió `FAIL` en `6df6397` por el inventario documental; el commit docs-only `158ca5b` corrigió el inventario y recibió `PASS`.
+- **Integración:** PR #2 integrado en `master`; issue #1 cerrada por el Orquestador tras la verificación independiente.
 - **Modo / riesgo:** `LIGHT` / `MEDIUM`.
-- **Verificación:** `FINAL`; el Verifier debe confirmar las seis rutas descritas, las reglas de ignore y la ausencia de contenido personal en el HEAD actualizado.
+- **Verificación:** `FINAL`, `PASS`; seis rutas exactas, reglas de ignore confirmadas y sin contenido personal en el árbol ni el diff publicado.
 
 ## Alcance de archivos
 
@@ -50,4 +52,4 @@
 - **Commit requerido:** `chore(fork-setup): issue 1 F1 CLOSED advance_review`; debe incluir el resultado de F1 y el evento `phase_verdict` junto con los cambios.
 - **Validaciones:** remotos, rama base, `git check-ignore`, estado de staging y lista de archivos del commit/PR.
 - **No ejecutar suites de pruebas:** el cambio no toca código de aplicación.
-- **Condición de parada:** PR #2 abierto y evidencia registrada; issue #1 sigue OPEN. El Verifier revalida el HEAD actualizado; después continúa el Orquestador. No hacer merge ni cerrar la issue.
+- **Condición de cierre:** PR #2 integrado, issue #1 cerrada y resultado registrado en la bitácora; no quedan acciones pendientes.

@@ -1,6 +1,6 @@
 # Issue #1: preparar checkout raíz y reglas de exclusión
 
-**Estado:** `WAITING_ORCHESTRATOR`  
+**Estado:** `COMPLETE`
 **Issue:** https://github.com/pronficilio/coup-online/issues/1  
 **Plan:** `docs/plans/active/issue_1_root_checkout_ignore.md`  
 **Handoff:** `docs/plans/active/handoff_issue_1_root_checkout_ignore.md`  
@@ -41,7 +41,7 @@ Dejar el fork ya creado de `https://github.com/Cheneth/coup-online` con su conte
 
 ### Desconocidos
 
-- El veredicto del Verifier independiente está pendiente.
+- El veredicto del Verifier independiente fue `PASS`; no quedan acciones pendientes para esta unidad.
 
 ## Alcance y aceptación
 
@@ -65,4 +65,4 @@ La creación del fork y el acceso al tracker ya están resueltos; el checkout en
 
 ## Estado y siguiente acción
 
-F1 cerró en `859696e` (`chore(fork-setup): issue 1 F1 CLOSED advance_review`). El PR [#2](https://github.com/pronficilio/coup-online/pull/2) está abierto desde `issue/1-root-checkout-ignore` hacia `master` e incluye `.gitignore` y los cinco artefactos de control enumerados. El Verifier emitió `FAIL` en el head previo `6df6397` por deriva en el inventario documental; este commit docs-only corrige la descripción. El Verifier debe revalidar el HEAD actual de PR #2 después del push. Siguiente dueño: Verifier y después Orquestador.
+F1 cerró en `859696e` (`chore(fork-setup): issue 1 F1 CLOSED advance_review`). El Verifier emitió `PASS` sobre el head `158ca5b`. El PR [#2](https://github.com/pronficilio/coup-online/pull/2) quedó integrado en `master` mediante el merge commit `af48570ac136e40fd2d9cfc1de2f4a838d8be563`; la issue #1 está cerrada. La raíz `E:\dev\coup` quedó sincronizada con `origin/master`, y `/fotos/` y `/docs/agentes/` están ignoradas. No quedan acciones pendientes.
