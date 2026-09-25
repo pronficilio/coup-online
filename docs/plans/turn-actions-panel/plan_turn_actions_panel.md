@@ -1,6 +1,6 @@
 # Plan: panel de acciones del turno — issue #6
 
-**Estado:** `ACTIVE`; F1 está `ACTIVE`, F2 depende de la integración del issue #5.  
+**Estado:** `WAITING_ORCHESTRATOR`; F1 está `BLOCKED` por evidencia visual inaccesible, F2 depende de la integración del issue #5.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/6  
 **Handoff:** `docs/plans/inbox/issue_6_turn_actions_panel.md`  
 **Bitácora:** `docs/plans/log/issue-6.jsonl`  
@@ -67,7 +67,7 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 
 ## Fases
 
-### F1 — Presentar acciones con semántica correcta (`ACTIVE`)
+### F1 — Presentar acciones con semántica correcta (`BLOCKED`)
 
 **Pregunta:** ¿el panel comunica de forma clara qué gana/paga el jugador, qué personaje declara y quién puede bloquear?  
 **Entrada:** `server/utilities/constants.js`, `ActionDecision.js`, estilos actuales y referencia visual. Se conserva el punto de montaje actual; F1 no depende del shell de #5.  
@@ -76,7 +76,9 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 **Evidencia:** `docs/plans/turn-actions-panel/report_issue_6_F1.md`, captura desde el montaje actual y tabla que contraste etiquetas con reglas.  
 **Avanzar:** los siete renglones reflejan el contrato de contenido sin confundir declaración, bloqueo, coste o beneficio y los callbacks actuales siguen conectados. **Pivotar:** separar la presentación en un subcomponente si reduce acoplamiento para F2. **Repetir:** una corrección acotada de etiqueta/legibilidad. **Bloquear/cancelar:** solo si el contrato actual no permite cambiar presentación sin invadir el flujo que #5 está integrando; devolver al Orquestador con evidencia.  
 **Validación:** revisión de reglas y visual en vista de acciones; build del cliente si el cambio lo requiere. No añadir tests automatizados.  
-**Commit:** `COMMIT_REQUIRED`; cierre `feat(actions-panel): issue 6 F1 CLOSED advance_f2`, con reporte y evento `phase_verdict`.
+**Commit:** `COMMIT_REQUIRED`; mensaje de cierre bloqueado `feat(actions-panel): issue 6 F1 BLOCKED visual evidence`, con reporte y evento `phase_verdict`.
+
+**Estado de ejecución:** `BLOCKED`; la presentación semántica se implementó y el build pasó, pero no se produjo la captura visual requerida. El helper computer-use falló y también falló su reintento tras reinicializar sesión. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`; el Orquestador resuelve el acceso a captura o devuelve esta fase para repetir únicamente esa inspección.
 
 ### F2 — Montar en el tablero y conectar confirmación (`PENDING`; depende de #5)
 
