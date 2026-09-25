@@ -1,6 +1,6 @@
 # Issue #3: chequeo rápido de seguridad de Coup Online
 
-**Estado:** `WAITING_ORCHESTRATOR`
+**Estado:** `COMPLETED`
 **Issue:** https://github.com/pronficilio/coup-online/issues/3
 **Handoff:** `docs/plans/active/handoff_issue_3_quick_security_check.md`
 **Bitácora:** `docs/plans/log/issue-3.jsonl`
@@ -52,4 +52,4 @@ El alcance es un chequeo inicial, no una certificación de seguridad ni una prue
 
 ## Estado y siguiente dueño
 
-F1 tiene evidencia en `docs/plans/active/report_issue_3_quick_security_check_F1.md` y verificación FINAL independiente `PASS` en `docs/plans/active/verifier_issue_3_final.md`. A petición del usuario, se añadió una copia aceptada para seguimiento de deuda técnica en `docs/technical-debt/issue-3-security-review.md`. El PR [#4](https://github.com/pronficilio/coup-online/pull/4) apunta a `master`; corresponde al Orquestador integrarlo y actualizar el estado de la issue después del merge.
+F1 tiene evidencia en `docs/plans/active/report_issue_3_quick_security_check_F1.md` y verificación FINAL independiente `PASS` en `docs/plans/active/verifier_issue_3_final.md`. A petición del usuario, se añadió una copia aceptada para seguimiento de deuda técnica en `docs/technical-debt/issue-3-security-review.md`. El PR [#4](https://github.com/pronficilio/coup-online/pull/4) se integró en `master` con merge commit `8348c058b252871dafca53d108da203f60399996`; GitHub cerró la issue #3. No hubo cambios de código ni dependencias; las remediaciones registradas requieren una unidad futura.

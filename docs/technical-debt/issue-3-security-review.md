@@ -10,7 +10,7 @@ Este registro conserva el reporte aceptado y las remediaciones pendientes; no co
 
 ## Resumen
 
-La revisión estática encontró riesgos demostrables en la confidencialidad de cartas privadas y en la autorización de acciones de juego. `npm audit` reportó vulnerabilidades conocidas en ambos árboles de dependencias, incluidas seis críticas en el cliente. Estos resultados justifican correcciones separadas; F1 no cambia código ni dependencias. La unidad queda pendiente del Verifier independiente exigido por el plan.
+La revisión estática encontró riesgos demostrables en la confidencialidad de cartas privadas y en la autorización de acciones de juego. `npm audit` reportó vulnerabilidades conocidas en ambos árboles de dependencias, incluidas seis críticas en el cliente. Estos resultados justifican correcciones separadas; F1 no cambió código ni dependencias. El Verifier independiente confirmó los hallazgos principales con `PASS`; la unidad quedó integrada y cerrada. Las remediaciones siguen como deuda técnica para unidades futuras.
 
 ## Matriz de revisión
 
