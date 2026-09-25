@@ -1,6 +1,6 @@
 # Plan: tablero circular de Coup — issue #5
 
-**Estado:** `WAITING_ORCHESTRATOR`
+**Estado:** `WAITING_EXECUTOR`
 
 **Unidad:** https://github.com/pronficilio/coup-online/issues/5
 
@@ -75,21 +75,21 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(board): issue 5 F1 CLOSED advance_f2`, junto con resultado y evento `phase_verdict`.
 
-### F2 — Integrar mesa y mazo WebP (`PENDING`)
+### F2 — Integrar mesa y mazo WebP (`READY`)
 
-**Pregunta:** ¿el tablero reemplaza la fila actual y presenta cartas, monedas, colores y turno sin interrumpir los controles del juego?
+**Pregunta:** ¿la mesa circular ya definida presenta las cartas y el mazo gráfico centrado sin interrumpir los controles del juego?
 
 **Entrada:** F1 cerrada y `fotos/deck.png`.
 
-**Subtareas:** convertir a WebP con transparencia conservada; conectar `Coup` con la mesa y dejar de filtrar eliminados para el render de asientos; aplicar CSS del círculo y borde neón; mantener decisiones existentes accesibles. Reutilizar selectivamente WebP de personajes del checkout local si faltan en la base remota.
+**Subtareas:** convertir `fotos/deck.png` a WebP conservando transparencia; renderizar la pila Court centrada en el círculo; usar los WebP de personajes y reverso en las cartas propias y rivales cuando estén disponibles, tomando solo los assets necesarios del checkout local si faltan en la base remota; conservar nombres, monedas, color y resalte de turno definidos en F1. No rehacer el cálculo de asientos ni la conexión de roster ya cerrados.
 
-**Áreas:** React y `coup-client/src/assets/`; no versionar fuentes PNG ni incorporar commits locales ajenos.
+**Áreas:** React y `coup-client/src/assets/`; no versionar fuentes PNG ni incorporar commits locales ajenos. Mantener fuera de alcance los paneles de acción/turno y los ajustes responsivos detallados, que pertenecen a F3.
 
-**Evidencia:** `docs/plans/circular-board/report_issue_5_F2.md`, captura de una mesa de 3 y lista del diff de assets.
+**Evidencia:** `docs/plans/circular-board/report_issue_5_F2.md`, captura de una mesa de 3 con la pila centrada, verificación de los WebP usados y lista del diff de assets.
 
-**Avanzar:** criterios 2, 4 y 5 se ven cumplidos. **Pivotar:** adaptar medidas o estructura si el mazo/controles colisionan. **Repetir:** una variante acotada del layout. **Bloquear/cancelar:** asset no convertible o imposible de integrar sin cambiar protocolo, con evidencia.
+**Avanzar:** la pila queda centrada, las caras/reversos muestran el estado correcto, el turno conserva su borde y los controles siguen accesibles. **Pivotar:** adaptar medidas o estructura si el mazo colisiona con asientos. **Repetir:** una variante acotada de escala/posición. **Bloquear/cancelar:** asset no convertible o imposible de integrar sin cambiar protocolo, con evidencia.
 
-**Validación mínima:** inspección del WebP, diff de assets y recorrido manual del flujo de decisiones.
+**Validación mínima:** inspección del WebP y transparencia, diff limitado a assets `.webp`, recorrido manual del flujo de decisiones y confirmación de que el PNG fuente no aparece en el diff.
 
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(board): issue 5 F2 CLOSED advance_f3`, junto con resultado y evento `phase_verdict`.
 
@@ -117,6 +117,12 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 - El Alquimista reclama #5 en GitHub, relee la unidad, confirma ausencia de reclamo incompatible, crea/confirma el branch y worktree únicos desde `origin/master` actualizado, registra `claim` y `worktree_confirmed`, y ejecuta fases allí. Un PR único apunta a `master`.
 - El Orquestador revisa diff, artefactos, veredicto y PR; solo integra y cierra la issue tras verificación. Ninguna fase cierra por una captura aislada sin comprobar el estado real.
 
+## Revisión F1 y autorización F2
+
+El Orquestador revisó el commit `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9` en el worktree canónico contra el reporte, diff, plan y bitácora. F1 cumple su pregunta de fase: el helper determina las posiciones de 2..6 con el observador abajo, conserva el roster y objetos eliminados, y `PlayerBoard` no renderiza valores de influencias rivales. `Coup` mantiene por separado el roster del tablero y los jugadores activos usados por las decisiones. El diff está dentro de alcance y el worktree estaba limpio, dos commits adelante de `origin/master`.
+
+`git diff --check` y la bitácora JSONL pasaron según evidencia registrada. No se ejecutaron tests ni build, no requeridos para cerrar este contrato F1; la inspección visual responsiva permanece en F3. El issue no tiene PR abierto. Veredicto del Orquestador: **aprobar F1 y liberar F2**. F2 queda `READY` en el mismo branch/worktree; la verificación independiente `FINAL` sigue pendiente para el checkpoint final de la unidad.
+
 ## Riesgos, preguntas y decisiones
 
 - **Riesgo responsivo:** seis manos alrededor de un círculo pueden requerir una mesa con ancho mínimo y desplazamiento en móvil. Priorizar cartas legibles y controles accesibles sobre comprimir el diseño.
@@ -127,4 +133,4 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 ## Siguiente acción
 
-Agente Alquimista: F1 cerrada con reporte y commit de fase. El Orquestador revisa este checkpoint; F2 y F3 siguen pendientes.
+Agente Alquimista: reanudar en F2 (`READY`) dentro de `issue/5-circular-board` y `.worktrees/issue-5-circular-board`; no reclamar otra unidad ni abrir otro worktree. F3 queda pendiente.

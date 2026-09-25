@@ -6,13 +6,13 @@
 
 **Bitácora exacta:** `docs/plans/log/issue-5.jsonl`
 
-**Estado:** `WAITING_ORCHESTRATOR`
+**Estado:** `WAITING_EXECUTOR`
 
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`
 
 **Verifier requerido ahora:** no; invocarlo al final, antes de integrar.
 
-**Fase cerrada:** F1, asientos estables y contrato visual. F2 y F3 siguen pendientes.
+**Fase cerrada:** F1, asientos estables y contrato visual. El Orquestador aprobó su commit `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9`. **Fase siguiente:** F2 `READY`; F3 sigue pendiente.
 
 **Branch destino de toda la issue:** `issue/5-circular-board`
 
@@ -33,7 +33,7 @@ El checkout raíz `master` tiene dos commits locales de reglas y WebP y está di
 ## Primera subtarea y fases
 
 - **F1 CLOSED:** tabla y tratamiento de eliminados documentados en `docs/plans/circular-board/report_issue_5_F1.md`; el cierre está en `feat(board): issue 5 F1 CLOSED advance_f2`.
-- **F2 PENDING:** conectar la mesa a `Coup`; mazo central convertido de `fotos/deck.png` a `coup-client/src/assets/deck.webp`; color/monedas/turno rojo neón; controles existentes accesibles. Solo WebP nuevo del mazo en Git. `COMMIT_REQUIRED`: `feat(board): issue 5 F2 CLOSED advance_f3`.
+- **F2 READY:** convertir `fotos/deck.png` a `coup-client/src/assets/deck.webp` conservando transparencia; centrar la pila Court; integrar WebP de personajes y reverso necesarios si faltan en la base remota. F1 ya conectó el roster y los estados visuales: no rehacer su geometría ni conexión a `Coup`. Mantener controles accesibles; no abordar todavía el ajuste responsivo de F3. Versionar solo assets WebP; no incluir PNG fuente ni commits locales ajenos. Evidencia: captura de 3 jugadores, revisión de caras/reversos y diff de assets. `COMMIT_REQUIRED`: `feat(board): issue 5 F2 CLOSED advance_f3`.
 - **F3 PENDING:** revisar y ajustar 2..6 en escritorio/móvil, cambios de turno y eliminación; dejar matriz visual y capturas. `COMMIT_REQUIRED`: `feat(board): issue 5 F3 CLOSED ready_review`.
 
 Cada cierre de fase incluye su `report_issue_5_F*.md`, código/evidencia y evento `phase_verdict` en la misma confirmación. El plan largo contiene entradas, cierres, pivotes y límites de cada fase. Si existe una política vigente de delegación de subtareas, aplícala dentro del worktree; no inventes agentes o permisos.
@@ -44,12 +44,12 @@ Cumplir los seis criterios del plan: posiciones exactas de 2, 3 y 4; cálculo es
 
 **Pregunta de falsificación para Verifier:** ¿hay n entre 2 y 6 o una transición de turno/pérdida/eliminación que mueva un asiento, revele una carta ajena en la interfaz, tape controles o descentre el mazo? El Verifier revisa de forma independiente el head final y emite `PASS`, `FAIL` o `BLOCKED` sin implementar.
 
-## Checkpoint después de F1
+## Revisión del Orquestador y liberación F2
 
-F1 está cerrada con reporte de evidencia y commit de fase. F2 permanece `PENDING` y no se inició en este checkpoint. El issue sigue abierto y no hay PR. Siguiente dueño: Orquestador, para revisar F1 y decidir el inicio de F2.
+El Orquestador revisó el diff de F1, el reporte y la bitácora. F1 cumple los criterios y queda aprobada; `git diff --check` y la bitácora pasaron. No se ejecutaron tests/build. El issue sigue abierto, asignado a `pronficilio`; no hay PR. F2 está `READY` y se autoriza reanudarla en el mismo worktree/branch. Siguiente dueño: Agente Alquimista.
 
 ## Alcance y límites
 
 Fuentes: `fotos/mini.png`, `fotos/ejemplo.png`, `fotos/deck.png`, `docs/coup_*.md`, `Coup.js`, `PlayerBoard.js`, `server/index.js`. `fotos/` es local e ignorado: no commitear PNGs. Los paneles de acción/turno de `ejemplo.png` quedan para otro issue. No alterar servidor, reglas ni protocolo; el servidor actualmente comunica influencias ajenas, por lo que esta entrega solo garantiza ocultarlas en la interfaz.
 
-**Qué actualizar:** issue al reclamar y al entregar PR; este handoff a `active/`; plan/estado por fase; bitácora append-only; reportes F1-F3; PR con evidencia. Al terminar, dejar `WAITING_ORCHESTRATOR` para revisión e integración. No cerrar la issue.
+**Qué actualizar:** issue al reanudar F2 y al entregar PR; este handoff a `active/`; plan/estado por fase; bitácora append-only; reportes F1-F3; PR con evidencia. Al terminar F2, deja F3 como siguiente fase y conserva el estado activo. Al terminar la unidad, deja `WAITING_ORCHESTRATOR` para revisión e integración. No cerrar la issue.
