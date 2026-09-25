@@ -1,0 +1,48 @@
+project: coup-online
+default_branch: master
+merge_target: master
+tracker: github
+control_root: docs/plans
+
+roles:
+  orchestrator: orchestrator
+  executor: alchemist
+  verifier: verifier
+
+isolation:
+  type: git_worktree
+  branch_pattern: issue/<id>-<slug>
+  worktree_pattern: .worktrees/issue-<id>-<slug>
+
+policies:
+  one_issue_one_integration: true
+  phase_commit_required: true
+  default_execution_mode: LIGHT
+  default_verification_policy: NONE
+
+verification:
+  full_mode_default: FINAL
+  require_for:
+    - security
+    - auth
+    - permissions
+    - destructive_data_change
+    - migrations
+    - concurrency
+    - private_data_exclusion
+  verdicts:
+    - PASS
+    - FAIL
+    - BLOCKED
+
+profile_notes:
+  upstream: https://github.com/Cheneth/coup-online
+  upstream_branch_observed: master
+  fork: https://github.com/pronficilio/coup-online
+  fork_created: true
+  fork_issues_enabled: true
+  local_repository: not_initialized
+  github_cli_account: pronficilio
+  github_cli_authentication: valid
+  log_mechanism: append_only_jsonl
+  pr_mechanism: github_pull_request
