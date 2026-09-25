@@ -1,6 +1,6 @@
 # Reporte F2 — mesa y mazo WebP
 
-**Veredicto:** `ACTIVE` — implementación y captura listas; falta una validación interactiva del flujo de decisiones
+**Veredicto:** `CLOSED` por aprobación visual del usuario; captura e implementación aceptadas. La validación interactiva del flujo de decisiones no se ejecutó y no se declara aprobada.
 **Issue:** #5
 
 **Branch/worktree:** `issue/5-circular-board` / `.worktrees/issue-5-circular-board`
@@ -27,6 +27,6 @@ Los seis WebP ingleses (`duke`, `captain`, `assassin`, `contessa`, `ambassador`,
 - La capa central no intercepta entradas (`pointer-events: none`) y queda debajo de los asientos; el área de decisiones permanece en `Coup.js` sin cambios. No se ejecutó una partida con socket ni se hizo clic en una decisión: la herramienta CUA falló dos veces antes de abrir el navegador (`helper_unknown_error: setup refresh had errors`). La captura se hizo con Edge headless sobre el preview local del componente.
 - No se ejecutaron tests ni build de producción. `npm ci` instaló las dependencias del lockfile para la inspección visual; su salida reportó 81 avisos de auditoría en dependencias existentes, sin cambios de dependencias en F2.
 
-## Siguiente paso y riesgo
+## Cierre y límite aceptado
 
-F2 queda `ACTIVE`; no se declara cerrada porque la validación mínima del plan pide recorrer el flujo de decisiones. La captura de tres jugadores valida la apariencia del `PlayerBoard`, pero no simula una partida. Siguiente paso verificable: abrir una partida/socket con la interfaz interactiva disponible, activar una ventana de decisión y confirmar que se puede usar mientras el mazo permanece centrado. Si el Orquestador acepta la evidencia estructural como suficiente para F2, puede liberar su cierre y dejar la revisión responsiva 2..6, turnos y eliminaciones para F3.
+El usuario revisó las capturas de dos y tres jugadores y aprobó continuar. El Orquestador cierra F2 con esa aprobación visual y libera F3. Las capturas validan la apariencia del `PlayerBoard` real, pero no simulan una partida; la herramienta CUA falló dos veces antes de abrir el navegador y no se ejecutó una decisión por socket. Esta interacción no se declara aprobada. En F3 se revisará que las ventanas y controles existentes sigan disponibles durante la inspección responsiva de 2..6; si no se puede verificar con la interfaz disponible, se dejará como límite explícito para revisión final.

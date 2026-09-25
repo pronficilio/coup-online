@@ -93,7 +93,7 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(board): issue 5 F2 CLOSED advance_f3`, junto con resultado y evento `phase_verdict`.
 
-### F3 — Cerrar disposición responsiva y evidencia (`PENDING`)
+### F3 — Cerrar disposición responsiva y evidencia (`ACTIVE`)
 
 **Pregunta:** ¿resiste la mesa las cinco cantidades permitidas y los cambios de estado en escritorio y móvil sin solapamientos ni regresiones visibles?
 
@@ -123,11 +123,11 @@ El Orquestador revisó el commit `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9` en e
 
 `git diff --check` y la bitácora JSONL pasaron según evidencia registrada. No se ejecutaron tests ni build, no requeridos para cerrar este contrato F1; la inspección visual responsiva permanece en F3. El issue no tiene PR abierto. Veredicto del Orquestador: **aprobar F1 y liberar F2**. F2 queda `READY` en el mismo branch/worktree; la verificación independiente `FINAL` sigue pendiente para el checkpoint final de la unidad.
 
-## Checkpoint F2 y siguiente acción
+## Cierre F2 y liberación F3
 
-La implementación de F2 integra caras WebP propias, el reverso de rivales y la pila Court centrada. La captura del componente React de tres jugadores, conversión/transparencia y lista de assets están en `docs/plans/circular-board/report_issue_5_F2.md`. El cliente compiló con el servidor de desarrollo y `git diff --check` pasó. No se ejecutó una partida con socket ni se interactuó con una decisión.
+La implementación F2 integra caras WebP propias, reverso de rivales y la pila Court centrada. El reporte documenta conversión/transparencia, inventario de assets, compilación local y `git diff --check`. Las capturas del componente React real con 2 y 3 jugadores están en `docs/plans/circular-board/preview_issue_5_F2_2players.png` y `docs/plans/circular-board/preview_issue_5_F2_3players.png`. El usuario revisó las capturas y aprobó continuar.
 
-F2 sigue `ACTIVE` porque queda pendiente la validación interactiva de decisiones. Siguiente paso verificable: activar una ventana de decisión en una partida/socket y comprobar que permanece utilizable junto al mazo. Siguiente dueño: Orquestador, para proveer/autorizar esa verificación o aceptar el límite documentado. No empezar F3; sigue `PENDING`.
+Veredicto del Orquestador: **F2 CLOSED; F3 ACTIVE**. No se hizo una partida socket ni se interactuó con una decisión en F2. Esto queda explícito como límite, no como una validación aprobada. La revisión de F3 debe comprobar que las áreas de decisión y controles existentes siguen utilizables mientras inspecciona 2..6 en escritorio y móvil; no se amplía el alcance a rediseñarlas. Siguiente dueño: Agente Alquimista, en el mismo branch y worktree. El issue permanece abierto y no hay PR.
 
 ## Riesgos, preguntas y decisiones
 
@@ -139,4 +139,4 @@ F2 sigue `ACTIVE` porque queda pendiente la validación interactiva de decisione
 
 ## Siguiente acción
 
-Orquestador: revisar el checkpoint F2 en `issue/5-circular-board` y `.worktrees/issue-5-circular-board`; decidir si realiza/acepta la validación interactiva pendiente antes de cerrar F2. No reclamar otra unidad ni abrir otro worktree. F3 queda pendiente.
+Agente Alquimista: ejecutar F3 en `issue/5-circular-board` y `.worktrees/issue-5-circular-board`; revisar las disposiciones 2..6 en escritorio y móvil, turnos, pérdida/eliminación y disponibilidad de los controles; guardar la matriz visual, capturas y límites en el reporte F3. No reclamar otra unidad ni abrir otro worktree. Al terminar, dejar `WAITING_ORCHESTRATOR`; no abrir PR ni cerrar el issue.
