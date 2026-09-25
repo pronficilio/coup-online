@@ -49,7 +49,7 @@ Dejar el fork ya creado de `https://github.com/Cheneth/coup-online` con su conte
 2. Mantener `fotos/` y `docs/agentes/` en el equipo y añadir `/fotos/` y `/docs/agentes/` a `.gitignore` sin eliminar ni inspeccionar su contenido.
 3. Configurar `origin` para el fork y `upstream` para `Cheneth/coup-online`.
 4. Confirmar con Git que ambas carpetas quedan ignoradas y que ningún archivo de ellas aparece como candidato a commit.
-5. Entregar el cambio de `.gitignore` junto con el plan, handoff y evento de cierre requeridos por el protocolo en un único PR a `master`, asociado a la issue #1.
+5. Entregar en un único PR a `master`, asociado a la issue #1, exactamente `.gitignore` y cinco artefactos de control: `docs/plans/README_plans.md`, `docs/plans/PROJECT_ORCHESTRATION.yaml`, `docs/plans/active/issue_1_root_checkout_ignore.md`, `docs/plans/active/handoff_issue_1_root_checkout_ignore.md` y `docs/plans/log/issue-1.jsonl`.
 
 ## Fase funcional prevista
 
@@ -58,11 +58,11 @@ Dejar el fork ya creado de `https://github.com/Cheneth/coup-online` con su conte
 - **Pregunta:** ¿el checkout del fork quedó en la raíz con las dos carpetas locales protegidas por `.gitignore`?
 - **Cierre:** repositorio e historial disponibles en la raíz; remotos correctos; reglas de ignore efectivas; contenido local preservado; PR abierto desde una rama asociada a la issue.
 - **Commit:** `COMMIT_REQUIRED` para `.gitignore`, resultado de F1, handoff actualizado y evento `phase_verdict`; mensaje `chore(fork-setup): issue 1 F1 CLOSED advance_review`.
-- **Verificación:** el Verifier independiente intenta refutar que solo se publicó `.gitignore` y que ambos directorios locales están ignorados.
+- **Verificación:** el Verifier independiente confirma las seis rutas previstas (`.gitignore` y los cinco artefactos de control enumerados), las reglas de exclusión y la ausencia de contenido personal en el árbol o el diff publicado.
 - **Veredicto posible:** avanzar a revisión e integración del Orquestador o bloquear ante cualquier archivo personal incluido.
 
 La creación del fork y el acceso al tracker ya están resueltos; el checkout en raíz forma parte del objetivo de esta unidad.
 
 ## Estado y siguiente acción
 
-F1 cerró en `859696e` (`chore(fork-setup): issue 1 F1 CLOSED advance_review`). El PR [#2](https://github.com/pronficilio/coup-online/pull/2) está abierto desde `issue/1-root-checkout-ignore` hacia `master`; el claim y las rutas activas constan en la issue #1 y en la bitácora. Sigue pendiente la verificación independiente. Siguiente dueño: Verifier y después Orquestador.
+F1 cerró en `859696e` (`chore(fork-setup): issue 1 F1 CLOSED advance_review`). El PR [#2](https://github.com/pronficilio/coup-online/pull/2) está abierto desde `issue/1-root-checkout-ignore` hacia `master` e incluye `.gitignore` y los cinco artefactos de control enumerados. El Verifier emitió `FAIL` en el head previo `6df6397` por deriva en el inventario documental; este commit docs-only corrige la descripción. El Verifier debe revalidar el HEAD actual de PR #2 después del push. Siguiente dueño: Verifier y después Orquestador.
