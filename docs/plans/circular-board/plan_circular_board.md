@@ -1,6 +1,6 @@
 # Plan: tablero circular de Coup — issue #5
 
-**Estado:** `WAITING_EXECUTOR`
+**Estado:** `ACTIVE`
 
 **Unidad:** https://github.com/pronficilio/coup-online/issues/5
 
@@ -75,7 +75,7 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(board): issue 5 F1 CLOSED advance_f2`, junto con resultado y evento `phase_verdict`.
 
-### F2 — Integrar mesa y mazo WebP (`READY`)
+### F2 — Integrar mesa y mazo WebP (`ACTIVE`)
 
 **Pregunta:** ¿la mesa circular ya definida presenta las cartas y el mazo gráfico centrado sin interrumpir los controles del juego?
 
@@ -123,6 +123,12 @@ El Orquestador revisó el commit `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9` en e
 
 `git diff --check` y la bitácora JSONL pasaron según evidencia registrada. No se ejecutaron tests ni build, no requeridos para cerrar este contrato F1; la inspección visual responsiva permanece en F3. El issue no tiene PR abierto. Veredicto del Orquestador: **aprobar F1 y liberar F2**. F2 queda `READY` en el mismo branch/worktree; la verificación independiente `FINAL` sigue pendiente para el checkpoint final de la unidad.
 
+## Checkpoint F2 y siguiente acción
+
+La implementación de F2 integra caras WebP propias, el reverso de rivales y la pila Court centrada. La captura del componente React de tres jugadores, conversión/transparencia y lista de assets están en `docs/plans/circular-board/report_issue_5_F2.md`. El cliente compiló con el servidor de desarrollo y `git diff --check` pasó. No se ejecutó una partida con socket ni se interactuó con una decisión.
+
+F2 sigue `ACTIVE` porque queda pendiente la validación interactiva de decisiones. Siguiente paso verificable: activar una ventana de decisión en una partida/socket y comprobar que permanece utilizable junto al mazo. Siguiente dueño: Orquestador, para proveer/autorizar esa verificación o aceptar el límite documentado. No empezar F3; sigue `PENDING`.
+
 ## Riesgos, preguntas y decisiones
 
 - **Riesgo responsivo:** seis manos alrededor de un círculo pueden requerir una mesa con ancho mínimo y desplazamiento en móvil. Priorizar cartas legibles y controles accesibles sobre comprimir el diseño.
@@ -133,4 +139,4 @@ El Orquestador revisó el commit `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9` en e
 
 ## Siguiente acción
 
-Agente Alquimista: reanudar en F2 (`READY`) dentro de `issue/5-circular-board` y `.worktrees/issue-5-circular-board`; no reclamar otra unidad ni abrir otro worktree. F3 queda pendiente.
+Orquestador: revisar el checkpoint F2 en `issue/5-circular-board` y `.worktrees/issue-5-circular-board`; decidir si realiza/acepta la validación interactiva pendiente antes de cerrar F2. No reclamar otra unidad ni abrir otro worktree. F3 queda pendiente.
