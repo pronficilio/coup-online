@@ -1,6 +1,6 @@
 # Issue #3: chequeo rápido de seguridad de Coup Online
 
-**Estado:** `WAITING_VERIFIER`
+**Estado:** `WAITING_ORCHESTRATOR`
 **Issue:** https://github.com/pronficilio/coup-online/issues/3
 **Handoff:** `docs/plans/active/handoff_issue_3_quick_security_check.md`
 **Bitácora:** `docs/plans/log/issue-3.jsonl`
@@ -15,10 +15,10 @@ Hacer un chequeo rápido, de solo lectura, de la superficie de seguridad del cli
 
 - Proyecto: `coup-online`; tracker GitHub en `pronficilio/coup-online`.
 - Rama base y merge target detectados: `master` (contrato del proyecto).
-- Aislamiento: un worktree y branch propios de la issue, según el patrón `issue/<id>-<slug>` y `.worktrees/issue-<id>-<slug>`; aún no reclamados ni creados.
+- Aislamiento: reclamo confirmado en `issue/3-quick-security-check` y `.worktrees/issue-3-quick-security-check`, creado desde `origin/master` (`61a43a6`).
 - Modo: `FULL`, porque el tema es seguridad, manteniendo la revisión acotada a una sola fase.
 - Riesgo: `HIGH`.
-- Verificación independiente: `FINAL`, obligatoria para seguridad según `docs/plans/PROJECT_ORCHESTRATION.yaml`.
+- Verificación independiente: `FINAL`, obligatoria para seguridad según `docs/plans/PROJECT_ORCHESTRATION.yaml`; resultado `PASS` en `docs/plans/active/verifier_issue_3_final.md`.
 
 ## Alcance
 
@@ -42,7 +42,7 @@ El alcance es un chequeo inicial, no una certificación de seguridad ni una prue
 
 ## Fases
 
-### F1 — Revisar la superficie de seguridad y documentar hallazgos (`CLOSED — evidencia lista; verificación FINAL pendiente`)
+### F1 — Revisar la superficie de seguridad y documentar hallazgos (`CLOSED — Verifier FINAL PASS`)
 
 - **Pregunta:** ¿la revisión acotada identifica fallos demostrables en los controles de entrada, autorización de acciones, aislamiento de datos o dependencias del cliente/servidor?
 - **Cierre:** cada punto del alcance queda etiquetado `PASS`, `FINDING` o `NOT_CHECKED`, con evidencia suficiente; los hallazgos tienen severidad (Crítico/Alto/Medio/Bajo/Informativo), impacto y reproducción segura local/estática; se registran limitaciones y recomendaciones; el Verifier independiente intenta refutar la conclusión principal y emite `PASS`, `FAIL` o `BLOCKED`.
@@ -52,4 +52,4 @@ El alcance es un chequeo inicial, no una certificación de seguridad ni una prue
 
 ## Estado y siguiente dueño
 
-F1 tiene evidencia y reporte para revisión independiente en `docs/plans/active/report_issue_3_quick_security_check_F1.md`. A petición del usuario, se añadió una copia aceptada para seguimiento de deuda técnica en `docs/technical-debt/issue-3-security-review.md`; mantiene las referencias al código ajustadas a su nueva ubicación. El PR borrador [#4](https://github.com/pronficilio/coup-online/pull/4) apunta a `master`. La issue remota #3 permanece abierta y asignada a `pronficilio`. El siguiente dueño es un Verifier independiente, quien debe intentar refutar los hallazgos principales y emitir `PASS`, `FAIL` o `BLOCKED`; no implementar fixes ni integrar en esta unidad.
+F1 tiene evidencia en `docs/plans/active/report_issue_3_quick_security_check_F1.md` y verificación FINAL independiente `PASS` en `docs/plans/active/verifier_issue_3_final.md`. A petición del usuario, se añadió una copia aceptada para seguimiento de deuda técnica en `docs/technical-debt/issue-3-security-review.md`. El PR [#4](https://github.com/pronficilio/coup-online/pull/4) apunta a `master`; corresponde al Orquestador integrarlo y actualizar el estado de la issue después del merge.

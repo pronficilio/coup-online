@@ -3,7 +3,7 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/3
 - **Plan:** `docs/plans/active/issue_3_quick_security_check.md`
 - **Bitácora:** `docs/plans/log/issue-3.jsonl`
-- **Estado:** `WAITING_VERIFIER`; issue #3 abierta y asignada a `pronficilio` para la ejecución F1.
+- **Estado:** `WAITING_ORCHESTRATOR`; issue #3 abierta y asignada a `pronficilio`.
 - **Branch/worktree:** `issue/3-quick-security-check` / `.worktrees/issue-3-quick-security-check`, desde `origin/master`, salvo conflicto real; documenta y coordina cualquier desviación antes de trabajar.
 - **Modo/riesgo/verificación:** `FULL` / `HIGH` / `FINAL` con Verifier independiente.
 
@@ -13,7 +13,7 @@ F1 está cerrada por el ejecutor y lista para verificación independiente FINAL.
 
 El usuario aceptó el informe y pidió conservarlo como deuda técnica. La copia de seguimiento está en `docs/technical-debt/issue-3-security-review.md`; el informe F1 anterior permanece como evidencia canónica de la fase.
 
-PR borrador [#4](https://github.com/pronficilio/coup-online/pull/4) abierto hacia `master`. No integrar hasta que el Verifier independiente complete la revisión FINAL y su veredicto quede registrado.
+El Verifier independiente completó la revisión FINAL con `PASS`; el dictamen y su evidencia están en `docs/plans/active/verifier_issue_3_final.md`. El PR [#4](https://github.com/pronficilio/coup-online/pull/4) apunta a `master` y puede integrarse tras la revisión del Orquestador.
 
 Hallazgos principales: `g-updatePlayers` difunde influencias privadas; los eventos de juego confían en actor/datos del payload y el inicio acepta roster del cliente; CORS es abierto y la creación de namespaces no muestra límites de frecuencia; `npm audit --json` reportó 15 vulnerabilidades del lado servidor y 81 del lado cliente (incluye 6 críticas en este último).
 
