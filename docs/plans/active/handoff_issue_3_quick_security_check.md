@@ -13,6 +13,8 @@ F1 está cerrada por el ejecutor y lista para verificación independiente FINAL.
 
 El usuario aceptó el informe y pidió conservarlo como deuda técnica. La copia de seguimiento está en `docs/technical-debt/issue-3-security-review.md`; el informe F1 anterior permanece como evidencia canónica de la fase.
 
+PR borrador [#4](https://github.com/pronficilio/coup-online/pull/4) abierto hacia `master`. No integrar hasta que el Verifier independiente complete la revisión FINAL y su veredicto quede registrado.
+
 Hallazgos principales: `g-updatePlayers` difunde influencias privadas; los eventos de juego confían en actor/datos del payload y el inicio acepta roster del cliente; CORS es abierto y la creación de namespaces no muestra límites de frecuencia; `npm audit --json` reportó 15 vulnerabilidades del lado servidor y 81 del lado cliente (incluye 6 críticas en este último).
 
 El Verifier debe intentar refutar específicamente la fuga de cartas y la falta de asociación actor/socket. No editar código/dependencias, no probar el servicio público y no hacer explotación activa. Los fixes requieren unidad separada; el Verifier solo evalúa, no implementa ni integra.
