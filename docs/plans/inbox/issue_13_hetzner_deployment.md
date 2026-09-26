@@ -2,15 +2,15 @@
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
 - **Plan:** `docs/plans/active/issue_13_hetzner_deployment.md`
-- **Estado:** `WAITING_USER`; inventario F0 cerrado; F1 espera el dominio GoDaddy exacto para conectar/verificar DNS.
+- **Estado:** `WAITING_USER`; inventario F0 cerrado; F1 espera corregir el registro DNS de `coup.ejele.net`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** no; requerido de forma independiente en F5 antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
-- **Fase sugerida:** F1 — cuando el usuario comparta el dominio ya comprado, comprobar que no exista un registro `coup` que debamos preservar y añadir `A coup → 178.105.138.91` en GoDaddy (si GoDaddy es el DNS autoritativo).
-- **Por qué sigue:** el dominio/hostname exacto no está confirmado. La IP pública `178.105.138.91` ya se verificó desde el servidor. Además, hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
+- **Fase sugerida:** F1 — cambiar el registro erróneo `A ejele` por `A coup → 178.105.138.91` y verificar la resolución pública, conservando el registro raíz.
+- **Por qué sigue:** el servidor resuelve `ejele.ejele.net` a `178.108.138.91` y no encuentra `coup.ejele.net`. La IP Hetzner verificada es `178.105.138.91`. Además, hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
 - **Subtareas listas para delegación:**
-  1. Con el dominio exacto, verificar DNS existente y añadir/verificar el A `coup → 178.105.138.91` sin tocar otros nombres.
+  1. Corregir/verificar el A `coup.ejele.net → 178.105.138.91` sin tocar la raíz ni otros nombres.
   2. Tras fijar el release, construir exactamente ese SHA y registrar artefacto/hash.
   3. Preparar Compose aislado (sin publicar 80/443), cliente same-origin, CORS acotado y health/rollback.
   4. Desplegar bajo ruta dedicada en Hetzner y probar vía SSH tunnel.

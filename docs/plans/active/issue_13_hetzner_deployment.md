@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `WAITING_USER` — falta el dominio exacto de GoDaddy para crear/verificar `coup` en DNS.
+- **Estado:** `WAITING_USER` — corregir el registro DNS de GoDaddy para `coup.ejele.net`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -28,12 +28,13 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - El backend aplica CORS abierto con `app.use(cors())`; revisar antes de exponerlo.
 - La copia compartida estaba en `master` con 67 entradas modificadas/no rastreadas. `origin/master` observado tras `git fetch` es `64593af`; la copia local `HEAD` es `1e4685f`, dos commits delante y dieciséis detrás, más cambios sin commit. Ninguno se asumirá como lanzamiento sin selección explícita.
 - GitHub no tenía una issue previa de despliegue. Issue #5 está cerrada; issue #6 permanece abierta.
-- El dominio aún no está confirmado como comprado. La IP pública efectiva se verificó desde el host y un servicio externo: `178.105.138.91`.
+- El usuario confirmó que compró `ejele.net`. La IP pública efectiva del servidor se verificó desde el host y un servicio externo: `178.105.138.91`.
+- Consulta DNS desde el servidor: `ejele.net` → `15.197.148.33`; `ejele.ejele.net` → `178.108.138.91`; `coup.ejele.net` no resuelve. El registro añadido con nombre `ejele` apunta a un hostname duplicado y la IP observada no coincide con Hetzner.
 - No hay conexión habilitada a GoDaddy desde esta sesión; la edición del registro se hará en su panel cuando tengamos el hostname exacto. No se han cambiado DNS ni nameservers.
 
 ## Supuestos, preguntas y riesgos
 
-- **Pregunta inmediata:** ¿cuál es el dominio exacto de GoDaddy y ya terminó la compra? Hay que comprobar si el hostname `coup` tiene un registro existente antes de añadir `A coup → 178.105.138.91`.
+- **Paso inmediato:** en GoDaddy reemplazar/eliminar el registro `A` con nombre `ejele` que creó `ejele.ejele.net`; crear `A` con nombre `coup` y valor `178.105.138.91`. Preservar el registro raíz de `ejele.net` y cualquier otro servicio.
 - **Pregunta que bloquea publicar código:** ¿qué commit/tag debe representar el lanzamiento? Alternativas: seleccionar un commit/tag existente o consolidar primero el checkout actual en una rama/PR y desplegar el commit integrado.
 - El dominio no bloquea el despliegue privado ni la verificación previa. Sí bloquea TLS público válido para el subdominio.
 - Confirmar la IP pública real del servidor y que los puertos 80/443 llegan desde Internet antes de solicitar certificado.
@@ -54,10 +55,10 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 ### F1 — Conectar el subdominio en DNS (`WAITING_USER`)
 
 - **Pregunta:** ¿puede `coup.<dominio>` resolver a la IP pública correcta sin alterar otros registros del dominio?
-- **Entrada:** dominio exacto ya comprado, cuenta que lo administra, estado actual de sus registros y la IP pública verificada `178.105.138.91`.
+- **Entrada:** dominio comprado `ejele.net`, DNS que el usuario administra en GoDaddy, estado observado de los registros e IP pública verificada `178.105.138.91`.
 - **Salida:** un registro `A` con nombre `coup` y valor `178.105.138.91`; registrar TTL y resolver públicamente el hostname.
-- **Criterio de avance:** el dominio usa DNS administrado por GoDaddy o el usuario identifica el proveedor autoritativo; no existe un registro `coup` que haya que preservar/editar de forma ambigua.
-- **Criterio de bloqueo:** dominio no comprado, no se conoce el nombre exacto, o existe un registro `coup` cuyo propósito no está claro.
+- **Criterio de avance:** `coup.ejele.net` resuelve a `178.105.138.91`; el registro raíz de `ejele.net` permanece intacto.
+- **Criterio de bloqueo:** GoDaddy no es el DNS autoritativo, existe ya otro `coup` con propósito no claro, o `coup` sigue apuntando a otra IP.
 - **Nota de publicación:** DNS solo apunta al host. Hasta desplegar Coup y configurar el vhost/certificado, el Nginx catch-all actual responderá al hostname; no anunciar ni usar el subdominio todavía.
 - **Política de commit:** `COMMIT_AFTER_REVIEW`.
 - **Cierre previsto:** `docs(deploy): issue 13 F1 CLOSED connect coup dns`.
@@ -118,7 +119,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-El inventario F0 está completo y la IP pública es `178.105.138.91`. La primera fase F1 espera el dominio exacto y confirmar que la compra terminó; entonces se podrá añadir/verificar `A coup → 178.105.138.91`. En paralelo, F2 espera elegir el commit/tag limpio. No instalar, copiar ni desplegar código hasta fijarlo.
+El inventario F0 está completo; el dominio comprado es `ejele.net` y la IP pública es `178.105.138.91`. F1 está bloqueada por el registro actual: `ejele.ejele.net` resuelve a `178.108.138.91` y `coup.ejele.net` no resuelve. Corregir el nombre a `coup` y el valor a `178.105.138.91`, conservando la raíz. En paralelo, F2 espera elegir el commit/tag limpio. No instalar, copiar ni desplegar código hasta fijarlo.
 
 ## Fuentes
 
