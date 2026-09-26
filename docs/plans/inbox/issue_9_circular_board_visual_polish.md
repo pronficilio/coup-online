@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/9  
 **Plan exacto:** `docs/plans/circular-board-visual-polish/plan_circular_board_visual_polish.md`  
 **Bitácora exacta:** `docs/plans/log/issue-9.jsonl`  
-**Estado:** `WAITING_EXECUTOR`  
+**Estado:** `WAITING_ORCHESTRATOR`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`  
 **Branch:** `issue/9-circular-board-visual-polish`  
 **Worktree:** `.worktrees/issue-9-circular-board-visual-polish`  
@@ -43,3 +43,7 @@ No modificar `Coup.js`, `ActionDecision.js`, paneles de acción/referencias, ser
 ## Criterio de cierre
 
 Entregar commit, reporte breve, dimensiones/peso del WebP, previews, comandos y resultado de compilación; detenerte para revisión del Orquestador. La issue permanece abierta y no se integra sin su revisión.
+
+## Reporte F1
+
+F1 quedó implementada y revisada visualmente en 2–6 jugadores para 1280×1400 y 490×1200. El informe, WebP y capturas están registrados en `docs/plans/circular-board-visual-polish/report_issue_9_F1.md`. Cliente compilado; `git diff --check` pasó. Pendiente únicamente la revisión del Orquestador; issue abierta, sin PR ni merge.

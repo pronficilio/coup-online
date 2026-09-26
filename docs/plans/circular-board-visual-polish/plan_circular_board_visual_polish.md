@@ -1,6 +1,6 @@
 # Plan: pulir la presentación visual del tablero circular — issue #9
 
-**Estado:** `WAITING_EXECUTOR`  
+**Estado:** `WAITING_ORCHESTRATOR`
 **Issue:** https://github.com/pronficilio/coup-online/issues/9  
 **Handoff:** `docs/plans/inbox/issue_9_circular_board_visual_polish.md`  
 **Bitácora:** `docs/plans/log/issue-9.jsonl`  
@@ -41,6 +41,11 @@ En el checkout local, el archivo de fondo disponible se llama `fotos/backgrond.p
 ## Ejecución y cierre
 
 Una fase `F1 — Integrar fondo, centro y escala de cartas`. Pregunta: ¿el tablero conserva legibilidad y asientos estables al introducir las tres capas visuales? El Ejecutor debe comprobar tamaños 2–6, priorizando además capturas de 3 jugadores (referencia principal) y 6 (caso más denso), escritorio y compacto. El reporte es una nota breve dentro del handoff o issue; no se requiere plan de fases adicional.
+
+## Registro de ejecución
+
+- 2026-09-25 20:03 -06:00: Alquimista reclamó F1 en la rama `issue/9-circular-board-visual-polish`; worktree limpio y basado en `origin/master` (`64593af`), con un commit previo de checkpoint documental (`bf38210`). Fuente inspeccionada: 1672×941 RGB, sin canal alfa. El recorte centrado cuadrado conserva la plataforma circular central.
+- 2026-09-25 20:54 -06:00: F1 cerrada; fondo WebP 1024×576 RGB (224710 bytes), proporción preservada por redimensionado, sin alfa en el PNG fuente. El tablero con disco y cartas mayores se revisó en 2–6 jugadores, 1280×1400 y 490×1200; panel de acciones visible debajo. Evidencia: `docs/plans/circular-board-visual-polish/report_issue_9_F1.md`. Dev server compiló con advertencias ESLint preexistentes; `git diff --check` correcto; no se ejecutaron tests ni build de producción. Pasa a revisión del Orquestador.
 
 **Validación mínima:** inspección visual de previews y compilación local del cliente. No agregar ni ejecutar tests automatizados para este cambio visual.
 

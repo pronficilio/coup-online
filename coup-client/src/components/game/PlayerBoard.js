@@ -1,5 +1,6 @@
 import React from 'react'
 import courtDeckImage from '../../assets/deck.webp'
+import boardBackgroundImage from '../../assets/background.webp'
 import dukeImage from '../../assets/characters/duke.webp'
 import captainImage from '../../assets/characters/captain.webp'
 import assassinImage from '../../assets/characters/assassin.webp'
@@ -75,6 +76,8 @@ export default function PlayerBoard(props) {
 
     return (
         <div className="PlayerBoardContainer" role="group" aria-label="Tablero de jugadores">
+            <div className="PlayerBoardBackdrop" style={{ backgroundImage: `url(${boardBackgroundImage})` }} aria-hidden="true" />
+            <div className="PlayerBoardCenter" aria-hidden="true" />
             <img
                 className="PlayerBoardDeck"
                 src={courtDeckImage}

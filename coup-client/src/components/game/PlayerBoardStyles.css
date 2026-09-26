@@ -5,11 +5,37 @@
     aspect-ratio: 1;
     margin: 12px auto;
     box-sizing: border-box;
+    background: #fff;
+}
+
+.PlayerBoardBackdrop {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.PlayerBoardCenter {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    width: 58%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.62);
+    box-shadow: 0 0 28px rgba(255, 255, 255, 0.32), inset 0 0 0 1px rgba(255, 255, 255, 0.42);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
 }
 
 .PlayerBoardDeck {
     position: absolute;
-    z-index: 0;
+    z-index: 2;
     top: 50%;
     left: 50%;
     width: clamp(68px, 16%, 120px);
@@ -21,7 +47,7 @@
 
 .PlayerBoardSeat {
     position: absolute;
-    z-index: 1;
+    z-index: 3;
     width: 154px;
     max-width: 42%;
     box-sizing: border-box;
@@ -61,8 +87,8 @@
 
 .PlayerInfluenceSlot {
     display: inline-flex;
-    width: 48px;
-    height: 64px;
+    width: 56px;
+    height: 76px;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
@@ -112,12 +138,12 @@
 
 @media only screen and (max-width: 520px) {
     .PlayerBoardSeat {
-        width: 106px;
+        width: 122px;
         padding: 6px;
     }
 
     .PlayerInfluenceSlot {
-        width: 42px;
-        height: 58px;
+        width: 46px;
+        height: 64px;
     }
 }
