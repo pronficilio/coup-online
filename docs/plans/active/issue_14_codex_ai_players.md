@@ -8,6 +8,7 @@ Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-play
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
+Commit F1: 608089d4c839f367b9b0b0e92009d3daf536ce5c (local; sin push)
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
 
 ## Contrato F0 y decisiones de producto definidos

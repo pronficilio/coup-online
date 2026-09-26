@@ -97,7 +97,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Estado/evidencia:** implementación en `docs/plans/active/issue_14_F1_evidence.md`; pruebas de servidor y checks estáticos pasan. F1 espera PHASE independiente; `react-scripts` no está instalado, por lo que build/test del cliente quedan sin ejecutar. No se inició F2/Codex.
 - **Pivote:** si el motor actual necesita una división mayor para preservar reglas, documentar y mantener dentro de esta fase solo los cambios necesarios para el contrato IA.
 - **Repetición:** una corrección acotada por cada fallo demostrable de los criterios.
-- **Commit:** registrar hash local al cerrar el commit F1; el commit no declara PASS/CLOSED.
+- **Commit:** implementación F1 en `608089d4c839f367b9b0b0e92009d3daf536ce5c`; este checkpoint no declara PASS/CLOSED.
 - **Validación:** `npm test` en `server/`, `node --check` en servidor y `git diff --check`; PHASE independiente pendiente.
 
 ### F2 — Añadir el controlador Codex con la suscripción del propietario (`PENDING`)

@@ -2,6 +2,7 @@
 
 **Estado:** implementación F1 lista para revisión independiente; no es `PASS` ni `CLOSED`.
 **Branch / worktree:** `issue/14-codex-ai-players` / `.worktrees/issue-14-codex-ai-players`.
+**Commit F1:** `608089d4c839f367b9b0b0e92009d3daf536ce5c` (local; sin push ni PR).
 **Contrato:** `docs/plans/codex-ai-players/f0_contract.md`.
 
 ## Cambios comprobables
