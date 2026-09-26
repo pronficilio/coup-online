@@ -46,3 +46,8 @@ profile_notes:
   github_cli_authentication: valid
   log_mechanism: append_only_jsonl
   pr_mechanism: github_pull_request
+  github_write_target:
+    repository: pronficilio/coup-online
+    push_remote: origin
+    require_explicit_repo_for_gh_writes: true
+    upstream_writes_allowed: false
