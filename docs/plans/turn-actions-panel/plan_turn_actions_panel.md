@@ -80,7 +80,7 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 
 **Estado de ejecución:** `CLOSED / PASS`. La presentación semántica, el build ya registrado y la revisión de `docs/plans/turn-actions-panel/issue_6_f1_visual.png` completan los criterios de F1. La captura a 1440 × 1500 muestra las siete acciones y sus metadatos completos en el montaje actual. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`. #5 quedó integrado a `master`; F2 está implementada y espera su recorrido manual.
 
-### F2 — Montar en el tablero y conectar confirmación (`BLOCKED`; #5 integrado, espera QA manual)
+### F2 — Montar en el tablero y conectar confirmación (`ACTIVE`; diseño aprobado, espera QA funcional)
 
 **Pregunta:** ¿el shell integrado muestra el panel solo en el turno local y permite confirmar objetivos sin cobrar prematuramente?  
 **Entrada:** F1 cerrada y #5 integrado a `master`; releer su markup/contrato antes de cambiar el montaje.  

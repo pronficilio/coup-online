@@ -1,6 +1,6 @@
 # Reporte F2 — montaje y confirmación
 
-**Estado:** `BLOCKED` — implementación y validación estática completas; falta el recorrido funcional manual del cliente para cerrar la fase.
+**Estado:** `ACTIVE` — el diseño visual fue aprobado; falta el recorrido funcional del cliente para cerrar la fase.
 
 ## Cambios revisados
 
@@ -16,7 +16,7 @@
 - Revisión estática del flujo: `server/game/coup.js` emite `g-updateCurrentPlayer` y luego dirige `g-chooseAction` al socket del jugador activo. El cliente valida el dueño del turno antes de habilitar el panel. Selección/cancelación no llama a `deductCoins` ni a `g-actionDecision`; confirmación válida envía ambos como máximo una vez, en ese orden.
 - Captura visual desde una partida local de dos jugadores con Edge headless: `issue_6_f2_active_turn.png` (1570 × 1149). Muestra las siete acciones completas junto al tablero durante el turno local; valida la composición visual, no el recorrido de interacción.
 - No se añadieron ni ejecutaron tests automatizados.
-- El recorrido funcional manual sigue pendiente: Computer Use falló (`kernel exited unexpectedly`; `windows sandbox failed: helper_unknown_error: setup refresh had errors`). No se afirma evidencia de cambio de turno, cancelación/confirmación ni respuestas en ejecución.
+- El recorrido funcional sigue pendiente: Computer Use falló (`kernel exited unexpectedly`; `windows sandbox failed: helper_unknown_error: setup refresh had errors`) y no debe reintentarse con ese helper. Edge headless/CDP ya permitió capturar la partida real y queda como vía alternativa para verificar interacciones; aún no hay evidencia de cambio de turno, cancelación/confirmación ni respuestas en ejecución.
 
 ## Límite del protocolo de cobro
 
@@ -24,4 +24,4 @@ El protocolo existente recibe `g-deductCoins` y `g-actionDecision` en manejadore
 
 ## Siguiente paso
 
-Completar el recorrido manual funcional de F2 cuando el helper de navegador esté disponible; verificar cambio de dueño/fin de turno, cancelación sin cobro/envío, confirmación de Coup/Assassinate, y accesibilidad de las decisiones de respuesta. F3 permanece pendiente y no se procesa en este reporte.
+Completar el recorrido funcional de F2 mediante Edge headless/CDP: verificar cambio de dueño/fin de turno, cancelación sin cobro/envío, confirmación única de Coup/Assassinate y disponibilidad de las decisiones de respuesta. No repetir intentos con Computer Use. F3 permanece pendiente hasta que F2 cierre.
