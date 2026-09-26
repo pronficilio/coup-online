@@ -198,8 +198,9 @@
 }
 
 .PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceSlot {
-    height: clamp(42px, 3.5vw, 46px);
-    aspect-ratio: auto;
+    width: clamp(48px, 5.2vw, 70px);
+    height: auto;
+    aspect-ratio: 0.68;
     border-width: 1px;
 }
 
@@ -304,7 +305,9 @@
     }
 
     .PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceSlot {
-        height: clamp(28px, 9vw, 38px);
+        width: clamp(29px, 9vw, 42px);
+        height: auto;
+        aspect-ratio: 0.68;
     }
 
     .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardSeatHeader {

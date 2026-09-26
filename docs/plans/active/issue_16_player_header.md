@@ -25,7 +25,7 @@ Las fuentes están en el checkout de orquestación, que no forma parte del remot
 
 ## F2 — revisión según feedback del usuario
 
-Reduce bastante la letra de los nombres; elimina `…` y permite que el texto completo expanda la barra. En móvil reduce la altura de esa barra y reduce también la altura de las cartas rivales. Se permite ajustar el alto visual de `PlayerInfluenceSlot` en CSS; conserva las cartas propias completas y no muevas asientos.
+Reduce bastante la letra de los nombres; elimina `…` y permite que el texto completo expanda la barra. En móvil reduce la altura de esa barra. Para las cartas rivales, reduce el ancho y conserva su proporción (`aspect-ratio: 0.68`) para que el alto se reduzca en consecuencia; las cartas propias conservan tamaño y aspecto. No muevas asientos.
 
 **Criterios:** nombre completo visible sin truncar ni salirse del viewport, saldo completo, barra móvil más baja y sin cruces visibles con cartas rivales para 2–6 jugadores. El neón sigue el turno real y los controles/datos quedan intactos.
 

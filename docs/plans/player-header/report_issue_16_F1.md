@@ -10,7 +10,7 @@
 ## Cambios revisados
 
 - `coup-client/src/components/game/PlayerBoard.js`: presenta icono y nombre junto al contador de monedas en una fila; conserva `player.money` y la señal existente `props.currentPlayer` para el turno activo.
-- `coup-client/src/components/game/PlayerBoardStyles.css`: estilos de barras, texto completo sin elipsis, resplandor activo, fila móvil más baja y cartas rivales más bajas. No cambia la posición de asientos ni controles.
+- `coup-client/src/components/game/PlayerBoardStyles.css`: estilos de barras, texto completo sin elipsis, resplandor activo, fila móvil más baja y cartas rivales reducidas proporcionalmente. No cambia la posición de asientos ni controles.
 - `coup-client/src/assets/player.webp` y `coin.webp`: copias de las fuentes WebP solicitadas.
 
 ## Resultado F1 inicial (histórico)
@@ -52,9 +52,10 @@ La primera iteración limitó el ancho del encabezado. El saldo permanecía ente
 ## F2 reorquestada tras feedback del usuario
 
 - El nombre usa letra mucho menor y se muestra completo sin `…`; la barra se centra respecto al asiento para conservar el texto largo dentro del viewport. A 320 CSS px la fila mide 18 px de alto.
-- Las cartas rivales conservan su ancho, pero su altura baja a 28–38 CSS px en móvil y 42–46 px en escritorio. Las cartas del observador mantienen su altura completa.
+- Las cartas rivales se escalan proporcionalmente con `aspect-ratio: 0.68`: ancho de 29–42 CSS px en móvil y 48–70 px en escritorio; su altura resulta de la proporción. Las cartas del observador mantienen su tamaño completo.
+- En la composición móvil de 6 jugadores, las cartas rivales terminan en `y=269.4` y la barra propia inicia en `y=274.0`, con 4.6 CSS px de separación.
 - Revisión manual de las capturas CDP de 2–6 jugadores: nombres completos, monedas visibles y sin cruce visible de barras con cartas rivales en 5p/6p. La medición focal de 4p móvil confirma nombre `x=29.0…274.8`, pill `x=281.8…310.0`, ambos dentro del viewport CSS 320 px; la fila completa mide 18 px.
-- El set actualizado, generado el 2026-09-26 a las 17:17 (UTC−06:00), está en la tabla nueva. El tablero conserva el viewport y las barras del nombre/saldo quedan dentro de él en los casos revisados.
+- El set actualizado, generado el 2026-09-26 a las 17:49 (UTC−06:00), está en la tabla nueva. El tablero conserva el viewport y las barras del nombre/saldo quedan dentro de él en los casos revisados.
 
 | Jugadores | Escritorio F2, 1280×1000 | Móvil F2, 320×900 CSS |
 |---|---|---|
@@ -67,7 +68,7 @@ La primera iteración limitó el ancho del encabezado. El saldo permanecía ente
 ## Validaciones
 
 - `BUILD_PATH=/tmp/issue16_final_build npm run build` desde `coup-client/`: **código 0**, `Compiled with warnings`. Avisos reportados: imports sin uso en `src/App.js` (`logo`, `Link`) y `src/components/game/Coup.js` (`ReactModal`), más `caniuse-lite` desactualizado. Bundle gzip reportado: 110.94 kB JS y 3.35 kB CSS.
-- `BUILD_PATH=/tmp/issue16_rework_final_build npm run build` desde `coup-client/`: **código 0**, compiló con las mismas advertencias de imports sin uso y `caniuse-lite` desactualizado. Bundle gzip: 110.94 kB JS y 3.4 kB CSS.
+- `BUILD_PATH=/tmp/issue16_ratio_verified npm run build` desde `coup-client/`: **código 0**, compiló con las mismas advertencias de imports sin uso y `caniuse-lite` desactualizado. Bundle gzip: 110.94 kB JS y 3.4 kB CSS.
 - `git diff --check`: pasó sin salida.
 - No se añadieron ni ejecutaron tests automatizados.
 - Las primeras capturas CLI que pedían ventana física de 320 px no fijaban un viewport CSS de 320 px; se descartaron y se retiraron. Este reporte solo enlaza el set CDP validado.

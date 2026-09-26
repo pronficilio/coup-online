@@ -46,8 +46,8 @@ Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`:
 
 ## F2 — Ajuste visual tras feedback del usuario (`READY_FOR_USER_REVIEW`)
 
-**Decisión autorizada:** reducir bastante el tamaño de letra del nombre, eliminar el truncado con `…` y dejar que el texto completo determine el ancho de la barra; bajar la altura de la barra móvil; reducir la altura de las cartas de los rivales. Las cartas del observador conservan su altura completa.
-**Implementación:** centrar la fila sobre el asiento para que un nombre largo no se corte en los bordes; barra móvil de 18 CSS px, letra de 0.52 rem y sin elipsis; cartas rivales de 28–38 CSS px en móvil y 42–46 CSS px fuera de móvil. El layout y los puntos de asiento no cambian.
+**Decisión autorizada:** reducir bastante el tamaño de letra del nombre, eliminar el truncado con `…` y dejar que el texto completo determine el ancho de la barra; bajar la altura de la barra móvil; reducir proporcionalmente el ancho y alto de las cartas rivales, respetando su aspecto original. Las cartas del observador conservan su tamaño.
+**Implementación:** centrar la fila sobre el asiento para que un nombre largo no se corte en los bordes; barra móvil de 18 CSS px, letra de 0.52 rem y sin elipsis; cartas rivales con `aspect-ratio: 0.68`, ancho de 29–42 CSS px en móvil y 48–70 CSS px fuera de móvil. Su altura se deriva de esa proporción. El layout y los puntos de asiento no cambian.
 **Evidencia:** capturas CDP actuales de 2–6 jugadores a 320×900 y 1280×1000 en `docs/plans/player-header/evidence/`; inspección visual de matriz, build y `git diff --check` pasan.
 **Avanzar:** dejar el PR draft para revisión del usuario. No fusionar ni cerrar #16.
 
