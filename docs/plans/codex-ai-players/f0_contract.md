@@ -1,15 +1,15 @@
 # Issue #14 — contrato F0 de observación y decisiones
 
-**Estado de unidad:** `WAITING_USER`.
-**Estado F0:** `BLOCKED` por tres decisiones no aprobadas; el checkpoint PHASE queda después de resolverlas.
-**F1:** `PENDING`; no iniciar hasta las decisiones pendientes y revisión PHASE independiente.
+**Estado de unidad:** `ACTIVE`.
+**Estado F0:** `WAITING_EXECUTOR_REVIEW`; contrato actualizado con las decisiones del usuario, pendiente del checkpoint PHASE independiente.
+**F1:** `PENDING`; no iniciar hasta recibir `PASS` en la revisión PHASE independiente.
 **Base inspeccionada:** `origin/master` `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; branch `issue/14-codex-ai-players`.
 
 ## Contrato mínimo
 
-El servidor mantiene la identidad del asiento, estado, turno, fase, ventana, mano, mazo, costos y resultados. Cliente y modelo solo eligen una opción preparada por el servidor; no envían una acción ejecutable, identidad, costo, objetivo o carta arbitrarios.
+Se conserva el acceso, lobby, nombres y conexión efímera por socket actuales: no se agregan cuentas, login, invitaciones ni recuperación persistente de identidad. Dentro de una partida el servidor asocia cada socket conectado a su asiento y deriva de ahí el actor; eso es validación de turno, no una capa de autenticación. El servidor mantiene estado, fase, ventana, mano, mazo, costos y resultados. Cliente y modelo solo eligen una opción preparada por el servidor; no envían acción ejecutable, actor, costo, objetivo o carta arbitrarios.
 
-La observación de cada asiento contiene el estado público (asientos, nombres, monedas, cartas reveladas, jugadores activos, turno/fase y sucesos públicos), su propia mano oculta, datos privados de su decisión (como las cartas recibidas al intercambiar) y sus opciones válidas. Excluye manos ocultas ajenas, estado/orden del mazo, IDs de socket, secretos de invitación/admin, texto libre y razonamiento del modelo. `g-updatePlayers` no puede ser proyección pública mientras incluya influencias de todos; F1 debe separar estado público y mano propia por socket.
+La observación de cada asiento contiene el estado público (asientos, nombres, monedas, cartas reveladas, jugadores activos, turno/fase y sucesos públicos), su propia mano oculta, datos privados de su decisión (como las cartas recibidas al intercambiar) y sus opciones válidas. Excluye manos ocultas ajenas, estado/orden del mazo, IDs de socket, credenciales operativas, texto libre y razonamiento del modelo. `g-updatePlayers` no puede ser proyección pública mientras incluya influencias de todos; F1 debe separar estado público y mano propia por socket.
 
 La respuesta es `{ decisionId, stateVersion, choiceId }`: ID único por decisión/ventana, versión monotónica que cambia con estado/fase, y opción creada por el servidor. El servidor deriva asiento de la sesión/socket asociado, no de `source`, `playerName`, `challenger` ni campos similares. Respuestas fuera de fase, repetidas con otra opción, de otra ventana o con versión vieja no tienen efecto; una repetición exacta es idempotente. El servidor valida y aplica una sola vez costos, acción, destino, pérdidas, intercambio y avance.
 
@@ -21,14 +21,14 @@ Para prompts individuales solo el asiento decisor recibe opciones/mano privada. 
 |---|---|---|
 | `setName` | Socket que reclama asiento libre | Nombre de presentación; validar y ligar asiento. El nombre no autentica ni recupera asiento. |
 | `setReady` | Socket de ese asiento, antes de iniciar | Cambia su propia disponibilidad; roster público sin IDs de socket. |
-| `startGameSignal` | Anfitrión autenticado | Solicita inicio; servidor valida/construye roster desde asientos conectados, ignora roster cliente. |
-| `disconnect` | Transporte del asiento | Notifica y pausa la decisión afectada; no elige, elimina influencia ni avanza turno. Reanudar exige reautenticar ese asiento. |
-| `g-playAgain` | Anfitrión autenticado, tras game over | Solicita reinicio; servidor crea nuevo estado/mazo. Permiso concreto depende de la identidad pendiente. |
+| `startGameSignal` | Socket líder del lobby actual | Solicita inicio; servidor valida/construye roster desde asientos conectados, ignora roster cliente. No hay login. |
+| `disconnect` | Transporte del asiento | Conserva el comportamiento actual del lobby; una respuesta pendiente de ese socket no se inventa ni aplica como acción. No se agrega recuperación de identidad. |
+| `g-playAgain` | Socket líder actual, tras game over | Solicita reinicio; servidor crea nuevo estado/mazo. El servidor valida el rol actual del socket, sin login. |
 | `g-deductCoins` | Nadie como comando independiente | Cliente/modelo no cambia monedas. El costo se deriva de la acción legal y se aplica atómicamente en servidor. |
 | `g-actionDecision` | Asiento cuyo turno está activo | Selecciona opción legal (acción/objetivo); servidor impone coup con 10+, costo, turno y objetivo vivo. |
-| `g-challengeDecision` | Cada jugador activo distinto del autor del reclamo | `challenge|pass`; una respuesta por asiento. El servidor cierra/resuelve según política determinista pendiente. |
-| `g-blockDecision` | Cualquiera para Foreign Aid; objetivo para Assassinate/Steal | `block|pass` solo donde las reglas lo permiten; servidor valida reclamo/personaje. |
-| `g-blockChallengeDecision` | Cada jugador activo distinto del autor del bloqueo | `challenge|pass` contra el reclamo de bloqueo. |
+| `g-challengeDecision` | Socket de cada jugador activo distinto del autor del reclamo | `challenge|pass`; una respuesta por asiento. Si varios desafían el mismo reclamo en la ventana común, solo se resuelve el primero según el orden fijo de asientos aprobado. |
+| `g-blockDecision` | Cualquiera para Foreign Aid; objetivo para Assassinate/Steal | `block|pass` solo donde las reglas lo permiten; servidor valida reclamo/personaje. Si más de un asiento declara un bloqueo válido en la ventana común, solo se resuelve el primero según el orden fijo aprobado. |
+| `g-blockChallengeDecision` | Cada jugador activo distinto del autor del bloqueo | `challenge|pass` contra el reclamo de bloqueo; si varios lo desafían en la misma ventana común, solo se resuelve el primero según el orden fijo aprobado. |
 | `g-revealDecision` | Asiento cuyo reclamo se desafía | Elige probar un reclamo posible con su propia mano o no probarlo; servidor revela/resuelve la carta. |
 | `g-chooseInfluenceDecision` | Asiento que pierde influencia | Elige una influencia propia; servidor resuelve revelación, eliminación y turno. Cada pérdida es una decisión separada. |
 | `g-chooseExchangeDecision` | Asiento que reclamó Exchange | Elige qué cartas propias/con Court conserva o devuelve; servidor valida cantidades y actualiza mazo/mano. |
@@ -42,22 +42,22 @@ Los nombres describen la interfaz observada. F1 puede sustituir eventos/payloads
 
 ## Ventanas, timeout, desconexión y kill switch
 
-**Propuesta no aprobada:** el orden Socket.IO/latencia Codex no debe decidir quién desafía o bloquea; el servidor abre una ventana con ID/versión y deadline común, reúne una respuesta por asiento y aplica prioridad determinista basada en el orden de asientos. Las reglas no fijan el desempate ni qué hacer con múltiples challenges/blocks simultáneos. El usuario/Orquestador debe aprobar la prioridad y resolución; no se implementará como regla aprobada sin respuesta.
+**Arbitraje aprobado por el usuario (2026-09-26):** cada fase de respuesta tiene una ventana común: se cierra cuando todos los asientos elegibles respondieron o al vencer el plazo compartido. Si varios jugadores desafían el mismo reclamo, bloquean la misma acción o desafían el mismo bloqueo, el servidor resuelve una sola respuesta según el orden fijo de asientos en sentido horario desde quien declaró la acción/bloqueo; omite a ese actor y a jugadores eliminados. No usa la hora de llegada. Las demás respuestas de esa ventana se descartan sin efecto. Ejemplo: si B y C desafían la misma acción casi a la vez y B va antes en el orden desde quien actuó, se resuelve solo el challenge de B aunque el paquete de C llegue primero. Las reglas impresas no definen este desempate digital; esta es la decisión de producto aprobada para el juego.
 
-Al vencer una decisión/ventana, faltar un actor requerido, desconectarse un proceso o agotarse tiempo/cuota, la partida se pausa con causa visible. El silencio no se convierte en `pass`, acción automática, pérdida o avance sin regla aprobada. Se rechazan respuestas tardías. Reanudar requiere acción autorizada explícita y decisión con ID/versión nuevos. Una desconexión humana también pausa; el método para reautenticar/reclamar asiento está pendiente.
+Al vencer una decisión/ventana, faltar un actor requerido, desconectarse un proceso o agotarse tiempo/cuota, la partida se pausa con causa visible. El silencio no se convierte en `pass`, acción automática, pérdida o avance sin regla aprobada. Se rechazan respuestas tardías. Reanudar crea un ID/versión nuevos y usa el lobby existente; no se agrega método de login/reclamo de identidad.
 
-Codex inicia deshabilitado, incluso tras reinicio. Apagarlo cierra primero nuevas invocaciones, intenta terminar procesos activos, invalida sus IDs/versiones y pausa las partidas afectadas aunque no pueda matar un proceso. Rehabilitar solo permite nuevas invocaciones; no reanuda partidas ni reproduce salidas. El propietario solicita explícitamente una decisión nueva.
+Codex inicia deshabilitado, incluso tras reinicio. La palanca roja del juego es solo de apagado y cualquier jugador conectado puede usarla: cierra nuevas invocaciones, intenta terminar procesos activos, invalida sus IDs/versiones y pausa las partidas afectadas aunque no pueda matar un proceso. Ningún cliente puede reactivar Codex; solo el propietario lo habilita desde la consola/SSH del servidor. Rehabilitar permite nuevas invocaciones, pero no reanuda partidas ni reproduce salidas; hace falta una decisión nueva.
 
-Una invitación del propietario permite acceso a partidas IA y nunca autoriza límites/admin/kill switch. La autorización administrativa se valida por separado en servidor para cada cambio; ningún booleano del cliente concede permiso. Invitación/admin no se incluyen en observación ni logs.
+El acceso a partidas IA sigue el lobby actual; no se agrega invitación ni login. La palanca web solo puede apagar Codex y, por tanto, conceder esa acción a cualquier jugador solo puede reducir uso. No se exponen en clientes controles que permitan reactivar Codex o modificar límites. El propietario rearma Codex desde SSH/consola.
 
-## Evidencia y decisiones elevadas
+## Reglas versionadas y decisiones elevadas
+
+Se copiaron sin alterar desde el checkout local `master` (`1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`) las cuatro reglas existentes: `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la fuente normativa completa; tarjetas/resumen son referencias derivadas. La transcripción dice que el ganador anterior empieza y que en partidas de dos jugadores quien empieza recibe una moneda. El motor actual inicia por índice 0 y entrega dos monedas a cada jugador. F1 corregirá el motor para concordar con las reglas versionadas, definiendo también un comienzo reproducible para la primera partida sin ganador previo.
+
+## Evidencia y decisión elevada
 
 Verificado estáticamente en el worktree: `server/index.js` acepta `startGameSignal` y el roster del cliente sin comprobar líder; `server/game/coup.js` recibe actor/acción/costo del payload, cuenta votos con un contador compartido, cierra al primer desafío y difunde `g-updatePlayers`; `server/game/utils.js` conserva `influences` al exportar jugadores. El reporte/veredicto de #3 confirma la difusión de manos y la falta de asociación actor/socket. `disconnect` solicita recrear la partida y el líder borra la namespace; no hay reconexión definida. No se cambió código.
 
-Decisiones pendientes de usuario/Orquestador; las propuestas no están aprobadas:
+Las decisiones de producto de F0 están resueltas: conservar acceso actual sin autenticación nueva; versionar las cuatro fuentes (transcripción normativa); desempatar respuestas simultáneas por orden fijo de asientos. La discrepancia de preparación y la conservación de cartas reveladas pasan a F1.
 
-1. **Desempate:** aprobar una prioridad determinista y el tratamiento de múltiples challenges/blocks concurrentes; las reglas no especifican el empate.
-2. **Identidad:** elegir mecanismo para identidad de propietario/admin, emisión/revocación de invitaciones y reconexión. La base inspeccionada solo tiene nombres elegidos por cliente e IDs efímeros de socket.
-3. **Fuente de reglas:** confirmar si `docs/coup_llm_summary.md` es normativa y debe versionarse en la base de la issue. Se leyó desde el checkout raíz compartido, pero no existe en este worktree ni en `origin/master`; no se copió. Esa fuente dice que en partidas de dos jugadores quien empieza recibe una moneda y empieza el ganador anterior; el motor inspeccionado reparte dos monedas y empieza por índice 0 (revancha aleatoria).
-
-Validación: lectura estática del contrato, reglas, reportes y eventos. No se escribieron/ejecutaron pruebas, no se inició Codex ni llamada de juego, y no se comprobó comportamiento en vivo. F0 sigue `BLOCKED`; el checkpoint PHASE y F1 esperan las tres respuestas pendientes. La unidad queda `WAITING_USER`.
+Validación: lectura estática del contrato, reglas, reportes y eventos. No se escribieron/ejecutaron pruebas, no se inició Codex ni llamada de juego, y no se comprobó comportamiento en vivo. F0 espera revisión PHASE independiente; F1 `PENDING` hasta su PASS.

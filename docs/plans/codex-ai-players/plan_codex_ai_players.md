@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: WAITING_USER; F0 BLOCKED; F1 PENDING
+Estado: ACTIVE; F0 WAITING_EXECUTOR_REVIEW; F1 PENDING
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -18,6 +18,8 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 - La issue #13 es la unidad canónica de despliegue. Está abierta, F0 quedó cerrado y el commit de release sigue por definir. #14 integra la funcionalidad; el despliegue la consume después.
 - El checkout raíz contiene modificaciones locales sin commit. El worktree de #14 parte del origin/master limpio; no incorporar cambios raíz sin una decisión registrada.
 - El usuario aprobó jugar con su login ChatGPT Plus mediante Codex CLI, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar el uso de Codex.
+- Por instrucción del usuario, se conserva el acceso/lobby actual sin cuentas ni invitaciones. Cualquier jugador conectado puede activar el apagado seguro; solo el propietario rearma Codex por SSH/consola.
+- Se versionaron desde el checkout local las reglas completas y sus tres resúmenes en `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la autoridad; F1 alineará el motor.
 
 ## Compatibilidad Codex/Plus y límite operativo (verificado 2026-09-26)
 
@@ -28,13 +30,13 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 
 ## Bloqueos explícitos por fase
 
-F0: bloquear ante una transición de reglas sin definir o una identidad de actor/socket que no pueda comprobarse.
+F0: bloquear ante una transición de reglas sin definir o una política de respuestas concurrentes sin decidir.
 F1: bloquear si una decisión puede cambiar estado fuera de turno/fase o una vista revela cartas privadas.
 F2: bloquear si el runner no puede aislarse o autenticarse con Plus; no sustituirlo por API.
-F3: bloquear si se puede saltar invitación, admin, límites o palanca desde HTTP/Socket.IO.
+F3: bloquear si se pueden saltar límites, el apagado o la reactivación de Codex desde HTTP/Socket.IO.
 F4: bloquear la integración si queda un hallazgo de privacidad, permisos, gasto o reglas críticas, o si el Verifier no da PASS.
 
-La primera fase F0 es análisis de contrato que produce evidencia documental y commit. F1 implementa privacidad/autoridad antes de F2. F2 agrega Codex CLI. F3 habilita invitados, asientos IA y kill switch. F4 cierra revisión y prepara el handoff de release a #13. La issue contiene el detalle y el criterio verificable de cada fase.
+La primera fase F0 es análisis de contrato que produce evidencia documental y commit. F1 implementa privacidad/autoridad antes de F2. F2 agrega Codex CLI. F3 habilita asientos IA y kill switch conservando el lobby actual, sin cuentas ni invitaciones. F4 cierra revisión y prepara el handoff de release a #13. La issue contiene el detalle y el criterio verificable de cada fase.
 ## Solicitud
 
 Agregar jugadores automáticos controlados por GPT-6 Luna a Coup Online. El propietario y sus amigos podrán jugar partidas mixtas (por ejemplo, un humano contra dos IA) y partidas IA contra IA. Las llamadas al modelo usarán Codex CLI autenticado con la suscripción ChatGPT Plus del propietario, con el esfuerzo de razonamiento elegido para cada asiento. No se usará una API key ni se activará facturación API como alternativa.
@@ -46,10 +48,10 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 ## Éxito
 
 1. Cada jugador IA recibe solo su mano, el estado público y su propio historial permitido; no recibe manos rivales ni estado interno del mazo.
-2. El servidor es la autoridad para identidad, acciones permitidas, monedas, desafíos, bloqueos, pérdidas de influencia y avance del turno. Las decisiones de IA se validan antes de ejecutarse.
+2. El servidor deriva el actor del socket ligado al asiento actual y es autoridad para acciones permitidas, monedas, desafíos, bloqueos, pérdidas de influencia y avance del turno. Las decisiones humanas e IA se validan antes de ejecutarse.
 3. Las partidas admiten humanos e IA en varios asientos, incluida una persona contra dos IA e IA contra IA. Cada asiento Codex permite seleccionar `low`, `medium` o `high`; GPT-6 Luna `medium` es el valor inicial recomendado.
 4. Codex CLI usa el inicio de sesión ChatGPT del propietario y entrega una selección legible por máquina entre opciones de decisión preparadas por el servidor. Las respuestas inválidas, duplicadas, tardías o pertenecientes a un estado anterior no cambian la partida.
-5. Las partidas con IA requieren acceso de invitación compartido por el propietario. El control de emergencia requiere autenticación administrativa separada.
+5. Se conserva el acceso/lobby actual: no se agregan cuentas, login ni invitaciones. Cualquier jugador conectado puede apagar Codex con la palanca roja; solo el propietario puede volver a encenderlo desde la consola/SSH del servidor.
 6. Al activar la palanca roja, el servidor bloquea nuevas invocaciones, termina las invocaciones activas cuando sea posible, invalida sus respuestas y pausa las partidas que esperan una decisión IA. Rehabilitar Codex no reproduce respuestas antiguas: el propietario reanuda o solicita una decisión nueva.
 7. Se limitan la concurrencia, el tiempo de espera y las llamadas por partida/ventana temporal. Un límite, fallo de login, proceso caído o cuota agotada pausa las partidas afectadas y muestra una causa; nunca cambia silenciosamente a API de pago.
 8. Los registros operativos pueden incluir partida/decisión, modelo, esfuerzo, duración, salida de proceso y contadores de uso disponibles. No guardan credenciales, manos rivales, razonamiento interno ni entradas arbitrarias de jugadores.
@@ -60,7 +62,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - Definir el contrato de observación privada, las decisiones del motor y la asociación de cada asiento con un controlador humano o Codex.
 - Cerrar las filtraciones de cartas privadas y discrepancias de reglas que impidan un experimento válido; hacer que el servidor valide y resuelva las decisiones relevantes.
 - Implementar un adaptador aislado para invocaciones puntuales de `codex exec`, con `gpt-6-luna`, esfuerzo configurable, esquema de salida y manejo de errores.
-- Incorporar invitación para partidas con IA, límites operativos por configuración y palanca de emergencia global con autorización del propietario.
+- Conservar el acceso/lobby existente sin autenticación nueva; añadir límites operativos y una palanca roja global de solo apagado.
 - Permitir configurar asientos humanos/IA y esfuerzo de cada IA en la creación de partidas.
 - Dejar una guía de autenticación inicial en Hetzner mediante el flujo de inicio de sesión de Codex apropiado para un servidor remoto, sin guardar ni publicar credenciales.
 - Producir evidencia de verificación independiente FINAL sobre privacidad, autenticación, costo/kill switch y reglas del juego.
@@ -69,29 +71,29 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 - Llamadas a la API de OpenAI, API keys, fallback de pago o alojamiento local del modelo.
 - Dar al agente Codex acceso al repositorio del juego, secretos de la aplicación, entradas libres de jugadores o herramientas que alteren el servidor.
-- Publicar las partidas con IA sin invitación/autorización o permitir que un cliente active el control administrativo.
+- Agregar autenticación de cuentas, acceso por invitación, cambios al acceso actual del lobby o una forma de reactivar Codex desde un cliente web.
 - Torneos masivos, aprendizaje entre partidas, coordinación secreta entre IA, conversación libre o una afirmación de que el agente es invencible.
 - Comprar dominio o cambiar DNS/TLS/infraestructura compartida del servidor; esos cambios se tramitan en #13.
 
 ## Fases
 
-### F0 — Fijar el contrato de privacidad y decisiones (`BLOCKED`)
+### F0 — Fijar el contrato de privacidad y decisiones (`WAITING_EXECUTOR_REVIEW`)
 
 - **Pregunta:** ¿puede el juego producir para cada asiento una observación suficiente y privada, y representar todas las decisiones necesarias sin entregar autoridad de ejecución al modelo?
-- **Entrada:** reglas de `docs/coup_llm_summary.md`, motor Socket.IO actual y análisis de seguridad ya registrado.
-- **Salida:** contrato de observación por asiento, decisiones válidas por fase, política para ventanas concurrentes, opciones de timeout/pausa y diseño de invitación/palanca. Evidencia: `docs/plans/codex-ai-players/f0_contract.md`.
-- **Estado:** contrato documentado y comprometido, pero F0 no está cerrado. Espera respuesta/aprobación sobre tres propuestas: desempate de ventanas concurrentes; identidad de propietario/admin, invitación y reconexión; fuente normativa/versionado de reglas. Después corresponde la revisión independiente PHASE antes de F1.
-- **Pivote:** si la interfaz de juego actual no permite identificar/validar de forma inequívoca al jugador que responde, F1 debe incluir la mínima corrección de identidad Socket.IO necesaria.
+- **Entrada:** `docs/coup_transcription.md` como regla completa, `docs/coup_play_reference.md` y `docs/coup_summary_card.md` como referencias, `docs/coup_llm_summary.md` como resumen operativo, motor Socket.IO y análisis de seguridad.
+- **Salida:** contrato de observación por asiento, decisiones válidas por fase, política para ventanas concurrentes y timeout/pausa; se conserva el lobby y la identidad efímera de socket actuales, sin cuentas ni invitaciones. La palanca permite apagar desde el juego; solo el propietario la rearma desde SSH/consola. Evidencia: `docs/plans/codex-ai-players/f0_contract.md`.
+- **Estado:** el usuario decidió conservar el acceso actual sin autenticación y versionar las cuatro fuentes; aprobó desempatar varias respuestas con orden fijo de asientos en sentido horario desde quien declaró la acción/bloqueo, independientemente de latencia. El contrato queda listo para revisión independiente PHASE; solo tras su `PASS` se inicia F1.
+- **Pivote:** si la interfaz no asocia de forma inequívoca una respuesta al socket que ocupa el asiento, F1 ajusta esa asociación efímera sin agregar autenticación persistente.
 - **Repetición:** una revisión de las fuentes de reglas y del motor; repetir solo para cerrar una ambigüedad identificada.
-- **Commit:** `COMMIT_REQUIRED`; `docs(codex-ai): issue 14 F0 pending decisions`.
+- **Commit:** `COMMIT_REQUIRED`; `docs(codex-ai): issue 14 F0 pending PHASE review`.
 - **Validación:** inspección de cada evento/decisión y trazado de una partida mixta; no se inicia una llamada a Codex real desde F0.
 
-### F1 — Hacer el estado y las decisiones privados y autoritativos (`PENDING`; bloqueada por F0)
+### F1 — Hacer el estado y las decisiones privados y autoritativos (`PENDING`; bloqueada por revisión PHASE F0)
 
 - **Pregunta:** ¿puede el servidor aplicar una decisión humana o IA sin filtrar cartas ni aceptar una mutación de estado que el jugador no tiene derecho a realizar?
 - **Entrada:** contrato F0.
 - **Salida:** proyecciones públicas/privadas explícitas, decisiones asociadas a socket/jugador/partida/fase, validación de acción/costo/destino y flujo correcto de cartas reveladas/reemplazadas.
-- **Cierre:** llamadas de cliente ya no determinan por sí solas fuente, costo, carta revelada ni cartas de intercambio; mano y mazo no salen en eventos públicos; decisiones fuera de fase, repetidas o de otro asiento se rechazan; los casos de Coup documentados en el LLM summary no contradicen la implementación; Verifier independiente emite `PASS` sobre filtración y autoridad.
+- **Cierre:** llamadas de cliente ya no determinan por sí solas fuente, costo, carta revelada ni cartas de intercambio; mano y mazo no salen en eventos públicos; decisiones fuera de fase, repetidas o de otro socket se rechazan; el motor cumple las reglas versionadas, incluido inicio por ganador previo, una moneda inicial para quien empieza en dos jugadores, y cartas de influencia reveladas que permanecen fuera del mazo; si no hay ganador previo, se elige al azar quién inicia la primera partida; Verifier independiente emite `PASS` sobre filtración, autoridad y reglas.
 - **Pivote:** si el motor actual necesita una división mayor para preservar reglas, documentar y mantener dentro de esta fase solo los cambios necesarios para el contrato IA.
 - **Repetición:** una corrección acotada por cada fallo demostrable de los criterios.
 - **Commit:** `COMMIT_REQUIRED`; `fix(game-engine): issue 14 F1 CLOSED private state`.
@@ -102,22 +104,22 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Pregunta:** ¿puede un proceso separado ejecutar una decisión Codex acotada y devolver una opción válida sin recibir secretos ajenos ni acceso operativo al servidor?
 - **Entrada:** proyecciones y decisiones autoritativas F1.
 - **Salida:** invocador `codex exec` autenticado con ChatGPT, contexto pequeño de reglas + mano propia + estado público + opciones permitidas, esquema JSON, identificador/versionado de decisión, límites de tiempo/ejecución y tratamiento de errores.
-- **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre de clientes; corre en un usuario/directorio de trabajo aislado y de solo lectura, sin montar el repo de Coup ni secretos de aplicación; no ejecuta shell pedido por jugadores; respuesta se valida contra la decisión vigente; no hay fallback a API; Verifier prueba de forma independiente la barrera del proceso y del gasto y resuelve el límite de automatización documentado para repositorios públicos antes de conectar jugadores invitados.
+- **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre de clientes; corre en un usuario/directorio de trabajo aislado y de solo lectura, sin montar el repo de Coup ni secretos de aplicación; no ejecuta shell pedido por jugadores; respuesta se valida contra la decisión vigente; no hay fallback a API. La documentación oficial de autenticación en automatización advierte contra este flujo con repositorios públicos/open source; como este repo es público, Verifier debe resolver compatibilidad y aislamiento del runner antes de habilitar asientos IA. También prueba de forma independiente la barrera del proceso y del gasto.
 - **Pivote:** si Codex CLI no permite una ejecución acotada y segura para una decisión de juego, bloquear F2 y presentar la limitación en lugar de sustituir autenticación/proveedor.
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
 - **Commit:** `COMMIT_REQUIRED`; `feat(codex-player): issue 14 F2 plus-auth runtime`.
 - **Validación:** verificación local bajo el login del propietario; registrar éxito/error, esfuerzo, latencia y uso disponible; no lanzar simulaciones masivas.
 
-### F3 — Añadir asientos IA, acceso de invitación y palanca roja (`PENDING`)
+### F3 — Añadir asientos IA y palanca roja (`PENDING`)
 
-- **Pregunta:** ¿pueden el propietario y amigos invitados configurar y detener partidas mixtas o IA contra IA sin que un cliente controle la identidad administrativa?
+- **Pregunta:** ¿pueden los jugadores configurar asientos IA en el lobby actual y apagar Codex sin agregar autenticación ni permitir que un cliente lo reactive?
 - **Entrada:** controlador Codex F2 y contratos del lobby/socket.
-- **Salida:** selección de tipo de asiento/esfuerzo, habilitación de partidas IA mediante invitación validada en servidor, controles por partida/ventana y panel administrativo mínimo.
-- **Cierre:** se crean partidas de una persona + dos IA y de varias IA; el invitado no puede activar la palanca ni modificar límites administrativos; activar kill switch bloquea trabajo nuevo, detiene/prohíbe aplicar respuestas activas y pausa la decisión actual con aviso visible; el reinicio conserva Codex apagado salvo habilitación administrativa explícita; Verifier independiente refuta vías alternativas para gastar cuota o saltarse la palanca.
-- **Pivote:** si no hay una frontera de autenticación fiable en el despliegue actual, no exponer la función a usuarios hasta añadir la mínima sesión/invitación necesaria.
+- **Salida:** selección de tipo de asiento/esfuerzo en el lobby actual, límites por partida/ventana y palanca roja global de solo apagado.
+- **Cierre:** se crean partidas de una persona + dos IA y de varias IA; cualquier jugador puede activar la palanca y solo el propietario puede reactivar Codex por SSH/consola; apagar bloquea llamadas nuevas, intenta terminar las activas, invalida sus respuestas y pausa la decisión actual; tras reinicio Codex sigue apagado hasta habilitación explícita del propietario; Verifier refuta vías de bypass desde HTTP/Socket.IO.
+- **Pivote:** si apagar Codex no invalida las respuestas en curso o si el cliente puede reactivar Codex, bloquear F3 hasta corregir la palanca.
 - **Repetición:** una corrección acotada por vía de bypass demostrada.
-- **Commit:** `COMMIT_REQUIRED`; `feat(game-lobby): issue 14 F3 invite and kill switch`.
-- **Validación:** recorrido propietario/invitado y lectura del control de gasto/kill switch por el Verifier.
+- **Commit:** `COMMIT_REQUIRED`; `feat(game-lobby): issue 14 F3 AI seats and kill switch`.
+- **Validación:** recorrido con el acceso actual y lectura del control de gasto/kill switch por el Verifier.
 
 ### F4 — Verificar la integración completa y preparar handoff de release (`PENDING`)
 
@@ -133,7 +135,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 ## Riesgos y mitigaciones
 
 - **Plus/cuota compartida:** máximo de invocaciones activas y decisiones por partida/ventana; pausa al llegar a límite. Registrar contadores sin afirmar que hay acceso a un saldo exacto de Plus.
-- **Abuso por invitados o fuga de invitación:** acceso a partidas IA validado en servidor, límites conservadores y kill switch administrativo no compartido.
+- **Acceso abierto del lobby actual:** no se agrega autenticación; toda conexión puede usar IA, así que se aplican límites globales conservadores y cualquier jugador puede apagar Codex, sin opción web para reactivarlo.
 - **Secretos Codex:** login se realiza en Hetzner como usuario del proceso o flujo remoto documentado; auth cache con permisos de propietario, nunca en logs/cliente/repositorio.
 - **Prompt injection:** no incluir chat libre; datos de juego estructurados; no abrir el modelo a archivos del proyecto ni a herramientas sobre el juego; opciones se generan y validan en servidor.
 - **Latencia/caída:** decisión con id y vencimiento; descartar respuestas tardías; pausa visible y recuperación explícita.
@@ -141,8 +143,8 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 ## Operación
 
-- Ejecución `FULL`; riesgo `HIGH`; verificación independiente `PHASE` obligatoria en F0–F3 y `FINAL` al cierre, por autenticación, permisos, privacidad y concurrencia.
-- Pregunta de falsificación: ¿puede un jugador invitado, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
+- Ejecución `FULL`; riesgo `HIGH`; verificación independiente `PHASE` obligatoria en F0–F3 y `FINAL` al cierre, por permisos de socket, privacidad y concurrencia.
+- Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
 - Siguiente dueño tras abrir issue: Alquimista, después de reclamar siguiendo el protocolo.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
