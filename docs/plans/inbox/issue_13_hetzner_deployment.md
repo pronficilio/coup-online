@@ -2,28 +2,26 @@
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
 - **Plan:** `docs/plans/active/issue_13_hetzner_deployment.md`
-- **Estado:** `WAITING_USER`; F0 y F1 (DNS) cerradas; F2 espera fijar el commit/tag de release.
+- **Estado:** `IN_PROGRESS`; F0–F5 cerradas y desplegadas; F6/verificación independiente e integración pendientes.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
-- **Verifier requerido ahora:** no; requerido de forma independiente en F5 antes de integrar/cerrar.
+- **Verifier requerido ahora:** sí; revisión final independiente antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
-- **Fase sugerida:** F2 — fijar SHA/tag reproducible que se desea publicar.
-- **Por qué sigue:** DNS ya está confirmado como `coup.ejele.net → 178.105.138.91`. Hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
+- **Versión aprobada:** SHA `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. El checkout raíz tiene cambios y no se usa como fuente.
+- **Despliegue activo:** release `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e` en `/opt/coup/releases/1e4685f`; `https://coup.ejele.net`; Mochila `https://ejele.net`; www redirige al apex. Cert SAN válido hasta 2026-12-25 y renovación automática probada.
+- **Fase siguiente:** F6 — verificar de forma independiente aislamiento, rollback, CORS/API/WebSocket, coexistencia Mochila/Minecraft y TLS; después abrir/integrar PR según veredicto.
+- **Por qué sigue:** el despliegue y TLS están operativos, pero falta el verifier separado y confirmar/documentar rollback. El checkout raíz permanece sucio y no fue usado.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
-- **Subtareas listas para delegación:**
-  1. Tras fijar el release, construir exactamente ese SHA y registrar artefacto/hash.
-  2. Preparar Compose aislado (sin publicar 80/443), cliente same-origin, CORS acotado y health/rollback.
-  3. Desplegar bajo ruta dedicada en Hetzner y probar vía SSH tunnel.
-  4. Añadir un vhost Nginx acotado y TLS, preservando Mochila/Minecraft; no instalar otro proxy que compita por 80/443.
+- **Subtarea pendiente:** F6: falsificar de forma independiente el aislamiento/rollback y las rutas/API/WebSocket/TLS, usando los datos de la sección «Validaciones realizadas» del plan.
 - **Criterios de aceptación:** ver el plan, issue #13.
 - **Evidencia requerida:** resolución DNS del A, SHA de release, resultado de build, pruebas API/Socket.IO, estado de servicios previos antes/después, comprobación post-restart, evidencia HTTPS/WebSocket, rollback.
-- **Riesgos/bloqueos:** proxy compartido; release no fijado; CORS actual abierto.
-- **Política de commits:** `COMMIT_AFTER_REVIEW` en F1/F3/F4; `COMMIT_REQUIRED` en F2/F5. Un solo branch/worktree/PR para el issue.
+- **Riesgos pendientes:** proxy compartido; rollback no probado; cuatro avisos moderados de npm en Socket.IO 2.x requieren migración mayor.
+- **Política de commits:** `COMMIT_AFTER_REVIEW` por fase técnica y `COMMIT_REQUIRED` en F6. Un solo branch/worktree/PR para el issue.
 - **Branch destino:** `issue/13-hetzner-deployment`.
 - **Worktree destino:** `.worktrees/issue-13-hetzner-deployment`.
 - **Merge target:** `master`.
 - **Bitácora:** `docs/plans/log/issue-13.jsonl` (append-only).
 - **PR esperado:** un PR `issue/13-hetzner-deployment` → `master`, después de completar fases y verificación.
 - **Secuencia de aislamiento:** reclamar en issue; volver a leer issue y descartar reclamo incompatible; usar el branch/worktree canónico ya preparado; registrar claim/worktree en log; commits de fase siempre en el mismo branch.
-- **Validaciones esperadas:** SHA/checkout limpio; build; curl API; handshake HTTP y WebSocket de Socket.IO; recreación/reinicio de Compose; probar host viejo y nuevo en Nginx; validar certificados y rollback.
-- **Verifier:** en F5, intentar refutar aislamiento, CORS/rutas, WebSocket, TLS, coexistencia y rollback; solo reporta evidencia y no modifica la implementación.
-- **Qué actualizar:** issue, plan, log, handoff y manifiesto de evidencia por fase; no guardar secretos ni modificar la configuración live sin copia y ruta de rollback. El A record puede apuntar antes del despliegue, pero el catch-all actual seguirá respondiendo hasta instalar el vhost.
+- **Validaciones realizadas:** build en Hetzner; API create/exists; cliente Socket.IO creó y se unió a sala y actualizó polling→WebSocket; API reiniciado y `healthy`; TLS y redirect de los tres hosts; Certbot staging dry-run y systemd renewal service; Mochila y Minecraft siguen arriba. **Pendiente:** prueba de rollback y verificación independiente.
+- **Verifier:** en F6, intentar refutar aislamiento, CORS/rutas, WebSocket, TLS, coexistencia y rollback; solo reporta evidencia y no modifica la implementación.
+- **Qué actualizar:** issue, plan, log y handoff con el veredicto final. La configuración live tiene copia original en `/opt/mochila/deploy/nginx.conf.bak-20260926`; no guardar secretos en Git.
