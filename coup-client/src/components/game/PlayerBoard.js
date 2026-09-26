@@ -97,6 +97,7 @@ export default function PlayerBoard(props) {
                                 : undefined
                 const seatClassName = [
                     'PlayerBoardSeat',
+                    isObserver ? 'PlayerBoardSeat--observer' : '',
                     isCurrentPlayer ? 'PlayerBoardSeat--current' : ''
                 ].filter(Boolean).join(' ')
 
@@ -157,4 +158,3 @@ export default function PlayerBoard(props) {
         </div>
     )
 }
-

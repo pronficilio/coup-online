@@ -1,6 +1,6 @@
 # Plan: encabezado del jugador con saldo y neón de turno — issue #16
 
-**Estado:** `ACTIVE`; F1 `FAILED` — requiere reorquestación.
+**Estado:** `ACTIVE`; F1 inicial `FAILED`; F2 `READY_FOR_USER_REVIEW` tras reorquestación.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/16
 **Handoff:** `docs/plans/active/issue_16_player_header.md`
 **Bitácora:** `docs/plans/log/issue-16.jsonl`
@@ -12,7 +12,7 @@
 
 Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`: barra con icono y nombre, seguida a la derecha por una barra más corta con moneda y saldo. En el turno activo, el nombre tendrá el neón rojo de `fotos/focus.png`, coordinado con el efecto que ya tienen las cartas.
 
-Éxito significa que el nombre y saldo se leen de un vistazo en partidas de 2 a 6 jugadores; el neón identifica correctamente el turno; y el encabezado funciona en escritorio y móvil sin recortar saldos ni chocar con cartas, jugadores o controles.
+Éxito significa que el nombre completo y el saldo se leen de un vistazo en partidas de 2 a 6 jugadores; el neón identifica correctamente el turno; y el encabezado funciona en escritorio y móvil sin truncar nombres ni saldos ni chocar con cartas, jugadores o controles.
 
 ## Fuentes, hechos y supuestos
 
@@ -21,18 +21,18 @@ Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`:
 - El tablero circular ya está integrado en `master` (#5 y #9). La PR #11 de #6 sigue abierta y modifica `Coup.js`, `ActionDecision.js` y `CoupStyles.css`; no incluye `PlayerBoard.js` ni `PlayerBoardStyles.css`. La PR #12 de #8 está fusionada y modifica paneles de referencia, sin solapamiento con este alcance.
 - GitHub todavía muestra #6 y #8 abiertas, aunque sus cuerpos/docs locales contienen referencias de seguimiento anteriores a esas integraciones. No se editarán esas unidades como parte de #16.
 - `fotos/player.webp` y `fotos/coin.webp` existen en el checkout local, pero son fuentes locales, no assets del repositorio remoto. El Ejecutor debe copiarlas explícitamente al worktree de #16 antes de usarlas. No versionar los PNG fuente.
-- Se conserva la geometría y el cálculo de asientos actuales. Se asume que el ancho del encabezado puede limitarse con CSS sin cambiar el tablero; si la evidencia visual contradice esto, detenerse y reorquestar.
+- Se conserva la geometría y el cálculo de asientos actuales. Tras revisar el primer resultado, el usuario autorizó reducir la altura visual de las cartas de los rivales, además de compactar la barra móvil. No se cambian posiciones de asientos, reglas, datos ni controles.
 
 ## Alcance y criterios de aceptación
 
 1. Cada jugador muestra en una sola fila su icono, nombre y una barra neutra de monedas a la derecha, con altura alineada y el valor real, incluido cero y cifras de dos dígitos.
 2. Solo el jugador activo recibe fondo rojo, contorno claro y halo rojo en la barra del nombre. El efecto sigue a `props.currentPlayer` y se coordina con las cartas actuales. La barra de monedas mantiene el fondo neutro.
 3. El color asignado al jugador se conserva en el nombre cuando no es su turno. Los iconos mantienen transparencia y proporción.
-4. En móvil, las barras siguen en una fila. Nombres largos se abrevian visualmente, conservando el nombre completo accesible; icono y saldo permanecen visibles.
+4. En móvil, la barra ocupa menos altura, el texto del nombre usa tipografía reducida y se muestra completo sin puntos suspensivos; el nombre puede expandirse naturalmente, mientras el saldo permanece entero y visible.
 5. La inspección de 2 a 6 jugadores no encuentra encabezados recortados o superpuestos entre sí, con cartas o con controles.
-6. Los cambios se limitan a encabezado, estilos y assets derivados necesarios; no alteran datos de juego, turno, asientos ni lógica del servidor.
+6. Los cambios se limitan a encabezado, altura CSS de cartas rivales y assets derivados necesarios; no alteran datos de juego, turno, coordenadas de asientos ni lógica del servidor.
 
-## F1 — Construir y revisar el encabezado (`FAILED`; reorquestación requerida)
+## F1 — Implementación inicial (`FAILED`; reorquestada tras feedback)
 
 **Pregunta única:** ¿el nuevo encabezado reproduce las referencias, sigue el turno real y permanece legible para 2–6 jugadores en escritorio y móvil?
 **Entrada:** issue #16, este plan, `fotos/jugador.png`, `fotos/focus.png`, `fotos/player.webp`, `fotos/coin.webp`, `PlayerBoard.js` y `PlayerBoardStyles.css` desde `origin/master`.
@@ -42,7 +42,14 @@ Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`:
 **Avanzar:** pasan los seis criterios anteriores y se entrega evidencia visual más compilación del cliente. **Pivotar:** solo ajustes CSS localizados dentro del encabezado. **Repetir:** una corrección visual acotada por viewport. **Bloquear/reorquestar:** si resolver una colisión requiere cambiar geometría de asientos, cartas u otras áreas fuera de alcance.
 **Falsificación:** con seis jugadores y nombres largos a 320 px, ¿se oculta el saldo, se recorta el neón o se superpone el encabezado con otro jugador, las cartas o controles?
 **Validación:** revisión manual en escritorio y móvil, incluidas vista de 320 px, 2–6 jugadores, nombres largos, saldos 0/2/10, turnos activo/inactivo y jugadores eliminados; compilación de coup-client y `git diff --check`. No añadir ni ejecutar tests automatizados.
-**Publicación:** F1 falló el criterio 5 y requiere reorquestación. Por solicitud explícita del usuario, la rama está en el [PR draft #17](https://github.com/pronficilio/coup-online/pull/17) para revisión visual de las capturas; declarar claramente que no está listo para integrar. Mantener la issue abierta y no fusionar ni cerrar.
+**Publicación:** F1 inicial falló el criterio 5; el usuario reorquestó el trabajo y F2 incorpora sus ajustes. La rama está en el [PR draft #17](https://github.com/pronficilio/coup-online/pull/17) para revisar las capturas actualizadas. Mantener la issue abierta y no fusionar ni cerrar.
+
+## F2 — Ajuste visual tras feedback del usuario (`READY_FOR_USER_REVIEW`)
+
+**Decisión autorizada:** reducir bastante el tamaño de letra del nombre, eliminar el truncado con `…` y dejar que el texto completo determine el ancho de la barra; bajar la altura de la barra móvil; reducir la altura de las cartas de los rivales. Las cartas del observador conservan su altura completa.
+**Implementación:** centrar la fila sobre el asiento para que un nombre largo no se corte en los bordes; barra móvil de 18 CSS px, letra de 0.52 rem y sin elipsis; cartas rivales de 28–38 CSS px en móvil y 42–46 CSS px fuera de móvil. El layout y los puntos de asiento no cambian.
+**Evidencia:** capturas CDP actuales de 2–6 jugadores a 320×900 y 1280×1000 en `docs/plans/player-header/evidence/`; inspección visual de matriz, build y `git diff --check` pasan.
+**Avanzar:** dejar el PR draft para revisión del usuario. No fusionar ni cerrar #16.
 
 ## Topología, riesgos y revisión
 

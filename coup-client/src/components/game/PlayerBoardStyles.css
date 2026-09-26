@@ -69,13 +69,15 @@
 }
 
 .PlayerBoardSeatHeader {
+    position: relative;
+    left: 50%;
     display: inline-flex;
     align-items: stretch;
     gap: 4px;
     width: max-content;
-    max-width: calc(2 * clamp(76px, 10.4vw, 134px) + 5px);
     box-sizing: border-box;
     margin: 0 auto 7px;
+    transform: translateX(-50%);
 }
 
 .PlayerBoardSeatName {
@@ -87,7 +89,6 @@
     align-items: center;
     gap: 5px;
     box-sizing: border-box;
-    max-width: 100%;
     margin: 0;
     padding: 4px 8px;
     overflow: visible;
@@ -96,7 +97,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
     color: #fff;
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 0.82rem;
+    font-size: 0.7rem;
     font-weight: 600;
     line-height: 1.15;
     text-align: left;
@@ -113,10 +114,10 @@
 
 .PlayerBoardSeatNameText {
     display: block;
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex: 0 0 auto;
+    min-width: max-content;
+    overflow: visible;
+    text-overflow: clip;
     white-space: nowrap;
 }
 
@@ -196,6 +197,12 @@
     box-shadow: 0 3px 7px rgba(0, 0, 0, 0.32);
 }
 
+.PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceSlot {
+    height: clamp(42px, 3.5vw, 46px);
+    aspect-ratio: auto;
+    border-width: 1px;
+}
+
 .PlayerInfluenceSlot--face {
     padding: 0;
     background: #fff;
@@ -258,7 +265,8 @@
 
 @media only screen and (max-width: 520px) {
     .PlayerBoardSeatHeader {
-        max-width: calc(2 * clamp(58px, 15.5vw, 82px) + 5px);
+        gap: 3px;
+        margin-bottom: 3px;
     }
 
     .PlayerBoardSeat {
@@ -270,28 +278,33 @@
     }
 
     .PlayerBoardSeatName {
-        gap: 4px;
-        padding: 3px 6px;
-        font-size: 0.68rem;
+        gap: 3px;
+        padding: 1px 4px;
+        font-size: 0.52rem;
+        line-height: 1;
     }
 
     .PlayerBoardPlayerIcon {
-        flex-basis: 15px;
-        width: 15px;
-        height: 15px;
+        flex-basis: 12px;
+        width: 12px;
+        height: 12px;
     }
 
     .PlayerBoardSeatCoins {
-        gap: 3px;
-        min-height: 27px;
-        padding: 3px 6px;
-        font-size: 0.68rem;
+        gap: 2px;
+        min-height: 18px;
+        padding: 1px 4px;
+        font-size: 0.58rem;
     }
 
     .PlayerBoardCoinIcon {
-        flex-basis: 16px;
-        width: 16px;
-        height: 16px;
+        flex-basis: 13px;
+        width: 13px;
+        height: 13px;
+    }
+
+    .PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceSlot {
+        height: clamp(28px, 9vw, 38px);
     }
 
     .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardSeatHeader {
