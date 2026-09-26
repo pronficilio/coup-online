@@ -1,0 +1,69 @@
+# Coup on Hetzner
+
+This Compose project runs the selected Coup release on the existing
+`mochila_default` Docker network. It publishes no host ports; the shared Nginx
+container routes `coup.ejele.net` to `coup-web` and sends `/createNamespace`,
+`/exists/*`, and `/socket.io/*` to `coup-api`.
+
+## Build and start
+
+First create a release directory from the selected clean commit and the
+reviewed production overlay:
+
+```sh
+deploy/package-release.sh 1e4685f0d079448fb6ca5df0aa0380632ffc2c7e /tmp/coup-release
+cd /tmp/coup-release/deploy
+docker compose up -d --build
+docker compose ps
+docker compose logs --tail=100
+```
+
+The web image builds the React app with `REACT_APP_BACKEND_URL` set to
+`https://coup.ejele.net`. The API uses Node 24, listens on port 8000 inside the
+Docker network, and allows the Coup origin for HTTP and Socket.IO handshakes.
+Game rooms live in memory and are lost if the API container restarts.
+
+## Stop and rollback
+
+Keep the complete release directory and images to support rollback. To stop
+the stack, run `docker compose down` from that release's `deploy/` directory.
+
+## Shared Nginx and TLS
+
+The host's existing `mochila-proxy-1` owns ports 80 and 443. Keep that proxy;
+do not start a second public reverse proxy. Back up
+`/opt/mochila/deploy/nginx.conf` before replacing it. First install
+`nginx-hetzner-acme.conf`, run `docker exec mochila-proxy-1 nginx -t`, and
+reload Nginx. Make the Certbot root traversable (`chmod 711
+/opt/mochila/certbot`); its private child directories stay mode `700`. Then
+issue the certificate with the existing Certbot account:
+
+```sh
+docker run --rm -v /opt/mochila/certbot:/etc/letsencrypt \
+  certbot/certbot:latest certonly --non-interactive --webroot \
+  --webroot-path /etc/letsencrypt/webroot --cert-name ejele.net \
+  --account <existing-account-id> --agree-tos --no-eff-email \
+  -d ejele.net -d www.ejele.net -d coup.ejele.net
+```
+
+After issuance, install `nginx-hetzner-final.conf`, test it, and reload. It
+routes `ejele.net` to Mochila, redirects `www.ejele.net` to the apex, and
+routes Coup's app/API/Socket.IO paths to the two Coup containers. The TLS
+fallback and the existing Mochila upstream remain in place.
+
+Install `coup-certbot-renew.service` and `.timer` in `/etc/systemd/system`,
+then run `systemctl daemon-reload` and
+`systemctl enable --now coup-certbot-renew.timer`. Test the stored renewal
+configuration with:
+
+```sh
+docker run --rm -v /opt/mochila/certbot:/etc/letsencrypt \
+  certbot/certbot:latest renew --dry-run --cert-name ejele.net
+```
+
+The service renews only `ejele.net` and reloads the shared proxy after a
+successful renewal.
+
+Keep each release source under a separate directory or archive so rollback
+uses the matching source and image tag. This project must not publish ports 80
+or 443; those belong to Mochila's shared Nginx proxy.

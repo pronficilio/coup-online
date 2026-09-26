@@ -1,0 +1,14 @@
+FROM node:24-alpine AS build
+
+WORKDIR /app
+COPY coup-client/package.json coup-client/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY coup-client/ ./
+ARG REACT_APP_BACKEND_URL=https://coup.ejele.net
+ENV REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
+RUN npm run build
+
+FROM nginx:1.29-alpine
+COPY deploy/nginx-client.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80

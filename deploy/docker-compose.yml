@@ -1,0 +1,32 @@
+services:
+  coup-api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.server
+    image: coup-api:${COUP_REVISION:-1e4685f}
+    environment:
+      NODE_ENV: production
+      PORT: "8000"
+      CORS_ORIGIN: https://coup.ejele.net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8000/exists/healthcheck').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mochila_default
+
+  coup-web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.client
+    image: coup-web:${COUP_REVISION:-1e4685f}
+    restart: unless-stopped
+    networks:
+      - mochila_default
+
+networks:
+  mochila_default:
+    external: true
