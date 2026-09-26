@@ -1,6 +1,6 @@
 # Plan: panel de acciones del turno — issue #6
 
-**Estado:** `BLOCKED`; F1 está `CLOSED`, F2 tiene implementación y revisión estática listas pero espera el recorrido manual del cliente. El helper de navegador falló en dos intentos; ver `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
+**Estado:** `ACTIVE`; F1 y F2 están `CLOSED / PASS`; F3 permanece `PENDING`. Computer Use no debe reintentarse; F2 se verificó con Edge headless/CDP. Ver `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/6  
 **Handoff:** `docs/plans/inbox/issue_6_turn_actions_panel.md`  
 **Bitácora:** `docs/plans/log/issue-6.jsonl`  
@@ -78,9 +78,9 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 **Validación:** revisión de reglas y visual en vista de acciones; build del cliente si el cambio lo requiere. No añadir tests automatizados.  
 **Commit:** `COMMIT_REQUIRED`; cierre `feat(actions-panel): issue 6 F1 CLOSED visual verified`, con reporte, captura y evento `phase_verdict`.
 
-**Estado de ejecución:** `CLOSED / PASS`. La presentación semántica, el build ya registrado y la revisión de `docs/plans/turn-actions-panel/issue_6_f1_visual.png` completan los criterios de F1. La captura a 1440 × 1500 muestra las siete acciones y sus metadatos completos en el montaje actual. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`. #5 quedó integrado a `master`; F2 está implementada y espera su recorrido manual.
+**Estado de ejecución:** `CLOSED / PASS`. La presentación semántica, el build ya registrado y la revisión de `docs/plans/turn-actions-panel/issue_6_f1_visual.png` completan los criterios de F1. La captura a 1440 × 1500 muestra las siete acciones y sus metadatos completos en el montaje actual. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`. #5 quedó integrado a `master`; F2 también está cerrada tras recorrido funcional.
 
-### F2 — Montar en el tablero y conectar confirmación (`ACTIVE`; diseño aprobado, espera QA funcional)
+### F2 — Montar en el tablero y conectar confirmación (`CLOSED / PASS`)
 
 **Pregunta:** ¿el shell integrado muestra el panel solo en el turno local y permite confirmar objetivos sin cobrar prematuramente?  
 **Entrada:** F1 cerrada y #5 integrado a `master`; releer su markup/contrato antes de cambiar el montaje.  
@@ -90,6 +90,8 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 **Avanzar:** los eventos y estados enumerados conservan dueño, saldo y controles esperados. **Pivotar:** ajustar el origen de verdad si #5 organiza el turno en un contenedor nuevo. **Repetir:** una variante acotada por transición incorrecta. **Bloquear/cancelar:** solo sería posible mantener el coste temprano alterando las reglas o el servidor; pedir reorquestación en vez de ampliar alcance unilateralmente.  
 **Validación:** recorrido funcional en cliente; build si los cambios lo requieren. No añadir tests automatizados.  
 **Commit:** `COMMIT_REQUIRED`; cierre `feat(actions-panel): issue 6 F2 CLOSED advance_f3`, con reporte y evento `phase_verdict`.
+
+**Estado de ejecución:** `CLOSED / PASS`. En Edge headless/CDP, la sala local `WA5EGX` verificó turno local/ajeno y montaje/ocultamiento del panel; cancelar Assassinate con 3 monedas y Coup con 7 dejó saldo y contadores de emisión intactos; confirmar con doble clic produjo 1 `g-deductCoins` y 1 `g-actionDecision` en cada acción. El turno del Guest mostró Challenge, Block Steal y Pass mientras el panel local permanecía oculto; tras Coup el servidor anunció a Luna como ganador y el panel quedó oculto. Consultar `docs/plans/turn-actions-panel/report_issue_6_F2.md`. Computer Use no se reintentó. F3 continúa `PENDING`.
 
 ### F3 — Cerrar respuesta visual, accesibilidad y movimiento (`PENDING`)
 
@@ -105,7 +107,7 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 ## Dependencia, integración y revisión
 
 - F1 está cerrada en el montaje actual de `ActionDecision`; no requirió cambios en el tablero de #5. F2 está habilitada después de sincronizar la rama con el merge de #5 a `master` (`64593af5cff7ff80863c3fc175067eb49fc4b5ad`).
-- Para F2, el Alquimista releyó el código integrado de #5 y adaptó el punto de montaje y contratos de props/eventos. La dependencia está resuelta; falta evidencia de recorrido manual del cliente antes de cerrar la fase.
+- Para F2, el Alquimista adaptó el punto de montaje a #5; el recorrido funcional quedó registrado en el reporte F2. F3 es el siguiente checkpoint.
 - El Alquimista reclama #6 en GitHub, relee el ticket y confirma que no hay reclamo incompatible; crea o confirma `issue/6-turn-actions-panel` desde `origin/master` actualizado en `.worktrees/issue-6-turn-actions-panel`; registra el reclamo antes del trabajo funcional.
 - Todas las fases pertenecen a ese branch/worktree y a un solo PR a `master`. El Orquestador revisa diff, evidencia, build/recorridos declarados y veredicto independiente antes de integrar o cerrar.
 - Pregunta de falsificación para Verifier: ¿puede algún evento fuera de turno mostrar acciones propias o quedar con botones habilitados; cancelar un objetivo puede descontar dinero; un segundo clic puede duplicar la acción; o una respuesta legítima quedar cubierta por el panel?

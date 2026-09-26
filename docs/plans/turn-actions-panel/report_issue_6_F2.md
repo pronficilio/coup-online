@@ -1,6 +1,6 @@
 # Reporte F2 — montaje y confirmación
 
-**Estado:** `ACTIVE` — el diseño visual fue aprobado; falta el recorrido funcional del cliente para cerrar la fase.
+**Estado:** `CLOSED / PASS` — composición visual aprobada y recorrido funcional de F2 verificado con Edge headless/CDP. F3 permanece `PENDING`.
 
 ## Cambios revisados
 
@@ -11,12 +11,22 @@
 
 ## Validación
 
-- `npm run build`: **PASS**. CRA compiló. Permanecen avisos ESLint existentes: `logo` y `Link` sin uso en `src/App.js`, `ReactModal` sin uso en `src/components/game/Coup.js`; Browserslist reporta `caniuse-lite` desactualizado.
-- `git diff --check`: **PASS**; Git solo avisó que normalizará LF a CRLF en archivos del checkout.
-- Revisión estática del flujo: `server/game/coup.js` emite `g-updateCurrentPlayer` y luego dirige `g-chooseAction` al socket del jugador activo. El cliente valida el dueño del turno antes de habilitar el panel. Selección/cancelación no llama a `deductCoins` ni a `g-actionDecision`; confirmación válida envía ambos como máximo una vez, en ese orden.
-- Captura visual desde una partida local de dos jugadores con Edge headless: `issue_6_f2_active_turn.png` (1570 × 1149). Muestra las siete acciones completas junto al tablero durante el turno local; valida la composición visual, no el recorrido de interacción.
-- No se añadieron ni ejecutaron tests automatizados.
-- El recorrido funcional sigue pendiente: Computer Use falló (`kernel exited unexpectedly`; `windows sandbox failed: helper_unknown_error: setup refresh had errors`) y no debe reintentarse con ese helper. Edge headless/CDP ya permitió capturar la partida real y queda como vía alternativa para verificar interacciones; aún no hay evidencia de cambio de turno, cancelación/confirmación ni respuestas en ejecución.
+- `npm run build`: **PASS** en el cambio visual aprobado. CRA compiló; permanecen avisos ESLint previos (`logo`, `Link` y `ReactModal` sin uso) y `caniuse-lite` desactualizado.
+- `git diff --check`: **PASS** para el cierre documental.
+- Recorrido funcional asistido por CDP en Edge headless, sala local `WA5EGX`, cliente en `3200`, backend en `8000`; la sesión terminó y cerró su perfil temporal. Se registraron contadores de eventos Socket.IO y estados DOM, no solo una captura.
+
+| Recorrido | Observación en ejecución | Resultado |
+|---|---|---|
+| Inicio/propiedad | Turno inicial Luna: panel activo; browser recibió 1 `g-chooseAction`, Guest 0. Tras Income, Guest fue el turno activo; el panel local quedó `aria-hidden=true` con 0 botones y Guest recibió 1 `g-chooseAction`. Al terminar Income de Guest, Luna volvió a recibir el turno y el panel se activó. | PASS |
+| Cancelar Assassinate | Con 3 monedas apareció el selector con objetivo `Guest`. Antes y después: balance 3, `g-deductCoins` 0 y `g-actionDecision` 1 (el evento previo fue Income). | PASS; cancelar no cobró ni emitió acción. |
+| Confirmar Assassinate | Se eligió Guest y se hizo doble clic en Confirm. El socket local emitió exactamente 1 `g-deductCoins` y 1 `g-actionDecision`; el saldo pasó de 3 a 0. Guest pasó el desafío y quedó con 1 influencia (de 2); el turno avanzó. | PASS; guard contra doble envío observado. |
+| Respuestas | En la acción Steal de Guest contra Luna, con panel local oculto, la sección de respuesta mostró `Challenge`, `Block Steal` y `Pass`. | PASS; las respuestas no quedaron cubiertas por el panel. |
+| Cancelar Coup | Con 7 monedas, cancelar el selector mantuvo balance 7 y los contadores en 1 cobro / 9 acciones; no hubo emisión adicional. | PASS |
+| Confirmar Coup / game over | Doble clic en Confirm produjo deltas exactos de 1 `g-deductCoins` y 1 `g-actionDecision`; el servidor resolvió el Coup y anunció ganador Luna. El panel quedó `aria-hidden=true` al terminar la partida. | PASS |
+
+- Evidencia visual complementaria desde una partida local de dos jugadores: [captura F2](issue_6_f2_active_turn.png), 1570 × 1149. Muestra la composición aprobada con las siete acciones y la mesa; los contadores anteriores documentan el recorrido funcional.
+- Computer Use falló dos veces (`kernel exited unexpectedly`; `windows sandbox failed: helper_unknown_error: setup refresh had errors`) y no se reintentó. No se añadieron ni ejecutaron tests automatizados.
+- No se simuló directamente la muerte del jugador local en su propia UI; el walkthrough sí comprobó la limpieza al perder el turno y al game over. La revisión de jugador local eliminado queda dentro de la matriz de F3.
 
 ## Límite del protocolo de cobro
 
@@ -24,4 +34,4 @@ El protocolo existente recibe `g-deductCoins` y `g-actionDecision` en manejadore
 
 ## Siguiente paso
 
-Completar el recorrido funcional de F2 mediante Edge headless/CDP: verificar cambio de dueño/fin de turno, cancelación sin cobro/envío, confirmación única de Coup/Assassinate y disponibilidad de las decisiones de respuesta. No repetir intentos con Computer Use. F3 permanece pendiente hasta que F2 cierre.
+F2 queda cerrada con PASS y este reporte queda enlazado desde PR #11, que permanece draft. Iniciar F3 en el mismo branch, worktree y PR: revisión visual/accessibilidad de escritorio y móvil, reduced motion, foco y estados de jugador eliminado, con matriz y evidencia propias. No repetir Computer Use.
