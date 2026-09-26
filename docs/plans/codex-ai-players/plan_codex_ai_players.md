@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); F2 ACTIVE
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); primer PHASE F2 BLOCKED, corrección local pendiente de recheck
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -109,8 +109,8 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Pivote:** si Codex CLI no permite una ejecución acotada y segura para una decisión de juego, bloquear F2 y presentar la limitación en lugar de sustituir autenticación/proveedor.
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
 - **Commit:** `COMMIT_REQUIRED`; `feat(codex-player): issue 14 F2 plus-auth runtime`.
-- **Validación:** verificación local bajo el login del propietario; registrar éxito/error, esfuerzo, latencia y uso disponible; no lanzar simulaciones masivas.
-- **Acotación OpenAI Docs (2026-09-26):** `codex exec` está documentado para uso no interactivo, acepta `--output-schema` y reutiliza autenticación CLI guardada. La primera prueba demostró que el sandbox antiguo `read-only` permitía leer un archivo señuelo fuera del workspace; F2 lo reemplaza por un perfil inline que deniega el filesystem por defecto, restringe lectura al workspace vacío y a paths mínimos, y deshabilita herramientas locales. La página de perfiles de permisos los marca Beta; PHASE debe probar la política con la versión fijada de Codex en Linux antes de habilitar asientos. La guía avanzada de autenticación además advierte no usar ese flujo con repositorios públicos/open source. El runner no enviará el checkout público: solo JSON de runtime; el Verifier debe resolver si esa separación satisface la guía. La CLI exige un Git repo salvo `--skip-git-repo-check`; se usa ese modo junto con `--ephemeral`. Referencias: [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode), [Permissions](https://learn.chatgpt.com/docs/permissions).
+- **Validación:** no iniciar sesión ni llamar a `codex exec` hasta que el PHASE resuelva el uso de Plus y confirme Luna. Primero probar el aislamiento con CLI/runtime Linux sin credenciales ni modelo; después de desbloquear los gates, una prueba mínima bajo el login del propietario debe registrar éxito/error, esfuerzo, latencia y uso disponible, sin simulaciones masivas.
+- **Acotación OpenAI Docs (2026-09-26):** `codex exec` está documentado para uso no interactivo, acepta `--output-schema` y reutiliza autenticación CLI guardada. La primera prueba demostró que el sandbox antiguo `read-only` permitía leer un archivo señuelo fuera del workspace; F2 lo reemplaza por un perfil inline que deniega el filesystem por defecto, restringe lectura al workspace vacío y a paths mínimos, permite el temporal privado del servicio y deshabilita herramientas locales. La CLI necesita `TMPDIR` y `XDG_RUNTIME_DIR` privados; ambos apuntan al runtime creado con modo `0700`. La página de perfiles de permisos los marca Beta; PHASE debe probar la política con la versión fijada de Codex en Linux antes de habilitar asientos. La guía avanzada de autenticación además advierte no usar ese flujo con repositorios públicos/open source. El runner no enviará el checkout público: solo JSON de runtime; el Verifier debe resolver si esa separación satisface la guía. La CLI exige un Git repo salvo `--skip-git-repo-check`; se usa ese modo junto con `--ephemeral`. Referencias: [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode), [Permissions](https://learn.chatgpt.com/docs/permissions).
 
 ### F3 — Añadir asientos IA y palanca roja (`PENDING`)
 

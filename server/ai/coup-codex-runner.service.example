@@ -13,6 +13,8 @@ UMask=0007
 Environment=CODEX_APP_ROOT=/srv/coup-online
 Environment=CODEX_HOME=/var/lib/coup-codex/auth
 Environment=CODEX_WORKDIR=/run/coup-codex-work
+Environment=TMPDIR=/run/coup-codex/tmp
+Environment=XDG_RUNTIME_DIR=/run/coup-codex/tmp
 Environment=CODEX_RUNNER_SOCKET=/run/coup-codex/runner.sock
 Environment=CODEX_PATH=/usr/local/bin:/usr/bin:/bin
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
@@ -21,6 +23,7 @@ Environment=CODEX_MAX_CONCURRENCY=2
 
 WorkingDirectory=/run/coup-codex-work
 ExecStart=/usr/bin/env node /opt/coup-codex-runner/server/ai/codex-worker.js
+ExecStartPre=/usr/bin/install -d -m 0700 /run/coup-codex/tmp
 ExecStartPre=/usr/bin/install -d -m 0700 /var/lib/coup-codex/auth
 Restart=on-failure
 RestartSec=2s

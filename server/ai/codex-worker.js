@@ -56,6 +56,10 @@ async function verifyConfiguredPaths(env, tempRoot) {
     if (!authDir.isDirectory() || (authDir.mode & 0o077) !== 0) {
         throw Object.assign(new Error('Codex authentication directory must be private to the runner user.'), { code: 'runner_not_configured' })
     }
+    const tempDir = await fs.stat(canonical.tempRoot)
+    if (!tempDir.isDirectory() || (tempDir.mode & 0o077) !== 0) {
+        throw Object.assign(new Error('Codex runtime directory must be private to the runner user.'), { code: 'runner_not_configured' })
+    }
     try {
         const authFile = await fs.lstat(path.join(canonical.codeHome, 'auth.json'))
         if (!authFile.isFile() || authFile.isSymbolicLink() || (authFile.mode & 0o077) !== 0) {
@@ -77,6 +81,7 @@ function runnerEnvironment(env = process.env, paths = configuredPaths(env)) {
         HOME: paths.workDir,
         CODEX_HOME: paths.codeHome,
         TMPDIR: paths.tempRoot,
+        XDG_RUNTIME_DIR: paths.tempRoot,
         LANG: env.LANG || 'C.UTF-8',
         TERM: 'dumb'
     }

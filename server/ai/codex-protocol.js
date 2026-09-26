@@ -174,7 +174,7 @@ function execArgs(request, schemaPath, outputPath) {
         '--model', MODEL,
         '--config', `model_reasoning_effort='"${request.effort}"'`,
         '--config', 'default_permissions="coup-ai"',
-        '--config', 'permissions.coup-ai.filesystem={":root"="deny",":minimal"="read",":tmpdir"="deny",":slash_tmp"="deny",":workspace_roots"={"."="read"}}',
+        '--config', 'permissions.coup-ai.filesystem={":root"="deny",":minimal"="read",":tmpdir"="write",":slash_tmp"="deny",":workspace_roots"={"."="read"}}',
         '--config', 'permissions.coup-ai.network={enabled=false}',
         '--config', 'web_search="disabled"',
         '--disable', 'shell_tool',
