@@ -2,22 +2,21 @@
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
 - **Plan:** `docs/plans/active/issue_13_hetzner_deployment.md`
-- **Estado:** `WAITING_USER`; inventario F0 cerrado; F1 espera corregir el registro DNS de `coup.ejele.net`.
+- **Estado:** `WAITING_USER`; F0 y F1 (DNS) cerradas; F2 espera fijar el commit/tag de release.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** no; requerido de forma independiente en F5 antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
-- **Fase sugerida:** F1 — asegurar que el A de `coup` tenga valor `178.105.138.91` y verificar que resolvers públicos dejen de responder con `178.108.138.91`, conservando el registro raíz.
-- **Por qué sigue:** Cloudflare y Google DNS resuelven `coup.ejele.net` a `178.108.138.91` (TTL 600 s), mientras la IP Hetzner verificada es `178.105.138.91`; falta confirmar el cambio/propagación. Además, hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
+- **Fase sugerida:** F2 — fijar SHA/tag reproducible que se desea publicar.
+- **Por qué sigue:** DNS ya está confirmado como `coup.ejele.net → 178.105.138.91`. Hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
 - **Subtareas listas para delegación:**
-  1. Corregir/verificar el A `coup.ejele.net → 178.105.138.91` sin tocar la raíz ni otros nombres.
-  2. Tras fijar el release, construir exactamente ese SHA y registrar artefacto/hash.
-  3. Preparar Compose aislado (sin publicar 80/443), cliente same-origin, CORS acotado y health/rollback.
-  4. Desplegar bajo ruta dedicada en Hetzner y probar vía SSH tunnel.
-  5. Añadir un vhost acotado y TLS, preservando Mochila/Minecraft.
+  1. Tras fijar el release, construir exactamente ese SHA y registrar artefacto/hash.
+  2. Preparar Compose aislado (sin publicar 80/443), cliente same-origin, CORS acotado y health/rollback.
+  3. Desplegar bajo ruta dedicada en Hetzner y probar vía SSH tunnel.
+  4. Añadir un vhost Nginx acotado y TLS, preservando Mochila/Minecraft; no instalar otro proxy que compita por 80/443.
 - **Criterios de aceptación:** ver el plan, issue #13.
 - **Evidencia requerida:** resolución DNS del A, SHA de release, resultado de build, pruebas API/Socket.IO, estado de servicios previos antes/después, comprobación post-restart, evidencia HTTPS/WebSocket, rollback.
-- **Riesgos/bloqueos:** proxy compartido; no domain aún; release no fijado; CORS actual abierto.
+- **Riesgos/bloqueos:** proxy compartido; release no fijado; CORS actual abierto.
 - **Política de commits:** `COMMIT_AFTER_REVIEW` en F1/F3/F4; `COMMIT_REQUIRED` en F2/F5. Un solo branch/worktree/PR para el issue.
 - **Branch destino:** `issue/13-hetzner-deployment`.
 - **Worktree destino:** `.worktrees/issue-13-hetzner-deployment`.
