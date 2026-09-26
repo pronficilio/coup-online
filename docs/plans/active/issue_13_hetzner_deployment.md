@@ -117,7 +117,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Criterio de cierre:** veredicto `PASS`, pasos de rollback probados/documentados, versión y salud actual registradas, PR integrado a `master` y issue actualizada.
 - **PR:** #15 en borrador, listo para revisión pero no para integrar.
 - **Política de commit:** `COMMIT_REQUIRED`.
-- **Cierre previsto:** `docs(deploy): issue 13 F5 CLOSED deployment verified`.
+- **Cierre previsto:** `docs(deploy): issue 13 F6 CLOSED deployment verified`.
 
 ## Registro de decisiones
 
