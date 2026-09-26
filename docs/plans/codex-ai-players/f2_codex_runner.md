@@ -28,6 +28,8 @@ El runner falla cerrado si CODEX_HOME, workspace, raíz de la app y temporal se 
 
 La documentación oficial dice que `codex exec` es para automatización, puede reutilizar auth guardada, acepta `--output-schema`, tiene sandbox de solo lectura y permite `--ephemeral` y `--ignore-user-config`. También advierte que no se use el flujo avanzado de auth gestionada por ChatGPT con repositorios públicos/open source. Coup Online es público. La separación propuesta implica que Codex recibe únicamente JSON del juego y no procesa el repo, pero la documentación no aclara si eso elimina la advertencia para este uso. El Verifier debe resolverlo antes de habilitar una sesión Plus o invocar el modelo real; no habrá API ni fallback.
 
+La documentación oficial lista `gpt-6-luna` en Codex, pero advierte que la disponibilidad depende del plan, método de inicio, cliente y rollout; no confirma que esta cuenta Plus tenga acceso. La guía señala que desde el 2026-10-14 Plus y otros planes deben elegir Sol como reemplazo de GPT-5.5, mientras Free/Go pueden elegir Luna. Se conserva Luna como modelo fijo: el Verifier debe revisar la disponibilidad prevista sin iniciar sesión; si no se confirma, no se invoca nada y se mantiene F2 bloqueada, sin cambiar de modelo ni usar API.
+
 Fuentes revisadas el 2026-09-26: [modo no interactivo](https://learn.chatgpt.com/docs/non-interactive-mode), [sandboxing](https://learn.chatgpt.com/docs/sandboxing), [opciones del CLI](https://learn.chatgpt.com/docs/developer-commands) y [esfuerzo de razonamiento](https://learn.chatgpt.com/docs/developer-settings).
 
 ## Evidencia local disponible
