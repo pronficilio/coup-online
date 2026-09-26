@@ -1,8 +1,8 @@
 # Issue #14 — evidencia de ejecución F1
 
-**Estado:** `WAITING_EXECUTOR_REVIEW` tras corregir los hallazgos de PHASE; no es `PASS` ni `CLOSED`.
+**Estado:** `CLOSED` tras correcciones y PHASE independiente `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 **Branch / worktree:** `issue/14-codex-ai-players` / `.worktrees/issue-14-codex-ai-players`.
-**Commit F1 inicial:** `608089d4c839f367b9b0b0e92009d3daf536ce5c`; checkpoint de correcciones local en este branch (hash comunicado al Orquestador; sin push ni PR).
+**Commit F1 inicial:** `608089d4c839f367b9b0b0e92009d3daf536ce5c`; checkpoint corregido revisado y publicado en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` (sin PR).
 **Contrato:** `docs/plans/codex-ai-players/f0_contract.md`.
 
 ## Cambios comprobables
@@ -39,4 +39,4 @@ El Verifier revisó `f9de90f` (incluye implementación `608089d`) y emitió `FAI
 1. Si el objetivo desafía Assassin y pierde, la continuación ahora resuelve directamente la acción después de la primera pérdida; no vuelve a abrir `afterActionClaim` ni una ventana Contessa. El coste de Asesinato sigue cobrándose y otras acciones reclamadas conservan el flujo anterior. La regresión verifica que el objetivo pierde Duke primero, mantiene Contessa en la mano y luego recibe solo una segunda opción `lose_influence` para Contessa.
 2. `openExchange` ahora genera elecciones del mismo tamaño que la mano previa (una o dos cartas). La regresión de una influencia verifica tres opciones singulares, conserva una carta elegida y devuelve las otras dos al Court.
 
-Las correcciones pasan la suite del servidor, ambas pruebas directas, `node --check` y `git diff --check`. F1 queda a la espera de PHASE independiente; no se inició Codex ni F2.
+Las correcciones pasan la suite del servidor, ambas pruebas directas, `node --check` y `git diff --check`. La segunda revisión PHASE independiente dio `PASS`; informe: `docs/plans/active/verifier_issue_14_F1_recheck.md`. El informe histórico `verifier_issue_14_F1.md` conserva el primer `FAIL`. F1 queda cerrada; el cierre de fase no invocó Codex.

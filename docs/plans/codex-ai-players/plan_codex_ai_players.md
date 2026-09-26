@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW tras corregir hallazgos PHASE
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); F2 ACTIVE
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -88,19 +88,19 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Commit:** contrato y reglas en `b189cc0`; cierre F0 registrado en este commit.
 - **Validación:** inspección de cada evento/decisión y trazado de una partida mixta; no se inicia una llamada a Codex real desde F0.
 
-### F1 — Hacer el estado y las decisiones privados y autoritativos (`WAITING_EXECUTOR_REVIEW`)
+### F1 — Hacer el estado y las decisiones privados y autoritativos (`CLOSED — PHASE PASS`)
 
 - **Pregunta:** ¿puede el servidor aplicar una decisión humana o IA sin filtrar cartas ni aceptar una mutación de estado que el jugador no tiene derecho a realizar?
 - **Entrada:** contrato F0.
 - **Salida:** proyecciones públicas/privadas explícitas, decisiones asociadas a socket/jugador/partida/fase, validación de acción/costo/destino y flujo correcto de cartas reveladas/reemplazadas.
 - **Cierre:** llamadas de cliente ya no determinan fuente, costo, carta revelada ni cartas de intercambio; mano y mazo no salen en eventos públicos; decisiones fuera de turno/fase, opciones inválidas o de otro socket se rechazan; repetición exacta es idempotente y una repetición con elección distinta se rechaza. El motor cumple las reglas versionadas, incluido inicio por ganador previo, una moneda inicial para quien empieza en dos jugadores y cartas de influencia reveladas fuera del mazo; sin ganador previo, el primer asiento se elige al azar. Ventanas de timeout reanudables solo por el líder con todos los sockets conectados; respuestas parciales se borran y se emiten IDs/versiones nuevos. Una desconexión obliga a recrear la partida. Verifier independiente debe emitir `PASS` sobre filtración, autoridad y reglas.
-- **Estado/evidencia:** el PHASE previo registró `FAIL` en `docs/plans/active/verifier_issue_14_F1.md`. Las dos correcciones están implementadas y cubiertas: al perder el desafío de una afirmación Assassin, el objetivo recibe directamente la pérdida de Asesinato sin otra ventana de bloqueo; Exchange conserva exactamente una o dos influencias según la mano previa. El resto de los criterios no cambió. `npm test`, las pruebas directas de motor y lobby, `node --check` y `git diff --check` pasan. `react-scripts` no está instalado, por lo que build/test del cliente siguen sin ejecutar. F1 espera una nueva revisión PHASE; F2/Codex no se inició.
+- **Estado/evidencia:** el PHASE inicial registró `FAIL` en `docs/plans/active/verifier_issue_14_F1.md`; las dos correcciones están implementadas y cubiertas por regresiones. La segunda revisión independiente dio `PASS` en `docs/plans/active/verifier_issue_14_F1_recheck.md`, en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. `npm test`, las pruebas directas de motor y lobby, `node --check` y `git diff --check` pasan. `react-scripts` no está instalado, por lo que build/test del cliente no se ejecutaron. F1 quedó cerrada sin invocar Codex.
 - **Pivote:** si el motor actual necesita una división mayor para preservar reglas, documentar y mantener dentro de esta fase solo los cambios necesarios para el contrato IA.
 - **Repetición:** una corrección acotada por cada fallo demostrable de los criterios.
-- **Commit:** implementación inicial `608089d4c839f367b9b0b0e92009d3daf536ce5c` devuelta; correcciones, regresiones y evidencia quedan en el commit local de este checkpoint.
-- **Validación:** `npm test` en `server/`, pruebas directas `node test/coup.test.js` y `node test/lobby.test.js`, `node --check` y `git diff --check`; solicitar un nuevo PHASE independiente antes de F2.
+- **Commit:** implementación inicial `608089d4c839f367b9b0b0e92009d3daf536ce5c` devuelta; correcciones, regresiones y evidencia revisadas en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
+- **Validación:** `npm test` en `server/`, pruebas directas `node test/coup.test.js` y `node test/lobby.test.js`, `node --check`, `git diff --check` y PHASE independiente `PASS`.
 
-### F2 — Añadir el controlador Codex con la suscripción del propietario (`PENDING`)
+### F2 — Añadir el controlador Codex con la suscripción del propietario (`ACTIVE`)
 
 - **Pregunta:** ¿puede un proceso separado ejecutar una decisión Codex acotada y devolver una opción válida sin recibir secretos ajenos ni acceso operativo al servidor?
 - **Entrada:** proyecciones y decisiones autoritativas F1.
@@ -110,6 +110,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
 - **Commit:** `COMMIT_REQUIRED`; `feat(codex-player): issue 14 F2 plus-auth runtime`.
 - **Validación:** verificación local bajo el login del propietario; registrar éxito/error, esfuerzo, latencia y uso disponible; no lanzar simulaciones masivas.
+- **Acotación OpenAI Docs (2026-09-26):** `codex exec` está documentado para uso no interactivo, acepta `--output-schema` y reutiliza la autenticación CLI guardada; por defecto usa sandbox read-only. La guía advierte no usar la ruta avanzada ChatGPT-managed auth para repositorios públicos/open source. Este juego no enviará código ni contexto del checkout público: F2 debe probar que el runner vive fuera de ese checkout, recibe solo JSON de runtime y no ejecuta herramientas MCP ni texto libre de jugadores. La CLI exige un Git repo salvo `--skip-git-repo-check`; probar ese modo junto con `--ephemeral` en el directorio aislado. El Verifier decide si esta separación queda dentro de la guía antes de habilitar asientos IA. Referencia: [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode).
 
 ### F3 — Añadir asientos IA y palanca roja (`PENDING`)
 
@@ -140,13 +141,13 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Secretos Codex:** login se realiza en Hetzner como usuario del proceso o flujo remoto documentado; auth cache con permisos de propietario, nunca en logs/cliente/repositorio.
 - **Prompt injection:** no incluir chat libre; datos de juego estructurados; no abrir el modelo a archivos del proyecto ni a herramientas sobre el juego; opciones se generan y validan en servidor.
 - **Latencia/caída:** decisión con id y vencimiento; descartar respuestas tardías; pausa visible y recuperación explícita.
-- **Reglas/privacidad heredadas:** limitar el acceso público a IA hasta cerrar F1 y revisión independiente.
+- **Reglas/privacidad heredadas:** F1 cerró con PHASE `PASS`; no habilitar asientos IA desde el lobby hasta cerrar F2/F3 y sus revisiones independientes.
 
 ## Operación
 
 - Ejecución `FULL`; riesgo `HIGH`; verificación independiente `PHASE` obligatoria en F0–F3 y `FINAL` al cierre, por permisos de socket, privacidad y concurrencia.
 - Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
-- Siguiente dueño tras abrir issue: Alquimista, después de reclamar siguiendo el protocolo.
+- Siguiente dueño: Ejecutor F2; revisión PHASE independiente antes de F3.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
 - Merge target: `master`.

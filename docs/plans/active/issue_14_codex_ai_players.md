@@ -2,15 +2,15 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW tras correcciones
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); F2 ACTIVE
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
-Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; PHASE encontró dos defectos, ya corregidos en el checkpoint F1 local indicado al Orquestador.
+Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
-Siguiente dueño: Orquestador para solicitar revisión PHASE independiente sobre el checkpoint corregido. F2 sigue pendiente.
+Siguiente dueño: Ejecutor para F2, comenzando por concretar la frontera de autenticación Plus, el runner aislado y la validación de `codex exec`. F2 no habilitará todavía asientos IA desde el lobby.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -28,7 +28,7 @@ Evidencia registrada: matriz evento × actor × información/acción y contrato 
 
 Commits F0: `6b480fa` contiene el primer contrato; `b189cc0` contiene decisiones aprobadas y reglas versionadas; el cierre documental con PHASE PASS queda en este commit. Solo el Orquestador registra `CLOSED` tras PASS del Verifier.
 Validación: revisión estática del contrato; no iniciar llamadas Codex reales durante F0.
-El usuario eligió orden fijo de asientos en sentido horario desde quien declara la acción/bloqueo; si varias personas responden, se escoge la primera elegible en ese orden, sin ventaja por latencia. Los documentos fuente están versionados y la transcripción es normativa. F1 corrigió la discrepancia de setup; la evidencia queda en `issue_14_F1_evidence.md`.
+El usuario eligió orden fijo de asientos en sentido horario desde quien declara la acción/bloqueo; si varias personas responden, se escoge la primera elegible en ese orden, sin ventaja por latencia. Los documentos fuente están versionados y la transcripción es normativa. F1 corrigió las discrepancias de reglas y cerró con PHASE `PASS`; evidencia y revisión están en `issue_14_F1_evidence.md` y `verifier_issue_14_F1_recheck.md`.
 
 ## Contrato global para las siguientes fases
 
@@ -41,6 +41,6 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Límites conservadores de concurrencia, llamadas y tiempo. Registros operativos no contienen credenciales, manos ajenas ni razonamiento privado.
 - No incluir texto libre de clientes ni acceso al repositorio/secretos en las solicitudes Codex; ejecutar en entorno aislado y de solo lectura.
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
-- F0 ya cerró antes de F1; no avanzar a F2 ni crear PR por fase antes del veredicto independiente de F1.
+- F0 y F1 ya cerraron tras PHASE `PASS`; F2 puede iniciar en este branch sin PR por fase. La revisión F1 no invocó Codex.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`; F0 `CLOSED`. El PHASE previo de F1 encontró dos defectos: tras perder un desafío contra Asesinato el objetivo podía recibir otra opción de bloqueo, y Exchange podía aumentar una mano de una carta a dos. Ambos están corregidos y cubiertos por regresiones en este checkpoint. `npm test`, las pruebas directas, `node --check` y `git diff --check` pasan; React sigue sin `react-scripts`. F1 espera un nuevo PHASE; F2 sigue pendiente. No abrir PR ni invocar Codex.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; F0 cerró con PHASE `PASS` en `b189cc0`. F1 cerró con PHASE `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` tras corregir el desafío perdido contra Asesinato y Exchange con una influencia. `npm test`, las pruebas directas, `node --check` y `git diff --check` pasan; React sigue sin `react-scripts`. F2 está activa para validar y construir el runner Codex autenticado de forma aislada; no crear PR todavía.
