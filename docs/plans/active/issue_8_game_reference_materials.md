@@ -1,9 +1,9 @@
-# Handoff bloqueado para Agente Alquimista — issue #8
+# Handoff para Agente Alquimista — issue #8
 
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/8
 - **Plan exacto:** `docs/plans/game-reference-materials/plan_game_reference_materials.md`
 - **Bitácora exacta:** `docs/plans/log/issue-8.jsonl`
-- **Estado:** `BLOCKED` en F1; #8 sigue abierta y asignada a `pronficilio`.
+- **Estado:** `ACTIVE`; #8 sigue abierta y asignada a `pronficilio`. El usuario autorizó completar la issue y abrir el PR con capturas.
 - **Branch/worktree únicos:** `issue/8-game-reference-assets` / `.worktrees/issue-8-game-reference-assets`.
 - **Base:** `origin/master`, actualizado antes del aislamiento a `febec397d3dcd9c2472a61910c8441800c939326`.
 - **Integración:** un PR desde la rama de issue a `master`, asociado a #8. Aún no existe PR.
@@ -15,7 +15,7 @@ El Orquestador asignó #8 a `pronficilio` después de verificar que la issue est
 
 ## Fase que debe tomar primero
 
-F1 está detenida antes de la conversión: las fuentes están en `E:\dev\coup\fotos\`, pero no hay un encoder cuya ejecución e inspección estén autorizadas. La escalación solicitada para Pillow se canceló; no repitas esa solicitud sin nueva autorización. Al levantarse el bloqueo, genera `card-en.webp`, `card-es.webp`, `table-en.webp` y `table-es.webp` en `coup-client/src/assets/references/`, todos de 1024 px de ancho, proporción preservada y WebP calidad 85. No copies ni agregues los PNG a Git. Registra encoder, versión, método, dimensiones y peso de cada resultado. El reporte F1 debe comprobar lectura de texto y consistencia con las reglas.
+Las fuentes están en `E:\dev\coup\fotos\`. El usuario autorizó completar la conversión e inspección local; genera `card-en.webp`, `card-es.webp`, `table-en.webp` y `table-es.webp` en `coup-client/src/assets/references/`, todos de 1024 px de ancho, proporción preservada y WebP calidad 85. No copies ni agregues los PNG a Git. Registra encoder, versión, método, dimensiones y peso de cada resultado. El reporte F1 debe comprobar lectura de texto y consistencia con las reglas.
 
 **Cierre F1:** reporte `docs/plans/game-reference-materials/report_issue_8_F1.md`, cuatro WebP y evento `phase_verdict` en la bitácora, juntos en el commit `feat(reference-assets): issue 8 F1 CLOSED advance_f2`.
 
