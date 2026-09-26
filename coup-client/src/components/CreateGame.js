@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import io from "socket.io-client";
-import { ReactSortable } from "react-sortablejs";
 import Coup from './game/Coup';
 
 const axios = require('axios');
@@ -21,7 +20,7 @@ export default class CreateGame extends Component {
             isError: false,
             isGameStarted: false,
             errorMsg: '',
-            canStart: false,
+            isLeader: false,
             socket: null,
 
         }
@@ -51,18 +50,20 @@ export default class CreateGame extends Component {
             bind.setState({ isLoading: false });
         })
 
+        socket.on('startGame', () => this.setState({ isGameStarted: true }))
+        socket.on('startRejected', reason => this.setState({
+            errorMsg: `Unable to start: ${reason}`,
+            isError: true
+        }))
+
         socket.on("leader", function() {
             console.log("You are the leader")
+            bind.setState({ isLeader: true })
         })
 
         socket.on('partyUpdate', (players) => {
             console.log(players)
             this.setState({ players })
-            if(players.length >= 2 && players.map(x => x.isReady).filter(x => x === true).length === players.length) { //TODO CHANGE 2 BACK TO 3
-                this.setState({ canStart: true })
-            } else {
-                this.setState({ canStart: false })
-            }
         })
 
         socket.on('disconnected', function() {
@@ -97,11 +98,7 @@ export default class CreateGame extends Component {
     }
 
     startGame = () => {
-        this.state.socket.emit('startGameSignal', this.state.players)
-
-        this.state.socket.on('startGame', () => {
-            this.setState({ isGameStarted: true});
-        })
+        this.state.socket.emit('startGameSignal')
     }
 
     copyCode = () => {
@@ -116,13 +113,12 @@ export default class CreateGame extends Component {
 
     render() {
         if(this.state.isGameStarted) {
-            return (<Coup name={this.state.name} socket={this.state.socket}></Coup>)
+            return (<Coup name={this.state.name} socket={this.state.socket} isLeader={this.state.isLeader}></Coup>)
         }
         let error = null;
         let roomCode = null;
         let startGame = null;
         let createButton = null;
-        let youCanSort = null;
         if(!this.state.isInRoom) {
             createButton = <>
             <button className="createButton" onClick={this.createParty} disabled={this.state.isLoading}>{this.state.isLoading ? 'Creating...': 'Create'}</button>
@@ -133,13 +129,12 @@ export default class CreateGame extends Component {
             error = <b>{this.state.errorMsg}</b>
         }
         if(this.state.roomCode !== '' && !this.state.isLoading) {
-            youCanSort = <p>You can drag to re-arrange the players in a specific turn order!</p>
             roomCode = <div>
                     <p>ROOM CODE: <br></br> <br></br><b className="RoomCode" onClick={this.copyCode}>{this.state.roomCode} <span className="iconify" data-icon="typcn-clipboard" data-inline="true"></span></b></p>
                     {this.state.copied ? <p>Copied to clipboard</p> : null}
                 </div>
         }
-        if(this.state.canStart) {
+        if(this.state.isLeader && this.state.players.length >= 2 && this.state.players.every(player => player.isReady)) {
             startGame = <button className="startGameButton" onClick={this.startGame}>Start Game</button>
         }
         return (
@@ -168,9 +163,7 @@ export default class CreateGame extends Component {
                 {error}
                 <br></br>
                 {roomCode}
-                {youCanSort}
                 <div className="readyUnitContainer">
-                    <ReactSortable list={this.state.players} setList={newState => this.setState({ players: newState })}>
                         {this.state.players.map((item,index) => {
                             let ready = null
                             let readyUnitColor = '#E46258'
@@ -187,7 +180,6 @@ export default class CreateGame extends Component {
                             )
                             })
                         }
-                    </ReactSortable>
                 </div>
                 
                 {startGame}

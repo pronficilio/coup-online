@@ -22,9 +22,11 @@ function getInfluenceImage(influence) {
     return INFLUENCE_IMAGES[String(influence).toLowerCase()] || cardBackImage
 }
 
-function renderInfluenceSlot(player, isObserver, slotIndex) {
-    const influences = Array.isArray(player.influences) ? player.influences : []
-    const isActive = !player.isDead && slotIndex < influences.length
+function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) {
+    const revealed = Array.isArray(player.revealedInfluences) ? player.revealedInfluences : []
+    const own = isObserver && Array.isArray(observerInfluences) ? observerInfluences : []
+    const knownCards = isObserver ? revealed.concat(own) : revealed
+    const isActive = slotIndex < (revealed.length + (isObserver ? own.length : (player.influenceCount || 0)))
 
     if (!isActive) {
         return <span
@@ -34,12 +36,12 @@ function renderInfluenceSlot(player, isObserver, slotIndex) {
         />
     }
 
-    if (isObserver) {
-        const influence = influences[slotIndex]
+    if (knownCards[slotIndex]) {
+        const influence = knownCards[slotIndex]
         return <span
             className="PlayerInfluenceSlot PlayerInfluenceSlot--face"
             role="img"
-            aria-label={`Influencia: ${influence}`}
+                aria-label={`Influencia revelada: ${influence}`}
             key={slotIndex}
         >
             <img
@@ -104,7 +106,7 @@ export default function PlayerBoard(props) {
                     <p className="PlayerBoardSeatCoins">Monedas: {player.money}</p>
                     <div className="PlayerBoardSeatInfluences">
                         {INFLUENCE_SLOTS.map(slotIndex =>
-                            renderInfluenceSlot(player, isObserver, slotIndex)
+                            renderInfluenceSlot(player, isObserver, props.observerInfluences, slotIndex)
                         )}
                     </div>
                 </section>
@@ -112,6 +114,5 @@ export default function PlayerBoard(props) {
         </div>
     )
 }
-
 
 

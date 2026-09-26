@@ -2,16 +2,17 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 ACTIVE
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
+Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
 
 ## Contrato F0 y decisiones de producto definidos
 
-El contrato F0 está en `docs/plans/codex-ai-players/f0_contract.md`. Define vistas públicas/privadas, actor por socket/asiento, opciones por fase, respuesta id/versionada, timeout/pausa y palanca. El usuario decidió conservar el acceso actual sin cuentas/login/invitaciones, versionar las cuatro fuentes de reglas y desempatar ventanas concurrentes por orden fijo de asientos. F0 cerró con PHASE `PASS`; F1 está activa. Se consultaron los hallazgos confirmados en:
+El contrato F0 está en `docs/plans/codex-ai-players/f0_contract.md`. Define vistas públicas/privadas, actor por socket/asiento, opciones por fase, respuesta id/versionada, timeout/pausa y palanca. El usuario decidió conservar el acceso actual sin cuentas/login/invitaciones, versionar las cuatro fuentes de reglas y desempatar ventanas concurrentes por orden fijo de asientos. F0 cerró con PHASE `PASS`; la implementación F1 está entregada y espera su revisión PHASE independiente. Se consultaron los hallazgos confirmados en:
 
 - docs/plans/active/report_issue_3_quick_security_check_F1.md
 - docs/plans/active/verifier_issue_3_final.md
@@ -25,7 +26,7 @@ Evidencia registrada: matriz evento × actor × información/acción y contrato 
 
 Commits F0: `6b480fa` contiene el primer contrato; `b189cc0` contiene decisiones aprobadas y reglas versionadas; el cierre documental con PHASE PASS queda en este commit. Solo el Orquestador registra `CLOSED` tras PASS del Verifier.
 Validación: revisión estática del contrato; no iniciar llamadas Codex reales durante F0.
-El usuario eligió orden fijo de asientos en sentido horario desde quien declara la acción/bloqueo; si varias personas responden, se escoge la primera elegible en ese orden, sin ventaja por latencia. Los documentos fuente están versionados y la transcripción es normativa; la discrepancia de setup pasa a F1. No se cambió código.
+El usuario eligió orden fijo de asientos en sentido horario desde quien declara la acción/bloqueo; si varias personas responden, se escoge la primera elegible en ese orden, sin ventaja por latencia. Los documentos fuente están versionados y la transcripción es normativa. F1 corrigió la discrepancia de setup; la evidencia queda en `issue_14_F1_evidence.md`.
 
 ## Contrato global para las siguientes fases
 
@@ -38,6 +39,6 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Límites conservadores de concurrencia, llamadas y tiempo. Registros operativos no contienen credenciales, manos ajenas ni razonamiento privado.
 - No incluir texto libre de clientes ni acceso al repositorio/secretos en las solicitudes Codex; ejecutar en entorno aislado y de solo lectura.
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
-- No comenzar F1 antes de cerrar F0; no crear ramas, worktrees ni PR por fase.
+- F0 ya cerró antes de F1; no avanzar a F2 ni crear PR por fase antes del veredicto independiente de F1.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`. F0 `CLOSED`; F1 `ACTIVE` en el mismo branch/worktree. No abrir PR ni invocar Codex antes de cerrar F1/F2/F3 según sus gates.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`; F0 `CLOSED`. Ejecución F1 documentada en `issue_14_F1_evidence.md`: lobby y motor derivan autoridad del socket, proyección privada/pública separada, decisiones `choiceId` con IDs/versiones, arbitraje horario, timeout/pausa/reanudación limitada, corrección de reglas y pruebas `node:test`. `npm test` en `server/`, `node --check` y `git diff --check` pasan. Los checks React no corrieron por falta de `react-scripts`; no hubo partida en vivo. F1 espera revisión PHASE independiente; F2 sigue pendiente. No abrir PR ni invocar Codex en F1.

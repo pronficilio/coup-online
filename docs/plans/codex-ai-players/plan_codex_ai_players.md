@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 ACTIVE
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -19,7 +19,7 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 - El checkout raíz contiene modificaciones locales sin commit. El worktree de #14 parte del origin/master limpio; no incorporar cambios raíz sin una decisión registrada.
 - El usuario aprobó jugar con su login ChatGPT Plus mediante Codex CLI, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar el uso de Codex.
 - Por instrucción del usuario, se conserva el acceso/lobby actual sin cuentas ni invitaciones. Cualquier jugador conectado puede activar el apagado seguro; solo el propietario rearma Codex por SSH/consola.
-- Se versionaron desde el checkout local las reglas completas y sus tres resúmenes en `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la autoridad; F1 alineará el motor.
+- Se versionaron desde el checkout local las reglas completas y sus tres resúmenes en `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la autoridad; F1 alineó el motor con esas reglas.
 
 ## Compatibilidad Codex/Plus y límite operativo (verificado 2026-09-26)
 
@@ -88,16 +88,17 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Commit:** contrato y reglas en `b189cc0`; cierre F0 registrado en este commit.
 - **Validación:** inspección de cada evento/decisión y trazado de una partida mixta; no se inicia una llamada a Codex real desde F0.
 
-### F1 — Hacer el estado y las decisiones privados y autoritativos (`ACTIVE`)
+### F1 — Hacer el estado y las decisiones privados y autoritativos (`WAITING_EXECUTOR_REVIEW`)
 
 - **Pregunta:** ¿puede el servidor aplicar una decisión humana o IA sin filtrar cartas ni aceptar una mutación de estado que el jugador no tiene derecho a realizar?
 - **Entrada:** contrato F0.
 - **Salida:** proyecciones públicas/privadas explícitas, decisiones asociadas a socket/jugador/partida/fase, validación de acción/costo/destino y flujo correcto de cartas reveladas/reemplazadas.
-- **Cierre:** llamadas de cliente ya no determinan por sí solas fuente, costo, carta revelada ni cartas de intercambio; mano y mazo no salen en eventos públicos; decisiones fuera de fase, repetidas o de otro socket se rechazan; el motor cumple las reglas versionadas, incluido inicio por ganador previo, una moneda inicial para quien empieza en dos jugadores, y cartas de influencia reveladas que permanecen fuera del mazo; si no hay ganador previo, se elige al azar quién inicia la primera partida; Verifier independiente emite `PASS` sobre filtración, autoridad y reglas.
+- **Cierre:** llamadas de cliente ya no determinan fuente, costo, carta revelada ni cartas de intercambio; mano y mazo no salen en eventos públicos; decisiones fuera de turno/fase, opciones inválidas o de otro socket se rechazan; repetición exacta es idempotente y una repetición con elección distinta se rechaza. El motor cumple las reglas versionadas, incluido inicio por ganador previo, una moneda inicial para quien empieza en dos jugadores y cartas de influencia reveladas fuera del mazo; sin ganador previo, el primer asiento se elige al azar. Ventanas de timeout reanudables solo por el líder con todos los sockets conectados; respuestas parciales se borran y se emiten IDs/versiones nuevos. Una desconexión obliga a recrear la partida. Verifier independiente debe emitir `PASS` sobre filtración, autoridad y reglas.
+- **Estado/evidencia:** implementación en `docs/plans/active/issue_14_F1_evidence.md`; pruebas de servidor y checks estáticos pasan. F1 espera PHASE independiente; `react-scripts` no está instalado, por lo que build/test del cliente quedan sin ejecutar. No se inició F2/Codex.
 - **Pivote:** si el motor actual necesita una división mayor para preservar reglas, documentar y mantener dentro de esta fase solo los cambios necesarios para el contrato IA.
 - **Repetición:** una corrección acotada por cada fallo demostrable de los criterios.
-- **Commit:** `COMMIT_REQUIRED`; `fix(game-engine): issue 14 F1 CLOSED private state`.
-- **Validación:** inspección independiente de vistas por asiento y eventos, más evidencia de las rutas de decisión/conservación de cartas.
+- **Commit:** registrar hash local al cerrar el commit F1; el commit no declara PASS/CLOSED.
+- **Validación:** `npm test` en `server/`, `node --check` en servidor y `git diff --check`; PHASE independiente pendiente.
 
 ### F2 — Añadir el controlador Codex con la suscripción del propietario (`PENDING`)
 
