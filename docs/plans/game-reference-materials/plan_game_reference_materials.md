@@ -71,15 +71,17 @@ Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referen
 
 **Cierre F1 (2026-09-25):** los cuatro WebP cumplen el ancho, proporción, calidad y revisión visual; los detalles y la nota sobre la tabla de contraataque de robar están en `docs/plans/game-reference-materials/report_issue_8_F1.md`. F2 permanece `PENDING` y requiere coordinación con #6 antes de tocar la cabecera de la partida.
 
-### F2 — Integrar el botón y el panel de consulta (`PENDING`)
+### F2 — Integrar el botón y el panel de consulta (`ACTIVE — SUBTASK PARCIAL`)
 
 **Pregunta:** ¿el jugador puede abrir, navegar y cerrar las cuatro referencias desde la partida sin alterar el estado de juego?
-**Dependencias:** F1 cerrada y #5 integrada a `master`. Antes de editar `Coup.js` o su cabecera, revisar el estado de #6 y acordar/registrar el punto de montaje para evitar dos cambios concurrentes al mismo shell. Si #6 está editando esa zona, esperar su integración o una reorquestación explícita del Orquestador.
+**Dependencias:** F1 cerrada y #5 integrada a `master`. Issue #6 sigue abierta y su PR draft #11 modifica `Coup.js`/GameHeader. Este subtask crea el componente autocontenido y estilos en archivos nuevos; no monta ni edita el shell. El punto de montaje requiere coordinación explícita con el PR #11 después de que #6 libere esa superficie.
 **Trabajo:** reemplazar el disparador visual del `CheatSheetModal` por `Referencias`; mantener `RulesModal`; crear pestañas `Tarjeta`/`Tabla`, selector de idioma con inglés inicial, carga condicional de una sola imagen, cierre por control/Escape/fondo, retorno de foco y presentación accesible para teclado/tacto. Mantener el juego y las decisiones utilizables inmediatamente tras cerrar.
 **Evidencia:** `docs/plans/game-reference-materials/report_issue_8_F2.md` con montaje utilizado, matriz de controles y resultado de recorridos en partida.
 **Avanzar:** ambos tipos de referencia y ambos idiomas funcionan desde la partida en los estados vivo/eliminado; no se pierden turnos ni decisiones al abrir/cerrar. **Pivotar:** ajustar el punto de composición tras revisar #5/#6. **Repetir:** una corrección localizada de control, foco o viewport. **Bloquear:** si el shell integrado no ofrece un punto seguro sin invadir cambios activos de #5/#6; devolverlo al Orquestador con estado de dependencias.
 **Validación:** recorrido manual; comprobar en herramientas de red que solo se solicita el recurso seleccionado.
 **Commit:** `COMMIT_REQUIRED`; incluir reporte y evento `phase_verdict`; mensaje `feat(reference-panel): issue 8 F2 CLOSED advance_f3`.
+
+**Subtask parcial en curso:** `ReferencePanel.js` y `ReferencePanel.css` con trigger propio, modal, tabs, selector de idioma e imagen activa condicional. Esto no cierra F2: quedan montaje coordinado, recorrido real, verificación de carga por red y capturas.
 
 ### F3 — Afinar movimiento, accesibilidad y rendimiento (`PENDING`)
 
