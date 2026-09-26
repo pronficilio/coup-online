@@ -2,15 +2,16 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); F2 ACTIVE
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); F2 ACTIVE, implementación lista y en espera de PHASE
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
+Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
-Siguiente dueño: Ejecutor para F2, comenzando por concretar la frontera de autenticación Plus, el runner aislado y la validación de `codex exec`. F2 no habilitará todavía asientos IA desde el lobby.
+Siguiente dueño: Verifier F2. La implementación del runner está lista para PHASE en `docs/plans/codex-ai-players/f2_codex_runner.md`; debe revisar el uso de Plus, el aislamiento efectivo, la compatibilidad del perfil con la CLI prevista y la validación Linux del sandbox. F2 no habilita asientos IA desde el lobby ni autoriza login o llamadas reales.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -43,4 +44,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
 - F0 y F1 ya cerraron tras PHASE `PASS`; F2 puede iniciar en este branch sin PR por fase. La revisión F1 no invocó Codex.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; F0 cerró con PHASE `PASS` en `b189cc0`. F1 cerró con PHASE `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` tras corregir el desafío perdido contra Asesinato y Exchange con una influencia. `npm test`, las pruebas directas, `node --check` y `git diff --check` pasan; React sigue sin `react-scripts`. F2 está activa para validar y construir el runner Codex autenticado de forma aislada; no crear PR todavía.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; F0 cerró con PHASE `PASS` en `b189cc0`. F1 cerró con PHASE `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` tras corregir el desafío perdido contra Asesinato y Exchange con una influencia. `npm test` (25/25), `node --check`, `git diff --check` y la verificación de sintaxis de la unidad systemd pasan. F2 tiene la implementación local del runner; espera PHASE independiente sobre aislamiento, compatibilidad de CLI y el gate de uso de Plus. No crear PR todavía.

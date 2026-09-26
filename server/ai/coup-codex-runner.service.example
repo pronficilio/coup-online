@@ -1,0 +1,55 @@
+[Unit]
+Description=Coup isolated Codex decision runner
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=coup-codex
+Group=coup-game
+UMask=0007
+
+# Replace /srv/coup-online with the canonical application checkout path chosen in Issue #13.
+Environment=CODEX_APP_ROOT=/srv/coup-online
+Environment=CODEX_HOME=/var/lib/coup-codex/auth
+Environment=CODEX_WORKDIR=/run/coup-codex-work
+Environment=CODEX_RUNNER_SOCKET=/run/coup-codex/runner.sock
+Environment=CODEX_PATH=/usr/local/bin:/usr/bin:/bin
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+Environment=CODEX_DECISION_TIMEOUT_MS=45000
+Environment=CODEX_MAX_CONCURRENCY=2
+
+WorkingDirectory=/run/coup-codex-work
+ExecStart=/usr/bin/env node /opt/coup-codex-runner/server/ai/codex-worker.js
+ExecStartPre=/usr/bin/install -d -m 0700 /var/lib/coup-codex/auth
+Restart=on-failure
+RestartSec=2s
+TimeoutStopSec=6s
+KillMode=control-group
+
+StateDirectory=coup-codex
+StateDirectoryMode=0700
+RuntimeDirectory=coup-codex coup-codex-work
+RuntimeDirectoryMode=0750
+RuntimeDirectoryPreserve=no
+
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectProc=invisible
+ProcSubset=pid
+NoNewPrivileges=true
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+# These must exactly match CODEX_APP_ROOT and CODEX_WORKDIR. Do not start with placeholder paths.
+InaccessiblePaths=/srv/coup-online
+ReadOnlyPaths=/run/coup-codex-work
+
+[Install]
+WantedBy=multi-user.target

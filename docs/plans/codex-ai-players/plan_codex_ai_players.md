@@ -110,7 +110,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
 - **Commit:** `COMMIT_REQUIRED`; `feat(codex-player): issue 14 F2 plus-auth runtime`.
 - **Validación:** verificación local bajo el login del propietario; registrar éxito/error, esfuerzo, latencia y uso disponible; no lanzar simulaciones masivas.
-- **Acotación OpenAI Docs (2026-09-26):** `codex exec` está documentado para uso no interactivo, acepta `--output-schema` y reutiliza la autenticación CLI guardada; por defecto usa sandbox read-only. La guía advierte no usar la ruta avanzada ChatGPT-managed auth para repositorios públicos/open source. Este juego no enviará código ni contexto del checkout público: F2 debe probar que el runner vive fuera de ese checkout, recibe solo JSON de runtime y no ejecuta herramientas MCP ni texto libre de jugadores. La CLI exige un Git repo salvo `--skip-git-repo-check`; probar ese modo junto con `--ephemeral` en el directorio aislado. El Verifier decide si esta separación queda dentro de la guía antes de habilitar asientos IA. Referencia: [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode).
+- **Acotación OpenAI Docs (2026-09-26):** `codex exec` está documentado para uso no interactivo, acepta `--output-schema` y reutiliza autenticación CLI guardada. La primera prueba demostró que el sandbox antiguo `read-only` permitía leer un archivo señuelo fuera del workspace; F2 lo reemplaza por un perfil inline que deniega el filesystem por defecto, restringe lectura al workspace vacío y a paths mínimos, y deshabilita herramientas locales. La página de perfiles de permisos los marca Beta; PHASE debe probar la política con la versión fijada de Codex en Linux antes de habilitar asientos. La guía avanzada de autenticación además advierte no usar ese flujo con repositorios públicos/open source. El runner no enviará el checkout público: solo JSON de runtime; el Verifier debe resolver si esa separación satisface la guía. La CLI exige un Git repo salvo `--skip-git-repo-check`; se usa ese modo junto con `--ephemeral`. Referencias: [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode), [Permissions](https://learn.chatgpt.com/docs/permissions).
 
 ### F3 — Añadir asientos IA y palanca roja (`PENDING`)
 
@@ -147,7 +147,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 - Ejecución `FULL`; riesgo `HIGH`; verificación independiente `PHASE` obligatoria en F0–F3 y `FINAL` al cierre, por permisos de socket, privacidad y concurrencia.
 - Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
-- Siguiente dueño: Ejecutor F2; revisión PHASE independiente antes de F3.
+- Siguiente dueño: Verifier F2; revisión PHASE independiente antes de F3.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
 - Merge target: `master`.
