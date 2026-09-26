@@ -31,6 +31,7 @@ Decisiones elevadas al usuario/Orquestador, aún no aprobadas: (1) desempate de 
 
 - Codex CLI mediante login ChatGPT Plus del propietario, GPT-6 Luna y esfuerzo low/medium/high por asiento; medium inicial.
 - Sin API key, facturación API ni fallback a otro modelo. Si Codex/Plus falla o llega a un límite, pausar con mensaje.
+- Codex CLI GPT-6 Luna, `codex exec` y `--output-schema` están disponibles con Plus; el uso comparte límites/cuota del plan, no es ilimitado. La guía de autenticación en automatización trata `auth.json` como contraseña y dice no usar este flujo con repositorios públicos/open source; este repo es público. F2 debe resolver con Verifier la compatibilidad y demostrar aislamiento del runner respecto del repo y del proceso web antes de atender invitados; si no, bloquear sin cambiar a API.
 - Privacidad por asiento y autoridad del servidor se implementan antes de conectar el jugador Codex.
 - Partidas humano contra dos IA e IA contra IA. Para partidas IA se valida una invitación compartida; el panel rojo administrativo usa autorización separada.
 - La palanca bloquea llamadas nuevas, termina las activas cuando sea posible, invalida respuestas y pausa partidas. Al reiniciar, Codex queda deshabilitado hasta habilitación administrativa explícita.

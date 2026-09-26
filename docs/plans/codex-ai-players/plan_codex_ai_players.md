@@ -19,6 +19,13 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 - El checkout raíz contiene modificaciones locales sin commit. El worktree de #14 parte del origin/master limpio; no incorporar cambios raíz sin una decisión registrada.
 - El usuario aprobó jugar con su login ChatGPT Plus mediante Codex CLI, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar el uso de Codex.
 
+## Compatibilidad Codex/Plus y límite operativo (verificado 2026-09-26)
+
+- La documentación oficial confirma Codex CLI en Plus, GPT-6 Luna (`gpt-6-luna`), `codex exec` y `--output-schema`; el esfuerzo `medium` está disponible. El uso de Codex comparte una cuota limitada del plan y varía con modelo, contexto y trabajo; no es un presupuesto API ni una capacidad ilimitada.
+- La guía oficial de automatización indica que `codex exec` puede reutilizar autenticación guardada de ChatGPT, que `~/.codex/auth.json` debe tratarse como una contraseña y que este flujo no debe usarse con repositorios públicos o open source. `pronficilio/coup-online` es público.
+- Por tanto, F2 no puede tratar el login Plus como un backend ya aprobado para servicio: antes de conectar asientos de amigos, el Verifier debe confirmar que el runner local de juego queda fuera del código/repositorio público y del proceso web no confiable, y que este uso autenticado es compatible con la guía vigente. Si no se puede confirmar esa frontera/compatibilidad, F2 queda bloqueada; no se elude con una cuenta/API alternativa.
+- Fuentes: [precios y límites de Codex](https://learn.chatgpt.com/docs/pricing), [modelos y CLI](https://learn.chatgpt.com/docs/models), [modo no interactivo y autenticación](https://learn.chatgpt.com/docs/non-interactive-mode).
+
 ## Bloqueos explícitos por fase
 
 F0: bloquear ante una transición de reglas sin definir o una identidad de actor/socket que no pueda comprobarse.
@@ -95,7 +102,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Pregunta:** ¿puede un proceso separado ejecutar una decisión Codex acotada y devolver una opción válida sin recibir secretos ajenos ni acceso operativo al servidor?
 - **Entrada:** proyecciones y decisiones autoritativas F1.
 - **Salida:** invocador `codex exec` autenticado con ChatGPT, contexto pequeño de reglas + mano propia + estado público + opciones permitidas, esquema JSON, identificador/versionado de decisión, límites de tiempo/ejecución y tratamiento de errores.
-- **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre de clientes; corre en un usuario/directorio de trabajo aislado y de solo lectura, sin montar el repo de Coup ni secretos de aplicación; no ejecuta shell pedido por jugadores; respuesta se valida contra la decisión vigente; no hay fallback a API; Verifier prueba de forma independiente la barrera del proceso y del gasto.
+- **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre de clientes; corre en un usuario/directorio de trabajo aislado y de solo lectura, sin montar el repo de Coup ni secretos de aplicación; no ejecuta shell pedido por jugadores; respuesta se valida contra la decisión vigente; no hay fallback a API; Verifier prueba de forma independiente la barrera del proceso y del gasto y resuelve el límite de automatización documentado para repositorios públicos antes de conectar jugadores invitados.
 - **Pivote:** si Codex CLI no permite una ejecución acotada y segura para una decisión de juego, bloquear F2 y presentar la limitación en lugar de sustituir autenticación/proveedor.
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
 - **Commit:** `COMMIT_REQUIRED`; `feat(codex-player): issue 14 F2 plus-auth runtime`.
