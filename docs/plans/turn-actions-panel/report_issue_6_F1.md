@@ -1,6 +1,6 @@
 # Reporte F1 — issue #6
 
-**Veredicto:** BLOCKED por evidencia visual inaccesible. La presentación y el build están listos; la inspección de la captura requerida no pudo ejecutarse.
+**Veredicto final:** CLOSED / PASS. La presentación, el build y la revisión visual requerida están completos.
 **Rama / worktree:** issue/6-turn-actions-panel / .worktrees/issue-6-turn-actions-panel
 **Alcance:** ActionDecision.js y CoupStyles.css. El montaje, los callbacks, la selección de objetivo y Socket.IO se conservaron. No hubo cambios a Coup.js, servidor, tablero ni protocolo.
 
@@ -27,11 +27,12 @@ Las acciones con coste superior al saldo quedan deshabilitadas y muestran el sal
 - npm run build: PASS. Después de ajustar la expresión booleana, no quedan advertencias ESLint en ActionDecision.js; permanecen avisos preexistentes en App.js y Coup.js y aviso de caniuse-lite desactualizado.
 - Pruebas automatizadas: no ejecutadas ni añadidas, según el plan.
 - Revisión de código: confirmados siete registros, metadatos de coste, beneficio, gratuidad, declaración y bloqueos; callbacks chooseAction, deductCoins, pickingTarget, pickTarget, doneAction y emisión g-actionDecision sin cambios de contrato.
-- Revisión visual/captura: BLOCKED. cua.getState() devolvió helper_unknown_error: setup refresh had errors; tras reset, el segundo intento terminó con trusted Node process exited unexpectedly. Se detuvo la automatización según la recuperación indicada por computer-use. No se produjo ni se afirma una captura.
+- Revisión visual/captura: PASS. `issue_6_f1_visual.png` muestra una partida local de 2 jugadores a 1440 × 1500. Se ven completas las siete acciones, con sus descripciones, coste/beneficio, gratuidad, personaje declarado, bloqueos y avisos de saldo. El panel sigue en su montaje centrado, permitido por F1.
 
 ## Artefactos
 
 - coup-client/src/components/game/ActionDecision.js
 - coup-client/src/components/game/CoupStyles.css
+- docs/plans/turn-actions-panel/issue_6_f1_visual.png
 
-**Siguiente acción:** Orquestador resuelve la evidencia visual faltante o devuelve F1 para repetirla. F2 permanece pendiente de integrar #5 a master.
+**Siguiente acción:** esperar la integración del issue #5 a `master`; F2 permanece `BLOCKED/PENDING` hasta entonces. El issue #6 sigue abierto.

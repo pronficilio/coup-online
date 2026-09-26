@@ -1,6 +1,6 @@
 # Plan: panel de acciones del turno — issue #6
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 está `BLOCKED` por evidencia visual inaccesible, F2 depende de la integración del issue #5.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 está `CLOSED`, F2 está `BLOCKED/PENDING` hasta integrar el issue #5 a `master`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/6  
 **Handoff:** `docs/plans/inbox/issue_6_turn_actions_panel.md`  
 **Bitácora:** `docs/plans/log/issue-6.jsonl`  
@@ -67,20 +67,20 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 
 ## Fases
 
-### F1 — Presentar acciones con semántica correcta (`BLOCKED`)
+### F1 — Presentar acciones con semántica correcta (`CLOSED`)
 
 **Pregunta:** ¿el panel comunica de forma clara qué gana/paga el jugador, qué personaje declara y quién puede bloquear?  
 **Entrada:** `server/utilities/constants.js`, `ActionDecision.js`, estilos actuales y referencia visual. Se conserva el punto de montaje actual; F1 no depende del shell de #5.  
 **Subtareas:** definir la presentación basada en los datos actuales; diseñar filas compactas; etiquetar coste/beneficio, declaración y bloqueos por separado; mostrar gratuidad, fondos insuficientes y Coup obligatorio; conservar callbacks y flujo/socket actual; preparar los estilos para que F2 monte la presentación en el tablero integrado.  
 **Áreas:** `coup-client/src/components/game/ActionDecision.js` y estilos/archivos de presentación de acciones. No editar `Coup.js`, tablero, servidor ni protocolo en esta fase.  
-**Evidencia:** `docs/plans/turn-actions-panel/report_issue_6_F1.md`, captura desde el montaje actual y tabla que contraste etiquetas con reglas.  
+**Evidencia:** `docs/plans/turn-actions-panel/report_issue_6_F1.md` y captura `docs/plans/turn-actions-panel/issue_6_f1_visual.png` desde el montaje actual; tabla que contrasta etiquetas con reglas.
 **Avanzar:** los siete renglones reflejan el contrato de contenido sin confundir declaración, bloqueo, coste o beneficio y los callbacks actuales siguen conectados. **Pivotar:** separar la presentación en un subcomponente si reduce acoplamiento para F2. **Repetir:** una corrección acotada de etiqueta/legibilidad. **Bloquear/cancelar:** solo si el contrato actual no permite cambiar presentación sin invadir el flujo que #5 está integrando; devolver al Orquestador con evidencia.  
 **Validación:** revisión de reglas y visual en vista de acciones; build del cliente si el cambio lo requiere. No añadir tests automatizados.  
-**Commit:** `COMMIT_REQUIRED`; mensaje de cierre bloqueado `feat(actions-panel): issue 6 F1 BLOCKED visual evidence`, con reporte y evento `phase_verdict`.
+**Commit:** `COMMIT_REQUIRED`; cierre `feat(actions-panel): issue 6 F1 CLOSED visual verified`, con reporte, captura y evento `phase_verdict`.
 
-**Estado de ejecución:** `BLOCKED`; la presentación semántica se implementó y el build pasó, pero no se produjo la captura visual requerida. El helper computer-use falló y también falló su reintento tras reinicializar sesión. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`; el Orquestador resuelve el acceso a captura o devuelve esta fase para repetir únicamente esa inspección.
+**Estado de ejecución:** `CLOSED / PASS`. La presentación semántica, el build ya registrado y la revisión de `docs/plans/turn-actions-panel/issue_6_f1_visual.png` completan los criterios de F1. La captura a 1440 × 1500 muestra las siete acciones y sus metadatos completos en el montaje actual. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`. F2 queda `BLOCKED/PENDING` hasta integrar el issue #5 a `master`.
 
-### F2 — Montar en el tablero y conectar confirmación (`PENDING`; depende de #5)
+### F2 — Montar en el tablero y conectar confirmación (`BLOCKED/PENDING`; depende de #5)
 
 **Pregunta:** ¿el shell integrado muestra el panel solo en el turno local y permite confirmar objetivos sin cobrar prematuramente?  
 **Entrada:** F1 cerrada y #5 integrado a `master`; releer su markup/contrato antes de cambiar el montaje.  
@@ -104,7 +104,7 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 
 ## Dependencia, integración y revisión
 
-- F1 está desbloqueada y lista para ejecutarse en el montaje actual de `ActionDecision`; no requiere cambios en el tablero de #5. F2 no puede empezar hasta integrar #5.
+- F1 está cerrada en el montaje actual de `ActionDecision`; no requirió cambios en el tablero de #5. F2 no puede empezar hasta integrar #5 a `master`.
 - Antes de F2, el Alquimista vuelve a leer issue #5, el head integrado, este plan y el código; adapta el punto de montaje y contratos de props/eventos. El Orquestador confirma el avance de la dependencia en tracker, plan y bitácora.
 - El Alquimista reclama #6 en GitHub, relee el ticket y confirma que no hay reclamo incompatible; crea o confirma `issue/6-turn-actions-panel` desde `origin/master` actualizado en `.worktrees/issue-6-turn-actions-panel`; registra el reclamo antes del trabajo funcional.
 - Todas las fases pertenecen a ese branch/worktree y a un solo PR a `master`. El Orquestador revisa diff, evidencia, build/recorridos declarados y veredicto independiente antes de integrar o cerrar.
