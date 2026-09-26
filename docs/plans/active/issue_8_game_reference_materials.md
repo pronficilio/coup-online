@@ -6,7 +6,7 @@
 - **Estado:** `ACTIVE`; #8 sigue abierta y asignada a `pronficilio`. El usuario autorizó completar la issue y abrir el PR con capturas.
 - **Branch/worktree únicos:** `issue/8-game-reference-assets` / `.worktrees/issue-8-game-reference-assets`.
 - **Base:** `origin/master`, actualizado antes del aislamiento a `febec397d3dcd9c2472a61910c8441800c939326`.
-- **Integración:** un PR desde la rama de issue a `master`, asociado a #8. Aún no existe PR.
+- **Integración:** PR draft #12 — https://github.com/pronficilio/coup-online/pull/12 — desde esta rama a `master`, asociado a #8. F1 está en el PR; F2/F3 y capturas del panel en partida se agregarán después de coordinar con #6.
 - **Modo/riesgo/verificación independiente:** `LIGHT` / `LOW` / `NONE`.
 
 ## Claim y primer paso
