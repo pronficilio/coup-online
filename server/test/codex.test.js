@@ -45,11 +45,13 @@ async function runnerFixture() {
     const paths = {
         CODEX_APP_ROOT: path.join(runnerRoot, 'app'),
         CODEX_HOME: path.join(runnerRoot, 'auth'),
-        CODEX_WORKDIR: path.join(runnerRoot, 'work')
+        CODEX_WORKDIR: path.join(runnerRoot, 'work'),
+        CODEX_RUNTIME_DIR: path.join(runnerRoot, 'runtime')
     }
     const tempRoot = path.join(root, 'tmp')
     await Promise.all([...Object.values(paths), tempRoot].map(directory => fs.mkdir(directory, { recursive: true })))
     await fs.chmod(paths.CODEX_HOME, 0o700)
+    await fs.chmod(paths.CODEX_RUNTIME_DIR, 0o700)
     await fs.chmod(tempRoot, 0o700)
     return { env: paths, tempRoot, cleanup: () => fs.rm(root, { recursive: true, force: true }) }
 }
@@ -117,7 +119,7 @@ test('runner schema and CLI flags pin model, effort, deny-by-default filesystem,
     }, [])
     assert.ok(configValues.includes(`model_reasoning_effort='"high"'`))
     assert.ok(configValues.includes('default_permissions="coup-ai"'))
-    assert.ok(configValues.includes('permissions.coup-ai.filesystem={":root"="deny",":minimal"="read",":tmpdir"="write",":slash_tmp"="deny",":workspace_roots"={"."="read"}}'))
+    assert.ok(configValues.includes('permissions.coup-ai.filesystem={":root"="deny",":minimal"="read",":tmpdir"="write",":workspace_roots"={"."="read"}}'))
     assert.ok(configValues.includes('permissions.coup-ai.network={enabled=false}'))
     assert.ok(configValues.includes('web_search="disabled"'))
     assert.equal(args.includes('--sandbox'), false)
@@ -163,7 +165,7 @@ test('Codex runner executes only with an allowlisted environment and returns a l
     assert.equal(fake.calls[0].options.env.HOME, fixture.env.CODEX_WORKDIR)
     assert.equal(fake.calls[0].options.env.CODEX_HOME, fixture.env.CODEX_HOME)
     assert.equal(fake.calls[0].options.env.TMPDIR, fixture.tempRoot)
-    assert.equal(fake.calls[0].options.env.XDG_RUNTIME_DIR, fixture.tempRoot)
+    assert.equal(fake.calls[0].options.env.XDG_RUNTIME_DIR, fixture.env.CODEX_RUNTIME_DIR)
     assert.equal('CODEX_APP_ROOT' in fake.calls[0].options.env, false)
     assert.equal('OPENAI_API_KEY' in fake.calls[0].options.env, false)
     assert.equal('CODEX_API_KEY' in fake.calls[0].options.env, false)
@@ -240,11 +242,18 @@ test('Codex runner rejects credentials located inside the model workspace or tem
     assert.equal(fake.calls.length, 0)
 })
 
-test('Codex runner refuses a shared runtime directory before starting Codex', async () => {
+test('Codex runner refuses shared temporary or app-server directories before starting Codex', async () => {
     const fixture = await runnerFixture()
     const fake = fakeSpawn(JSON.stringify({ choiceId: 'income' }))
     try {
         await fs.chmod(fixture.tempRoot, 0o755)
+        await assert.rejects(runCodexDecision(request(), {
+            env: fixture.env,
+            spawn: fake.spawn,
+            tempRoot: fixture.tempRoot
+        }), { code: 'runner_not_configured' })
+        await fs.chmod(fixture.tempRoot, 0o700)
+        await fs.chmod(fixture.env.CODEX_RUNTIME_DIR, 0o755)
         await assert.rejects(runCodexDecision(request(), {
             env: fixture.env,
             spawn: fake.spawn,
@@ -327,6 +336,7 @@ test('runner environment drops unrelated credentials', () => {
         CODEX_APP_ROOT: '/srv/coup-online',
         CODEX_HOME: '/var/lib/coup-codex/auth',
         CODEX_WORKDIR: '/var/lib/coup-codex/work',
+        CODEX_RUNTIME_DIR: '/run/coup-codex/runtime',
         OPENAI_API_KEY: 'secret',
         CODEX_API_KEY: 'secret',
         AWS_SECRET_ACCESS_KEY: 'secret'
@@ -334,7 +344,7 @@ test('runner environment drops unrelated credentials', () => {
     assert.deepEqual(Object.keys(env).sort(), ['CODEX_HOME', 'HOME', 'LANG', 'PATH', 'TERM', 'TMPDIR', 'XDG_RUNTIME_DIR'].sort())
     assert.equal(env.HOME, '/var/lib/coup-codex/work')
     assert.equal(env.TMPDIR, os.tmpdir())
-    assert.equal(env.XDG_RUNTIME_DIR, os.tmpdir())
+    assert.equal(env.XDG_RUNTIME_DIR, '/run/coup-codex/runtime')
     assert.equal('OPENAI_API_KEY' in env, false)
     assert.equal('CODEX_API_KEY' in env, false)
     assert.equal('AWS_SECRET_ACCESS_KEY' in env, false)

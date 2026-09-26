@@ -20,11 +20,13 @@ function configuredPaths(env = process.env, tempRoot = os.tmpdir()) {
     const codeHome = env.CODEX_HOME
     const workDir = env.CODEX_WORKDIR
     const appRoot = env.CODEX_APP_ROOT
+    const runtimeDir = env.CODEX_RUNTIME_DIR
     if (!codeHome || !path.isAbsolute(codeHome) || !workDir || !path.isAbsolute(workDir)
-        || !appRoot || !path.isAbsolute(appRoot) || !path.isAbsolute(tempRoot)) {
+        || !appRoot || !path.isAbsolute(appRoot) || !runtimeDir || !path.isAbsolute(runtimeDir)
+        || !path.isAbsolute(tempRoot)) {
         throw Object.assign(new Error('Codex runner paths are not configured.'), { code: 'runner_not_configured' })
     }
-    const roots = [codeHome, workDir, appRoot, tempRoot].map(value => path.resolve(value))
+    const roots = [codeHome, workDir, appRoot, runtimeDir, tempRoot].map(value => path.resolve(value))
     const overlap = (left, right) => pathIsInside(left, right) || pathIsInside(right, left)
     if (roots.some((root, index) => roots.slice(index + 1).some(other => overlap(root, other)))) {
         throw Object.assign(new Error('Codex credentials and workspace must be isolated.'), { code: 'runner_not_configured' })
@@ -33,6 +35,7 @@ function configuredPaths(env = process.env, tempRoot = os.tmpdir()) {
         appRoot: path.resolve(appRoot),
         codeHome: path.resolve(codeHome),
         workDir: path.resolve(workDir),
+        runtimeDir: path.resolve(runtimeDir),
         tempRoot: path.resolve(tempRoot)
     }
 }
@@ -60,6 +63,10 @@ async function verifyConfiguredPaths(env, tempRoot) {
     if (!tempDir.isDirectory() || (tempDir.mode & 0o077) !== 0) {
         throw Object.assign(new Error('Codex runtime directory must be private to the runner user.'), { code: 'runner_not_configured' })
     }
+    const xdgRuntimeDir = await fs.stat(canonical.runtimeDir)
+    if (!xdgRuntimeDir.isDirectory() || (xdgRuntimeDir.mode & 0o077) !== 0) {
+        throw Object.assign(new Error('Codex app-server directory must be private to the runner user.'), { code: 'runner_not_configured' })
+    }
     try {
         const authFile = await fs.lstat(path.join(canonical.codeHome, 'auth.json'))
         if (!authFile.isFile() || authFile.isSymbolicLink() || (authFile.mode & 0o077) !== 0) {
@@ -81,7 +88,7 @@ function runnerEnvironment(env = process.env, paths = configuredPaths(env)) {
         HOME: paths.workDir,
         CODEX_HOME: paths.codeHome,
         TMPDIR: paths.tempRoot,
-        XDG_RUNTIME_DIR: paths.tempRoot,
+        XDG_RUNTIME_DIR: paths.runtimeDir,
         LANG: env.LANG || 'C.UTF-8',
         TERM: 'dumb'
     }
