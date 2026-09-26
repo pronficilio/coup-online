@@ -1,6 +1,6 @@
 # Plan: panel de acciones del turno — issue #6
 
-**Estado:** `ACTIVE`; F1 y F2 están `CLOSED / PASS`; F3 permanece `PENDING`. Computer Use no debe reintentarse; F2 se verificó con Edge headless/CDP. Ver `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
+**Estado:** `ACTIVE`; F1 y F2 están `CLOSED / PASS`; F3 está `ACTIVE`. Computer Use no debe reintentarse; F2 se verificó con Edge headless/CDP. Ver `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/6  
 **Handoff:** `docs/plans/inbox/issue_6_turn_actions_panel.md`  
 **Bitácora:** `docs/plans/log/issue-6.jsonl`  
@@ -91,9 +91,11 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 **Validación:** recorrido funcional en cliente; build si los cambios lo requieren. No añadir tests automatizados.  
 **Commit:** `COMMIT_REQUIRED`; cierre `feat(actions-panel): issue 6 F2 CLOSED advance_f3`, con reporte y evento `phase_verdict`.
 
-**Estado de ejecución:** `CLOSED / PASS`. En Edge headless/CDP, la sala local `WA5EGX` verificó turno local/ajeno y montaje/ocultamiento del panel; cancelar Assassinate con 3 monedas y Coup con 7 dejó saldo y contadores de emisión intactos; confirmar con doble clic produjo 1 `g-deductCoins` y 1 `g-actionDecision` en cada acción. El turno del Guest mostró Challenge, Block Steal y Pass mientras el panel local permanecía oculto; tras Coup el servidor anunció a Luna como ganador y el panel quedó oculto. Consultar `docs/plans/turn-actions-panel/report_issue_6_F2.md`. Computer Use no se reintentó. F3 continúa `PENDING`.
+**Estado de ejecución:** `CLOSED / PASS`. En Edge headless/CDP, la sala local `WA5EGX` verificó turno local/ajeno y montaje/ocultamiento del panel; cancelar Assassinate con 3 monedas y Coup con 7 dejó saldo y contadores de emisión intactos; confirmar con doble clic produjo 1 `g-deductCoins` y 1 `g-actionDecision` en cada acción. El turno del Guest mostró Challenge, Block Steal y Pass mientras el panel local permanecía oculto; tras Coup el servidor anunció a Luna como ganador y el panel quedó oculto. Consultar `docs/plans/turn-actions-panel/report_issue_6_F2.md`. Computer Use no se reintentó. F3 está `ACTIVE`.
 
-### F3 — Cerrar respuesta visual, accesibilidad y movimiento (`PENDING`)
+### F3 — Cerrar respuesta visual, accesibilidad y movimiento (`ACTIVE`)
+
+**Estado de ejecución:** `ACTIVE`, revisión parcial; PR #11 continúa draft. Se observó una sala de 2 y otra de 6 participantes. El panel móvil quedó en flujo debajo del tablero con scroll interno; escritorio conserva la columna lateral y ahora también limita el scroll al panel. `prefers-reduced-motion`, foco por teclado y ocultamiento al cambiar de turno se verificaron en Edge headless/CDP. Consultar `docs/plans/turn-actions-panel/report_issue_6_F3.md`; faltan 3–5 jugadores, eliminación local, respuesta en móvil y scroll final explícito de escritorio.
 
 **Pregunta:** ¿el panel se abre y recoge en escritorio y móvil sin mover la mesa, ocultar controles ni crear tirones?  
 **Entrada:** F2 cerrada.  

@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/6  
 **Plan exacto:** `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`  
 **Bitácora exacta:** `docs/plans/log/issue-6.jsonl`  
-**Estado:** `ACTIVE`; F1 `CLOSED`, F2 `CLOSED / PASS` tras recorrido funcional Edge headless/CDP; F3 `PENDING`. No reintentar Computer Use. PR #11 permanece draft. Consultar `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
+**Estado:** `ACTIVE`; F1 `CLOSED`, F2 `CLOSED / PASS` tras recorrido funcional Edge headless/CDP; F3 `ACTIVE`. No reintentar Computer Use. PR #11 permanece draft. Consultar `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`  
 **Verifier requerido ahora:** no; invocarlo al final antes de integrar.  
 **Branch destino de toda la issue:** `issue/6-turn-actions-panel`  
@@ -26,8 +26,14 @@ Empieza F1 ahora, sin esperar el merge de #5. Modifica únicamente `coup-client/
 
 ## F2 — CLOSED / PASS: diseño y recorrido funcional
 
-El issue #5 fue confirmado cerrado y mergeado a `master` en `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; la rama #6 ya incluye su sincronización. El diseño corregido fue aprobado. El recorrido de la sala `WA5EGX` verificó propiedad/inicio-fin de turno, cancelación de Assassinate y Coup sin eventos ni cobro, confirmaciones únicas de ambas acciones, controles Challenge/Block/Pass y panel oculto al game over. Los contadores y observaciones están en `docs/plans/turn-actions-panel/report_issue_6_F2.md`. F3 sigue pendiente.
+El issue #5 fue confirmado cerrado y mergeado a `master` en `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; la rama #6 ya incluye su sincronización. El diseño corregido fue aprobado. El recorrido de la sala `WA5EGX` verificó propiedad/inicio-fin de turno, cancelación de Assassinate y Coup sin eventos ni cobro, confirmaciones únicas de ambas acciones, controles Challenge/Block/Pass y panel oculto al game over. Los contadores y observaciones están en `docs/plans/turn-actions-panel/report_issue_6_F2.md`. F2 está cerrada; F3 está activa.
 
 ## Límites y pregunta de falsificación
 
 Cumple los criterios del plan. Preserva desafíos, bloqueos, revelación e influencia. No cambies lógica del servidor/socket ni añadas tests automatizados o bibliotecas de animación. La revisión final preguntará: ¿algún estado muestra acciones al jugador incorrecto, permite cobrar al cancelar, duplica una acción, tapa respuestas o hace saltar/atascar el tablero?
+
+## F3 — ACTIVE: revisión visual y de accesibilidad
+
+Inspecciona el panel en escritorio y móvil, cambios de turno repetidos, `prefers-reduced-motion`, foco/teclado y estados con 2–6 jugadores, jugador eliminado y fase de respuesta. Conserva PR #11 como draft. Registra capturas y observaciones; no añadas ni ejecutes tests automatizados. Deja pendientes para el checkpoint final/verificador cualquier escenario que no puedas observar en esta ronda.
+
+La revisión parcial está en `docs/plans/turn-actions-panel/report_issue_6_F3.md`. Dos y seis participantes, scroll móvil, modo reducido, teclado y cierre/apertura por turno están observados; 3–5 participantes, eliminación local, respuesta móvil y final de scroll de escritorio quedan pendientes. No marcar F3 `PASS` hasta cubrir esos casos y revisión independiente.

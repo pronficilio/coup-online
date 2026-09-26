@@ -256,7 +256,7 @@ export default class Coup extends Component {
             actionDecision = <ActionDecision key={`${this.props.name}-${this.state.currentPlayer}`} doneAction={this.doneAction} deductCoins={this.deductCoins} name={this.props.name} socket={this.props.socket} money={this.state.players[this.state.playerIndex].money} players={this.state.players}></ActionDecision>
         }
         if(this.state.currentPlayer) {
-            currentPlayer = <p>It is <b>{this.state.currentPlayer}</b>'s turn</p>
+            currentPlayer = <p aria-live="polite" aria-atomic="true">It is <b>{this.state.currentPlayer}</b>'s turn</p>
         }
         if(this.state.revealingRes) {
             isWaiting = false;
