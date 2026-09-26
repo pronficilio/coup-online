@@ -6,6 +6,7 @@
 - El fondo usa `cover` centrado en una capa fija de viewport, sin deformación; la plataforma central del arte permanece reconocible y la imagen también aparece en las franjas superior e inferior de la página. Añadí un disco blanco translúcido centrado detrás del mazo.
 - Corrección de cartas solicitada para PR #10: quité el panel blanco exterior de cada asiento y dejé nombre/monedas en etiquetas compactas con color de jugador. Las influencias miden hasta 134 px de ancho en escritorio y usan `clamp(58px, 15.5vw, 82px)` en compacto (76 px a 490 px). El contorno neón sigue en las cartas del jugador actual.
 - Para pantallas compactas, los asientos próximos a los bordes desplazan sus cartas hacia adentro según su coordenada horizontal calculada; el cálculo base del círculo se conserva. Así se mantienen completas las cartas laterales en 3, 4, 5 y 6 jugadores.
+- Corrección de sombras para PR #10: cada `.PlayerInfluenceSlot` tiene una sombra negra corta y discreta; el mazo usa varias capas `drop-shadow` para sugerir una pila física. El jugador actual recibe un `::after` externo: contorno blanco de 2 px, unos 3 px de separación de la carta y halo rojo exterior. La sombra negra de carta/mazo no comparte la capa del neón.
 - No cambié posiciones, colores, resalte neón, reversos, reglas, socket ni paneles. No versioné el PNG fuente.
 
 ## Evidencia visual
@@ -20,7 +21,7 @@ Capturas de navegador con `PlayerBoard` real, fixtures locales de 2–6 jugadore
 | 5 | [preview](preview_issue_9_F1_5p_desktop.png) | [preview](preview_issue_9_F1_5p_mobile.png) |
 | 6 | [preview](preview_issue_9_F1_6p_desktop.png) | [preview](preview_issue_9_F1_6p_mobile.png) |
 
-Revisé la composición, en especial 3 y 6 jugadores en escritorio y compacto. Los pares de cartas, el mazo, disco, nombres, monedas y controles no se solapan; los asientos de borde permanecen dentro del viewport. La simulación usa `Coup`/`ActionDecision` reales con fixtures deterministas y socket sin red; no usa partida/socket real ni se hicieron clics en acciones.
+Revisé la composición, en especial 3 y 6 jugadores en escritorio y compacto. Sombras, mazo, disco, nombres, monedas y controles permanecen legibles. En compacto para 6 jugadores, las esquinas de las manos laterales inferiores quedan muy próximas y se superponen ligeramente con el área de las cartas activas; se conservó el layout y quedó registrado para revisión visual futura. Las demás cartas caben completas. La simulación usa `Coup`/`ActionDecision` reales con fixtures deterministas y socket sin red; no usa partida/socket real ni se hicieron clics en acciones.
 
 ## Validación
 
