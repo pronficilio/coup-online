@@ -42,7 +42,7 @@ Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`:
 **Avanzar:** pasan los seis criterios anteriores y se entrega evidencia visual más compilación del cliente. **Pivotar:** solo ajustes CSS localizados dentro del encabezado. **Repetir:** una corrección visual acotada por viewport. **Bloquear/reorquestar:** si resolver una colisión requiere cambiar geometría de asientos, cartas u otras áreas fuera de alcance.
 **Falsificación:** con seis jugadores y nombres largos a 320 px, ¿se oculta el saldo, se recorta el neón o se superpone el encabezado con otro jugador, las cartas o controles?
 **Validación:** revisión manual en escritorio y móvil, incluidas vista de 320 px, 2–6 jugadores, nombres largos, saldos 0/2/10, turnos activo/inactivo y jugadores eliminados; compilación de coup-client y `git diff --check`. No añadir ni ejecutar tests automatizados.
-**Publicación:** F1 falló el criterio 5 y requiere reorquestación. Por solicitud explícita del usuario, publicar esta rama en un PR draft para revisión visual de las capturas; declarar claramente que no está listo para integrar. Mantener la issue abierta y no fusionar ni cerrar.
+**Publicación:** F1 falló el criterio 5 y requiere reorquestación. Por solicitud explícita del usuario, la rama está en el [PR draft #17](https://github.com/pronficilio/coup-online/pull/17) para revisión visual de las capturas; declarar claramente que no está listo para integrar. Mantener la issue abierta y no fusionar ni cerrar.
 
 ## Topología, riesgos y revisión
 

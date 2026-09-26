@@ -3,7 +3,8 @@
 **Unidad:** https://github.com/pronficilio/coup-online/issues/16
 **Worktree / rama:** `.worktrees/issue-16-player-header` / `issue/16-player-header`
 **Veredicto:** `FAILED` — requiere reorquestación por colisiones que exceden el alcance autorizado.
-**Issue:** permanece abierta. El usuario solicitó un PR draft para poder revisar las capturas; el PR documenta este veredicto fallido y no está listo para integrar.
+**PR de revisión (draft):** https://github.com/pronficilio/coup-online/pull/17
+**Issue:** permanece abierta. El PR documenta este veredicto fallido y no está listo para integrar.
 
 ## Cambios revisados
 
