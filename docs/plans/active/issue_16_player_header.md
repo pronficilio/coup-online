@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/16
 **Plan exacto:** `docs/plans/player-header/plan_player_header.md`
 **Bitácora exacta:** `docs/plans/log/issue-16.jsonl`
-**Estado:** `ACTIVE`; F1 `ACTIVE`.
+**Estado:** `ACTIVE`; F1 `FAILED` — requiere reorquestación.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Verifier requerido ahora:** no; revisión final del Orquestador.
 **Branch destino de toda la issue:** `issue/16-player-header`.
@@ -27,7 +27,9 @@ Las fuentes están en el checkout de orquestación, que no forma parte del remot
 
 **Validaciones:** inspección visual/manual, `npm run build` desde `coup-client` y `git diff --check`. No añadir ni ejecutar tests automatizados. Registrar comandos y resultados reales, sin anticiparlos.
 
-**Cierre:** política `COMMIT_REQUIRED`. Commit de cierre `feat(player-header): issue 16 F1 CLOSED ready_review`, junto al reporte/evidencia y evento `phase_verdict` en `docs/plans/log/issue-16.jsonl`. Entrega el hash, capturas y resultados al Orquestador; no integres ni cierres #16.
+**Resultado F1 (2026-09-26):** FAILED; reorquestación requerida. La evidencia CDP confirma el saldo entero dentro del viewport CSS de 320 px, pero en 5p/6p los encabezados se cruzan con cartas/asientos laterales. El baseline tiene la misma geometría saturada; quitar las colisiones requiere mover asientos/cartas/controles, que el alcance actual prohíbe. Ver `docs/plans/player-header/report_issue_16_F1.md` y sus capturas CDP. La compilación final y `git diff --check` pasaron; no se ejecutaron tests. A petición explícita del usuario, se publicará un PR draft para revisar las capturas; F1 no está listo para integrar y la issue permanece abierta.
+
+**Cierre:** política `COMMIT_REQUIRED` para una F1 exitosa. En este resultado fallido, el usuario autorizó publicar un PR draft solo para revisar cambios y capturas; el PR debe explicar que requiere reorquestación, sin integrar ni cerrar #16. Registrar ambos eventos en `docs/plans/log/issue-16.jsonl`.
 
 ## Pregunta de falsificación
 

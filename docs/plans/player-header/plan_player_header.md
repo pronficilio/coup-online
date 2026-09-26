@@ -1,6 +1,6 @@
 # Plan: encabezado del jugador con saldo y neón de turno — issue #16
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`.
+**Estado:** `ACTIVE`; F1 `FAILED` — requiere reorquestación.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/16
 **Handoff:** `docs/plans/active/issue_16_player_header.md`
 **Bitácora:** `docs/plans/log/issue-16.jsonl`
@@ -32,16 +32,17 @@ Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`:
 5. La inspección de 2 a 6 jugadores no encuentra encabezados recortados o superpuestos entre sí, con cartas o con controles.
 6. Los cambios se limitan a encabezado, estilos y assets derivados necesarios; no alteran datos de juego, turno, asientos ni lógica del servidor.
 
-## F1 — Construir y revisar el encabezado (`READY`)
+## F1 — Construir y revisar el encabezado (`FAILED`; reorquestación requerida)
 
 **Pregunta única:** ¿el nuevo encabezado reproduce las referencias, sigue el turno real y permanece legible para 2–6 jugadores en escritorio y móvil?
 **Entrada:** issue #16, este plan, `fotos/jugador.png`, `fotos/focus.png`, `fotos/player.webp`, `fotos/coin.webp`, `PlayerBoard.js` y `PlayerBoardStyles.css` desde `origin/master`.
 **Subtareas:** copiar selectivamente los dos WebP locales a `coup-client/src/assets/`; incorporar icono y saldo en una fila; aplicar el estado activo al nombre usando la señal existente; ajustar tamaños, truncado y desbordamiento para móviles; producir reporte y capturas de evidencia.
 **Áreas permitidas:** `coup-client/src/components/game/PlayerBoard.js`, `PlayerBoardStyles.css`, `coup-client/src/assets/player.webp`, `coin.webp` y artefactos de `docs/plans/player-header/`. No cambiar `playerBoardLayout.js`, `Coup.js`, servidor, reglas o controles del shell.
+**Resultado:** el saldo completo queda visible a 320 CSS px, pero la inspección CDP válida encontró colisiones de encabezados con las cartas/asientos laterales en partidas de 5 y 6 jugadores. La misma geometría saturada aparece en el baseline de `origin/master`; eliminar esos cruces exige reposicionar asientos/cartas/controles, fuera del alcance autorizado. F1 queda `FAILED` y requiere reorquestación antes de otra implementación.
 **Avanzar:** pasan los seis criterios anteriores y se entrega evidencia visual más compilación del cliente. **Pivotar:** solo ajustes CSS localizados dentro del encabezado. **Repetir:** una corrección visual acotada por viewport. **Bloquear/reorquestar:** si resolver una colisión requiere cambiar geometría de asientos, cartas u otras áreas fuera de alcance.
 **Falsificación:** con seis jugadores y nombres largos a 320 px, ¿se oculta el saldo, se recorta el neón o se superpone el encabezado con otro jugador, las cartas o controles?
 **Validación:** revisión manual en escritorio y móvil, incluidas vista de 320 px, 2–6 jugadores, nombres largos, saldos 0/2/10, turnos activo/inactivo y jugadores eliminados; compilación de coup-client y `git diff --check`. No añadir ni ejecutar tests automatizados.
-**Commit:** `COMMIT_REQUIRED`; `feat(player-header): issue 16 F1 CLOSED ready_review`, incluyendo implementación, reporte/evidencia y evento `phase_verdict`.
+**Publicación:** F1 falló el criterio 5 y requiere reorquestación. Por solicitud explícita del usuario, publicar esta rama en un PR draft para revisión visual de las capturas; declarar claramente que no está listo para integrar. Mantener la issue abierta y no fusionar ni cerrar.
 
 ## Topología, riesgos y revisión
 

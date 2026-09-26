@@ -6,6 +6,8 @@ import assassinImage from '../../assets/characters/assassin.webp'
 import contessaImage from '../../assets/characters/contessa.webp'
 import ambassadorImage from '../../assets/characters/ambassador.webp'
 import cardBackImage from '../../assets/characters/reverso.webp'
+import playerIconImage from '../../assets/player.webp'
+import coinImage from '../../assets/coin.webp'
 import { getPlayerBoardSeats } from './playerBoardLayout'
 import './PlayerBoardStyles.css'
 
@@ -103,6 +105,7 @@ export default function PlayerBoard(props) {
                     key={player.name}
                     data-seat-index={seatIndex}
                     data-seat-edge={seatEdge}
+                    data-seat-header-edge={left <= 20 ? 'left' : left >= 80 ? 'right' : undefined}
                     data-player-count={seats.length}
                     data-seat-lower-side={
                         seats.length >= 5 && top >= 60 && Math.abs(left - 50) >= 5 ? 'true' : undefined
@@ -118,8 +121,32 @@ export default function PlayerBoard(props) {
                         '--player-color': player.color
                     }}
                 >
-                    <h2 className="PlayerBoardSeatName">{player.name}</h2>
-                    <p className="PlayerBoardSeatCoins">Monedas: {player.money}</p>
+                    <div className="PlayerBoardSeatHeader">
+                        <h2 className="PlayerBoardSeatName" title={player.name}>
+                            <img
+                                className="PlayerBoardPlayerIcon"
+                                src={playerIconImage}
+                                alt=""
+                                aria-hidden="true"
+                                draggable="false"
+                            />
+                            <span className="PlayerBoardSeatNameText">{player.name}</span>
+                        </h2>
+                        <p
+                            className="PlayerBoardSeatCoins"
+                            role="img"
+                            aria-label={`${player.money} monedas`}
+                        >
+                            <img
+                                className="PlayerBoardCoinIcon"
+                                src={coinImage}
+                                alt=""
+                                aria-hidden="true"
+                                draggable="false"
+                            />
+                            <span>{player.money}</span>
+                        </p>
+                    </div>
                     <div className="PlayerBoardSeatInfluences">
                         {INFLUENCE_SLOTS.map(slotIndex =>
                             renderInfluenceSlot(player, isObserver, slotIndex)
@@ -130,6 +157,4 @@ export default function PlayerBoard(props) {
         </div>
     )
 }
-
-
 
