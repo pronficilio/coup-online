@@ -2,7 +2,7 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 WAITING_EXECUTOR_REVIEW; F1 PENDING
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 ACTIVE
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -11,7 +11,7 @@ PR: todavía no existe; debe haber una sola integración a master para esta issu
 
 ## Contrato F0 y decisiones de producto definidos
 
-El contrato F0 está en `docs/plans/codex-ai-players/f0_contract.md`. Define vistas públicas/privadas, actor por socket/asiento, opciones por fase, respuesta id/versionada, timeout/pausa y palanca. El usuario decidió conservar el acceso actual sin cuentas/login/invitaciones, versionar las cuatro fuentes de reglas y desempatar ventanas concurrentes por orden fijo de asientos. F0 espera revisión PHASE independiente antes de F1. Se consultaron los hallazgos confirmados en:
+El contrato F0 está en `docs/plans/codex-ai-players/f0_contract.md`. Define vistas públicas/privadas, actor por socket/asiento, opciones por fase, respuesta id/versionada, timeout/pausa y palanca. El usuario decidió conservar el acceso actual sin cuentas/login/invitaciones, versionar las cuatro fuentes de reglas y desempatar ventanas concurrentes por orden fijo de asientos. F0 cerró con PHASE `PASS`; F1 está activa. Se consultaron los hallazgos confirmados en:
 
 - docs/plans/active/report_issue_3_quick_security_check_F1.md
 - docs/plans/active/verifier_issue_3_final.md
@@ -21,9 +21,9 @@ Pregunta de falsificación: ¿puede otro socket, una respuesta Codex vencida o u
 
 Subtareas F0: mapear cada evento del motor por actor/datos/permisos; definir la observación privada y el esquema de elección; documentar el arbitraje de desafíos y bloqueos; conservar la asociación efímera socket/asiento sin agregar autenticación; fijar idempotencia, timeout, pausa y reanudación.
 
-Evidencia registrada: matriz evento × actor × información/acción y contrato de respuesta documentados en `f0_contract.md`; la revisión PHASE sigue pendiente. Si las reglas no definen una transición, bloquear la decisión y pedir orquestación; no inventar reglas.
+Evidencia registrada: matriz evento × actor × información/acción y contrato de respuesta documentados en `f0_contract.md`; el informe independiente PHASE PASS está en `verifier_issue_14_F0.md`. Si las reglas no definen una transición, bloquear la decisión y pedir orquestación; no inventar reglas.
 
-Commit documental previo: `6b480fa`; el siguiente commit deja el contrato `WAITING_EXECUTOR_REVIEW`. Solo el Orquestador puede registrar `CLOSED` tras PASS del Verifier.
+Commits F0: `6b480fa` contiene el primer contrato; `b189cc0` contiene decisiones aprobadas y reglas versionadas; el cierre documental con PHASE PASS queda en este commit. Solo el Orquestador registra `CLOSED` tras PASS del Verifier.
 Validación: revisión estática del contrato; no iniciar llamadas Codex reales durante F0.
 El usuario eligió orden fijo de asientos en sentido horario desde quien declara la acción/bloqueo; si varias personas responden, se escoge la primera elegible en ese orden, sin ventaja por latencia. Los documentos fuente están versionados y la transcripción es normativa; la discrepancia de setup pasa a F1. No se cambió código.
 
@@ -40,4 +40,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
 - No comenzar F1 antes de cerrar F0; no crear ramas, worktrees ni PR por fase.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados y registrados; contrato y reglas versionadas. Estado de unidad `ACTIVE`; F0 `WAITING_EXECUTOR_REVIEW`; F1 `PENDING`. Siguiente: revisión independiente PHASE de F0. Solo tras `PASS` puede empezar F1. No abrir PR ni invocar Codex desde F0.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`. F0 `CLOSED`; F1 `ACTIVE` en el mismo branch/worktree. No abrir PR ni invocar Codex antes de cerrar F1/F2/F3 según sus gates.

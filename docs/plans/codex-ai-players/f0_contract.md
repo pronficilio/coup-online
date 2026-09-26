@@ -1,8 +1,8 @@
 # Issue #14 — contrato F0 de observación y decisiones
 
 **Estado de unidad:** `ACTIVE`.
-**Estado F0:** `WAITING_EXECUTOR_REVIEW`; contrato actualizado con las decisiones del usuario, pendiente del checkpoint PHASE independiente.
-**F1:** `PENDING`; no iniciar hasta recibir `PASS` en la revisión PHASE independiente.
+**Estado F0:** `CLOSED`; revisión PHASE independiente `PASS` en `b189cc0`.
+**F1:** `ACTIVE`; ejecutar los cambios de privacidad, autoridad y reglas descritos en el plan.
 **Base inspeccionada:** `origin/master` `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; branch `issue/14-codex-ai-players`.
 
 ## Contrato mínimo
@@ -60,4 +60,4 @@ Verificado estáticamente en el worktree: `server/index.js` acepta `startGameSig
 
 Las decisiones de producto de F0 están resueltas: conservar acceso actual sin autenticación nueva; versionar las cuatro fuentes (transcripción normativa); desempatar respuestas simultáneas por orden fijo de asientos. La discrepancia de preparación y la conservación de cartas reveladas pasan a F1.
 
-Validación: lectura estática del contrato, reglas, reportes y eventos. No se escribieron/ejecutaron pruebas, no se inició Codex ni llamada de juego, y no se comprobó comportamiento en vivo. F0 espera revisión PHASE independiente; F1 `PENDING` hasta su PASS.
+Validación F0: lectura estática del contrato, reglas, reportes y eventos. No se escribieron/ejecutaron pruebas, no se inició Codex ni llamada de juego, y no se comprobó comportamiento en vivo. El informe PHASE independiente concluye `PASS`; queda guardado en `docs/plans/active/verifier_issue_14_F0.md`. F1 queda `ACTIVE` tras cerrar F0.

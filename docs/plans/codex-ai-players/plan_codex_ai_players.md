@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 WAITING_EXECUTOR_REVIEW; F1 PENDING
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 ACTIVE
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -77,18 +77,18 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 ## Fases
 
-### F0 — Fijar el contrato de privacidad y decisiones (`WAITING_EXECUTOR_REVIEW`)
+### F0 — Fijar el contrato de privacidad y decisiones (`CLOSED`)
 
 - **Pregunta:** ¿puede el juego producir para cada asiento una observación suficiente y privada, y representar todas las decisiones necesarias sin entregar autoridad de ejecución al modelo?
 - **Entrada:** `docs/coup_transcription.md` como regla completa, `docs/coup_play_reference.md` y `docs/coup_summary_card.md` como referencias, `docs/coup_llm_summary.md` como resumen operativo, motor Socket.IO y análisis de seguridad.
 - **Salida:** contrato de observación por asiento, decisiones válidas por fase, política para ventanas concurrentes y timeout/pausa; se conserva el lobby y la identidad efímera de socket actuales, sin cuentas ni invitaciones. La palanca permite apagar desde el juego; solo el propietario la rearma desde SSH/consola. Evidencia: `docs/plans/codex-ai-players/f0_contract.md`.
-- **Estado:** el usuario decidió conservar el acceso actual sin autenticación y versionar las cuatro fuentes; aprobó desempatar varias respuestas con orden fijo de asientos en sentido horario desde quien declaró la acción/bloqueo, independientemente de latencia. El contrato queda listo para revisión independiente PHASE; solo tras su `PASS` se inicia F1.
+- **Estado:** el usuario decidió conservar el acceso actual sin autenticación y versionar las cuatro fuentes; aprobó desempatar varias respuestas con orden fijo de asientos en sentido horario desde quien declaró la acción/bloqueo, independientemente de latencia. El Verifier independiente emitió `PASS` para `b189cc0`; informe: `docs/plans/active/verifier_issue_14_F0.md`.
 - **Pivote:** si la interfaz no asocia de forma inequívoca una respuesta al socket que ocupa el asiento, F1 ajusta esa asociación efímera sin agregar autenticación persistente.
 - **Repetición:** una revisión de las fuentes de reglas y del motor; repetir solo para cerrar una ambigüedad identificada.
-- **Commit:** `COMMIT_REQUIRED`; `docs(codex-ai): issue 14 F0 pending PHASE review`.
+- **Commit:** contrato y reglas en `b189cc0`; cierre F0 registrado en este commit.
 - **Validación:** inspección de cada evento/decisión y trazado de una partida mixta; no se inicia una llamada a Codex real desde F0.
 
-### F1 — Hacer el estado y las decisiones privados y autoritativos (`PENDING`; bloqueada por revisión PHASE F0)
+### F1 — Hacer el estado y las decisiones privados y autoritativos (`ACTIVE`)
 
 - **Pregunta:** ¿puede el servidor aplicar una decisión humana o IA sin filtrar cartas ni aceptar una mutación de estado que el jugador no tiene derecho a realizar?
 - **Entrada:** contrato F0.
