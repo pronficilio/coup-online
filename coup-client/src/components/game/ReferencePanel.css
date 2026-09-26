@@ -1,6 +1,15 @@
-.reference-panel__trigger {
-    min-height: 40px;
-    padding: 8px 12px;
+.reference-panel__triggers {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.reference-panel__trigger,
+.reference-panel__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     border: 1px solid #777;
     border-radius: 6px;
     background: #f2f2f2;
@@ -9,11 +18,13 @@
     cursor: pointer;
 }
 
+.reference-panel__trigger {
+    min-height: 40px;
+    padding: 8px 12px;
+}
+
 .reference-panel__trigger:focus-visible,
-.reference-panel__close:focus-visible,
-.reference-panel__tab:focus-visible,
-.reference-panel__language:focus-visible,
-.reference-panel__zoom:focus-visible {
+.reference-panel__close:focus-visible {
     outline: 3px solid #1976d2;
     outline-offset: 2px;
 }
@@ -32,10 +43,12 @@
 }
 
 .reference-panel__modal {
-    display: flex;
-    width: min(1024px, 100%);
-    max-height: min(94vh, 1100px);
-    flex-direction: column;
+    position: relative;
+    display: grid;
+    place-items: center;
+    max-width: 100%;
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
     min-width: 0;
     overflow: hidden;
     box-sizing: border-box;
@@ -48,6 +61,18 @@
     transform: perspective(1400px) rotateY(-9deg) scale(0.985);
     transform-origin: left center;
     transition: opacity 260ms ease, transform 320ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.reference-panel__modal--card {
+    width: min(1024px, calc(66.6667vh - 32px), calc(100vw - 48px));
+    width: min(1024px, calc(66.6667dvh - 32px), calc(100vw - 48px));
+    aspect-ratio: 2 / 3;
+}
+
+.reference-panel__modal--table {
+    width: min(1024px, calc(133.3333vh - 64px), calc(100vw - 48px));
+    width: min(1024px, calc(133.3333dvh - 64px), calc(100vw - 48px));
+    aspect-ratio: 4 / 3;
 }
 
 .reference-panel__overlay--open {
@@ -69,134 +94,34 @@
 }
 
 .reference-panel {
-    display: flex;
+    position: relative;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
     min-height: 0;
-    min-width: 0;
-    flex: 1 1 auto;
-    flex-direction: column;
-}
-
-.reference-panel__header {
-    display: flex;
-    min-height: 64px;
-    min-width: 0;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 12px 18px;
-    border-bottom: 1px solid #d7d9dc;
-    background: #fff;
-}
-
-.reference-panel__eyebrow {
-    margin: 0 0 3px;
-    color: #555;
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-.reference-panel__title {
-    margin: 0;
-    color: #202124;
-    font-size: 20px;
-    line-height: 1.2;
+    place-items: center;
+    overflow: hidden;
 }
 
 .reference-panel__close {
-    display: inline-flex;
-    width: 40px;
-    height: 40px;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #8a8d91;
+    position: absolute;
+    z-index: 1;
+    top: 8px;
+    right: 8px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    background: #fff;
-    color: #202124;
-    font-size: 28px;
+    background: rgba(255, 255, 255, 0.96);
+    font-size: 26px;
     line-height: 1;
-    cursor: pointer;
-}
-
-.reference-panel__controls {
-    display: flex;
-    min-height: 58px;
-    min-width: 0;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 8px 16px;
-    border-bottom: 1px solid #d7d9dc;
-    background: #f7f7f7;
-}
-
-.reference-panel__tabs,
-.reference-panel__options {
-    display: flex;
-    min-width: 0;
-    align-items: center;
-    gap: 8px;
-}
-
-.reference-panel__tab,
-.reference-panel__language,
-.reference-panel__zoom {
-    min-height: 40px;
-    border: 1px solid #777;
-    border-radius: 6px;
-    background: #fff;
-    color: #222;
-    font: inherit;
-}
-
-.reference-panel__tab,
-.reference-panel__zoom {
-    padding: 7px 12px;
-    cursor: pointer;
-}
-
-.reference-panel__tab.is-active {
-    border-color: #313a44;
-    background: #313a44;
-    color: #fff;
-}
-
-.reference-panel__language-label {
-    color: #333;
-    font-size: 14px;
-}
-
-.reference-panel__language {
-    max-width: 125px;
-    padding: 6px 28px 6px 8px;
-}
-
-.reference-panel__image-scroll {
-    min-height: 0;
-    min-width: 0;
-    flex: 1 1 auto;
-    overflow: auto;
-    overscroll-behavior: contain;
-    background: #e9eaec;
-    text-align: center;
-    -webkit-overflow-scrolling: touch;
 }
 
 .reference-panel__image {
     display: block;
     width: 100%;
-    max-width: 1024px;
-    height: auto;
-    margin: 0 auto;
-}
-
-.reference-panel__image.is-zoomed {
-    width: 1024px;
-    max-width: none;
-    margin: 0;
+    height: 100%;
+    object-fit: contain;
 }
 
 @media (max-width: 620px) {
@@ -205,53 +130,29 @@
     }
 
     .reference-panel__modal {
-        width: 100%;
+        max-width: 100vw;
         max-height: 100vh;
         max-height: 100dvh;
         border-radius: 0;
         transform-origin: center center;
     }
 
-    .reference-panel__controls {
-        align-items: stretch;
-        flex-direction: column;
-        gap: 8px;
-        padding: 8px 10px;
+    .reference-panel__modal--card {
+        width: min(100vw, 66.6667vh);
+        width: min(100vw, 66.6667dvh);
     }
 
-    .reference-panel__tabs {
-        display: grid;
-        width: 100%;
-        min-width: 0;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .reference-panel__modal--table {
+        width: min(100vw, 133.3333vh);
+        width: min(100vw, 133.3333dvh);
     }
 
-    .reference-panel__tab {
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    .reference-panel__options {
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-
-    .reference-panel__language {
-        min-width: 0;
-        box-sizing: border-box;
-    }
-
-    .reference-panel__zoom {
-        box-sizing: border-box;
-        flex: 0 0 100%;
-        width: 100%;
-        padding-right: 8px;
-        padding-left: 8px;
-        font-size: 13px;
+    .reference-panel__close {
+        top: 6px;
+        right: 6px;
+        width: 34px;
+        height: 34px;
+        font-size: 24px;
     }
 }
 

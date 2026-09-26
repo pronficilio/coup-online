@@ -1,34 +1,36 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
-import cardEnglish from '../../assets/references/card-en.webp';
 import cardSpanish from '../../assets/references/card-es.webp';
-import tableEnglish from '../../assets/references/table-en.webp';
 import tableSpanish from '../../assets/references/table-es.webp';
 import './ReferencePanel.css';
 
-const assets = {
-    card: { en: cardEnglish, es: cardSpanish },
-    table: { en: tableEnglish, es: tableSpanish }
-};
-
-const tabs = [
-    { key: 'card', label: 'Tarjeta' },
-    { key: 'table', label: 'Tabla' }
+const references = [
+    {
+        key: 'card',
+        label: 'Tarjeta',
+        contentLabel: 'Tarjeta de referencia en español',
+        image: cardSpanish,
+        alt: 'Tarjeta de referencia de Coup en español',
+        width: 1024,
+        height: 1536
+    },
+    {
+        key: 'table',
+        label: 'Tabla',
+        contentLabel: 'Tabla de referencia en español',
+        image: tableSpanish,
+        alt: 'Tabla de referencia de Coup en español',
+        width: 1024,
+        height: 768
+    }
 ];
-
-let nextPanelId = 0;
 
 export default class ReferencePanel extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isOpen: false,
-            activeTab: 'card',
-            language: 'en',
-            isZoomed: false
+            openReference: null
         };
-        this.idPrefix = `reference-panel-${nextPanelId++}`;
-        this.tabButtons = [];
     }
 
     componentDidMount() {
@@ -38,172 +40,79 @@ export default class ReferencePanel extends Component {
         }
     }
 
-    openPanel = () => {
-        this.setState({ isOpen: true, isZoomed: false });
+    openReference = (key) => {
+        this.setState({ openReference: key });
     }
 
-    closePanel = () => {
-        this.setState({ isOpen: false, isZoomed: false });
-    }
-
-    selectTab = (activeTab) => {
-        this.setState({ activeTab });
-    }
-
-    handleTabKeyDown = (event, currentIndex) => {
-        let nextIndex = null;
-        if (event.key === 'ArrowRight') {
-            nextIndex = (currentIndex + 1) % tabs.length;
-        } else if (event.key === 'ArrowLeft') {
-            nextIndex = (currentIndex + tabs.length - 1) % tabs.length;
-        } else if (event.key === 'Home') {
-            nextIndex = 0;
-        } else if (event.key === 'End') {
-            nextIndex = tabs.length - 1;
-        }
-
-        if (nextIndex !== null) {
-            event.preventDefault();
-            const nextTab = tabs[nextIndex];
-            this.setState({ activeTab: nextTab.key }, () => {
-                if (this.tabButtons[nextIndex]) {
-                    this.tabButtons[nextIndex].focus();
-                }
-            });
-        }
+    closeReference = () => {
+        this.setState({ openReference: null });
     }
 
     render() {
-        const { isOpen, activeTab, language, isZoomed } = this.state;
-        const title = activeTab === 'card' ? 'Tarjeta' : 'Tabla';
-        const selectedTabId = `${this.idPrefix}-${activeTab}-tab`;
-        const titleId = `${this.idPrefix}-title`;
-        const languageId = `${this.idPrefix}-language`;
-        const image = assets[activeTab][language];
+        const { openReference } = this.state;
         const prefersReducedMotion = typeof window !== 'undefined'
             && typeof window.matchMedia === 'function'
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const alt = activeTab === 'card'
-            ? (language === 'en' ? 'Action reference card in English' : 'Tarjeta de acciones en español')
-            : (language === 'en' ? 'Reference table in English' : 'Tabla de referencia en español');
-        const zoomLabel = isZoomed ? 'Ajustar a pantalla' : 'Ver tamaño original';
 
         return (
-            <>
-                <button
-                    type="button"
-                    className="reference-panel__trigger"
-                    onClick={this.openPanel}
-                    aria-haspopup="dialog"
-                    aria-expanded={isOpen}
-                >
-                    Referencias
-                </button>
+            <div className="reference-panel__triggers" role="group" aria-label="Referencias de juego">
+                {references.map((reference) => {
+                    const isOpen = openReference === reference.key;
+                    return (
+                        <React.Fragment key={reference.key}>
+                            <button
+                                type="button"
+                                className="reference-panel__trigger"
+                                onClick={() => this.openReference(reference.key)}
+                                aria-haspopup="dialog"
+                                aria-expanded={isOpen}
+                            >
+                                {reference.label}
+                            </button>
 
-                <ReactModal
-                    isOpen={isOpen}
-                    onRequestClose={this.closePanel}
-                    contentLabel="Referencias de juego"
-                    className={{
-                        base: 'reference-panel__modal',
-                        afterOpen: 'reference-panel__modal--open',
-                        beforeClose: 'reference-panel__modal--closing'
-                    }}
-                    overlayClassName={{
-                        base: 'reference-panel__overlay',
-                        afterOpen: 'reference-panel__overlay--open',
-                        beforeClose: 'reference-panel__overlay--closing'
-                    }}
-                    closeTimeoutMS={prefersReducedMotion ? 0 : 320}
-                    shouldCloseOnOverlayClick
-                    shouldCloseOnEsc
-                    shouldReturnFocusAfterClose
-                >
-                    {isOpen && (
-                        <section className="reference-panel" aria-labelledby={titleId}>
-                            <header className="reference-panel__header">
-                                <div>
-                                    <p className="reference-panel__eyebrow">Consulta de juego</p>
-                                    <h2 className="reference-panel__title" id={titleId}>{title}</h2>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="reference-panel__close"
-                                    onClick={this.closePanel}
-                                    aria-label="Cerrar referencias"
-                                >
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </header>
-
-                            <div className="reference-panel__controls">
-                                <div className="reference-panel__tabs" role="tablist" aria-label="Tipo de referencia">
-                                    {tabs.map((tab, index) => {
-                                        const tabId = `${this.idPrefix}-${tab.key}-tab`;
-                                        return (
-                                            <button
-                                                key={tab.key}
-                                                type="button"
-                                                id={tabId}
-                                                ref={(element) => { this.tabButtons[index] = element; }}
-                                                className={`reference-panel__tab${activeTab === tab.key ? ' is-active' : ''}`}
-                                                role="tab"
-                                                aria-selected={activeTab === tab.key}
-                                                aria-controls={`${this.idPrefix}-tabpanel`}
-                                                tabIndex={activeTab === tab.key ? 0 : -1}
-                                                onClick={() => this.selectTab(tab.key)}
-                                                onKeyDown={(event) => this.handleTabKeyDown(event, index)}
-                                            >
-                                                {tab.label}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                <div className="reference-panel__options">
-                                    <label className="reference-panel__language-label" htmlFor={languageId}>
-                                        Idioma
-                                    </label>
-                                    <select
-                                        id={languageId}
-                                        className="reference-panel__language"
-                                        value={language}
-                                        onChange={(event) => this.setState({ language: event.target.value })}
-                                    >
-                                        <option value="en">English</option>
-                                        <option value="es">Español</option>
-                                    </select>
+                            <ReactModal
+                                isOpen={isOpen}
+                                onRequestClose={this.closeReference}
+                                contentLabel={reference.contentLabel}
+                                className={{
+                                    base: `reference-panel__modal reference-panel__modal--${reference.key}`,
+                                    afterOpen: 'reference-panel__modal--open',
+                                    beforeClose: 'reference-panel__modal--closing'
+                                }}
+                                overlayClassName={{
+                                    base: 'reference-panel__overlay',
+                                    afterOpen: 'reference-panel__overlay--open',
+                                    beforeClose: 'reference-panel__overlay--closing'
+                                }}
+                                closeTimeoutMS={prefersReducedMotion ? 0 : 320}
+                                shouldCloseOnOverlayClick
+                                shouldCloseOnEsc
+                                shouldReturnFocusAfterClose
+                            >
+                                <section className="reference-panel" aria-label={reference.contentLabel}>
                                     <button
                                         type="button"
-                                        className="reference-panel__zoom"
-                                        onClick={() => this.setState({ isZoomed: !isZoomed })}
-                                        aria-pressed={isZoomed}
+                                        className="reference-panel__close"
+                                        onClick={this.closeReference}
+                                        aria-label={`Cerrar ${reference.label.toLowerCase()}`}
                                     >
-                                        {zoomLabel}
+                                        <span aria-hidden="true">×</span>
                                     </button>
-                                </div>
-                            </div>
-
-                            <div
-                                className="reference-panel__image-scroll"
-                                id={`${this.idPrefix}-tabpanel`}
-                                role="tabpanel"
-                                aria-labelledby={selectedTabId}
-                                tabIndex="0"
-                            >
-                                <img
-                                    className={`reference-panel__image${isZoomed ? ' is-zoomed' : ''}`}
-                                    src={image}
-                                    alt={alt}
-                                    decoding="async"
-                                    width="1024"
-                                    height={activeTab === 'card' ? '1536' : '768'}
-                                />
-                            </div>
-                        </section>
-                    )}
-                </ReactModal>
-            </>
+                                    <img
+                                        className="reference-panel__image"
+                                        src={reference.image}
+                                        alt={reference.alt}
+                                        decoding="async"
+                                        loading="lazy"
+                                        width={reference.width}
+                                        height={reference.height}
+                                    />
+                                </section>
+                            </ReactModal>
+                        </React.Fragment>
+                    );
+                })}
+            </div>
         );
     }
 }
