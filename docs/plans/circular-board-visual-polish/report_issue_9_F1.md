@@ -6,8 +6,8 @@
 - El fondo usa `cover` centrado en una capa fija de viewport, sin deformación; la plataforma central del arte permanece reconocible y la imagen también aparece en las franjas superior e inferior de la página. Añadí un disco blanco translúcido centrado detrás del mazo.
 - Corrección de cartas solicitada para PR #10: quité el panel blanco exterior de cada asiento y dejé nombre/monedas en etiquetas compactas con color de jugador. Las influencias miden hasta 134 px de ancho en escritorio y usan `clamp(58px, 15.5vw, 82px)` en compacto (76 px a 490 px). El contorno neón sigue en las cartas del jugador actual.
 - Para pantallas compactas, los asientos próximos a los bordes desplazan sus cartas hacia adentro según su coordenada horizontal calculada; el cálculo base del círculo se conserva. Así se mantienen completas las cartas laterales en 3, 4, 5 y 6 jugadores.
-- Corrección de sombras para PR #10: cada `.PlayerInfluenceSlot` tiene una sombra negra corta y discreta; el mazo usa varias capas `drop-shadow` para sugerir una pila física. El jugador actual recibe un `::after` externo: contorno blanco de 2 px, unos 3 px de separación de la carta y halo rojo exterior. La sombra negra de carta/mazo no comparte la capa del neón.
-- No cambié posiciones, colores, resalte neón, reversos, reglas, socket ni paneles. No versioné el PNG fuente.
+- Corrección de sombras para PR #10: cada `.PlayerInfluenceSlot` tiene una sombra negra corta y discreta; el mazo usa varias capas `drop-shadow` para sugerir una pila física. El jugador actual recibe un `::after` externo: contorno blanco de 2 px, unos 9 px de aire hasta la carta y halo rojo suave fuera del contorno. La sombra negra de carta/mazo no comparte la capa del neón.
+- Para evitar recortes laterales compactos y resolver la proximidad en 6p, el CSS ajusta asientos por borde y eleva 20 px los inferiores de 5p y 32 px los de 6p. No se cambiaron colores, tamaños de cartas, reglas, socket ni paneles. No versioné el PNG fuente.
 
 ## Evidencia visual
 
@@ -21,7 +21,7 @@ Capturas de navegador con `PlayerBoard` real, fixtures locales de 2–6 jugadore
 | 5 | [preview](preview_issue_9_F1_5p_desktop.png) | [preview](preview_issue_9_F1_5p_mobile.png) |
 | 6 | [preview](preview_issue_9_F1_6p_desktop.png) | [preview](preview_issue_9_F1_6p_mobile.png) |
 
-Revisé la composición, en especial 3 y 6 jugadores en escritorio y compacto. Sombras, mazo, disco, nombres, monedas y controles permanecen legibles. En compacto para 6 jugadores, las esquinas de las manos laterales inferiores quedan muy próximas y se superponen ligeramente con el área de las cartas activas; se conservó el layout y quedó registrado para revisión visual futura. Las demás cartas caben completas. La simulación usa `Coup`/`ActionDecision` reales con fixtures deterministas y socket sin red; no usa partida/socket real ni se hicieron clics en acciones.
+Revisé la composición, en especial 3 y 6 jugadores en escritorio y compacto. El aro activo conserva una franja de aire visible con la imagen de la carta; los halos de las dos cartas activas no se fusionan. En 6p compacto, elevar 32 px los dos asientos laterales inferiores deja un espacio visible de alrededor de 10 px entre sus cartas y las activas. La ampliación del margen lateral evita recortes también en 5p compacto. Se revisaron los diez previews finales. Sombras, mazo, disco, nombres, monedas y controles permanecen legibles. La simulación usa `Coup`/`ActionDecision` reales con fixtures deterministas y socket sin red; no usa partida/socket real ni se hicieron clics en acciones.
 
 ## Validación
 
