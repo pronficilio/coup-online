@@ -22,6 +22,7 @@ export default class Coup extends Component {
              action: null,
              blockChallengeRes: null,
              players: [],
+             boardPlayers: [],
              playerIndex: null,
              currentPlayer: '',
              isChooseAction: false,
@@ -57,11 +58,12 @@ export default class Coup extends Component {
         this.props.socket.on('g-updatePlayers', (players) => {
             bind.setState({playAgain: null})
             bind.setState({winner: null})
-            players = players.filter(x => !x.isDead);
+            const boardPlayers = players;
+            const activePlayers = players.filter(x => !x.isDead);
             let playerIndex = null;
-            for(let i = 0; i < players.length; i++) {
-                console.log(players[i].name, this.props.name)
-                if(players[i].name === this.props.name) {
+            for(let i = 0; i < activePlayers.length; i++) {
+                console.log(activePlayers[i].name, this.props.name)
+                if(activePlayers[i].name === this.props.name) {
                     playerIndex = i;
                     break;
                 }
@@ -72,7 +74,7 @@ export default class Coup extends Component {
                 this.setState({ isDead: false})
             }
             console.log(playerIndex)
-            bind.setState({playerIndex, players});
+            bind.setState({playerIndex, players: activePlayers, boardPlayers});
             
         });
         this.props.socket.on('g-updateCurrentPlayer', (currentPlayer) => {
@@ -325,7 +327,11 @@ export default class Coup extends Component {
                 <div className="InfluenceSection">
                     {influences}
                 </div>
-                <PlayerBoard players={this.state.players}></PlayerBoard>
+                <PlayerBoard
+                    players={this.state.boardPlayers}
+                    observerName={this.props.name}
+                    currentPlayer={this.state.currentPlayer}
+                />
                 <div className="DecisionsSection">
                     {waiting}
                     {revealDecision}
