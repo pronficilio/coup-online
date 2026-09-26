@@ -74,7 +74,7 @@ export default function PlayerBoard(props) {
     const seats = getPlayerBoardSeats(players, props.observerName)
 
     return (
-        <div className="PlayerBoardContainer" role="group" aria-label="Tablero de jugadores">
+        <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label="Tablero de jugadores">
             <div className="PlayerBoardCenter" aria-hidden="true" />
             <img
                 className="PlayerBoardDeck"
@@ -84,6 +84,7 @@ export default function PlayerBoard(props) {
             />
             {seats.map(({ player, seatIndex, left, top, isObserver }) => {
                 const isCurrentPlayer = player.name === props.currentPlayer
+                const seatEdge = left <= 20 ? 'left' : left >= 80 ? 'right' : undefined
                 const seatClassName = [
                     'PlayerBoardSeat',
                     isCurrentPlayer ? 'PlayerBoardSeat--current' : ''
@@ -93,6 +94,7 @@ export default function PlayerBoard(props) {
                     className={seatClassName}
                     key={player.name}
                     data-seat-index={seatIndex}
+                    data-seat-edge={seatEdge}
                     data-current-player={isCurrentPlayer ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
                     style={{

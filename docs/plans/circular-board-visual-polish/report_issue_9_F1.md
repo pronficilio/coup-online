@@ -3,7 +3,9 @@
 ## Resultado
 
 - Convertí `E:\dev\coup\fotos\backgrond.png` (1672×941, RGB, sin alfa) a `coup-client/src/assets/background.webp` (1024×576, RGB, 224710 bytes). La proporción se mantiene mediante redimensionado proporcional. Corrección de PR #10: el fondo blanco cubre el viewport completo y el velo blanco CSS al 70% deja una opacidad efectiva de imagen de 30%.
-- El fondo usa `cover` centrado en una capa fija de viewport, sin deformación; la plataforma central del arte permanece reconocible y la imagen también aparece en las franjas superior e inferior de la página. Añadí un disco blanco translúcido centrado detrás del mazo y amplié las cartas a 56×76 px en escritorio y 46×64 px en compacto.
+- El fondo usa `cover` centrado en una capa fija de viewport, sin deformación; la plataforma central del arte permanece reconocible y la imagen también aparece en las franjas superior e inferior de la página. Añadí un disco blanco translúcido centrado detrás del mazo.
+- Corrección de cartas solicitada para PR #10: quité el panel blanco exterior de cada asiento y dejé nombre/monedas en etiquetas compactas con color de jugador. Las influencias miden hasta 134 px de ancho en escritorio y usan `clamp(58px, 15.5vw, 82px)` en compacto (76 px a 490 px). El contorno neón sigue en las cartas del jugador actual.
+- Para pantallas compactas, los asientos próximos a los bordes desplazan sus cartas hacia adentro según su coordenada horizontal calculada; el cálculo base del círculo se conserva. Así se mantienen completas las cartas laterales en 3, 4, 5 y 6 jugadores.
 - No cambié posiciones, colores, resalte neón, reversos, reglas, socket ni paneles. No versioné el PNG fuente.
 
 ## Evidencia visual
@@ -18,12 +20,12 @@ Capturas de navegador con `PlayerBoard` real, fixtures locales de 2–6 jugadore
 | 5 | [preview](preview_issue_9_F1_5p_desktop.png) | [preview](preview_issue_9_F1_5p_mobile.png) |
 | 6 | [preview](preview_issue_9_F1_6p_desktop.png) | [preview](preview_issue_9_F1_6p_mobile.png) |
 
-Revisé la composición, en especial 3 y 6 jugadores. Los paneles y controles quedan visibles. En compacto para 3 jugadores, el asiento derecho se recorta parcialmente; el layout queda intacto en esta corrección, fuera del alcance solicitado. La simulación no usa partida/socket real ni se hicieron clics en acciones.
+Revisé la composición, en especial 3 y 6 jugadores en escritorio y compacto. Los pares de cartas, el mazo, disco, nombres, monedas y controles no se solapan; los asientos de borde permanecen dentro del viewport. La simulación usa `Coup`/`ActionDecision` reales con fixtures deterministas y socket sin red; no usa partida/socket real ni se hicieron clics en acciones.
 
 ## Validación
 
 - `npm ci`: completó para instalar las dependencias del worktree.
-- `npm run start-pc`: compiló el cliente, incluidos los cambios de `PlayerBoard`. Para generar capturas se usó temporalmente un harness en `App.js`, restaurado antes del cierre. Quedaron advertencias ESLint ya existentes en `App.js` (`logo`, `Link`) y `Coup.js` (`ReactModal` sin uso).
+- `npm run start-pc`: compiló el cliente con el fixture y volvió a compilar tras restaurar `App.js`. El harness fue temporal y no forma parte del diff. Quedaron advertencias ESLint existentes en `App.js` (`logo`, `Link`) y `Coup.js` (`ReactModal` sin uso).
 - `git diff --check`: pasó.
 - No ejecuté tests automatizados ni build de producción, de acuerdo con el alcance.
 

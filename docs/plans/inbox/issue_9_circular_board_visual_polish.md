@@ -46,4 +46,4 @@ Entregar commit, reporte breve, dimensiones/peso del WebP, previews, comandos y 
 
 ## Reporte F1
 
-F1 quedó implementada y revisada visualmente en 2–6 jugadores para 1280×1400 y 490×1200. Tras la corrección, el fondo cubre el viewport completo con opacidad efectiva 0.30; el informe, WebP y capturas están registrados en `docs/plans/circular-board-visual-polish/report_issue_9_F1.md`. Cliente compilado; `git diff --check` pasó. PR #10 abierto; issue abierta y sin merge.
+F1 quedó implementada y revisada visualmente en 2–6 jugadores para 1280×1400 y 490×1200. El fondo cubre el viewport con opacidad efectiva 0.30; las cartas grandes ya no tienen caja blanca exterior y los asientos laterales se desplazan automáticamente hacia adentro en viewport compacto para evitar recortes. El informe, WebP y diez capturas finales están en `docs/plans/circular-board-visual-polish/report_issue_9_F1.md`. Cliente compilado; `git diff --check` pasó. PR #10 abierta; issue abierta y sin merge.

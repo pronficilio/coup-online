@@ -56,24 +56,25 @@
 .PlayerBoardSeat {
     position: absolute;
     z-index: 3;
-    width: 154px;
-    max-width: 42%;
+    width: max-content;
+    max-width: 46%;
     box-sizing: border-box;
-    padding: 8px;
-    border: 2px solid var(--player-color, #707070);
-    border-radius: 14px;
-    background: #fff;
     color: #252525;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     text-align: center;
     transform: translate(-50%, -50%);
 }
 
 .PlayerBoardSeatName {
     overflow: hidden;
-    margin: 0;
-    color: #252525;
-    font-size: 1rem;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 4px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--player-color, #707070);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    font-size: 0.82rem;
     font-weight: 600;
     line-height: 1.25;
     text-overflow: ellipsis;
@@ -81,22 +82,28 @@
 }
 
 .PlayerBoardSeatCoins {
-    margin: 3px 0 8px;
+    display: table;
+    margin: 0 auto 7px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
     color: #555;
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     line-height: 1.2;
 }
 
 .PlayerBoardSeatInfluences {
     display: flex;
     justify-content: center;
-    gap: 6px;
+    gap: 5px;
 }
 
 .PlayerInfluenceSlot {
     display: inline-flex;
-    width: 56px;
-    height: 76px;
+    flex: 0 0 auto;
+    width: clamp(76px, 10.4vw, 134px);
+    height: auto;
+    aspect-ratio: 0.74;
     box-sizing: border-box;
     align-items: center;
     justify-content: center;
@@ -146,12 +153,22 @@
 
 @media only screen and (max-width: 520px) {
     .PlayerBoardSeat {
-        width: 122px;
-        padding: 6px;
+        max-width: 48%;
     }
 
     .PlayerInfluenceSlot {
-        width: 46px;
-        height: 64px;
+        width: clamp(58px, 15.5vw, 82px);
+    }
+
+    .PlayerBoardSeatName {
+        font-size: 0.72rem;
+    }
+
+    .PlayerBoardSeat[data-seat-edge="left"] {
+        transform: translate(calc(-50% + clamp(16px, 5vw, 26px)), -50%);
+    }
+
+    .PlayerBoardSeat[data-seat-edge="right"] {
+        transform: translate(calc(-50% - clamp(16px, 5vw, 26px)), -50%);
     }
 }
