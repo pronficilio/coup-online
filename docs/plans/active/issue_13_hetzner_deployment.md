@@ -29,7 +29,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - La copia compartida estaba en `master` con 67 entradas modificadas/no rastreadas. `origin/master` observado tras `git fetch` es `64593af`; la copia local `HEAD` es `1e4685f`, dos commits delante y dieciséis detrás, más cambios sin commit. Ninguno se asumirá como lanzamiento sin selección explícita.
 - GitHub no tenía una issue previa de despliegue. Issue #5 está cerrada; issue #6 permanece abierta.
 - El usuario confirmó que compró `ejele.net`. La IP pública efectiva del servidor se verificó desde el host y un servicio externo: `178.105.138.91`.
-- Consulta DNS desde el servidor: `ejele.net` → `15.197.148.33`; `ejele.ejele.net` → `178.108.138.91`; `coup.ejele.net` no resuelve. El registro añadido con nombre `ejele` apunta a un hostname duplicado y la IP observada no coincide con Hetzner.
+- Nameservers públicos: `ns19.domaincontrol.com` y `ns20.domaincontrol.com` (GoDaddy). Cloudflare y Google DNS responden `coup.ejele.net` → `178.108.138.91` (TTL 600 s), no la IP Hetzner. Puede ser caché/propagación del cambio reciente o un valor distinto al guardado; reconsultar.
 - No hay conexión habilitada a GoDaddy desde esta sesión; la edición del registro se hará en su panel cuando tengamos el hostname exacto. No se han cambiado DNS ni nameservers.
 
 ## Supuestos, preguntas y riesgos
@@ -119,7 +119,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-El inventario F0 está completo; el dominio comprado es `ejele.net` y la IP pública es `178.105.138.91`. F1 está bloqueada por el registro actual: `ejele.ejele.net` resuelve a `178.108.138.91` y `coup.ejele.net` no resuelve. Corregir el nombre a `coup` y el valor a `178.105.138.91`, conservando la raíz. En paralelo, F2 espera elegir el commit/tag limpio. No instalar, copiar ni desplegar código hasta fijarlo.
+El inventario F0 está completo; el dominio comprado es `ejele.net` y la IP pública es `178.105.138.91`. Aunque el usuario informa que creó `coup`, dos resolvers públicos aún devuelven `178.108.138.91` para `coup.ejele.net` (TTL 600 s). Verificar/corregir el valor a `178.105.138.91` y reconsultar; conservar el registro raíz. No instalar Caddy como segundo proxy: Nginx de Mochila ya ocupa 80/443. F2 sigue esperando elegir el commit/tag limpio. No desplegar código hasta fijarlo.
 
 ## Fuentes
 

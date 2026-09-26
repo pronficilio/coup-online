@@ -6,8 +6,8 @@
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** no; requerido de forma independiente en F5 antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
-- **Fase sugerida:** F1 — cambiar el registro erróneo `A ejele` por `A coup → 178.105.138.91` y verificar la resolución pública, conservando el registro raíz.
-- **Por qué sigue:** el servidor resuelve `ejele.ejele.net` a `178.108.138.91` y no encuentra `coup.ejele.net`. La IP Hetzner verificada es `178.105.138.91`. Además, hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
+- **Fase sugerida:** F1 — asegurar que el A de `coup` tenga valor `178.105.138.91` y verificar que resolvers públicos dejen de responder con `178.108.138.91`, conservando el registro raíz.
+- **Por qué sigue:** Cloudflare y Google DNS resuelven `coup.ejele.net` a `178.108.138.91` (TTL 600 s), mientras la IP Hetzner verificada es `178.105.138.91`; falta confirmar el cambio/propagación. Además, hay 67 cambios locales, `HEAD=1e4685f` diverge de `origin/master=64593af` (2 adelante, 16 detrás) y falta una versión aprobada para producción.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
 - **Subtareas listas para delegación:**
   1. Corregir/verificar el A `coup.ejele.net → 178.105.138.91` sin tocar la raíz ni otros nombres.
