@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; Coup y TLS están activos; F6/verificación independiente e integración siguen pendientes.
+- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; Coup y TLS están activos; PR #15 está en borrador; F6/verificación independiente e integración siguen pendientes.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -37,6 +37,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Paso inmediato:** ninguno para DNS; el A de `coup` ya está confirmado. Preservar el registro raíz y otros servicios.
 - **Versión aprobada:** `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. El usuario eligió esa versión; el checkout local tiene cambios y no se usa como fuente.
 - El server de esa revisión tenía dependencias vulnerables. El artefacto de producción actualiza solo dependencias compatibles por lockfile y restringe el origen CORS a `https://coup.ejele.net`; permanecen cuatro avisos moderados del stack Socket.IO 2.x, cuya remediación automática requeriría una migración mayor.
+- El árbol de build frontend reporta 81 advisories (incluye 35 high y 6 critical); el contenedor final de frontend contiene Nginx y archivos estáticos, no `node_modules`. Se requiere una actualización separada de esa toolchain.
 - El usuario compró `ejele.net`; los A/CNAME ya resuelven y los tres hosts validaron HTTP-01.
 - Riesgo alto: el proxy es compartido; conservar catch-all y certificado actuales. La config original tiene copia de seguridad y cada recarga pasó `nginx -t`.
 - Riesgo alto: verificar origen permitido en CORS, rutas HTTP y upgrade WebSocket por hostname.
@@ -114,6 +115,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Pregunta:** ¿hay una petición o fallo razonable que rompa el tráfico existente, filtre una versión distinta o impida el juego?
 - **Verifier:** independiente; intentará falsar aislamiento/rollback, rutas API, CORS, upgrade WebSocket, persistencia del servicio y TLS/vhost. No implementa fixes.
 - **Criterio de cierre:** veredicto `PASS`, pasos de rollback probados/documentados, versión y salud actual registradas, PR integrado a `master` y issue actualizada.
+- **PR:** #15 en borrador, listo para revisión pero no para integrar.
 - **Política de commit:** `COMMIT_REQUIRED`.
 - **Cierre previsto:** `docs(deploy): issue 13 F5 CLOSED deployment verified`.
 
@@ -126,11 +128,12 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-F0–F5 cerradas. Coup está en `https://coup.ejele.net` y Mochila en `https://ejele.net`; el certificado SAN también cubre `www.ejele.net` y su redirección va al apex. Renovación automática está instalada y probada. F6 requiere una revisión independiente, confirmar rollback y luego integrar el PR; no cerrar la issue antes de eso.
+F0–F5 cerradas. Coup está en `https://coup.ejele.net` y Mochila en `https://ejele.net`; el certificado SAN también cubre `www.ejele.net` y su redirección va al apex. Renovación automática está instalada y probada. PR #15 está en borrador; F6 requiere revisión independiente y confirmar rollback antes de integrar/cerrar la issue.
 
 ## Fuentes
 
 - Issue: https://github.com/pronficilio/coup-online/issues/13
+- PR: https://github.com/pronficilio/coup-online/pull/15
 - Proyecto: `docs/plans/PROJECT_ORCHESTRATION.yaml`
 - Log: `docs/plans/log/issue-13.jsonl`
 - Handoff: `docs/plans/inbox/issue_13_hetzner_deployment.md`

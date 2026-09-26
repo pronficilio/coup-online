@@ -8,7 +8,8 @@
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
 - **Versión aprobada:** SHA `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. El checkout raíz tiene cambios y no se usa como fuente.
 - **Despliegue activo:** release `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e` en `/opt/coup/releases/1e4685f`; `https://coup.ejele.net`; Mochila `https://ejele.net`; www redirige al apex. Cert SAN válido hasta 2026-12-25 y renovación automática probada.
-- **Fase siguiente:** F6 — verificar de forma independiente aislamiento, rollback, CORS/API/WebSocket, coexistencia Mochila/Minecraft y TLS; después abrir/integrar PR según veredicto.
+- **PR:** #15 está en borrador hacia `master`; no integrar todavía.
+- **Fase siguiente:** F6 — verificar de forma independiente aislamiento, rollback, CORS/API/WebSocket, coexistencia Mochila/Minecraft y TLS; después integrar PR según veredicto.
 - **Por qué sigue:** el despliegue y TLS están operativos, pero falta el verifier separado y confirmar/documentar rollback. El checkout raíz permanece sucio y no fue usado.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
 - **Subtarea pendiente:** F6: falsificar de forma independiente el aislamiento/rollback y las rutas/API/WebSocket/TLS, usando los datos de la sección «Validaciones realizadas» del plan.
@@ -20,7 +21,7 @@
 - **Worktree destino:** `.worktrees/issue-13-hetzner-deployment`.
 - **Merge target:** `master`.
 - **Bitácora:** `docs/plans/log/issue-13.jsonl` (append-only).
-- **PR esperado:** un PR `issue/13-hetzner-deployment` → `master`, después de completar fases y verificación.
+- **PR abierto:** #15, `issue/13-hetzner-deployment` → `master`, en borrador hasta completar F6.
 - **Secuencia de aislamiento:** reclamar en issue; volver a leer issue y descartar reclamo incompatible; usar el branch/worktree canónico ya preparado; registrar claim/worktree en log; commits de fase siempre en el mismo branch.
 - **Validaciones realizadas:** build en Hetzner; API create/exists; cliente Socket.IO creó y se unió a sala y actualizó polling→WebSocket; API reiniciado y `healthy`; TLS y redirect de los tres hosts; Certbot staging dry-run y systemd renewal service; Mochila y Minecraft siguen arriba. **Pendiente:** prueba de rollback y verificación independiente.
 - **Verifier:** en F6, intentar refutar aislamiento, CORS/rutas, WebSocket, TLS, coexistencia y rollback; solo reporta evidencia y no modifica la implementación.
