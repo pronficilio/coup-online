@@ -19,11 +19,13 @@ F1 ya generó y verificó `card-en.webp`, `card-es.webp`, `table-en.webp` y `tab
 
 **Cierre F1:** reporte `docs/plans/game-reference-materials/report_issue_8_F1.md`, cuatro WebP y evento `phase_verdict` en la bitácora, juntos en el commit `feat(reference-assets): issue 8 F1 CLOSED advance_f2`.
 
-El reporte confirma 1024 px, proporciones conservadas, WebP calidad 85 y legibilidad visual. F2 sigue pendiente: #6 permanece abierta, así que no edites `Coup.js`/GameHeader hasta que el Orquestador registre la coordinación o la liberación del punto de montaje.
+El reporte confirma 1024 px, proporciones conservadas, WebP calidad 85 y legibilidad visual. El subtask aislado de F2 está activo; no montes ni edites `Coup.js`/GameHeader hasta que el Orquestador registre la coordinación o la liberación del punto de montaje de PR #11 de #6.
 
-## Dependencias de montaje
+## F2 — subtask autocontenido; montaje pendiente
 
-F2 no comienza hasta integrar #5 a `master`. Antes de editar `Coup.js`/GameHeader, verifica el estado de #6 y registra coordinación con su trabajo sobre el shell. Si #6 está modificando esa superficie, espera su integración o una reorquestación explícita. No cambies reglas, servidor, Socket.IO ni paneles de decisiones en esta issue.
+#5 ya está integrada a `master`. Issue #6 sigue abierta; su PR draft #11 toca `Coup.js`/GameHeader y el shell. F2 puede avanzar únicamente con el componente aislado en archivos nuevos; no montes ni edites esas superficies hasta coordinación explícita/liberación del PR #11. Registra el subtask y su evidencia, pero no cierres F2 sin montaje coordinado, recorrido real, verificación de carga y capturas.
+
+No cambies reglas, servidor, Socket.IO ni paneles de decisiones en esta issue.
 
 Completa después F2 y F3 según el plan. Cada fase requiere su reporte, el evento `phase_verdict` y un commit de cierre. No abras branches, worktrees o PRs por fase; deja la unidad completa en una sola integración y en estado `WAITING_ORCHESTRATOR` al terminar.
 
