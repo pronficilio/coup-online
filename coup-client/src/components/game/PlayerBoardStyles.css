@@ -110,7 +110,7 @@
     box-shadow: 0 0 8px #ff1744, 0 0 16px rgba(255, 23, 68, 0.72);
 }
 
-@media only screen and (max-width: 460px) {
+@media only screen and (max-width: 520px) {
     .PlayerBoardSeat {
         width: 106px;
         padding: 6px;

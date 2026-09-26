@@ -6,13 +6,13 @@
 
 **Bitácora exacta:** `docs/plans/log/issue-5.jsonl`
 
-**Estado:** `ACTIVE`
+**Estado:** `WAITING_ORCHESTRATOR`
 
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`
 
 **Verifier requerido ahora:** no; invocarlo al final, antes de integrar.
 
-**Fases cerradas:** F1, asientos estables y contrato visual; F2, integración visual de WebP y mazo centrado. El Orquestador aprobó F1 en `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9`; F2 se cerró tras la aprobación visual del usuario sobre las capturas de dos y tres jugadores. No se hizo una partida socket ni se interactuó con una decisión en F2; esta limitación se registra y F3 deberá verificar el acceso a los controles al revisar los tamaños. **Fase actual:** F3 `ACTIVE`.
+**Fases cerradas:** F1, asientos estables y contrato visual; F2, integración visual de WebP y mazo centrado; F3, disposición responsiva y evidencia. El Orquestador aprobó F1 en `5d77ffdc3805b3ba7b50d0d0619caca15e7613d9`; F2 se cerró tras la aprobación visual del usuario de las capturas de dos y tres jugadores. En F2 no se hizo una partida socket ni se interactuó con una decisión. En F3 se confirmó visualmente que las ventanas actuales de turno/acciones y sus controles quedan disponibles debajo del tablero, sin rediseñarlos. Reporte: `docs/plans/circular-board/report_issue_5_F3.md`. **Estado:** `WAITING_ORCHESTRATOR`; verificación independiente final pendiente.
 
 **Branch destino de toda la issue:** `issue/5-circular-board`
 
@@ -34,7 +34,7 @@ El checkout raíz `master` tiene dos commits locales de reglas y WebP y está di
 
 - **F1 CLOSED:** tabla y tratamiento de eliminados documentados en `docs/plans/circular-board/report_issue_5_F1.md`; el cierre está en `feat(board): issue 5 F1 CLOSED advance_f2`.
 - **F2 CLOSED:** `deck.webp` se convirtió desde `fotos/deck.png` conservando su alfa; se integraron las caras inglesas propias y el reverso rival, y la pila Court se centra en el tablero. El usuario aprobó las capturas visuales de dos y tres jugadores. No se hizo una partida/socket ni se interactuó con una decisión; el cierre no afirma esa validación. El reporte registra la limitación. Assets versionados: solo siete WebP; sin PNG fuente ni commits locales ajenos.
-- **F3 ACTIVE:** revisar y ajustar 2..6 en escritorio/móvil, cambios de turno y eliminación, incluyendo que las ventanas/controles existentes sigan utilizables; dejar matriz visual y capturas. `COMMIT_REQUIRED`: `feat(board): issue 5 F3 CLOSED ready_review`.
+- **F3 CLOSED / READY_REVIEW:** el breakpoint compacto inicia a 520 px; matriz visual de 2..6 en escritorio/viewport estrecho, turno, pérdida/eliminación, y disponibilidad visible de controles está en el reporte F3. Las capturas documentan las vistas. `npm run start-pc` compiló y `git diff --check` pasó. Harness temporal restaurado; no hubo partida ni clic de acción por socket. Verificación independiente final pendiente.
 
 Cada cierre de fase incluye su `report_issue_5_F*.md`, código/evidencia y evento `phase_verdict` en la misma confirmación. El plan largo contiene entradas, cierres, pivotes y límites de cada fase. Si existe una política vigente de delegación de subtareas, aplícala dentro del worktree; no inventes agentes o permisos.
 
@@ -54,4 +54,4 @@ Fuentes: `fotos/mini.png`, `fotos/ejemplo.png`, `fotos/deck.png`, `docs/coup_*.m
 
 **Qué actualizar:** issue al reanudar F2 y al entregar PR; este handoff a `active/`; plan/estado por fase; bitácora append-only; reportes F1-F3; PR con evidencia. Al terminar F2, deja F3 como siguiente fase y conserva el estado activo. Al terminar la unidad, deja `WAITING_ORCHESTRATOR` para revisión e integración. No cerrar la issue.
 
-**Checkpoint F2/F3:** F2 `CLOSED` por aprobación visual del usuario; la interacción socket de decisiones no se ejecutó y no se declara aprobada. F3 `ACTIVE`; estado global `ACTIVE`. Siguiente dueño: Agente Alquimista. Continuar en el mismo branch/worktree; no abrir PR, integrar ni cerrar la issue.
+**Checkpoint F3:** F1–F3 `CLOSED`; estado global `WAITING_ORCHESTRATOR`. El tablero se verificó en vistas 2..6 y en turnos/pérdida/eliminación con eventos simulados. La acción por socket real no se recorrió y no se declara aprobada. Siguiente dueño: Orquestador para la verificación independiente final. Mantener issue abierta; no integrar ni cerrar antes de ese veredicto.

@@ -1,6 +1,6 @@
 # Plan: tablero circular de Coup — issue #5
 
-**Estado:** `ACTIVE`
+**Estado:** `WAITING_ORCHESTRATOR`
 
 **Unidad:** https://github.com/pronficilio/coup-online/issues/5
 
@@ -75,7 +75,7 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(board): issue 5 F1 CLOSED advance_f2`, junto con resultado y evento `phase_verdict`.
 
-### F2 — Integrar mesa y mazo WebP (`ACTIVE`)
+### F2 — Integrar mesa y mazo WebP (`CLOSED`)
 
 **Pregunta:** ¿la mesa circular ya definida presenta las cartas y el mazo gráfico centrado sin interrumpir los controles del juego?
 
@@ -93,7 +93,7 @@ El usuario pide maquetar una representación circular del juego inspirada en `fo
 
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(board): issue 5 F2 CLOSED advance_f3`, junto con resultado y evento `phase_verdict`.
 
-### F3 — Cerrar disposición responsiva y evidencia (`ACTIVE`)
+### F3 — Cerrar disposición responsiva y evidencia (`CLOSED`)
 
 **Pregunta:** ¿resiste la mesa las cinco cantidades permitidas y los cambios de estado en escritorio y móvil sin solapamientos ni regresiones visibles?
 
@@ -129,6 +129,12 @@ La implementación F2 integra caras WebP propias, reverso de rivales y la pila C
 
 Veredicto del Orquestador: **F2 CLOSED; F3 ACTIVE**. No se hizo una partida socket ni se interactuó con una decisión en F2. Esto queda explícito como límite, no como una validación aprobada. La revisión de F3 debe comprobar que las áreas de decisión y controles existentes siguen utilizables mientras inspecciona 2..6 en escritorio y móvil; no se amplía el alcance a rediseñarlas. Siguiente dueño: Agente Alquimista, en el mismo branch y worktree. El issue permanece abierto y no hay PR.
 
+## Cierre F3 y checkpoint para verificación final
+
+F3 queda **CLOSED / READY_REVIEW**. Se revisaron visualmente 2..6 en escritorio y ancho compacto, más cambio de turno, pérdida de influencia y eliminación. La matriz y las capturas están en `docs/plans/circular-board/report_issue_5_F3.md`. El tablero conserva el centro, las ubicaciones especiales de 2/3/4 y el círculo matemático de 5/6; los asientos y controles se ven completos sin colisiones. El borde neón sigue al jugador activo; el eliminado conserva su asiento con slots inactivos. El ancho compacto se activó a 520 px porque la captura estrecha de Edge midió 488 px CSS.
+
+El `PlayerBoard`, `Coup` y `ActionDecision` reales se montaron en una ruta temporal con eventos de socket simulados para inspeccionar los estados; no hubo partida/socket real ni clic de acción. `App.js` quedó restaurado y el servidor de desarrollo se detuvo. `npm run start-pc` compiló correctamente y `git diff --check` no encontró errores de whitespace. No se ejecutaron tests ni build de producción. El issue sigue abierto, sin PR; el checkpoint queda para revisión independiente antes de decidir integración.
+
 ## Riesgos, preguntas y decisiones
 
 - **Riesgo responsivo:** seis manos alrededor de un círculo pueden requerir una mesa con ancho mínimo y desplazamiento en móvil. Priorizar cartas legibles y controles accesibles sobre comprimir el diseño.
@@ -139,4 +145,4 @@ Veredicto del Orquestador: **F2 CLOSED; F3 ACTIVE**. No se hizo una partida sock
 
 ## Siguiente acción
 
-Agente Alquimista: ejecutar F3 en `issue/5-circular-board` y `.worktrees/issue-5-circular-board`; revisar las disposiciones 2..6 en escritorio y móvil, turnos, pérdida/eliminación y disponibilidad de los controles; guardar la matriz visual, capturas y límites en el reporte F3. No reclamar otra unidad ni abrir otro worktree. Al terminar, dejar `WAITING_ORCHESTRATOR`; no abrir PR ni cerrar el issue.
+Orquestador: revisar el checkpoint F3 y preparar la verificación independiente final desde el branch/worktree canónico. Mantener el issue abierto; no integrar ni cerrar antes del veredicto final.
