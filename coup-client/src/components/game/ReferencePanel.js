@@ -80,6 +80,9 @@ export default class ReferencePanel extends Component {
         const titleId = `${this.idPrefix}-title`;
         const languageId = `${this.idPrefix}-language`;
         const image = assets[activeTab][language];
+        const prefersReducedMotion = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const alt = activeTab === 'card'
             ? (language === 'en' ? 'Action reference card in English' : 'Tarjeta de acciones en español')
             : (language === 'en' ? 'Reference table in English' : 'Tabla de referencia en español');
@@ -101,8 +104,17 @@ export default class ReferencePanel extends Component {
                     isOpen={isOpen}
                     onRequestClose={this.closePanel}
                     contentLabel="Referencias de juego"
-                    className="reference-panel__modal"
-                    overlayClassName="reference-panel__overlay"
+                    className={{
+                        base: 'reference-panel__modal',
+                        afterOpen: 'reference-panel__modal--open',
+                        beforeClose: 'reference-panel__modal--closing'
+                    }}
+                    overlayClassName={{
+                        base: 'reference-panel__overlay',
+                        afterOpen: 'reference-panel__overlay--open',
+                        beforeClose: 'reference-panel__overlay--closing'
+                    }}
+                    closeTimeoutMS={prefersReducedMotion ? 0 : 320}
                     shouldCloseOnOverlayClick
                     shouldCloseOnEsc
                     shouldReturnFocusAfterClose

@@ -81,7 +81,7 @@ Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referen
 **Validación:** recorrido manual; comprobar en herramientas de red que solo se solicita el recurso seleccionado.
 **Commit:** `COMMIT_REQUIRED`; incluir reporte y evento `phase_verdict`; mensaje `feat(reference-panel): issue 8 F2 CLOSED advance_f3`.
 
-**Subtask parcial en curso:** `ReferencePanel.js` y `ReferencePanel.css` con trigger propio, modal, tabs, selector de idioma e imagen activa condicional. Esto no cierra F2: quedan montaje coordinado, recorrido real, verificación de carga por red y capturas.
+**Subtask parcial en curso:** `ReferencePanel.js` y `ReferencePanel.css` con trigger propio, modal, tabs, selector de idioma e imagen activa condicional. La transición local de hoja con `transform`/`opacity` y `prefers-reduced-motion` también está preparada. Esto no cierra F2/F3: quedan montaje coordinado, recorrido real, verificación de carga por red y capturas de la partida integrada; los previews aislados están documentados en el subtask.
 
 ### F3 — Afinar movimiento, accesibilidad y rendimiento (`PENDING`)
 

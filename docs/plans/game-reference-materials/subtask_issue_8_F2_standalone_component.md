@@ -17,6 +17,15 @@ El modal usa `react-modal`: cierra con botón, Escape o fondo y devuelve el foco
 
 ## Límite de este avance
 
-No se modificaron `Coup.js`, GameHeader ni estilos existentes del shell. El componente aún no está montado dentro de una partida, así que F2 no demuestra recorrido vivo/eliminado, continuidad de decisiones, retorno de foco observado ni solicitudes reales de red, y todavía no hay capturas del panel. F2 queda abierta hasta integrar PR #11, montar el componente, recorrer la partida y guardar capturas.
+No se modificaron `Coup.js`, GameHeader ni estilos existentes del shell. El componente aún no está montado dentro de una partida, así que F2 no demuestra recorrido vivo/eliminado, continuidad de decisiones, retorno de foco observado ni solicitudes reales de red. Hay previews visuales aislados, pero no capturas de una partida integrada. F2 queda abierta hasta coordinar PR #11, montar el componente y recorrer la partida.
 
-No se ejecutaron build ni pruebas automatizadas; la revisión actual es estática y aislada. F3 no comenzó.
+No se ejecutaron build ni pruebas automatizadas. La animación local de hoja ya está preparada: entrada/salida con `transform` y `opacity`, y sin transición ni demora de cierre con `prefers-reduced-motion`. F3 sigue formalmente `PENDING` porque requiere F2 integrada; no se emite veredicto ni se afirma validación de rendimiento.
+
+## Capturas de preview aislado
+
+**Caption:** “Preview del componente aislado; no captura de partida”. Las imágenes muestran `ReferencePanel` sobre un fondo neutro; no son evidencia de F2 integrada ni cierran F2/F3.
+
+- `preview_issue_8_desktop.webp`: Tarjeta / English. Viewport observado: `1252 × 1399 CSS px`; WebP: `1282 × 1494 px`. La tarjeta se cargó y se decodificó (`naturalWidth=1024`).
+- `preview_issue_8_mobile.webp`: Tabla / Español. Viewport observado: `492 × 843 CSS px`; WebP: `518 × 938 px`, escala 1:1. Se ven completos los controles y la tabla.
+
+Los PNG temporales de captura no se versionan. Git conserva solo estos dos WebP de evidencia.

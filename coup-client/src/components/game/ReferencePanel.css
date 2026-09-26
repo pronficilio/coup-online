@@ -27,7 +27,8 @@
     justify-content: center;
     box-sizing: border-box;
     padding: clamp(8px, 2vw, 24px);
-    background: rgba(12, 14, 17, 0.76);
+    background: rgba(12, 14, 17, 0);
+    transition: background-color 260ms ease;
 }
 
 .reference-panel__modal {
@@ -35,17 +36,42 @@
     width: min(1024px, 100%);
     max-height: min(94vh, 1100px);
     flex-direction: column;
+    min-width: 0;
     overflow: hidden;
+    box-sizing: border-box;
     border: 0;
     border-radius: 12px;
     outline: none;
     background: #fff;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-9deg) scale(0.985);
+    transform-origin: left center;
+    transition: opacity 260ms ease, transform 320ms cubic-bezier(0.2, 0.75, 0.25, 1);
+}
+
+.reference-panel__overlay--open {
+    background: rgba(12, 14, 17, 0.76);
+}
+
+.reference-panel__overlay--closing {
+    background: rgba(12, 14, 17, 0);
+}
+
+.reference-panel__modal--open {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0) scale(1);
+}
+
+.reference-panel__modal--closing {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(8deg) scale(0.985);
 }
 
 .reference-panel {
     display: flex;
     min-height: 0;
+    min-width: 0;
     flex: 1 1 auto;
     flex-direction: column;
 }
@@ -53,6 +79,7 @@
 .reference-panel__header {
     display: flex;
     min-height: 64px;
+    min-width: 0;
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
@@ -96,6 +123,7 @@
 .reference-panel__controls {
     display: flex;
     min-height: 58px;
+    min-width: 0;
     flex: 0 0 auto;
     align-items: center;
     justify-content: space-between;
@@ -108,6 +136,7 @@
 .reference-panel__tabs,
 .reference-panel__options {
     display: flex;
+    min-width: 0;
     align-items: center;
     gap: 8px;
 }
@@ -147,6 +176,7 @@
 
 .reference-panel__image-scroll {
     min-height: 0;
+    min-width: 0;
     flex: 1 1 auto;
     overflow: auto;
     overscroll-behavior: contain;
@@ -179,6 +209,7 @@
         max-height: 100vh;
         max-height: 100dvh;
         border-radius: 0;
+        transform-origin: center center;
     }
 
     .reference-panel__controls {
@@ -190,20 +221,53 @@
 
     .reference-panel__tabs {
         display: grid;
+        width: 100%;
+        min-width: 0;
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .reference-panel__tab {
         width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .reference-panel__options {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
         justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .reference-panel__language {
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .reference-panel__zoom {
+        box-sizing: border-box;
+        flex: 0 0 100%;
+        width: 100%;
         padding-right: 8px;
         padding-left: 8px;
         font-size: 13px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reference-panel__overlay,
+    .reference-panel__overlay--open,
+    .reference-panel__overlay--closing,
+    .reference-panel__modal,
+    .reference-panel__modal--open,
+    .reference-panel__modal--closing {
+        transition: none;
+    }
+
+    .reference-panel__modal,
+    .reference-panel__modal--closing {
+        opacity: 1;
+        transform: none;
     }
 }
