@@ -2,18 +2,19 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 RETURNED tras PHASE FAIL
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
-Commit F1: 608089d4c839f367b9b0b0e92009d3daf536ce5c (local; sin push)
+Implementación revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; revisión fallida, requiere correcciones.
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
+Siguiente dueño: Ejecutor F1 para corregir los dos hallazgos PHASE antes de repetir revisión.
 
 ## Contrato F0 y decisiones de producto definidos
 
-El contrato F0 está en `docs/plans/codex-ai-players/f0_contract.md`. Define vistas públicas/privadas, actor por socket/asiento, opciones por fase, respuesta id/versionada, timeout/pausa y palanca. El usuario decidió conservar el acceso actual sin cuentas/login/invitaciones, versionar las cuatro fuentes de reglas y desempatar ventanas concurrentes por orden fijo de asientos. F0 cerró con PHASE `PASS`; la implementación F1 está entregada y espera su revisión PHASE independiente. Se consultaron los hallazgos confirmados en:
+El contrato F0 está en `docs/plans/codex-ai-players/f0_contract.md`. Define vistas públicas/privadas, actor por socket/asiento, opciones por fase, respuesta id/versionada, timeout/pausa y palanca. El usuario decidió conservar el acceso actual sin cuentas/login/invitaciones, versionar las cuatro fuentes de reglas y desempatar ventanas concurrentes por orden fijo de asientos. F0 cerró con PHASE `PASS`. F1 fue devuelta tras PHASE `FAIL`; los dos hallazgos y la evidencia están en `verifier_issue_14_F1.md`. Se consultaron los hallazgos confirmados en:
 
 - docs/plans/active/report_issue_3_quick_security_check_F1.md
 - docs/plans/active/verifier_issue_3_final.md
@@ -42,4 +43,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
 - F0 ya cerró antes de F1; no avanzar a F2 ni crear PR por fase antes del veredicto independiente de F1.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`; F0 `CLOSED`. Ejecución F1 documentada en `issue_14_F1_evidence.md`: lobby y motor derivan autoridad del socket, proyección privada/pública separada, decisiones `choiceId` con IDs/versiones, arbitraje horario, timeout/pausa/reanudación limitada, corrección de reglas y pruebas `node:test`. `npm test` en `server/`, `node --check` y `git diff --check` pasan. Los checks React no corrieron por falta de `react-scripts`; no hubo partida en vivo. F1 espera revisión PHASE independiente; F2 sigue pendiente. No abrir PR ni invocar Codex en F1.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`; F0 `CLOSED`. F1 quedó devuelta por dos refutaciones: tras perder un desafío contra Asesinato el objetivo puede recibir otra opción de bloqueo, y Exchange aumenta de una a dos influencias. Añadir pruebas de regresión para ambos casos. F2 sigue pendiente; no abrir PR ni invocar Codex.

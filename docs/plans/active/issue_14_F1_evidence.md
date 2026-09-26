@@ -1,6 +1,6 @@
 # Issue #14 — evidencia de ejecución F1
 
-**Estado:** implementación F1 lista para revisión independiente; no es `PASS` ni `CLOSED`.
+**Estado:** F1 devuelta al Ejecutor tras revisión PHASE `FAIL`; no es `PASS` ni `CLOSED`.
 **Branch / worktree:** `issue/14-codex-ai-players` / `.worktrees/issue-14-codex-ai-players`.
 **Commit F1:** `608089d4c839f367b9b0b0e92009d3daf536ce5c` (local; sin push ni PR).
 **Contrato:** `docs/plans/codex-ai-players/f0_contract.md`.
@@ -25,10 +25,17 @@ Checks que pasan:
 - `git diff --check`.
 - Búsqueda estática confirma que el cliente ya no emite los eventos antiguos de acción/desafío/bloqueo/revelación/intercambio y que los eventos de salida no serializan `socketID`.
 
-La compilación y el test de React no pudieron ejecutarse: en el worktree no existe `coup-client/node_modules/.bin/react-scripts`; `npm test -- --watchAll=false` y `npm run build` terminan con `react-scripts: not found`. No se descargaron dependencias. Tampoco se hizo una partida en vivo ni revisión PHASE independiente.
+La compilación y el test de React no pudieron ejecutarse: en el worktree no existe `coup-client/node_modules/.bin/react-scripts`; `npm test -- --watchAll=false` y `npm run build` terminan con `react-scripts: not found`. No se descargaron dependencias. Tampoco se hizo una partida en vivo.
 
 ## Reanudación y límites
 
 Tras un timeout, el líder actual puede emitir `g-resume` solo mientras todos los sockets del roster sigan conectados. El servidor reemite las mismas opciones con ID/versión nuevos y descarta respuestas parciales; las respuestas al ID anterior fallan. Si falta un socket o la pausa fue causada por desconexión, no hay reanudación ni reasignación de asiento: se recrea la partida. No hay recuperación de identidad persistente.
 
-No se hizo una partida en vivo ni revisión PHASE independiente. F1 queda pendiente de ese veredicto; no se inició Codex ni F2.
+## Revisión PHASE independiente
+
+El Verifier revisó `f9de90f` (incluye implementación `608089d`) y emitió `FAIL`; informe: `docs/plans/active/verifier_issue_14_F1.md`.
+
+1. Si el objetivo desafía la afirmación Assassin y pierde, `loseInfluence` vuelve a `afterActionClaim` y abre otra ventana para bloquear. La regla de doble peligro de Asesinato exige aplicar la pérdida de la acción después de perder el desafío; el objetivo no debe obtener una segunda oportunidad de bloquear.
+2. `openExchange` siempre ofrece conservar dos cartas y puede aumentar la mano de una influencia a dos. Exchange debe conservar el número de influencias que el jugador tenía y devolver las cartas restantes al Court.
+
+El Verifier reprodujo ambos defectos. Se requieren pruebas de regresión para cada uno. No se inició Codex ni F2.
