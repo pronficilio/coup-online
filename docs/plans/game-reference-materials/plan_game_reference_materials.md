@@ -45,7 +45,7 @@ Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referen
 3. El diff no agrega PNG ni formatos de imagen alternativos para estas referencias; `/fotos/` permanece como fuente local ignorada.
 4. Durante una partida cualquier jugador vivo o eliminado puede abrir cada referencia en su modal separado, verla en español y cerrar la consulta sin perder el estado de juego.
 5. La carga de la partida no solicita estas imágenes antes de abrir la consulta; al abrir una referencia se solicita solo su WebP en español.
-6. El panel sirve en escritorio y móvil; cerrar con botón, Escape o fondo funciona y el foco vuelve al control que lo abrió. Se puede usar con teclado y tacto.
+6. El panel sirve en escritorio y móvil; cerrar con botón táctil de 48 × 48 px, Escape o fondo funciona y el foco vuelve al control que lo abrió. Se puede usar con teclado y tacto.
 7. La entrada y salida usan solo `transform`/`opacity`, no causan desplazamiento del tablero ni interfieren con una respuesta del juego; movimiento reducido elimina la transición.
 8. El build del cliente pasa y la revisión manual documenta apertura y cierre de cada modal, solicitudes de red, legibilidad sin scroll, viewport pequeño y movimiento reducido.
 

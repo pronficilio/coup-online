@@ -11,7 +11,7 @@
 - `coup-client/src/components/game/ReferencePanel.js`
 - `coup-client/src/components/game/ReferencePanel.css`
 
-El componente ofrece botones separados `Tarjeta` y `Tabla`; cada uno abre su propio modal con una sola referencia. No hay encabezado, título ni controles para cambiar de referencia dentro del modal. El idioma está fijo en español hasta que exista la configuración de idioma. Cada imagen se ajusta al viewport para evitar el scroll.
+El componente ofrece botones separados `Tarjeta` y `Tabla`; cada uno abre su propio modal con una sola referencia. No hay encabezado, título ni controles para cambiar de referencia dentro del modal. El idioma está fijo en español hasta que exista la configuración de idioma. Cada imagen se ajusta al viewport para evitar el scroll. Ambos modales comparten un botón de cierre táctil de 48 × 48 px, también en móvil.
 
 Cada modal usa `react-modal`: cierra con botón, Escape o fondo y devuelve el foco a su botón de apertura. El `img` solo está montado para el modal abierto y usa `decoding="async"`; la solicitud de red real queda pendiente del montaje y el recorrido.
 
