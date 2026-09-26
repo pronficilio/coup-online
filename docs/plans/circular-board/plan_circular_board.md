@@ -133,7 +133,7 @@ Veredicto del Orquestador: **F2 CLOSED; F3 ACTIVE**. No se hizo una partida sock
 
 F3 queda **CLOSED / READY_REVIEW**. Se revisaron visualmente 2..6 en escritorio y ancho compacto, más cambio de turno, pérdida de influencia y eliminación. La matriz y las capturas están en `docs/plans/circular-board/report_issue_5_F3.md`. El tablero conserva el centro, las ubicaciones especiales de 2/3/4 y el círculo matemático de 5/6; los asientos y controles se ven completos sin colisiones. El borde neón sigue al jugador activo; el eliminado conserva su asiento con slots inactivos. El ancho compacto se activó a 520 px porque la captura estrecha de Edge midió 488 px CSS.
 
-El `PlayerBoard`, `Coup` y `ActionDecision` reales se montaron en una ruta temporal con eventos de socket simulados para inspeccionar los estados; no hubo partida/socket real ni clic de acción. `App.js` quedó restaurado y el servidor de desarrollo se detuvo. `npm run start-pc` compiló correctamente y `git diff --check` no encontró errores de whitespace. No se ejecutaron tests ni build de producción. El issue sigue abierto, sin PR; el checkpoint queda para revisión independiente antes de decidir integración.
+El `PlayerBoard`, `Coup` y `ActionDecision` reales se montaron en una ruta temporal con eventos de socket simulados para inspeccionar los estados; no hubo partida/socket real ni clic de acción. `App.js` quedó restaurado y el servidor de desarrollo se detuvo. `npm run start-pc` compiló correctamente y `git diff --check` no encontró errores de whitespace. No se ejecutaron tests ni build de producción. El issue sigue abierto. Se publicó la PR borrador [#7](https://github.com/pronficilio/coup-online/pull/7) a `master`; el head inicial `982c2b3de2ea188e2831f31d7fafac32f1c8af6f` recibió `PASS` del Verifier independiente. El siguiente commit de este checkpoint solo actualizará la documentación del plan y la bitácora, así que se repetirá una comprobación del head actualizado antes de decidir integración.
 
 ## Riesgos, preguntas y decisiones
 
@@ -145,4 +145,4 @@ El `PlayerBoard`, `Coup` y `ActionDecision` reales se montaron en una ruta tempo
 
 ## Siguiente acción
 
-Orquestador: revisar el checkpoint F3 y preparar la verificación independiente final desde el branch/worktree canónico. Mantener el issue abierto; no integrar ni cerrar antes del veredicto final.
+Orquestador: publicar este checkpoint documental y pedir al Verifier que confirme el head actualizado de la PR #7. Mantener el issue abierto; esperar autorización del usuario antes de integrar o cerrar.
