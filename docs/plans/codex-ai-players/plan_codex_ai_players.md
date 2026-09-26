@@ -1,12 +1,13 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: PLANNED; F0 READY
+Estado: WAITING_USER; F0 BLOCKED; F1 PENDING
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
-Handoff: docs/plans/inbox/issue_14_codex_ai_players.md
+Handoff: docs/plans/active/issue_14_codex_ai_players.md
+Contrato F0: docs/plans/codex-ai-players/f0_contract.md
 
 El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, exclusiones, fases, criterios de cierre, riesgos y la pregunta adversarial. Esta copia se conserva como plan documental de la unidad y se mantendrá sincronizada con la issue.
 
@@ -67,18 +68,18 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 ## Fases
 
-### F0 — Fijar el contrato de privacidad y decisiones (`READY`)
+### F0 — Fijar el contrato de privacidad y decisiones (`BLOCKED`)
 
 - **Pregunta:** ¿puede el juego producir para cada asiento una observación suficiente y privada, y representar todas las decisiones necesarias sin entregar autoridad de ejecución al modelo?
 - **Entrada:** reglas de `docs/coup_llm_summary.md`, motor Socket.IO actual y análisis de seguridad ya registrado.
-- **Salida:** contrato de observación por asiento, decisiones válidas por fase, política para ventanas concurrentes, opciones de timeout/pausa y diseño de invitación/palanca.
-- **Cierre:** cada fase del juego queda asociada a un controlador/observación; la política de empate/ventana y la conducta ante desconexión se documentan sin depender del orden de llegada de respuestas IA; Verifier independiente revisa el contrato de privacidad antes de F1.
+- **Salida:** contrato de observación por asiento, decisiones válidas por fase, política para ventanas concurrentes, opciones de timeout/pausa y diseño de invitación/palanca. Evidencia: `docs/plans/codex-ai-players/f0_contract.md`.
+- **Estado:** contrato documentado y comprometido, pero F0 no está cerrado. Espera respuesta/aprobación sobre tres propuestas: desempate de ventanas concurrentes; identidad de propietario/admin, invitación y reconexión; fuente normativa/versionado de reglas. Después corresponde la revisión independiente PHASE antes de F1.
 - **Pivote:** si la interfaz de juego actual no permite identificar/validar de forma inequívoca al jugador que responde, F1 debe incluir la mínima corrección de identidad Socket.IO necesaria.
 - **Repetición:** una revisión de las fuentes de reglas y del motor; repetir solo para cerrar una ambigüedad identificada.
-- **Commit:** `COMMIT_REQUIRED`; `docs(codex-ai): issue 14 F0 CLOSED contract`.
+- **Commit:** `COMMIT_REQUIRED`; `docs(codex-ai): issue 14 F0 pending decisions`.
 - **Validación:** inspección de cada evento/decisión y trazado de una partida mixta; no se inicia una llamada a Codex real desde F0.
 
-### F1 — Hacer el estado y las decisiones privados y autoritativos (`PENDING`)
+### F1 — Hacer el estado y las decisiones privados y autoritativos (`PENDING`; bloqueada por F0)
 
 - **Pregunta:** ¿puede el servidor aplicar una decisión humana o IA sin filtrar cartas ni aceptar una mutación de estado que el jugador no tiene derecho a realizar?
 - **Entrada:** contrato F0.

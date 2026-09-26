@@ -13,7 +13,7 @@ GitHub Issues es el tracker canónico; su estado remoto manda sobre bandejas y c
 ## Unidades abiertas relevantes
 
 - #13 — Desplegar Coup Online en Hetzner: inventario F0 cerrado; F1 espera fijar un commit/tag limpio. Tras integrar el jugador Codex, el release se coordina por esta misma issue.
-- #14 — Integrar jugadores IA con Codex y una palanca de emergencia: F0 READY. Plan: codex-ai-players/plan_codex_ai_players.md. Handoff: inbox/issue_14_codex_ai_players.md. Bitácora: log/issue-14.jsonl. Branch/worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players.
+- #14 — Integrar jugadores IA con Codex y una palanca de emergencia: issue reclamada; unidad `WAITING_USER`; F0 `BLOCKED` por tres propuestas sin aprobar; F1 `PENDING`. Plan: codex-ai-players/plan_codex_ai_players.md. Contrato: codex-ai-players/f0_contract.md. Handoff: active/issue_14_codex_ai_players.md. Bitácora: log/issue-14.jsonl. Branch/worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players.
 - #6, #8 y #9 siguen abiertas y tienen PR #11, #12 y #10 respectivamente. #5 está cerrada. Verifica el tracker antes de reanudar unidades históricas.
 
 La raíz del checkout compartido conserva modificaciones sin commit. El trabajo de #14 usa un worktree limpio desde origin/master y no incorpora esas modificaciones automáticamente.
