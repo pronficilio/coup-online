@@ -12,5 +12,5 @@ La unidad inicial fue la issue [#1](https://github.com/pronficilio/coup-online/i
 
 ## Unidades abiertas
 
-- [#5 — tablero circular](https://github.com/pronficilio/coup-online/issues/5): issue `OPEN`, F2 `READY`, sin PR todavía; rama/worktree canónicos `issue/5-circular-board` / `.worktrees/issue-5-circular-board`. Plan: `docs/plans/circular-board/plan_circular_board.md`.
-- [#6 — panel de acciones del turno](https://github.com/pronficilio/coup-online/issues/6): `WAITING_ORCHESTRATOR`, F1 `CLOSED`; F2 `BLOCKED/PENDING` hasta integrar #5 a `master`. Plan: `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; handoff activo en `docs/plans/active/issue_6_turn_actions_panel.md`; reporte `docs/plans/turn-actions-panel/report_issue_6_F1.md`; bitácora `docs/plans/log/issue-6.jsonl`.
+- [#5 — tablero circular](https://github.com/pronficilio/coup-online/issues/5): issue `CLOSED`, integrado a `master` en `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; rama/worktree canónicos `issue/5-circular-board` / `.worktrees/issue-5-circular-board`. Plan: `docs/plans/circular-board/plan_circular_board.md`.
+- [#6 — panel de acciones del turno](https://github.com/pronficilio/coup-online/issues/6): issue `OPEN`, `WAITING_ORCHESTRATOR`; F1 `CLOSED`, F2 `BLOCKED` hasta completar el recorrido funcional manual, F3 `PENDING`. Plan: `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; handoff activo en `docs/plans/active/issue_6_turn_actions_panel.md`; reportes F1/F2 en `docs/plans/turn-actions-panel/`; bitácora `docs/plans/log/issue-6.jsonl`.

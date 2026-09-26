@@ -1,6 +1,6 @@
 # Plan: panel de acciones del turno — issue #6
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 está `CLOSED`, F2 está `BLOCKED/PENDING` hasta integrar el issue #5 a `master`.
+**Estado:** `BLOCKED`; F1 está `CLOSED`, F2 tiene implementación y revisión estática listas pero espera el recorrido manual del cliente. El helper de navegador falló en dos intentos; ver `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/6  
 **Handoff:** `docs/plans/inbox/issue_6_turn_actions_panel.md`  
 **Bitácora:** `docs/plans/log/issue-6.jsonl`  
@@ -18,7 +18,7 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 
 ## Fuentes y hechos actuales
 
-- Issue #5 (`https://github.com/pronficilio/coup-online/issues/5`) continúa `OPEN`: F1 está cerrada, F2 aún no se integra y todavía no hay PR. Su contrato excluye expresamente los paneles de acción y turno. F1 de #6 solo modifica la presentación autocontenida de `ActionDecision`; montar el panel en el shell final queda para F2, después de integrar #5 a `master`.
+- Issue #5 (`https://github.com/pronficilio/coup-online/issues/5`) fue confirmado cerrado y mergeado a `master` en `64593af5cff7ff80863c3fc175067eb49fc4b5ad`. Su contrato excluye expresamente los paneles de acción y turno. F1 de #6 solo modifica la presentación autocontenida de `ActionDecision`; F2 monta ahora esa presentación en el shell integrado.
 - `coup-client/src/components/game/Coup.js` escucha `g-updateCurrentPlayer` y `g-chooseAction`. Mantiene por separado los estados de desafío, bloqueo, revelación, selección de influencia e intercambio.
 - `coup-client/src/components/game/ActionDecision.js` actualmente dibuja botones y pide objetivos para Coup, Assassinate y Steal. Coup y Assassinate descuentan monedas antes de que se confirme el objetivo; `doneAction` oculta la decisión al emitir la acción.
 - `server/utilities/constants.js` es la referencia de personajes declarados y bloqueos. Las reglas se basan en declaraciones que pueden ser faroles: la presencia de una influencia en la mano no debe decidir si se ofrece una acción.
@@ -78,9 +78,9 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 **Validación:** revisión de reglas y visual en vista de acciones; build del cliente si el cambio lo requiere. No añadir tests automatizados.  
 **Commit:** `COMMIT_REQUIRED`; cierre `feat(actions-panel): issue 6 F1 CLOSED visual verified`, con reporte, captura y evento `phase_verdict`.
 
-**Estado de ejecución:** `CLOSED / PASS`. La presentación semántica, el build ya registrado y la revisión de `docs/plans/turn-actions-panel/issue_6_f1_visual.png` completan los criterios de F1. La captura a 1440 × 1500 muestra las siete acciones y sus metadatos completos en el montaje actual. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`. F2 queda `BLOCKED/PENDING` hasta integrar el issue #5 a `master`.
+**Estado de ejecución:** `CLOSED / PASS`. La presentación semántica, el build ya registrado y la revisión de `docs/plans/turn-actions-panel/issue_6_f1_visual.png` completan los criterios de F1. La captura a 1440 × 1500 muestra las siete acciones y sus metadatos completos en el montaje actual. Consultar `docs/plans/turn-actions-panel/report_issue_6_F1.md`. #5 quedó integrado a `master`; F2 está implementada y espera su recorrido manual.
 
-### F2 — Montar en el tablero y conectar confirmación (`BLOCKED/PENDING`; depende de #5)
+### F2 — Montar en el tablero y conectar confirmación (`BLOCKED`; #5 integrado, espera QA manual)
 
 **Pregunta:** ¿el shell integrado muestra el panel solo en el turno local y permite confirmar objetivos sin cobrar prematuramente?  
 **Entrada:** F1 cerrada y #5 integrado a `master`; releer su markup/contrato antes de cambiar el montaje.  
@@ -104,15 +104,15 @@ La persona usuaria solicita llevar las acciones del juego a una experiencia visu
 
 ## Dependencia, integración y revisión
 
-- F1 está cerrada en el montaje actual de `ActionDecision`; no requirió cambios en el tablero de #5. F2 no puede empezar hasta integrar #5 a `master`.
-- Antes de F2, el Alquimista vuelve a leer issue #5, el head integrado, este plan y el código; adapta el punto de montaje y contratos de props/eventos. El Orquestador confirma el avance de la dependencia en tracker, plan y bitácora.
+- F1 está cerrada en el montaje actual de `ActionDecision`; no requirió cambios en el tablero de #5. F2 está habilitada después de sincronizar la rama con el merge de #5 a `master` (`64593af5cff7ff80863c3fc175067eb49fc4b5ad`).
+- Para F2, el Alquimista releyó el código integrado de #5 y adaptó el punto de montaje y contratos de props/eventos. La dependencia está resuelta; falta evidencia de recorrido manual del cliente antes de cerrar la fase.
 - El Alquimista reclama #6 en GitHub, relee el ticket y confirma que no hay reclamo incompatible; crea o confirma `issue/6-turn-actions-panel` desde `origin/master` actualizado en `.worktrees/issue-6-turn-actions-panel`; registra el reclamo antes del trabajo funcional.
 - Todas las fases pertenecen a ese branch/worktree y a un solo PR a `master`. El Orquestador revisa diff, evidencia, build/recorridos declarados y veredicto independiente antes de integrar o cerrar.
 - Pregunta de falsificación para Verifier: ¿puede algún evento fuera de turno mostrar acciones propias o quedar con botones habilitados; cancelar un objetivo puede descontar dinero; un segundo clic puede duplicar la acción; o una respuesta legítima quedar cubierta por el panel?
 
 ## Riesgos y decisiones
 
-- **Dependencia de layout:** el panel de #5 no está integrado aún; no asumir su DOM, anchos ni punto de composición. F1 trabaja sobre `ActionDecision` en el montaje actual y F2 espera el resultado integrado.
+- **Dependencia de layout:** #5 está integrado; F2 usa su `PlayerBoard` y shell observados. F1 conserva el montaje actual registrado en su propio reporte.
 - **Cobro distribuido en cliente/socket:** posponer el cobro exige ordenar confirmación, deducción y evento de acción. Conservar protocolo y usar el orden del mismo socket; si las transiciones observadas contradicen este supuesto, bloquear y reorquestar antes de tocar servidor.
 - **Farol vs. propiedad de personaje:** los distintivos representan declaración y bloqueadores según reglas; no limitan la disponibilidad a la mano.
 - **Rendimiento percibido:** la lista es estática y pequeña. Evitar animaciones de layout, filtros pesados, recalcular la mesa o re-render continuo; usar transiciones cortas compositables.

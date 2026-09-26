@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/6  
 **Plan exacto:** `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`  
 **Bitácora exacta:** `docs/plans/log/issue-6.jsonl`  
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`, F2 `BLOCKED/PENDING` hasta integrar #5 a `master`.
+**Estado:** `BLOCKED`; F1 `CLOSED`, F2 implementada y revisada estáticamente, pero espera recorrido manual funcional en el cliente. El helper de navegador falló dos veces; consultar `docs/plans/turn-actions-panel/report_issue_6_F2.md`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`  
 **Verifier requerido ahora:** no; invocarlo al final antes de integrar.  
 **Branch destino de toda la issue:** `issue/6-turn-actions-panel`  
@@ -22,11 +22,11 @@ Empieza F1 ahora, sin esperar el merge de #5. Modifica únicamente `coup-client/
 **Evidencia:** `docs/plans/turn-actions-panel/report_issue_6_F1.md`, captura `docs/plans/turn-actions-panel/issue_6_f1_visual.png` del montaje actual y tabla de reglas contrastada.
 **Cierre:** `CLOSED`; presentación, build, captura visual y evento `phase_verdict` registrados en commits de la misma rama.
 
-**Resultado final:** `PASS`. La captura a 1440 × 1500 muestra completas las siete acciones y sus descripciones, coste/beneficio, gratuidad, personaje declarado, bloqueos y avisos de saldo. F1 conserva el montaje centrado actual, dentro de su alcance. El build ya registrado pasó. F2 permanece `BLOCKED/PENDING` hasta la integración de #5 a `master`; siguiente paso: esperar esa integración.
+**Resultado final:** `PASS`. La captura a 1440 × 1500 muestra completas las siete acciones y sus descripciones, coste/beneficio, gratuidad, personaje declarado, bloqueos y avisos de saldo. F1 conserva el montaje centrado actual, dentro de su alcance. El build ya registrado pasó. #5 quedó integrado a `master` en `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; F2 está implementada, pero no se declara cerrada sin el recorrido manual requerido.
 
-## F2 depende de #5
+## F2 — implementación lista; QA manual pendiente
 
-El issue #5 sigue abierto y aún no tiene PR integrado. No montes el panel en el shell final ni edites `Coup.js` para reorganizar el tablero hasta que #5 llegue a `master`. Después relee el resultado integrado y adapta F2 para conectar el panel al turno real y aplazar el cobro de Coup/Assassinate hasta confirmar el objetivo. F3 queda pendiente de F2.
+El issue #5 fue confirmado cerrado y mergeado a `master` en `64593af5cff7ff80863c3fc175067eb49fc4b5ad`; la rama #6 ya incluye su sincronización. El panel ya está montado en el shell integrado y la confirmación aplaza el cobro de Coup/Assassinate. El plan exige un recorrido funcional manual; Computer Use falló en dos intentos y su skill ordena detener los intentos tras esos fallos. Espera que el helper vuelva a estar disponible y verifica inicio/fin de turno, cancelar/confirmar objetivo y decisiones de respuesta antes de declarar `CLOSED`. F3 permanece pendiente.
 
 ## Límites y pregunta de falsificación
 

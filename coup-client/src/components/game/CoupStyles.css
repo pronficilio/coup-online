@@ -453,6 +453,134 @@
     text-align: center;
 }
 
+.TurnTableShell {
+    position: relative;
+    width: min(100%, 1236px);
+    margin: 0 auto;
+}
+
+.TurnActionPanel {
+    box-sizing: border-box;
+    width: min(320px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    border-radius: 10px;
+    background: #f2f5f6;
+    box-shadow: 0 2px 9px rgba(20, 43, 58, 0.14);
+    opacity: 0;
+    transform: translate3d(-8px, 0, 0);
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease, visibility 0s linear 180ms;
+}
+
+.TurnActionPanel--active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+}
+
+.TurnActionPanel--inactive {
+    visibility: hidden;
+}
+
+.TurnActionPanel .ActionDecision {
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+}
+
+.TurnActionPanel .ActionList {
+    grid-template-columns: minmax(0, 1fr);
+    max-height: calc(100vh - 120px);
+}
+
+@media only screen and (min-width: 1200px) {
+    .TurnTableShell {
+        display: grid;
+        grid-template-columns: 320px minmax(0, 900px);
+        gap: 16px;
+        align-items: start;
+        justify-content: center;
+    }
+
+    .TurnTableShell > .PlayerBoardContainer {
+        grid-column: 2;
+        grid-row: 1;
+        margin: 12px 0;
+    }
+
+    .TurnTableShell > .TurnActionPanel {
+        grid-column: 1;
+        grid-row: 1;
+        width: 320px;
+        margin-top: 12px;
+    }
+}
+
+@media only screen and (max-width: 1199px) {
+    .TurnTableShell > .TurnActionPanel {
+        position: absolute;
+        z-index: 3;
+        top: 12px;
+        left: 0;
+    }
+}
+
+.ActionConfirmation {
+    grid-column: 1 / -1;
+    padding: 12px;
+    border: 1px solid #d8e0e5;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.ActionConfirmation p {
+    margin: 0 0 10px;
+}
+
+.TurnActionPanel .ActionConfirmButton,
+.TurnActionPanel .ActionCancelButton {
+    min-width: 110px;
+    min-height: 40px;
+    height: auto;
+    margin: 5px 8px 0 0;
+    padding: 8px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    transition: background-color 140ms ease, opacity 140ms ease;
+}
+
+.TurnActionPanel .ActionConfirmButton {
+    background: #1c4a63;
+    color: #fff;
+}
+
+.TurnActionPanel .ActionConfirmButton:hover {
+    background: #286a8a;
+}
+
+.TurnActionPanel .ActionCancelButton {
+    border: 1px solid #9aabb4;
+    background: #fff;
+    color: #334c5a;
+}
+
+.TurnActionPanel .ActionCancelButton:hover {
+    background: #edf2f4;
+}
+
+.TurnActionPanel .ActionConfirmButton:focus-visible,
+.TurnActionPanel .ActionCancelButton:focus-visible {
+    outline: 3px solid #efb84c;
+    outline-offset: 2px;
+}
+
 @media only screen and (min-width: 700px) {
     .ActionList {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -462,8 +590,15 @@
 
 @media (prefers-reduced-motion: reduce) {
     .ActionButton,
-    .TargetButton {
+    .TargetButton,
+    .TurnActionPanel,
+    .TurnActionPanel .ActionConfirmButton,
+    .TurnActionPanel .ActionCancelButton {
         transition: none;
+    }
+
+    .TurnActionPanel {
+        transform: none;
     }
 }
 

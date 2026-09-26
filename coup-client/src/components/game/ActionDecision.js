@@ -74,11 +74,32 @@ export default class ActionDecision extends Component {
             decision: '',
             isPickingTarget: false,
             targetAction: '',
+            selectedTarget: '',
             actionError: ''
         }
+
+        // Socket callbacks and rapid clicks can arrive before React finishes a
+        // render. Keep submission idempotent for this mounted turn panel.
+        this.submissionLocked = false
     }
 
     chooseAction = (action, target = null) => {
+        if (this.submissionLocked) {
+            return
+        }
+
+        const actionDetails = ACTIONS.find(item => item.action === action)
+        if (actionDetails && actionDetails.cost !== undefined && this.props.money < actionDetails.cost) {
+            this.setState({ actionError: `Requires ${actionDetails.cost} coins to ${action}.` })
+            return
+        }
+
+        if (target && !this.props.players.some(player => !player.isDead && player.name === target)) {
+            this.setState({ actionError: 'That player is no longer a valid target.' })
+            return
+        }
+
+        this.submissionLocked = true
         const res = {
             action: {
                 action: action,
@@ -86,50 +107,62 @@ export default class ActionDecision extends Component {
                 source: this.props.name
             }
         }
-        console.log(res)
-        
+        if (actionDetails && actionDetails.cost !== undefined) {
+            this.props.deductCoins(actionDetails.cost)
+        }
+
         this.props.socket.emit('g-actionDecision', res)
         this.props.doneAction();
-    }
-
-    deductCoins = (action) => {
-        console.log(this.props.money, action)
-        if(action === 'assassinate') {
-            if(this.props.money >= 3) {
-                this.props.deductCoins(3);
-                this.pickingTarget('assassinate');
-            } else {
-                this.setState({ actionError: 'Not enough coins to assassinate!'})
-            }
-        } else if(action === 'coup') {
-            if(this.props.money >= 7) {
-                this.props.deductCoins(7);
-                this.pickingTarget('coup');
-            } else {
-                this.setState({ actionError: 'Not enough coins to coup!'})
-            }
-        }
     }
 
     pickingTarget = (action) => {
         this.setState({
             isPickingTarget: true,
             targetAction: action,
+            selectedTarget: '',
             actionError: ''
         });
-        this.setState({targetAction: action});
     }
 
     pickTarget = (target) => {
-        this.chooseAction(this.state.targetAction, target);
+        this.setState({ selectedTarget: target, isPickingTarget: false, actionError: '' })
+    }
+
+    cancelTargetSelection = () => {
+        this.setState({
+            isPickingTarget: false,
+            targetAction: '',
+            selectedTarget: '',
+            actionError: ''
+        })
+    }
+
+    confirmTarget = () => {
+        if (!this.state.selectedTarget) {
+            this.setState({ actionError: 'Choose a target before confirming.' })
+            return
+        }
+
+        this.chooseAction(this.state.targetAction, this.state.selectedTarget)
     }
 
     render() {
         let controls = null
         if(this.state.isPickingTarget) {
-            controls = this.props.players.filter(x => !x.isDead).filter(x => x.name !== this.props.name).map((x, index) => {
+            controls = <>
+                {this.props.players.filter(x => !x.isDead).filter(x => x.name !== this.props.name).map((x, index) => {
                 return <button className="TargetButton" style={{ backgroundColor: x.color}} key={index} onClick={() => this.pickTarget(x.name)}>{x.name}</button>
-            })
+                })}
+                <button className="ActionCancelButton" type="button" onClick={this.cancelTargetSelection}>Cancel</button>
+            </>
+        } else if (this.state.selectedTarget) {
+            const action = ACTIONS.find(item => item.action === this.state.targetAction)
+            const label = action ? action.label : this.state.targetAction
+            controls = <div className="ActionConfirmation">
+                <p>Confirm {label} against <strong>{this.state.selectedTarget}</strong>?</p>
+                <button className="ActionConfirmButton" type="button" onClick={this.confirmTarget}>Confirm {label}</button>
+                <button className="ActionCancelButton" type="button" onClick={this.cancelTargetSelection}>Cancel</button>
+            </div>
         } else {
             const coupRequired = this.props.money >= 10
             controls = ACTIONS.map(({ action, label, description, benefit, cost, free, declaration, blockers, target }) => {
@@ -138,7 +171,7 @@ export default class ActionDecision extends Component {
                 let onClick
 
                 if (action === 'coup' || action === 'assassinate') {
-                    onClick = () => this.deductCoins(action)
+                    onClick = () => this.pickingTarget(action)
                 } else if (target) {
                     onClick = () => this.pickingTarget(action)
                 } else {
@@ -170,15 +203,14 @@ export default class ActionDecision extends Component {
                 )
             })
         }
-        return (<>
+        return (
             <section className="ActionDecision">
-                <p className="ActionDecisionTitle">{this.state.isPickingTarget ? 'Choose a target' : 'Choose an action'}</p>
+                <p className="ActionDecisionTitle">{this.state.isPickingTarget ? 'Choose a target' : this.state.selectedTarget ? 'Confirm your action' : 'Choose an action'}</p>
                 <div className={this.state.isPickingTarget ? 'TargetList' : 'ActionList'}>
                     {controls}
                 </div>
                 <p className="ActionError">{this.state.actionError}</p>
             </section>
-            </>
         )
     }
 }
