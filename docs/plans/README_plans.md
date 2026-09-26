@@ -10,3 +10,4 @@ Este directorio es el plano de control del proyecto, siguiendo `docs/agentes/ORQ
 GitHub Issues es la fuente de estado de las unidades: la [issue #1](https://github.com/pronficilio/coup-online/issues/1) cerró el trabajo inicial del checkout; la [issue #3](https://github.com/pronficilio/coup-online/issues/3) registra el chequeo de seguridad. Cada unidad tiene su propio plan y bitácora en este plano de control.
 
 La [issue #9](https://github.com/pronficilio/coup-online/issues/9) registra el pulido visual del tablero circular; su worktree canónico es `.worktrees/issue-9-circular-board-visual-polish`.
+La [issue #8 — referencias visuales para la partida](https://github.com/pronficilio/coup-online/issues/8) está `ACTIVE`, asignada a `pronficilio`; F1 está lista. Plan: `docs/plans/game-reference-materials/plan_game_reference_materials.md`; handoff: `docs/plans/active/issue_8_game_reference_materials.md`; bitácora: `docs/plans/log/issue-8.jsonl`.
