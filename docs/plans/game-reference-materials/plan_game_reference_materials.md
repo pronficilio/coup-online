@@ -59,7 +59,7 @@ Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referen
 
 ## Fases de ejecución
 
-### F1 — Preparar las cuatro referencias WebP (`BLOCKED`)
+### F1 — Preparar las cuatro referencias WebP (`ACTIVE`)
 
 **Pregunta:** ¿se pueden entregar las cuatro referencias en WebP calidad 85 y ancho exacto de 1024 px, conservando proporción y legibilidad?
 **Entrada:** las fuentes locales `fotos/card.png`, `fotos/tarjeta.png`, `fotos/table.png` y `fotos/tabla.png`; el contrato de dimensiones y formato de esta issue.
@@ -69,7 +69,7 @@ Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referen
 **Validación:** inspección de metadatos/dimensiones y revisión visual a ajuste y ampliación; no se requiere build todavía.
 **Commit:** `COMMIT_REQUIRED`; incluir cuatro WebP, reporte y evento `phase_verdict`; mensaje `feat(reference-assets): issue 8 F1 CLOSED advance_f2`.
 
-**Estado actual (2026-09-25):** bloqueada antes de la conversión. Las cuatro fuentes existen en `E:\dev\coup\fotos\`, pero no se confirmó un encoder local ejecutable con autorización disponible; no se generaron WebP ni reporte F1. Retomar la fase cuando haya un método local de conversión e inspección autorizado.
+**Estado actual (2026-09-25):** reanudada tras la autorización del usuario para completar #8 y abrir el PR con capturas. Las fuentes existen en `E:\dev\coup\fotos\`; F1 continúa con conversión local, inspección visual y reporte.
 
 ### F2 — Integrar el botón y el panel de consulta (`PENDING`)
 
