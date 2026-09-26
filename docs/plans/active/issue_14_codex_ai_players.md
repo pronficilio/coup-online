@@ -2,15 +2,15 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 RETURNED tras PHASE FAIL
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW tras correcciones
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
 Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
-Implementación revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; revisión fallida, requiere correcciones.
+Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; PHASE encontró dos defectos, ya corregidos en el checkpoint F1 local indicado al Orquestador.
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
-Siguiente dueño: Ejecutor F1 para corregir los dos hallazgos PHASE antes de repetir revisión.
+Siguiente dueño: Orquestador para solicitar revisión PHASE independiente sobre el checkpoint corregido. F2 sigue pendiente.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -43,4 +43,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
 - F0 ya cerró antes de F1; no avanzar a F2 ni crear PR por fase antes del veredicto independiente de F1.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`; F0 `CLOSED`. F1 quedó devuelta por dos refutaciones: tras perder un desafío contra Asesinato el objetivo puede recibir otra opción de bloqueo, y Exchange aumenta de una a dos influencias. Añadir pruebas de regresión para ambos casos. F2 sigue pendiente; no abrir PR ni invocar Codex.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; Verifier PHASE emitió `PASS` para F0 en `b189cc0`; F0 `CLOSED`. El PHASE previo de F1 encontró dos defectos: tras perder un desafío contra Asesinato el objetivo podía recibir otra opción de bloqueo, y Exchange podía aumentar una mano de una carta a dos. Ambos están corregidos y cubiertos por regresiones en este checkpoint. `npm test`, las pruebas directas, `node --check` y `git diff --check` pasan; React sigue sin `react-scripts`. F1 espera un nuevo PHASE; F2 sigue pendiente. No abrir PR ni invocar Codex.

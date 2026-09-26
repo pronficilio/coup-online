@@ -1,8 +1,8 @@
 # Issue #14 — evidencia de ejecución F1
 
-**Estado:** F1 devuelta al Ejecutor tras revisión PHASE `FAIL`; no es `PASS` ni `CLOSED`.
+**Estado:** `WAITING_EXECUTOR_REVIEW` tras corregir los hallazgos de PHASE; no es `PASS` ni `CLOSED`.
 **Branch / worktree:** `issue/14-codex-ai-players` / `.worktrees/issue-14-codex-ai-players`.
-**Commit F1:** `608089d4c839f367b9b0b0e92009d3daf536ce5c` (local; sin push ni PR).
+**Commit F1 inicial:** `608089d4c839f367b9b0b0e92009d3daf536ce5c`; checkpoint de correcciones local en este branch (hash comunicado al Orquestador; sin push ni PR).
 **Contrato:** `docs/plans/codex-ai-players/f0_contract.md`.
 
 ## Cambios comprobables
@@ -16,11 +16,12 @@
 
 ## Pruebas y checks
 
-Pruebas significativas agregadas con `node:test` en `server/test/coup.test.js` y `server/test/lobby.test.js`. Cubren el recorrido `income` y turno siguiente, proyección privada, roster/control de líder aunque el orden de conexión difiera del primer nombre, roster hostil, socket y versión inválidos, payload con actor/costo adicional, challenge/block simultáneos, idempotencia, timeout con respuesta parcial, setup de dos jugadores, revancha, pérdida fuera del mazo y prueba/reemplazo de influencia.
+Pruebas significativas agregadas con `node:test` en `server/test/coup.test.js` y `server/test/lobby.test.js`. Cubren el recorrido `income` y turno siguiente, proyección privada, roster/control de líder aunque el orden de conexión difiera del primer nombre, roster hostil, socket y versión inválidos, payload con actor/costo adicional, challenge/block simultáneos, idempotencia, timeout con respuesta parcial, setup de dos jugadores, revancha, pérdida fuera del mazo y prueba/reemplazo de influencia. Las regresiones nuevas comprueban que un objetivo que desafía Assassin y pierde Duke recibe enseguida la pérdida de Asesinato sin opción de bloquear con Contessa, y que Exchange con una influencia conserva solo una carta.
 
 Checks que pasan:
 
-- `npm test` en `server/`.
+- `npm test` en `server/` (2 archivos de prueba pasan; `coup.test.js` tiene 14 casos y `lobby.test.js` uno).
+- `node test/coup.test.js` y `node test/lobby.test.js` en `server/`.
 - `node --check` para `server/game/coup.js`, `server/game/lobby.js`, `server/game/utils.js` y `server/index.js`.
 - `git diff --check`.
 - Búsqueda estática confirma que el cliente ya no emite los eventos antiguos de acción/desafío/bloqueo/revelación/intercambio y que los eventos de salida no serializan `socketID`.
@@ -31,11 +32,11 @@ La compilación y el test de React no pudieron ejecutarse: en el worktree no exi
 
 Tras un timeout, el líder actual puede emitir `g-resume` solo mientras todos los sockets del roster sigan conectados. El servidor reemite las mismas opciones con ID/versión nuevos y descarta respuestas parciales; las respuestas al ID anterior fallan. Si falta un socket o la pausa fue causada por desconexión, no hay reanudación ni reasignación de asiento: se recrea la partida. No hay recuperación de identidad persistente.
 
-## Revisión PHASE independiente
+## Revisión PHASE independiente y correcciones
 
-El Verifier revisó `f9de90f` (incluye implementación `608089d`) y emitió `FAIL`; informe: `docs/plans/active/verifier_issue_14_F1.md`.
+El Verifier revisó `f9de90f` (incluye implementación `608089d`) y emitió `FAIL`; informe histórico: `docs/plans/active/verifier_issue_14_F1.md`. Las dos refutaciones quedaron corregidas en este checkpoint:
 
-1. Si el objetivo desafía la afirmación Assassin y pierde, `loseInfluence` vuelve a `afterActionClaim` y abre otra ventana para bloquear. La regla de doble peligro de Asesinato exige aplicar la pérdida de la acción después de perder el desafío; el objetivo no debe obtener una segunda oportunidad de bloquear.
-2. `openExchange` siempre ofrece conservar dos cartas y puede aumentar la mano de una influencia a dos. Exchange debe conservar el número de influencias que el jugador tenía y devolver las cartas restantes al Court.
+1. Si el objetivo desafía Assassin y pierde, la continuación ahora resuelve directamente la acción después de la primera pérdida; no vuelve a abrir `afterActionClaim` ni una ventana Contessa. El coste de Asesinato sigue cobrándose y otras acciones reclamadas conservan el flujo anterior. La regresión verifica que el objetivo pierde Duke primero, mantiene Contessa en la mano y luego recibe solo una segunda opción `lose_influence` para Contessa.
+2. `openExchange` ahora genera elecciones del mismo tamaño que la mano previa (una o dos cartas). La regresión de una influencia verifica tres opciones singulares, conserva una carta elegida y devuelve las otras dos al Court.
 
-El Verifier reprodujo ambos defectos. Se requieren pruebas de regresión para cada uno. No se inició Codex ni F2.
+Las correcciones pasan la suite del servidor, ambas pruebas directas, `node --check` y `git diff --check`. F1 queda a la espera de PHASE independiente; no se inició Codex ni F2.

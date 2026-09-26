@@ -468,7 +468,12 @@ class CoupGame {
                     challenger: selected.seat,
                     roles: [role],
                     description: `${this.players[action.actor].name} must prove the ${role} claim.`,
-                    onProved: () => this.loseInfluence(selected.seat, () => this.afterActionClaim(action)),
+                    onProved: () => this.loseInfluence(selected.seat, () => {
+                        if (action.type === 'assassinate' && selected.seat === action.target) {
+                            return this.resolveAction(action)
+                        }
+                        this.afterActionClaim(action)
+                    }),
                     onConceded: () => {
                         if (action.cost) this.players[action.actor].money += action.cost
                         this.updatePlayers()
@@ -653,21 +658,26 @@ class CoupGame {
         const player = this.players[seat]
         const pool = player.influences.concat(drawn)
         const combinations = []
-        for (let first = 0; first < pool.length; first += 1) {
-            for (let second = first + 1; second < pool.length; second += 1) {
-                combinations.push([first, second])
+        const keepCount = player.influences.length
+        const selectCombination = (start, selected) => {
+            if (selected.length === keepCount) {
+                combinations.push(selected)
+                return
+            }
+            for (let index = start; index < pool.length; index += 1) {
+                selectCombination(index + 1, selected.concat(index))
             }
         }
+        selectCombination(0, [])
         const options = combinations.map((keptIndices, index) => {
             const kept = keptIndices.map(poolIndex => pool[poolIndex])
-            const keptCounts = kept.reduce((counts, card) => ({ ...counts, [card]: (counts[card] || 0) + 1 }), {})
-            const label = `Keep ${kept[0]} and ${kept[1]}`
-            return this.createChoice(`exchange:${index}`, label, { kind: 'exchange', keptIndices, keptCounts })
+            const label = `Keep ${kept.join(' and ')}`
+            return this.createChoice(`exchange:${index}`, label, { kind: 'exchange', keptIndices })
         })
         this.openDecision({
             type: 'exchange',
-            title: 'Choose two influences to keep',
-            description: 'Your current cards and the two private Court draws are shown as choices.',
+            title: `Choose ${keepCount === 1 ? 'one influence' : 'two influences'} to keep`,
+            description: `Keep exactly ${keepCount} ${keepCount === 1 ? 'influence' : 'influences'} from your current cards and the two private Court draws.`,
             seats: [seat],
             optionsFor: () => options,
             resolve: responses => {

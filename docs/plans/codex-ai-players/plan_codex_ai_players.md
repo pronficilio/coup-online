@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 RETURNED tras PHASE FAIL
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 WAITING_EXECUTOR_REVIEW tras corregir hallazgos PHASE
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -88,17 +88,17 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Commit:** contrato y reglas en `b189cc0`; cierre F0 registrado en este commit.
 - **Validación:** inspección de cada evento/decisión y trazado de una partida mixta; no se inicia una llamada a Codex real desde F0.
 
-### F1 — Hacer el estado y las decisiones privados y autoritativos (`RETURNED`)
+### F1 — Hacer el estado y las decisiones privados y autoritativos (`WAITING_EXECUTOR_REVIEW`)
 
 - **Pregunta:** ¿puede el servidor aplicar una decisión humana o IA sin filtrar cartas ni aceptar una mutación de estado que el jugador no tiene derecho a realizar?
 - **Entrada:** contrato F0.
 - **Salida:** proyecciones públicas/privadas explícitas, decisiones asociadas a socket/jugador/partida/fase, validación de acción/costo/destino y flujo correcto de cartas reveladas/reemplazadas.
 - **Cierre:** llamadas de cliente ya no determinan fuente, costo, carta revelada ni cartas de intercambio; mano y mazo no salen en eventos públicos; decisiones fuera de turno/fase, opciones inválidas o de otro socket se rechazan; repetición exacta es idempotente y una repetición con elección distinta se rechaza. El motor cumple las reglas versionadas, incluido inicio por ganador previo, una moneda inicial para quien empieza en dos jugadores y cartas de influencia reveladas fuera del mazo; sin ganador previo, el primer asiento se elige al azar. Ventanas de timeout reanudables solo por el líder con todos los sockets conectados; respuestas parciales se borran y se emiten IDs/versiones nuevos. Una desconexión obliga a recrear la partida. Verifier independiente debe emitir `PASS` sobre filtración, autoridad y reglas.
-- **Estado/evidencia:** PHASE independiente `FAIL` en `docs/plans/active/verifier_issue_14_F1.md`. Corregir la segunda pérdida de influencia tras desafío fallido contra Asesinato (sin reabrir bloqueo) y mantener el conteo de influencias al resolver Exchange; añadir una prueba de regresión por caso. Los demás criterios revisados no produjeron otra refutación material. `react-scripts` no está instalado, por lo que build/test del cliente quedan sin ejecutar. No se inició F2/Codex.
+- **Estado/evidencia:** el PHASE previo registró `FAIL` en `docs/plans/active/verifier_issue_14_F1.md`. Las dos correcciones están implementadas y cubiertas: al perder el desafío de una afirmación Assassin, el objetivo recibe directamente la pérdida de Asesinato sin otra ventana de bloqueo; Exchange conserva exactamente una o dos influencias según la mano previa. El resto de los criterios no cambió. `npm test`, las pruebas directas de motor y lobby, `node --check` y `git diff --check` pasan. `react-scripts` no está instalado, por lo que build/test del cliente siguen sin ejecutar. F1 espera una nueva revisión PHASE; F2/Codex no se inició.
 - **Pivote:** si el motor actual necesita una división mayor para preservar reglas, documentar y mantener dentro de esta fase solo los cambios necesarios para el contrato IA.
 - **Repetición:** una corrección acotada por cada fallo demostrable de los criterios.
-- **Commit:** implementación F1 `608089d4c839f367b9b0b0e92009d3daf536ce5c` devuelta; commit de corrección pendiente.
-- **Validación:** repetir `npm test` en `server/`, `node --check` y `git diff --check`; después solicitar un nuevo PHASE independiente.
+- **Commit:** implementación inicial `608089d4c839f367b9b0b0e92009d3daf536ce5c` devuelta; correcciones, regresiones y evidencia quedan en el commit local de este checkpoint.
+- **Validación:** `npm test` en `server/`, pruebas directas `node test/coup.test.js` y `node test/lobby.test.js`, `node --check` y `git diff --check`; solicitar un nuevo PHASE independiente antes de F2.
 
 ### F2 — Añadir el controlador Codex con la suscripción del propietario (`PENDING`)
 

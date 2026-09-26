@@ -220,6 +220,78 @@ test('the server charges assassination and keeps the lost target influence out o
     assert.equal(game.players[0].money, 2)
 })
 
+test('a target who loses an Assassin challenge takes the assassination loss without a block window', () => {
+    const { game, sockets } = makeGame()
+    const [actor, target] = sockets
+    game.clearDecisionTimer()
+    game.activeDecision = null
+    game.players[0].money = 5
+    game.players[0].influences = ['assassin', 'duke']
+    game.players[1].influences = ['duke', 'contessa']
+    game.playTurn()
+
+    const envelope = (decision, choiceId) => ({
+        decisionId: decision.decisionId,
+        stateVersion: decision.stateVersion,
+        choiceId
+    })
+    let decision = actor.last('g-decision').payload
+    actor.receive('g-submitDecision', envelope(decision, 'assassinate:1'))
+    decision = target.last('g-decision').payload
+    assert.equal(decision.type, 'challenge')
+    target.receive('g-submitDecision', envelope(decision, 'challenge'))
+
+    decision = actor.last('g-decision').payload
+    assert.equal(decision.type, 'prove_claim')
+    actor.receive('g-submitDecision', envelope(decision, 'prove:assassin:0'))
+
+    decision = target.last('g-decision').payload
+    assert.equal(decision.type, 'lose_influence')
+    target.receive('g-submitDecision', envelope(decision, 'lose:0'))
+
+    assert.deepEqual(game.players[1].revealedInfluences, ['duke'])
+    assert.deepEqual(game.players[1].influences, ['contessa'])
+    decision = target.last('g-decision').payload
+    assert.equal(decision.type, 'lose_influence')
+    assert.deepEqual(decision.options.map(option => option.label), ['Reveal and lose contessa'])
+    assert.equal(target.outgoing.filter(item => item.event === 'g-decision' && item.payload.type === 'block').length, 0)
+
+    const deckAfterProof = game.deck.slice()
+    target.receive('g-submitDecision', envelope(decision, 'lose:0'))
+    assert.deepEqual(game.players[1].revealedInfluences, ['duke', 'contessa'])
+    assert.deepEqual(game.deck, deckAfterProof)
+    assert.equal(game.phase, 'gameover')
+})
+
+test('Exchange with one influence keeps one card and returns the rest to the Court deck', () => {
+    const { game, sockets } = makeGame()
+    const [actor] = sockets
+    game.clearDecisionTimer()
+    game.activeDecision = null
+    game.deck = []
+    game.players[0].influences = ['duke']
+    game.openExchange(0, ['captain', 'ambassador'])
+
+    const decision = actor.last('g-decision').payload
+    assert.equal(decision.type, 'exchange')
+    assert.equal(decision.title, 'Choose one influence to keep')
+    assert.equal(decision.options.length, 3)
+    assert.deepEqual(decision.options.map(option => option.label), [
+        'Keep duke',
+        'Keep captain',
+        'Keep ambassador'
+    ])
+    actor.receive('g-submitDecision', {
+        decisionId: decision.decisionId,
+        stateVersion: decision.stateVersion,
+        choiceId: 'exchange:1'
+    })
+
+    assert.deepEqual(game.players[0].influences, ['captain'])
+    assert.equal(game.players[0].influences.length, 1)
+    assert.deepEqual(game.deck.slice().sort(), ['ambassador', 'duke'])
+})
+
 test('the explicitly supplied lobby leader alone may restart and the prior winner starts', () => {
     const { game, sockets } = makeGame({ leaderSocketID: 'socket-1' })
     game.previousWinner = 0
