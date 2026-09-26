@@ -11,4 +11,4 @@ GitHub Issues es la fuente de estado de las unidades: la [issue #1](https://gith
 
 ## Unidades abiertas
 
-- [#13 — desplegar Coup Online en Hetzner](https://github.com/pronficilio/coup-online/issues/13): `WAITING_USER`; F0 inventario cerrado, F1 espera seleccionar commit/tag de lanzamiento. Plan: `docs/plans/active/issue_13_hetzner_deployment.md`; handoff: `docs/plans/inbox/issue_13_hetzner_deployment.md`; bitácora: `docs/plans/log/issue-13.jsonl`.
+- [#13 — desplegar Coup Online en Hetzner](https://github.com/pronficilio/coup-online/issues/13): `WAITING_USER`; F0 inventario cerrado, F1 espera dominio exacto para DNS. Plan: `docs/plans/active/issue_13_hetzner_deployment.md`; handoff: `docs/plans/inbox/issue_13_hetzner_deployment.md`; bitácora: `docs/plans/log/issue-13.jsonl`.

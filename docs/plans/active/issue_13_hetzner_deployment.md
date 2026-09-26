@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `WAITING_USER` — seleccionar un commit/tag limpio de lanzamiento.
+- **Estado:** `WAITING_USER` — falta el dominio exacto de GoDaddy para crear/verificar `coup` en DNS.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -28,11 +28,13 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - El backend aplica CORS abierto con `app.use(cors())`; revisar antes de exponerlo.
 - La copia compartida estaba en `master` con 67 entradas modificadas/no rastreadas. `origin/master` observado tras `git fetch` es `64593af`; la copia local `HEAD` es `1e4685f`, dos commits delante y dieciséis detrás, más cambios sin commit. Ninguno se asumirá como lanzamiento sin selección explícita.
 - GitHub no tenía una issue previa de despliegue. Issue #5 está cerrada; issue #6 permanece abierta.
-- El dominio no está comprado. La IP configurada en el alias SSH no se asume como IP pública final hasta comprobarla por DNS/red.
+- El dominio aún no está confirmado como comprado. La IP pública efectiva se verificó desde el host y un servicio externo: `178.105.138.91`.
+- No hay conexión habilitada a GoDaddy desde esta sesión; la edición del registro se hará en su panel cuando tengamos el hostname exacto. No se han cambiado DNS ni nameservers.
 
 ## Supuestos, preguntas y riesgos
 
-- **Pregunta que bloquea implementación:** ¿qué commit/tag debe representar el lanzamiento? Alternativas: seleccionar un commit/tag existente o consolidar primero el checkout actual en una rama/PR y desplegar el commit integrado.
+- **Pregunta inmediata:** ¿cuál es el dominio exacto de GoDaddy y ya terminó la compra? Hay que comprobar si el hostname `coup` tiene un registro existente antes de añadir `A coup → 178.105.138.91`.
+- **Pregunta que bloquea publicar código:** ¿qué commit/tag debe representar el lanzamiento? Alternativas: seleccionar un commit/tag existente o consolidar primero el checkout actual en una rama/PR y desplegar el commit integrado.
 - El dominio no bloquea el despliegue privado ni la verificación previa. Sí bloquea TLS público válido para el subdominio.
 - Confirmar la IP pública real del servidor y que los puertos 80/443 llegan desde Internet antes de solicitar certificado.
 - Riesgo alto: el proxy es compartido; conservar catch-all y certificado actuales. Tener copia/rollback de su configuración antes de tocarla.
@@ -49,7 +51,18 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Política de commit:** `COMMIT_REQUIRED` (este plan, handoff y evento de bitácora quedan en el commit de planificación).
 - **Cierre previsto:** `docs(deploy): issue 13 F0 CLOSED readiness inventory`.
 
-### F1 — Fijar el artefacto de lanzamiento (`WAITING_USER`)
+### F1 — Conectar el subdominio en DNS (`WAITING_USER`)
+
+- **Pregunta:** ¿puede `coup.<dominio>` resolver a la IP pública correcta sin alterar otros registros del dominio?
+- **Entrada:** dominio exacto ya comprado, cuenta que lo administra, estado actual de sus registros y la IP pública verificada `178.105.138.91`.
+- **Salida:** un registro `A` con nombre `coup` y valor `178.105.138.91`; registrar TTL y resolver públicamente el hostname.
+- **Criterio de avance:** el dominio usa DNS administrado por GoDaddy o el usuario identifica el proveedor autoritativo; no existe un registro `coup` que haya que preservar/editar de forma ambigua.
+- **Criterio de bloqueo:** dominio no comprado, no se conoce el nombre exacto, o existe un registro `coup` cuyo propósito no está claro.
+- **Nota de publicación:** DNS solo apunta al host. Hasta desplegar Coup y configurar el vhost/certificado, el Nginx catch-all actual responderá al hostname; no anunciar ni usar el subdominio todavía.
+- **Política de commit:** `COMMIT_AFTER_REVIEW`.
+- **Cierre previsto:** `docs(deploy): issue 13 F1 CLOSED connect coup dns`.
+
+### F2 — Fijar el artefacto de lanzamiento (`WAITING_USER`)
 
 - **Pregunta:** ¿qué commit/tag limpio se construirá y publicará?
 - **Entrada:** `HEAD`, `origin/master`, diferencias locales y elección del usuario.
@@ -60,7 +73,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Política de commit:** `COMMIT_AFTER_REVIEW`.
 - **Cierre previsto:** `docs(deploy): issue 13 F1 CLOSED pin release source`.
 
-### F2 — Preparar despliegue aislado y reproducible (`PENDING`)
+### F3 — Preparar despliegue aislado y reproducible (`PENDING`)
 
 - **Pregunta:** ¿puede la versión fijada construirse y ejecutarse en contenedores sin instalar Node en el host ni ocupar 80/443?
 - **Salida:** Dockerfile(s)/Compose y guía que mantengan frontend/backend en puertos locales dedicados; cliente configurado para el hostname final sin hardcodear localhost; backend restringido según origen de producción; health/operación y rollback documentados.
@@ -69,7 +82,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Política de commit:** `COMMIT_REQUIRED`.
 - **Cierre previsto:** `feat(deploy): issue 13 F2 CLOSED containerize coup`.
 
-### F3 — Desplegar en Hetzner sin exposición pública (`PENDING`)
+### F4 — Desplegar en Hetzner sin exposición pública (`PENDING`)
 
 - **Pregunta:** ¿funciona el stack en el host aislado y sobrevive a reinicio sin interferir con servicios actuales?
 - **Salida:** Compose desplegado bajo `/opt/coup` o ruta acordada, bind solo a loopback/bridge privado, instrucciones de arranque/parada/rollback y evidencia de pruebas vía SSH tunnel.
@@ -78,17 +91,17 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Política de commit:** `COMMIT_AFTER_REVIEW` (código/guía/evidencia en Git; estado remoto no se versiona).
 - **Cierre previsto:** `ops(deploy): issue 13 F3 CLOSED stage on hetzner`.
 
-### F4 — DNS, subdominio y TLS con GoDaddy (`PENDING`, depende del usuario)
+### F5 — Vhost público y TLS (`PENDING`, depende de F1 y compra/DNS)
 
-- **Pregunta:** ¿resuelve `coup.<dominio>` al host y puede añadirse un vhost TLS sin alterar el tráfico existente?
-- **Dependencia:** dominio comprado; registrar usuario identifica dominio exacto y confirma acceso DNS; IP pública comprobada; puertos 80/443 accesibles.
-- **Salida:** solo cuando se autorice aplicar DNS/proxy: registro `A` con nombre `coup` e IP del servidor, TLS válido, proxy `/` al cliente y API/Socket.IO a backend, manteniendo el host default existente.
+- **Pregunta:** ¿puede servirse `coup.<dominio>` por HTTPS y enrutar API/Socket.IO sin alterar el tráfico existente?
+- **Dependencia:** F1 resuelto; dominio comprado; DNS apunta a la IP; puertos 80/443 accesibles.
+- **Salida:** añadir un vhost TLS, proxy `/` al cliente y API/Socket.IO al backend, manteniendo el host default y certificado existentes.
 - **Criterio de avance:** HTTPS sirve app, endpoints API responden y negociación Socket.IO/WebSocket funciona; host anterior sigue respondiendo.
 - **Bloqueo:** cambiar nameservers o tocar otros registros no es necesario; no hacerlo sin decisión explícita.
 - **Política de commit:** `COMMIT_AFTER_REVIEW`.
-- **Cierre previsto:** `ops(deploy): issue 13 F4 CLOSED domain and tls`.
+- **Cierre previsto:** `ops(deploy): issue 13 F5 CLOSED domain and tls`.
 
-### F5 — Verificación adversarial y cierre (`PENDING`)
+### F6 — Verificación adversarial y cierre (`PENDING`)
 
 - **Pregunta:** ¿hay una petición o fallo razonable que rompa el tráfico existente, filtre una versión distinta o impida el juego?
 - **Verifier:** independiente; intentará falsar aislamiento/rollback, rutas API, CORS, upgrade WebSocket, persistencia del servicio y TLS/vhost. No implementa fixes.
@@ -105,7 +118,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-El inventario F0 está completo. La primera fase técnica F1 espera que el usuario indique qué commit/tag quiere publicar o que autorice consolidar el estado local antes de fijarlo. Mientras tanto, no instalar, copiar ni desplegar código en el servidor.
+El inventario F0 está completo y la IP pública es `178.105.138.91`. La primera fase F1 espera el dominio exacto y confirmar que la compra terminó; entonces se podrá añadir/verificar `A coup → 178.105.138.91`. En paralelo, F2 espera elegir el commit/tag limpio. No instalar, copiar ni desplegar código hasta fijarlo.
 
 ## Fuentes
 
