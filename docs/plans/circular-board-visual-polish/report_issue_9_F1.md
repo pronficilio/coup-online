@@ -6,8 +6,8 @@
 - El fondo usa `cover` centrado en una capa fija de viewport, sin deformación; la plataforma central del arte permanece reconocible y la imagen también aparece en las franjas superior e inferior de la página. Añadí un disco blanco translúcido centrado detrás del mazo.
 - Corrección de cartas solicitada para PR #10: quité el panel blanco exterior de cada asiento y dejé nombre/monedas en etiquetas compactas con color de jugador. Las influencias miden hasta 134 px de ancho en escritorio y usan `clamp(58px, 15.5vw, 82px)` en compacto (76 px a 490 px). El contorno neón sigue en las cartas del jugador actual.
 - Para pantallas compactas, los asientos próximos a los bordes desplazan sus cartas hacia adentro según su coordenada horizontal calculada; el cálculo base del círculo se conserva. Así se mantienen completas las cartas laterales en 3, 4, 5 y 6 jugadores.
-- Corrección de sombras para PR #10: cada `.PlayerInfluenceSlot` tiene una sombra negra corta y discreta; el mazo usa varias capas `drop-shadow` para sugerir una pila física. El jugador actual recibe un `::after` externo: contorno blanco de 2 px, unos 9 px de aire hasta la carta y halo rojo suave fuera del contorno. La sombra negra de carta/mazo no comparte la capa del neón.
-- Para evitar recortes laterales compactos y resolver la proximidad en 6p, el CSS ajusta asientos por borde y eleva 20 px los inferiores de 5p y 32 px los de 6p. No se cambiaron colores, tamaños de cartas, reglas, socket ni paneles. No versioné el PNG fuente.
+- Corrección actual de PR #10: cada `.PlayerInfluenceSlot` conserva sombra negra discreta y el mazo su sombra por capas. Solo las cartas del asiento activo reciben `::before` con iluminación roja interior y `::after` con borde blanco de 2 px a unos 3 px de la carta, halo rojo exterior multicapa y esquinas redondeadas. El gap entre cartas activas vuelve a 5 px para que los aros se unan visualmente. El estado del asiento activo sigue el `currentPlayer` que recibe `PlayerBoard`.
+- Las cartas mantienen su ancho y se hacen cerca de 8.8% más altas mediante `aspect-ratio: 0.68`. Para despejar las etiquetas en 6p compacto, los laterales superiores suben 24 px; los inferiores conservan el desplazamiento de 32 px y el margen cercano a 8 px con la mano activa. Las reglas, el socket, los paneles, tamaños de ancho y sombras negras no cambian. No versioné el PNG fuente.
 
 ## Evidencia visual
 
@@ -21,13 +21,14 @@ Capturas de navegador con `PlayerBoard` real, fixtures locales de 2–6 jugadore
 | 5 | [preview](preview_issue_9_F1_5p_desktop.png) | [preview](preview_issue_9_F1_5p_mobile.png) |
 | 6 | [preview](preview_issue_9_F1_6p_desktop.png) | [preview](preview_issue_9_F1_6p_mobile.png) |
 
-Revisé la composición, en especial 3 y 6 jugadores en escritorio y compacto. El aro activo conserva una franja de aire visible con la imagen de la carta; los halos de las dos cartas activas no se fusionan. En 6p compacto, elevar 32 px los dos asientos laterales inferiores deja un espacio visible de alrededor de 10 px entre sus cartas y las activas. La ampliación del margen lateral evita recortes también en 5p compacto. Se revisaron los diez previews finales. Sombras, mazo, disco, nombres, monedas y controles permanecen legibles. La simulación usa `Coup`/`ActionDecision` reales con fixtures deterministas y socket sin red; no usa partida/socket real ni se hicieron clics en acciones.
+Se regeneró la matriz completa de diez previews (2–6 jugadores, escritorio/compacto). Revisé 2p compacto, 3p escritorio, 5p compacto y 6p compacto: los aros de las dos cartas activas se unen sin perder el borde blanco, el glow rojo ilumina ambos lados del borde y 6p compacto no cruza etiquetas ni cartas; conserva unos 8 px entre manos laterales inferiores y mano activa. También se cambió el fixture a `?current=Amarillo` en 2p y el aro se movió a su mano, confirmando que sigue el `currentPlayer` que informa Coup.
 
 ## Validación
 
 - `npm ci`: completó para instalar las dependencias del worktree.
-- `npm run start-pc`: compiló el cliente con el fixture y volvió a compilar tras restaurar `App.js`. El harness fue temporal y no forma parte del diff. Quedaron advertencias ESLint existentes en `App.js` (`logo`, `Link`) y `Coup.js` (`ReactModal` sin uso).
+- `npm run start-pc`: compiló el cliente con el fixture temporal. Restauré `App.js` antes del commit.
+- `npm run build`: compiló el cliente después de restaurar `App.js`; quedaron advertencias ESLint existentes en `Coup.js` (`ReactModal` sin uso) y de Browserslist desactualizado.
 - `git diff --check`: pasó.
-- No ejecuté tests automatizados ni build de producción, de acuerdo con el alcance.
+- No ejecuté tests automatizados.
 
 F1 queda cerrada y se entrega al Orquestador. La corrección de viewport se preparó como commit adicional en la misma rama y PR #10; issue abierta y sin merge.
