@@ -4,62 +4,60 @@ const ACTIONS = [
     {
         action: 'income',
         label: 'Income',
-        description: 'Gain 1 coin.',
-        benefit: 'Benefit: +1 coin',
+        description: 'Take 1 coin.',
         free: true,
-        declaration: 'Declared character: None',
-        blockers: 'Blockers: None'
+        declaration: null,
+        blockers: []
     },
     {
         action: 'foreign_aid',
         label: 'Foreign Aid',
-        description: 'Gain 2 coins.',
-        benefit: 'Benefit: +2 coins',
+        description: 'Take 2 coins.',
         free: true,
-        declaration: 'Declared character: None',
-        blockers: 'Blockers: Duke'
+        declaration: null,
+        blockers: ['Duke']
     },
     {
         action: 'coup',
         label: 'Coup',
-        description: 'Pay 7 coins to eliminate a player.',
+        description: 'Pay 7 coins. Choose a player to lose an influence card.',
         cost: 7,
-        declaration: 'Declared character: None',
-        blockers: 'Blockers: None'
+        declaration: null,
+        blockers: [],
+        target: true
     },
     {
         action: 'tax',
         label: 'Tax',
-        description: 'Gain 3 coins.',
-        benefit: 'Benefit: +3 coins',
+        description: 'Take 3 coins.',
         free: true,
-        declaration: 'Declared character: Duke',
-        blockers: 'Blockers: None'
+        declaration: 'Duke',
+        blockers: []
     },
     {
         action: 'steal',
         label: 'Steal',
         description: 'Take up to 2 coins from another player.',
-        benefit: 'Benefit: up to 2 coins',
-        declaration: 'Declared character: Captain',
-        blockers: 'Blockers: Captain or Ambassador',
+        amount: 2,
+        declaration: 'Captain',
+        blockers: ['Captain', 'Ambassador'],
         target: true
     },
     {
         action: 'exchange',
         label: 'Exchange',
-        description: 'Exchange influences.',
+        description: 'Swap 2 cards with the deck.',
         free: true,
-        declaration: 'Declared character: Ambassador',
-        blockers: 'Blockers: None'
+        declaration: 'Ambassador',
+        blockers: []
     },
     {
         action: 'assassinate',
         label: 'Assassinate',
-        description: 'Pay 3 coins to assassinate a player.',
+        description: 'Pay 3 coins. Choose a player to lose an influence card.',
         cost: 3,
-        declaration: 'Declared character: Assassin',
-        blockers: 'Blockers: Contessa',
+        declaration: 'Assassin',
+        blockers: ['Contessa'],
         target: true
     }
 ]
@@ -165,7 +163,7 @@ export default class ActionDecision extends Component {
             </div>
         } else {
             const coupRequired = this.props.money >= 10
-            controls = ACTIONS.map(({ action, label, description, benefit, cost, free, declaration, blockers, target }) => {
+            controls = ACTIONS.map(({ action, label, description, cost, amount, free, declaration, blockers, target }) => {
                 const insufficientFunds = cost !== undefined && this.props.money < cost
                 const disabled = (coupRequired && action !== 'coup') || insufficientFunds
                 let onClick
@@ -179,33 +177,37 @@ export default class ActionDecision extends Component {
                 }
 
                 return (
-                    <article className={`ActionCard${disabled ? ' ActionCard--disabled' : ''}`} key={action}>
-                        <button
-                            className="ActionButton"
-                            id={action === 'steal' ? 'captain' : action === 'assassinate' ? 'assassin' : action === 'tax' ? 'duke' : action === 'exchange' ? 'ambassador' : undefined}
-                            type="button"
-                            onClick={onClick}
-                            disabled={disabled}
-                        >
-                            {label}
-                        </button>
-                        <p className="ActionDescription">{description}</p>
-                        <div className="ActionMeta">
-                            {benefit && <span className="ActionTag ActionTag--benefit">{benefit}</span>}
-                            {cost !== undefined && <span className="ActionTag ActionTag--cost">Cost: {cost} coins</span>}
-                            {free && <span className="ActionTag ActionTag--free">Free</span>}
-                            <span className="ActionTag">{declaration}</span>
-                            <span className="ActionTag">{blockers}</span>
-                            {insufficientFunds && <span className="ActionTag ActionTag--warning">Requires {cost} coins</span>}
-                            {coupRequired && action !== 'coup' && <span className="ActionTag ActionTag--warning">Coup required with 10+ coins</span>}
+                    <article className={`ActionRow${disabled ? ' ActionRow--disabled' : ''}`} key={action}>
+                        <div className="ActionRowContent">
+                            <div className="ActionHeading">
+                                <button
+                                    className="ActionButton"
+                                    type="button"
+                                    onClick={onClick}
+                                    disabled={disabled}
+                                >
+                                    {label}
+                                </button>
+                                {declaration && <span className={`ActionRoleChip ActionRoleChip--declared ActionRoleChip--${declaration.toLowerCase()}`}>{declaration}</span>}
+                            </div>
+                            <p className="ActionDescription">{description}</p>
+                            {blockers.length > 0 && <div className="ActionMeta">
+                                <span className="ActionMetaLabel">Can be blocked by</span>
+                                {blockers.map(role => <span className={`ActionRoleChip ActionRoleChip--blocker ActionRoleChip--${role.toLowerCase()}`} key={role}>{role}</span>)}
+                            </div>}
+                            {declaration && blockers.length === 0 && <p className="ActionMeta ActionMeta--unblockable">Cannot be blocked.</p>}
+                            {(insufficientFunds || (coupRequired && action !== 'coup')) && <p className="ActionWarning">{insufficientFunds ? `Requires ${cost} coins` : 'Coup required with 10+ coins'}</p>}
                         </div>
+                        <span className={`ActionPrice${free ? ' ActionPrice--free' : ''}`} aria-label={free ? 'Free' : cost !== undefined ? `Costs ${cost} coins` : `Up to ${amount} coins`}>
+                            {free ? 'Free' : <><span className="ActionPriceAmount">{cost !== undefined ? cost : amount}<span className="ActionCoin" aria-hidden="true">⚜</span></span></>}
+                        </span>
                     </article>
                 )
             })
         }
         return (
             <section className="ActionDecision">
-                <p className="ActionDecisionTitle">{this.state.isPickingTarget ? 'Choose a target' : this.state.selectedTarget ? 'Confirm your action' : 'Choose an action'}</p>
+                <h2 className="ActionDecisionTitle">{this.state.isPickingTarget ? 'Choose a target' : this.state.selectedTarget ? 'Confirm your action' : 'Actions on your turn'}</h2>
                 <div className={this.state.isPickingTarget ? 'TargetList' : 'ActionList'}>
                     {controls}
                 </div>
