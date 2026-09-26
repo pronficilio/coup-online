@@ -5,17 +5,25 @@
     aspect-ratio: 1;
     margin: 12px auto;
     box-sizing: border-box;
-    background: #fff;
 }
 
-.PlayerBoardBackdrop {
-    position: absolute;
-    z-index: 0;
+.GameContainer {
+    position: relative;
+    isolation: isolate;
+}
+
+.GameContainer::before {
+    content: '';
+    position: fixed;
+    z-index: -1;
     inset: 0;
+    background-color: #fff;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.70), rgba(255, 255, 255, 0.70)),
+        url('../../assets/background.webp');
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    opacity: 0.8;
     pointer-events: none;
 }
 

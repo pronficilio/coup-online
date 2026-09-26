@@ -18,7 +18,7 @@ La issue #9 ya está creada y asignada a `pronficilio`. El Orquestador creó est
 
 Implementar conjuntamente el fondo, el disco central y el aumento de tamaño de las cartas según el plan. El PNG fuente disponible en el checkout local es `E:\dev\coup\fotos\backgrond.png`; se escribe solamente el resultado WebP al worktree como `coup-client/src/assets/background.webp`, con ancho ≤1024, proporción y alfa preservados. No agregar, mover ni renombrar el PNG.
 
-“Absorción blanca ~20%” significa opacidad inicial de imagen 0.8 sobre blanco. Usar una capa CSS centrada, sin estirar y con `pointer-events: none`; elegir `cover` o `contain` según mantenga visible la plataforma sin deformarla. Colocar el disco blanco translúcido centrado detrás del mazo y encima del fondo. Aumentar cartas sin cambiar la geometría de posiciones.
+La revisión del usuario precisó el fondo: debe cubrir la página/viewport completo y verse como paisaje, no como una imagen de detalle. Usa `cover` centrado y sin deformación sobre blanco, con una capa blanca del 70% (opacidad efectiva de imagen 0.30), y `pointer-events: none`. Colocar el disco blanco translúcido centrado detrás del mazo y encima del fondo. Aumentar cartas sin cambiar la geometría de posiciones.
 
 ### Archivos permitidos
 
@@ -46,4 +46,4 @@ Entregar commit, reporte breve, dimensiones/peso del WebP, previews, comandos y 
 
 ## Reporte F1
 
-F1 quedó implementada y revisada visualmente en 2–6 jugadores para 1280×1400 y 490×1200. El informe, WebP y capturas están registrados en `docs/plans/circular-board-visual-polish/report_issue_9_F1.md`. Cliente compilado; `git diff --check` pasó. Pendiente únicamente la revisión del Orquestador; issue abierta, sin PR ni merge.
+F1 quedó implementada y revisada visualmente en 2–6 jugadores para 1280×1400 y 490×1200. Tras la corrección, el fondo cubre el viewport completo con opacidad efectiva 0.30; el informe, WebP y capturas están registrados en `docs/plans/circular-board-visual-polish/report_issue_9_F1.md`. Cliente compilado; `git diff --check` pasó. PR #10 abierto; issue abierta y sin merge.
