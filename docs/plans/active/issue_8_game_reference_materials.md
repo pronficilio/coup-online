@@ -13,11 +13,13 @@
 
 El Orquestador asignó #8 a `pronficilio` después de verificar que la issue estaba abierta, sin asignados ni comentarios previos. El claim remoto quedó confirmado el 2026-09-25 y `claim`/`worktree_confirmed` ya constan en la bitácora. Al reanudar, relee este handoff y el plan; usa el branch/worktree existente, sin crear una segunda topología ni trabajar desde `master`.
 
-## Fase que debe tomar primero
+## Fase F1 — cerrada
 
-Las fuentes están en `E:\dev\coup\fotos\`. El usuario autorizó completar la conversión e inspección local; genera `card-en.webp`, `card-es.webp`, `table-en.webp` y `table-es.webp` en `coup-client/src/assets/references/`, todos de 1024 px de ancho, proporción preservada y WebP calidad 85. No copies ni agregues los PNG a Git. Registra encoder, versión, método, dimensiones y peso de cada resultado. El reporte F1 debe comprobar lectura de texto y consistencia con las reglas.
+F1 ya generó y verificó `card-en.webp`, `card-es.webp`, `table-en.webp` y `table-es.webp` en `coup-client/src/assets/references/`. Los resultados y la revisión de lectura/reglas constan en `docs/plans/game-reference-materials/report_issue_8_F1.md`; no regeneres los activos ni copies o agregues los PNG fuente a Git.
 
 **Cierre F1:** reporte `docs/plans/game-reference-materials/report_issue_8_F1.md`, cuatro WebP y evento `phase_verdict` en la bitácora, juntos en el commit `feat(reference-assets): issue 8 F1 CLOSED advance_f2`.
+
+El reporte confirma 1024 px, proporciones conservadas, WebP calidad 85 y legibilidad visual. F2 sigue pendiente: #6 permanece abierta, así que no edites `Coup.js`/GameHeader hasta que el Orquestador registre la coordinación o la liberación del punto de montaje.
 
 ## Dependencias de montaje
 
