@@ -13,6 +13,7 @@
 - Se fijó `lang="es"`, y se tradujeron título, metadatos sociales/búsqueda y texto `<noscript>` en `coup-client/public/index.html`; también se localizaron `short_name` y `name` de la PWA.
 - Se tradujeron los nodos de texto visibles de `coup-client/src/assets/CheatSheet.svg`. El efecto del Golpe/Asesinato se compactó a «Elige quién pierde 1 influencia» para ajustarse a la columna del recurso.
 - Tras cerrarse #18 y fusionarse su PR #20 (`64a507d`), `ReferencePanel.js` se conectó a `t()` para etiquetas del grupo, botones, modales, `alt` y controles accesibles. Los textos predeterminados españoles no cambian; se agregaron equivalentes `en` para sus nueve claves. El `Coup.js` recibido por el merge monta ReferencePanel desde master; #19 no modificó ese archivo.
+- En el barrido adicional F2 del 2026-09-26 21:30 (hora local), la relectura de #19 confirmó `OPEN` y la de #14 confirmó `OPEN` sin assignee. El worktree #14 estaba `ahead 1`, con staging amplio y conflictos `UU` en `Coup.js`, `PlayerBoard.js` y `README_plans.md`. La inspección de `App.js` y las superficies no reservadas ya traducidas no encontró otra cadena visible elegible; los textos de lobby/decisión/tablero siguen en rutas reservadas, las variantes gráficas españolas requieren `PlayerBoard.js`, y `g-addLog` pertenece a F3. No se editó producto ni se modificó el worktree #14. El cuerpo de #19 se actualizó y releyó a las 2026-09-27T03:32:06Z; sigue `OPEN` y ahora incluye esta dependencia y la ausencia de más trabajo F2 independiente.
 
 ## Validación y límites
 
