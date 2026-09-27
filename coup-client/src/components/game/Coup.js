@@ -377,6 +377,15 @@ export default class Coup extends Component {
         const me = this.state.players.find(player => player.name === this.props.name)
         const decision = this.state.decision
         const ownInfluences = this.state.ownInfluences
+        const responseWindowOpen = Boolean(
+            decision &&
+            RESPONSE_WINDOW_TYPES.has(decision.type) &&
+            Array.isArray(decision.options) &&
+            decision.options.length > 0 &&
+            !this.state.gamePaused &&
+            !this.props.isSpectator
+        )
+        const responseAvailable = responseWindowOpen && !this.state.submitted
         let playAgain = null
         if (this.state.winner && this.state.canPlayAgain && this.props.isLeader) {
             playAgain = <button className="startGameButton" onClick={this.playAgain}>{t('game.playAgain')}</button>
@@ -389,7 +398,7 @@ export default class Coup extends Component {
             </div>
         }
 
-        return <div className="GameContainer">
+        return <div className="GameContainer" data-player-count={this.state.players.length}>
             <div className="GameHeader">
                 <div className="PlayerInfo">
                     <p>{t('game.player.identity', { playerName: this.props.name })}{this.props.isSpectator ? ` ${t('game.spectator')}` : ''}</p>
@@ -408,6 +417,8 @@ export default class Coup extends Component {
                 observerName={this.props.name}
                 observerInfluences={ownInfluences}
                 currentPlayer={this.state.currentPlayer}
+                responseWindowOpen={responseWindowOpen}
+                responseAvailable={responseAvailable}
                 courtCount={this.state.courtCount}
             />
             <ReferencePanel />

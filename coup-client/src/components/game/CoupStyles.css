@@ -183,6 +183,18 @@
     margin: 0;
     margin-bottom: 5px;
 }
+
+@media only screen and (max-width: 520px) {
+    .GameContainer[data-player-count="5"] .EventLogContainer {
+        box-sizing: border-box;
+        width: clamp(100px, calc(43vw - 38px), 130px);
+    }
+
+    .GameContainer[data-player-count="5"] .EventLogBody {
+        overflow-wrap: anywhere;
+    }
+}
+
 .bold {
     font-weight: bold;
 }
@@ -241,7 +253,6 @@
 
 .GameHeader {
     position: relative;
-    z-index: 4;
     height: 22VH;
 }
 

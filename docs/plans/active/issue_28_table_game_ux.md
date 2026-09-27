@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. El propietario aprobó visualmente el preview. F2 conserva el margen de cinco jugadores y eleva el stacking context del encabezado sobre el tablero, sin mover el Event Log; el build pasó. El mismo Verifier repetirá F4.
+- **Estado:** `ACTIVE`; F1–F3 `CLOSED`; F4 `ACTIVE / WAITING_USER` hasta que el propietario revise en preview el layout de 5p/390 px y los estados del halo respondible. La aprobación visual anterior cubrió el preview de 2p, no este seguimiento.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -23,9 +23,11 @@ El Verifier independiente informó `FAIL` medio para F4 el 2026-09-27: con cinco
 
 El seguimiento F4 sincronizó después `origin/master@094a61e4a45b08ffb6aba68098bb424d21b9b7d2` (#37/#36, recuperación de recursos de cartas) en `caa39f1ec82eca193ce00f8b0e0f3707db142cf9`, sin conflictos. Sobre este HEAD pasan `git diff origin/master...HEAD --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y bitácora JSONL; el build de cliente termina con código 0 y conserva solo los avisos conocidos. El cliente continúa respondiendo HTTP 200 en `localhost:3015`; no se ejecutaron tests automatizados. La issue #28 fue actualizada y conserva los criterios 1–6.
 
-La repetición independiente de F4 en `a9cbeb21b6581af78d16018cd9d4ba2b178476aa` informó un segundo `FAIL` medio: el asiento superior derecho a cinco jugadores puede solapar con el Event Log a 390 px; la capa del tablero (`z-index: 3`) puede cubrir texto o scroll, cuyo contenedor se ancla en `top: 60px`. La revisión fue estática y no midió una captura. Los criterios 1, 3, 4, 5 y 6 pasaron; el margen superior ya coincide con 14%. F2 y F4 volvieron a `RETURNED` para resolver el criterio 2.
+El 2026-09-27 se confirmó `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`; era 13 commits por delante del último sync documentado. El merge en este worktree quedó en `488405097e94dd591903a5107589e75cdee781f1`, sin conflictos. No se copiaron branches/worktrees #24 o #26. El preview `http://localhost:3015` permanece activo.
 
-El seguimiento de F2 añadió `z-index: 4` a `.GameHeader`, que conserva su posición y fondo transparente. El encabezado y el Event Log quedan por encima del contexto transformado del tablero; el log conserva su anclaje y área desplazable. `git diff --check`, `node --check server/game/coup.js` y el build de cliente pasan con avisos conocidos. El mismo Verifier repetirá F4; preview activo en `http://localhost:3015`.
+La repetición de F4 sobre `a9cbeb2` confirmó el margen superior pero devolvió F4 por un posible solapamiento en móvil. El siguiente pase, sobre `cbc0892`, confirmó que el `z-index: 4` pone el Event Log delante, pero texto y cartas todavía se cruzan a 390 px. También detectó que el lift truncado en −180 px deja márgenes de ~68 px a 1200 px de alto y ~104 px a 1440 px. Los criterios 1, 3–6 pasaron estáticamente. F2 y F4 vuelven a `ACTIVE` para corregir la geometría e incorporar el halo de respuesta pedido por el propietario.
+
+La declaración de F2 `CLOSED` registrada para `cbc0892` fue prematura: el `z-index` priorizaba el log sin separar las superficies. Se conserva la fila append-only original y se registra su devolución correctiva. El candidato quita ese `z-index`, mantiene el anclaje vigente del Event Log (`top:10vh; right:10vw` hasta 1199 px; `top:60px; right:15px` a partir de 1200 px), 9vh de scroll y wrap de texto. En cinco jugadores y hasta 520 px limita el ancho del log y desplaza/compacta los asientos superiores para separar las cajas. El lift responsive usa `clamp(-240px, calc(...), -40px)` y evita saturarse en pantallas altas. El halo local deriva de opciones de `g-decision`, se apaga en submit (incluido Pass) y al cerrar; el indicador `--current` se suspende durante la ventana respondible local. El build final terminó con código 0; diff-check y sintaxis pasan. La revisión visual de 5p/390 px y de abrir/enviar/cerrar respuesta sigue pendiente; después el mismo Verifier puede repetir F4. Preview activo en `http://localhost:3015`.
 
 El cuerpo actualizado de #28 también pide que las influencias perdidas permanentemente permanezcan visibles con tratamiento gris y símbolo/etiqueta accesible que no dependa solo del color; el rol debe seguir legible. No marcar cartas probadas temporalmente durante un desafío, ya que vuelven a Court, y no revelar las influencias ocultas activas de rivales.
 
@@ -43,7 +45,7 @@ Entrega `docs/plans/game-table-ux/report_issue_28_F1.md` con fuentes, observacio
 - Mostrar el conteo localizado de Court inmediatamente encima de la imagen del mazo, derivado del tamaño real `this.deck.length` que proyecta el servidor. En un Exchange pendiente hay dos cartas menos; al devolver las dos, el conteo final no cambia. Un reemplazo por desafío devuelve y roba una; tampoco cambia el total. Reinicio vuelve a inicializarlo.
 - Conservar 15 cartas, cinco roles, 2–6 jugadores, identidades privadas y protocolo existentes.
 
-El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F2 y F3 cerraron implementación y build; el propietario hará la revisión visual en el preview completo. F4 permanece pendiente para el recorrido y revisión final independiente.
+El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F3 está cerrada; el seguimiento F2 compila y sus cotas son estáticas. El propietario debe revisar el preview actualizado en 5p/390 px y los estados del halo antes de repetir F4.
 
 ## Preview local para revisión visual
 
@@ -51,8 +53,16 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 - Backend: `http://localhost:8015` — escuchando desde este worktree, exec session `84755` (la ruta `/` responde 404 porque no es una ruta de aplicación).
 - No se creó una sala de juego. El servicio existente del puerto 8000 sigue intacto; 3015 y 8015 estaban libres antes del inicio.
 - La fórmula responsive del lift se calibró para el ancho máximo de 900 px del tablero; el cliente activo recibe el CSS por HMR y el build de seguimiento terminó correctamente.
-- El propietario confirmó la revisión visual y autorizó continuar el 2026-09-27. Mantener ambas sesiones activas mientras el Verifier independiente realiza la revisión final.
+- El propietario aprobó visualmente un preview anterior de dos jugadores el 2026-09-27. La revisión de este ajuste de cinco jugadores y del halo sigue pendiente; mantener ambas sesiones activas para esa comprobación.
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en el único branch. F2 cierra el apilamiento del encabezado sobre el tablero; F4 está `ACTIVE` para revisión por el mismo Verifier. Build/diff-check/sintaxis pasan. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
+Cada fase con artefactos requiere commit en el único branch. F2 queda `CLOSED` tras el commit de seguimiento y validación estática; F4 permanece `ACTIVE / WAITING_USER` hasta revisar visualmente 5p/390 px y encendido/apagado/cierre del halo. No iniciar la repetición independiente antes de esa revisión. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
+
+## Criterio visual añadido por el propietario — incorporar en F2/F4
+
+Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment-5860766944.
+
+Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
+
+Alquimista: registra el commit de seguimiento F2. Cuando el propietario confirme visualmente 5p/390 px y los estados de respuesta, pide al mismo Verifier repetir F4 sobre ese SHA; comprobar encendido, apagado tras envío y cierre del halo, además de los criterios existentes. No push/PR hasta PASS.

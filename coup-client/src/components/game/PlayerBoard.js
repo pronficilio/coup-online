@@ -118,6 +118,7 @@ export default function PlayerBoard(props) {
             </div>
             {seats.map(({ player, seatIndex, left, top, isObserver }) => {
                 const isCurrentPlayer = player.name === props.currentPlayer
+                const isRespondable = isObserver && props.responseAvailable
                 const seatEdge = left <= 15
                     ? 'left-far'
                     : left < 17
@@ -130,7 +131,8 @@ export default function PlayerBoard(props) {
                 const seatClassName = [
                     'PlayerBoardSeat',
                     isObserver ? 'PlayerBoardSeat--observer' : '',
-                    isCurrentPlayer ? 'PlayerBoardSeat--current' : ''
+                    isCurrentPlayer && !props.responseWindowOpen ? 'PlayerBoardSeat--current' : '',
+                    isRespondable ? 'PlayerBoardSeat--respondable' : ''
                 ].filter(Boolean).join(' ')
 
                 return <section
@@ -147,6 +149,7 @@ export default function PlayerBoard(props) {
                         seats.length === 6 && top <= 40 && Math.abs(left - 50) >= 5 ? 'true' : undefined
                     }
                     data-current-player={isCurrentPlayer ? 'true' : 'false'}
+                    data-respondable={isRespondable ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
                     style={{
                         left: `${left}%`,
