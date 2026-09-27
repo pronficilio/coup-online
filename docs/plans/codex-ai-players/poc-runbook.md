@@ -16,7 +16,7 @@ docker compose -p deploy -f docker-compose.yml -f codex-ai.compose.yml up -d --b
 docker compose -p deploy -f docker-compose.yml -f codex-ai.compose.yml ps
 ```
 
-El runner solo tiene salida de red para login y servicio Codex; no comparte la red Docker de Coup. Sus volúmenes persistentes contienen la autenticación y el contador de uso; un volumen de control separado comparte únicamente el marcador de apagado con el API. El workspace, runtime y TMPDIR están en un área temporal privada. Los límites iniciales son dos solicitudes simultáneas, doce en cola, 120 llamadas por partida y 240 por hora.
+El runner usa una red Docker separada de Coup y no publica puertos; Compose no configura una lista blanca de destinos de salida. Sus volúmenes persistentes contienen la autenticación y el contador de uso; un volumen de control separado comparte únicamente el marcador de apagado con el API. El workspace, runtime y TMPDIR están en un área temporal privada. Los límites iniciales son dos solicitudes simultáneas, doce en cola, 120 llamadas por partida y 240 por hora.
 
 ## Autorizar la cuenta y probar
 
@@ -53,7 +53,7 @@ Abrir en el navegador del mismo equipo la URL OAuth que imprime el CLI y complet
 
 No copiar `auth.json` fuera del volumen del runner. Comprobar después `codex login status` y el healthcheck del runner, crear una sala, habilitar IA con el código compartido y jugar una mano corta. El primer uso real confirma si la cuenta ofrece `gpt-6-luna` mediante App Server; si el modelo o el login no están disponibles, el turno se pausa y no hay fallback ni API.
 
-Probar en este orden: persona contra una IA, persona contra dos IA, IA contra IA con el creador como espectador, desafío/bloqueo, apagado durante un turno y reinicio del servidor. La palanca roja aparece una sola vez en el lobby y solo para el líder que validó el código compartido. El servidor aplica el mismo permiso al evento, incluso si otro socket intenta emitirlo manualmente. Al activarla se apaga Codex globalmente y el propietario debe rearmarlo desde SSH.
+Probar en este orden: persona contra una IA, persona contra dos IA, IA contra IA con el creador como espectador, desafío/bloqueo, apagado durante un turno y reinicio del servidor. El control rojo solo se muestra al líder que validó el código compartido, tanto en el lobby como en la partida; en cada pantalla aparece una sola vez. El servidor aplica el mismo permiso al evento, incluso si otro socket intenta emitirlo manualmente. Al activarla se apaga Codex globalmente y el propietario debe rearmarlo desde SSH.
 
 ## Palanca roja y rearme
 

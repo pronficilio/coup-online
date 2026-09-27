@@ -17,7 +17,7 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 - El código actual envía influencias de todos los jugadores a toda la sala y devuelve al mazo cartas que las reglas dejan reveladas.
 - La issue #13 sigue siendo la unidad del despliegue regular. Para esta prueba temporal, el usuario autorizó un release POC separado que conserva intacto el release actual como rollback.
 - El checkout raíz contiene modificaciones locales sin commit. El worktree de #14 parte del origin/master limpio; no incorporar cambios raíz sin una decisión registrada.
-- El usuario aprobó una prueba temporal con su login ChatGPT mediante Codex App Server, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar Codex. No se publicarán cambios al fork; el runner y el release se preparan aislados.
+- El usuario aprobó una prueba temporal con su login ChatGPT mediante Codex App Server, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar Codex. Después autorizó preparar un PR contra `master`; el runner y el release POC permanecen aislados y no se fusiona sin revisión/pruebas manuales.
 - Por instrucción del usuario, se conserva el acceso/lobby actual sin cuentas ni invitaciones. Solo el líder del lobby que validó el código compartido puede activar el apagado seguro; interfaz y servidor comprueban el permiso. Solo el propietario rearma Codex por SSH/consola.
 - Se versionaron desde el checkout local las reglas completas y sus tres resúmenes en `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la autoridad; F1 alineó el motor con esas reglas.
 
