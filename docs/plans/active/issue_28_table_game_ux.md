@@ -33,6 +33,13 @@ Entrega `docs/plans/game-table-ux/report_issue_28_F1.md` con fuentes, observacio
 
 El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F2 y F3 cerraron implementación y build; el propietario hará la revisión visual en el preview completo. F4 permanece pendiente para el recorrido y revisión final independiente.
 
+## Preview local para revisión visual
+
+- Cliente: `http://localhost:3015` — HTTP 200; proceso iniciado desde este worktree, exec session `17958`.
+- Backend: `http://localhost:8015` — escuchando desde este worktree, exec session `84755` (la ruta `/` responde 404 porque no es una ruta de aplicación).
+- No se creó una sala de juego. El servicio existente del puerto 8000 sigue intacto; 3015 y 8015 estaban libres antes del inicio.
+- La revisión visual queda pendiente del propietario. Mantener ambas sesiones activas hasta que concluya esa revisión.
+
 ## Commits y validación
 
 Cada fase con artefactos requiere commit en el único branch. F2/F3 requieren build e inspección estática. El propietario revisará visualmente el preview local, así que registra esa revisión como pendiente hasta recibirla; F4 requiere recorrido 2/3/6 jugadores en móvil/escritorio y Verifier FINAL independiente. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres ni cierres. Reporta al Orquestador commit, archivos, evidencia y bloqueos.
