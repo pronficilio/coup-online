@@ -1,11 +1,11 @@
 # URL de prueba y crédito de la portada — issue #29
 
-**Estado:** `ACTIVE`; F1 `READY`.
+**Estado:** `ACTIVE`; F1 `CLOSED`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/29
 **Handoff:** `docs/plans/active/issue_29_readme_site_credit.md`
 **Bitácora:** `docs/plans/log/issue-29.jsonl`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
-**Siguiente dueño:** Agente Alquimista.
+**Siguiente dueño:** Agente Alquimista (publicar la única PR y transferir al Orquestador).
 **Integración única esperada:** `issue/29-readme-site-credit` en `.worktrees/issue-29-readme-site-credit`, una PR a `master`.
 
 ## Objetivo y éxito
@@ -20,7 +20,7 @@ Indicar en el README que `https://coup.ejele.net` es un sitio donde probar el ju
 
 Fuera de alcance: cambios de reglas o lógica del juego, despliegue, cambios de idioma, y cualquier edición de otras entradas de la issue #19.
 
-## F1 — Actualizar los dos créditos y documentar la URL (`READY`)
+## F1 — Actualizar los dos créditos y documentar la URL (`CLOSED`)
 
 **Pregunta:** ¿el README señala `coup.ejele.net` como lugar para probar el juego y la portada identifica a Pronficilio como modificador conservando a Ethan Chen como autor original?
 
@@ -39,6 +39,8 @@ Fuera de alcance: cambios de reglas o lógica del juego, despliegue, cambios de 
 **Riesgo:** `LOW`; cambios localizados de documentación y texto, reversibles.
 **Verifier:** no requerido (`NONE`).
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `docs(home): issue 29 F1 CLOSED ready_for_review`.
+
+**Veredicto F1 (2026-09-27):** `CLOSED`. La revisión del diff confirmó el enlace de prueba y el de chickenkoup.com, ambos créditos enlazados y las etiquetas en español/inglés. `git diff --check` pasó; no se ejecutaron pruebas.
 
 ## Falsificación
 

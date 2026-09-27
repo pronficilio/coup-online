@@ -3,7 +3,7 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/29
 - **Plan exacto:** `docs/plans/website-credit/plan_website_credit.md`
 - **Bitácora exacta:** `docs/plans/log/issue-29.jsonl`
-- **Estado:** `ACTIVE`; F1 `READY`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`.
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Pregunta de falsificación:** ¿puede revisarse el README o la portada y encontrar que falta `coup.ejele.net`, que se perdió el crédito de Ethan Chen como autor original, o que las etiquetas en español/inglés contradicen el cambio?
@@ -25,6 +25,8 @@
 - **Reclamo confirmado:** issue asignada a `pronficilio`, sigue abierta; worktree observado en `/mnt/e/dev/coup/.worktrees/issue-29-readme-site-credit`, branch `issue/29-readme-site-credit`, base `origin/master` `1ff478c308478af3be61131daa1bd88652bdc77f`.
 - **Validaciones esperadas:** revisar manualmente las cadenas de crédito `es`/`en`, el enlace nuevo y la conservación del enlace existente; ejecutar `git diff --check`. No añadir ni ejecutar pruebas automatizadas.
 - **Contrato de evidencia:** veredicto F1 con commit y validaciones observadas; no se requiere manifiesto separado.
+- **Veredicto F1:** `CLOSED`; diff revisado, ambos destinos y créditos ES/EN confirmados; `git diff --check` pasó. No se ejecutaron pruebas automatizadas. Cierre por commit `docs(home): issue 29 F1 CLOSED ready_for_review`.
+- **Siguiente dueño:** Agente Alquimista para publicar la PR única a `master` y dejar la unidad `WAITING_ORCHESTRATOR`.
 - **Qué debe actualizar el Ejecutor:** issue #29, plan, handoff (`active/`), bitácora y una sola PR; dejar la unidad `WAITING_ORCHESTRATOR` al finalizar.
 
 El checkout raíz compartido tiene cambios locales previos en `docs/plans/`; no modificar ni descartar esos cambios. Limitar cualquier copia local de este handoff al worktree canónico de #29.
