@@ -108,7 +108,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre; corre en contenedor sin checkout ni secretos del API, sin herramientas y con rootfs de solo lectura; la respuesta se valida contra la decisión vigente; no hay fallback a API. La documentación del App Server lo marca experimental, de modo que se trata de prueba temporal.
 - **Pivote:** si App Server no está disponible en la cuenta/CLI, retirar la conexión Plus y dejar registrada la limitación; no sustituir autenticación/proveedor.
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
-**F2 evidencia (2026-09-27):** `npm test` cubre App Server JSON-RPC, opciones legales, timeouts y cancelaciones; la CLI 0.157.1 completó localmente `initialize` y `thread/start` efímero sin login ni turno; imagen Docker construida; el contenedor pasa healthcheck y un proceso con UID/GID del API conecta al socket `0660` grupo 10002. Quedan la autorización device-code del propietario y una sola decisión real para confirmar Luna y el uso disponible.
+**F2 evidencia (2026-09-26):** `npm test` cubre App Server JSON-RPC, opciones legales, timeouts y cancelaciones; la CLI 0.157.1 completó localmente `initialize` y `thread/start` efímero sin login ni turno; imagen Docker construida; el contenedor pasa healthcheck y un proceso con UID/GID del API conecta al socket `0660` grupo 10002. Quedan la autorización device-code del propietario y una sola decisión real para confirmar Luna y el uso disponible.
 
 ### F3 — Añadir asientos IA y palanca roja (`IMPLEMENTADO; REVISIÓN F4 PENDIENTE`)
 
@@ -128,7 +128,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** recorrido humano vs dos IA e IA vs IA en Hetzner; acciones/desafíos/bloqueos/intercambio/timeout y kill switch revisados; compilar cliente y servidor; revisión final; mantener release previo listo para rollback. No iniciar torneos masivos.
 - **Pivote:** si falla una invariante de reglas, privacidad o kill switch, devolver a su fase propietaria.
 - **Repetición:** una ronda de correcciones/revisión focalizada por criterio fallido.
-- **Estado:** pendiente completar device-code, modelo real y escenarios manuales.
+- **Estado:** la validación local tras integrar la base activa `55be894` pasó: suite del servidor 36/36, `node --check` y build de cliente. El build conserva dos warnings existentes de imports sin uso en `src/App.js`. Pendiente crear la release POC separada, completar device-code, probar una decisión real y recorrer los escenarios manuales.
 
 ## Riesgos y mitigaciones
 
@@ -143,7 +143,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 - Ejecución `FULL`; riesgo `HIGH`; pruebas de motor, runner, socket, cuotas y build completadas localmente; queda prueba real de cuenta y operación de Hetzner.
 - Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
-- Siguiente paso: empaquetar un release POC privado, activar device-code con el propietario y probar una sola jugada antes de invitar amigos.
+- Siguiente paso: empaquetar un release POC privado como carpeta nueva, conservar `55be894` para rollback, activar device-code con el propietario y probar una sola jugada antes de invitar amigos. La comprobación de solo lectura del host encontró 16 GB libres; la release activa sigue siendo `55be894` y aún no se ha modificado.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
 - Merge target: `master`.

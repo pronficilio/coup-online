@@ -2,7 +2,7 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0/F1 CLOSED (PHASE PASS); F2 App Server y runner aislado implementados, handshake local PASS; F3 IA/lobby/kill switch implementados; faltan login device-code, una decisión real y prueba en Hetzner
+Estado: ACTIVE; F0/F1 CLOSED (PHASE PASS); F2 App Server y runner aislado implementados, handshake local PASS; F3 IA/lobby/kill switch implementados. Tras integrar la base activa `55be894`, la suite del servidor pasó 36/36, `node --check` pasó y el build del cliente terminó con dos warnings existentes en `src/App.js`. Faltan release POC en Hetzner, login device-code, una decisión real y escenarios manuales.
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -11,7 +11,7 @@ Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 PR: todavía no existe; el usuario pidió una prueba temporal y no publicar cambios al fork.
-Siguiente paso: desplegar el runner como sidecar en un release nuevo, conservar `55be894` para rollback, pedir al propietario que complete el device-code y probar una sola decisión antes de invitar amigos. No se han iniciado sesiones ni llamadas al modelo.
+Siguiente paso: desplegar el runner como sidecar en un release nuevo, conservar `55be894` para rollback, pedir al propietario que complete el device-code y probar una sola decisión antes de invitar amigos. La revisión remota de solo lectura confirma 16 GB libres y que la release activa sigue intacta. No se han iniciado sesiones ni llamadas al modelo.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -44,4 +44,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - El usuario autorizó desplegar esta prueba en Hetzner desde un release separado y reversible; no se tocará DNS/Nginx ni el release anterior. El branch no se publicará al fork.
 - F0 y F1 cerraron con PHASE `PASS`. La guía operativa POC está en `docs/plans/codex-ai-players/poc-runbook.md`.
 
-Secuencia actual: Issue #14 y branch/worktree conservados; F0 `b189cc0`; F1 `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. Se cambió el runner de `codex exec` al App Server JSON-RPC efímero, que completó localmente `initialize` y `thread/start` sin login ni llamada de modelo. Suite de servidor 36/36; build React Scripts del cliente; imagen de runner construida e iniciada localmente; verificados healthcheck, socket `0660` con GID 10002 y conexión desde UID del API. La palanca compartida se probó escribiendo como API y recreando runner: el estado quedó deshabilitado. Sin login, cuenta real o modelo. El release POC aún no se ha desplegado; no publicar PR ni branch.
+Secuencia actual: Issue #14 y branch/worktree conservados; F0 `b189cc0`; F1 `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. La rama integra la base activa de Hetzner `55be894` para que el POC no quite la interfaz vigente. El runner App Server JSON-RPC efímero completó localmente `initialize` y `thread/start` sin login ni llamada de modelo. Suite de servidor 36/36; `node --check` y build React Scripts del cliente pasan (dos warnings previos de imports sin uso); imagen de runner construida e iniciada localmente; verificados healthcheck, socket `0660` con GID 10002 y conexión desde UID del API. La palanca compartida se probó escribiendo como API y recreando runner: el estado quedó deshabilitado. Sin login, cuenta real o modelo. El release POC aún no se ha desplegado; no publicar PR ni branch.

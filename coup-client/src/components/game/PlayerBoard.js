@@ -6,6 +6,8 @@ import assassinImage from '../../assets/characters/assassin.webp'
 import contessaImage from '../../assets/characters/contessa.webp'
 import ambassadorImage from '../../assets/characters/ambassador.webp'
 import cardBackImage from '../../assets/characters/reverso.webp'
+import playerIconImage from '../../assets/player.webp'
+import coinImage from '../../assets/coin.webp'
 import { getPlayerBoardSeats } from './playerBoardLayout'
 import './PlayerBoardStyles.css'
 
@@ -41,7 +43,7 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
         return <span
             className="PlayerInfluenceSlot PlayerInfluenceSlot--face"
             role="img"
-                aria-label={`Influencia revelada: ${influence}`}
+            aria-label={`Influencia revelada: ${influence}`}
             key={slotIndex}
         >
             <img
@@ -76,7 +78,8 @@ export default function PlayerBoard(props) {
     const seats = getPlayerBoardSeats(players, props.observerName)
 
     return (
-        <div className="PlayerBoardContainer" role="group" aria-label="Tablero de jugadores">
+        <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label="Tablero de jugadores">
+            <div className="PlayerBoardCenter" aria-hidden="true" />
             <img
                 className="PlayerBoardDeck"
                 src={courtDeckImage}
@@ -85,8 +88,18 @@ export default function PlayerBoard(props) {
             />
             {seats.map(({ player, seatIndex, left, top, isObserver }) => {
                 const isCurrentPlayer = player.name === props.currentPlayer
+                const seatEdge = left <= 15
+                    ? 'left-far'
+                    : left < 17
+                        ? 'left-near'
+                        : left >= 85
+                            ? 'right-far'
+                            : left > 83
+                                ? 'right-near'
+                                : undefined
                 const seatClassName = [
                     'PlayerBoardSeat',
+                    isObserver ? 'PlayerBoardSeat--observer' : '',
                     isCurrentPlayer ? 'PlayerBoardSeat--current' : ''
                 ].filter(Boolean).join(' ')
 
@@ -94,6 +107,15 @@ export default function PlayerBoard(props) {
                     className={seatClassName}
                     key={player.name}
                     data-seat-index={seatIndex}
+                    data-seat-edge={seatEdge}
+                    data-seat-header-edge={left <= 20 ? 'left' : left >= 80 ? 'right' : undefined}
+                    data-player-count={seats.length}
+                    data-seat-lower-side={
+                        seats.length >= 5 && top >= 60 && Math.abs(left - 50) >= 5 ? 'true' : undefined
+                    }
+                    data-seat-upper-side={
+                        seats.length === 6 && top <= 40 && Math.abs(left - 50) >= 5 ? 'true' : undefined
+                    }
                     data-current-player={isCurrentPlayer ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
                     style={{
@@ -102,10 +124,34 @@ export default function PlayerBoard(props) {
                         '--player-color': player.color
                     }}
                 >
-                    <h2 className="PlayerBoardSeatName">
-                        {player.name}{player.controller === 'codex' ? <span> · IA ({player.effort})</span> : null}
-                    </h2>
-                    <p className="PlayerBoardSeatCoins">Monedas: {player.money}</p>
+                    <div className="PlayerBoardSeatHeader">
+                        <h2 className="PlayerBoardSeatName" title={player.name}>
+                            <img
+                                className="PlayerBoardPlayerIcon"
+                                src={playerIconImage}
+                                alt=""
+                                aria-hidden="true"
+                                draggable="false"
+                            />
+                            <span className="PlayerBoardSeatNameText">
+                                {player.name}{player.controller === 'codex' ? ` · IA (${player.effort})` : ''}
+                            </span>
+                        </h2>
+                        <p
+                            className="PlayerBoardSeatCoins"
+                            role="img"
+                            aria-label={`${player.money} monedas`}
+                        >
+                            <img
+                                className="PlayerBoardCoinIcon"
+                                src={coinImage}
+                                alt=""
+                                aria-hidden="true"
+                                draggable="false"
+                            />
+                            <span>{player.money}</span>
+                        </p>
+                    </div>
                     <div className="PlayerBoardSeatInfluences">
                         {INFLUENCE_SLOTS.map(slotIndex =>
                             renderInfluenceSlot(player, isObserver, props.observerInfluences, slotIndex)
@@ -116,4 +162,3 @@ export default function PlayerBoard(props) {
         </div>
     )
 }
-
