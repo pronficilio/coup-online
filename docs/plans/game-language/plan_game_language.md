@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Siguiente dueño:** Orquestación debe delegar Verifier FINAL independiente sobre los reportes, inventario, diff y el informe de recorrido proporcionado por el usuario. El Alquimista no emite PASS.
-**Integración:** PR #22 se fusionó parcialmente en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Luego PR #30 de #21 añadió cinco familias de botones ilustrados con texto inglés; la rama #19 se sincronizó con `origin/master@3313d42` y corrigió las cinco. Reorquestación documentada: Orquestación abrirá una PR de continuación desde el mismo branch/worktree porque #22 ya está fusionada y el alcance reveló este hallazgo posterior. Esta excepción mantiene una sola rama/worktree activa; la continuación queda pendiente de revisión FINAL y aprobación del usuario antes de merge. No cierra #19 ni acepta F4.
+**Integración:** PR #22 se fusionó parcialmente en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Luego PR #30 de #21 añadió cinco familias de botones ilustrados con texto inglés; la rama #19 se sincronizó con `origin/master@3313d42` y corrigió las cinco. Antes de abrir la continuación, también integró `origin/master@be93e97` (PR #31/#29) mediante merge `318c119`. Reorquestación documentada: Orquestación abrirá una PR de continuación desde el mismo branch/worktree porque #22 ya está fusionada y el alcance reveló este hallazgo posterior. Esta excepción mantiene una sola rama/worktree activa; la continuación queda pendiente de revisión FINAL y aprobación del usuario antes de merge. No cierra #19 ni acepta F4.
 
 ## Solicitud y definición de éxito
 
@@ -136,7 +136,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 ## Topología, riesgos y decisiones
 
-El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. PR #22 se fusionó a `master` mediante `5de95ee`; el worktree canónico #19 se sincronizó por fast-forward desde `ca16e42` hasta `origin/master@3313d42`. El usuario autorizó la integración parcial para revisión incremental; no equivale a aceptación F4 ni al cierre de la issue.
+El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. PR #22 se fusionó a `master` mediante `5de95ee`; el worktree canónico #19 se sincronizó por fast-forward desde `ca16e42` hasta `origin/master@3313d42` y luego integró `origin/master@be93e97` con merge `318c119`. El usuario autorizó la integración parcial para revisión incremental; no equivale a aceptación F4 ni al cierre de la issue.
 
 Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas y evitar exponer IDs ingleses. La base publicada de PR #23 ya está integrada; no se copian cambios locales de otros worktrees. No cambiar reglas, enums o payloads para traducir etiquetas. Aplicar el glosario y referencias españolas existentes.
 
@@ -158,4 +158,5 @@ Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas 
 - 2026-09-27: se reemplazaron y releyeron los cuerpos de #19 y PR #22 para registrar el bloqueo F4 observado. La API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`; ambos describen F4 `BLOCKED` y declaran que no hubo recorrido manual. Evento append-only en `issue-19.jsonl`.
 - 2026-09-27 (histórico, antes del merge): el usuario autorizó explícitamente integrar PR #22 parcialmente para revisión incremental aunque F4 estuviera `BLOCKED`; no equivalía a aceptación/veredicto ni cierre de #19.
 - 2026-09-27: #22 fue fusionada con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; issue #19 sigue `OPEN`. `origin/master` avanzó a `3313d42`; el branch #19 se sincronizó por fast-forward limpio desde `ca16e42`.
+- 2026-09-27: antes de abrir la PR de continuación, #19 integró `origin/master@be93e97` (PR #31/#29) mediante merge limpio `318c119`; se conserva el branch/worktree único de la issue.
 - 2026-09-27: el usuario informó exactamente que recorrió portada, lobby y partida completa y que ve todo en orden. Sin detalles de navegador/dispositivo/pasos. F4 `ACTIVE`, pendiente del Verifier independiente; F2/F3 siguen `ACTIVE`, sin cierre ni PASS.

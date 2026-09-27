@@ -1,7 +1,7 @@
 # Reporte F4 — cobertura final y revisión independiente
 
 **Estado:** `ACTIVE`; el Verifier independiente reportó `FAIL` en AC1/AC2/AC4/AC7 y `PASS` en AC3/AC5/AC6 por texto inglés incrustado en cinco familias de botones. La corrección está en curso y requiere revisión FINAL nueva. Este documento no emite PASS general ni aceptación.
-**Base sincronizada:** `origin/master@3313d42`, que contiene el merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico se actualizó por fast-forward desde `ca16e42`.
+**Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29 y llega después del merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico avanzó mediante fast-forward a `3313d42` y merge `318c119` desde `ca16e42`.
 **Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `ACTIVE`, pendiente del Verifier FINAL. Issue #19 permanece `OPEN`; PR #22 está `MERGED`.
 
 ## Alcance requerido

@@ -3,7 +3,7 @@
 **Estado actual de la fase:** `ACTIVE`; además de las superficies previas, esta tanda localiza los rótulos de las cinco familias de botones ilustrados que se integraron después de PR #22. El usuario informó que recorrió portada, lobby y una partida completa y que ve todo en orden; el Verifier encontró después los rótulos ingleses de los nuevos assets. F4 está `ACTIVE`, pendiente de revisión independiente tras esta corrección.
 **Estado de F3:** `ACTIVE`; las ocho emisiones actuales de `g-addLog` están localizadas en origen. El reporte del usuario incluye una partida completa, sin pasos/detalles de registro especificados (ver reporte F4).
 **PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22) se fusionó mediante `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; merge parcial para revisión incremental, sin aceptación F4 ni cierre de #19.
-**Base sincronizada:** `origin/master@3313d42` (merge de PR #30/#21), incorporado por fast-forward desde `ca16e42`. La base de PR #23 (`2d82fa1`, merge local `74432a6`) queda como antecedente.
+**Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29; integrada por merge `318c119` después del fast-forward inicial a `origin/master@3313d42` (merge de PR #30/#21) desde `ca16e42`. La base de PR #23 (`2d82fa1`, merge local `74432a6`) queda como antecedente.
 **Commits de la unidad:** `4b6b564`, `c9d5442`, `a63336c` y `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`), publicado en `origin/issue/19-spanish-default-dictionary`. La sincronización de tracker se registró en un commit documental posterior.
 **Fecha:** 2026-09-27.
 

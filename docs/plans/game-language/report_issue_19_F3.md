@@ -2,7 +2,7 @@
 
 **Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. El usuario informó haber recorrido una partida completa y que todo se ve en orden, pero no indicó detalles específicos de los mensajes del registro (ver `report_issue_19_F4.md`). F3 sigue `ACTIVE`, pendiente de revisión independiente.
 **Base del trabajo F3:** `origin/master@2d82fa1`, integrada en #19 por `74432a6`.
-**Base actual:** `origin/master@3313d42`, que contiene el merge de PR #22 (`5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`) y PR #30/#21. Esta reauditoría de assets no cambia el alcance ni el protocolo de F3.
+**Base actual:** `origin/master@be93e97`, que además contiene PR #31/#29 e integra en #19 por merge `318c119`; ya incluía PR #22 (`5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`) y PR #30/#21. Esta reauditoría de assets no cambia el alcance ni el protocolo de F3.
 **PR:** [#22](https://github.com/pronficilio/coup-online/pull/22) está `MERGED`; issue #19 permanece `OPEN`. El merge parcial no constituye aceptación F4 ni cierre de la issue.
 **Commit publicado:** `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`); la sincronización de los cuerpos de tracker se registró después en un commit documental.
 
