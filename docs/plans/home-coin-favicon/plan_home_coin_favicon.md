@@ -1,11 +1,11 @@
 # Moneda animada en la portada y favicon optimizado — issue #25
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`.
+**Estado:** `WAITING_EXECUTOR`; F1 `READY`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/25
 **Handoff:** `docs/plans/active/issue_25_home_coin_favicon.md`
 **Bitácora:** `docs/plans/log/issue-25.jsonl`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
-**Siguiente dueño:** Agente Menor de implementación, bajo revisión del Agente Alquimista.
+**Siguiente dueño:** Agente Menor de implementación, gobernado por el Agente Alquimista.
 **Integración esperada:** `issue/25-home-coin-favicon` en `.worktrees/issue-25-home-coin-favicon`, una PR a `master`.
 
 ## Solicitud y definición de éxito
@@ -25,16 +25,16 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 
 ## Alcance y exclusiones
 
-**Incluye:** `Home.js`, las reglas de la imagen principal en `src/index.css`, `public/favicon.ico` y la declaración de tamaños de `public/manifest.json` para que corresponda con el archivo generado.
+**Incluye:** `Home.js`, las reglas de la imagen principal en `src/index.css`, `public/favicon.ico`, la declaración de tamaños de `public/manifest.json` para que corresponda con el archivo generado, y `src/i18n/translations.json` únicamente para localizar el texto alternativo de la moneda.
 
-**Excluye:** otros recursos de la partida, touch icon de Apple, demás iconos PWA, traducciones, nuevas dependencias en tiempo de ejecución y despliegue.
+**Excluye:** cualquier otro cambio de traducción/copy, recursos y controles de la partida, touch icon de Apple, demás iconos PWA, nuevas dependencias en tiempo de ejecución y despliegue.
 
 ## Criterios de aceptación
 
-1. La portada ya no muestra el muslo de pollo y presenta la moneda animada con texto alternativo descriptivo.
+1. La portada ya no muestra el muslo de pollo y presenta la moneda animada con `alt={t('home.coin.alt')}`. `translations.json` contiene esa clave en ambos idiomas: “Moneda giratoria” (`es`) y “Spinning coin” (`en`); no cambia ningún otro texto.
 2. Se conserva el GIF original de 256×256 px, salvo que el Ejecutor demuestre una derivación más ligera que conserve la animación y calidad. En escritorio no supera 256×256; en móvil se reduce proporcionalmente, no desborda ni domina toda la pantalla.
 3. `public/favicon.ico` es un ICO válido derivado de `fotos/coin.png`, con resoluciones de 16×16 y 32×32 px. `manifest.json` declara los tamaños presentes. El PNG original de 408 KB no se sirve como favicon.
-4. No se añaden dependencias de procesamiento al runtime y no se versionan archivos fuente de `fotos/`.
+4. No se añaden dependencias de procesamiento al runtime, no se versionan archivos fuente de `fotos/` y las claves `es`/`en` mantienen paridad.
 5. Se registran dimensiones y bytes finales de GIF/favicon. `npm run build` termina correctamente y una revisión manual en escritorio y móvil confirma el tamaño y la visibilidad de los controles de portada. No agregar ni ejecutar tests automatizados.
 
 ## Fase única
@@ -45,7 +45,7 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 
 **Entrada:** #25, este plan, fuentes locales `fotos/gif.gif` y `fotos/coin.png`, y `origin/master` actualizado con la integración de PR #22.
 
-**Salida/evidencia:** cambio de portada y estilos responsivos; ICO de 16×16/32×32 y manifest consistente; tamaños de recursos documentados aquí o en el handoff; build y comprobación visual manual registrados.
+**Salida/evidencia:** cambio de portada y estilos responsivos; clave `home.coin.alt` localizada solo para la moneda; ICO de 16×16/32×32 y manifest consistente; tamaños de recursos documentados aquí o en el handoff; paridad del diccionario, build y comprobación visual manual registrados.
 
 **Avanzar:** criterios AC1–AC5 satisfechos; dejar #25 `WAITING_ORCHESTRATOR` para revisar la única PR.
 **Pivotar:** si el GIF no cabe junto al contenido móvil, ajustar su límite responsivo preservando el área disponible para Create/Join.
@@ -53,7 +53,7 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 **Bloquear/cancelar:** reaparece un conflicto material en `Home.js`, las fuentes no están disponibles en el checkout del Ejecutor o hace falta alterar el alcance del producto.
 
 **Commit:** `COMMIT_REQUIRED`; `feat(home): issue 25 animated coin and favicon`.
-**Validación:** build del cliente, inspección del formato/dimensiones/tamaño de recursos y recorrido visual de portada en escritorio y móvil; sin tests automatizados.
+**Validación:** build del cliente, inspección del formato/dimensiones/tamaño de recursos, revisión de `home.coin.alt` en `es`/`en` y recorrido visual de portada en escritorio y móvil; sin tests automatizados.
 
 ## Topología y coordinación
 
@@ -68,3 +68,6 @@ La unidad está desbloqueada tras integrar PR #22 y la confirmación del Orquest
 - 2026-09-27: crear la unidad como `LIGHT/LOW/NONE`; mantener el GIF original de 256×256 porque pesa 109,685 bytes.
 - 2026-09-27: usar un ICO derivado en tamaños habituales 16×16 y 32×32, no redimensionar el favicon a ~100 px.
 - 2026-09-27: desbloquear F1 después de integrar la PR #22 de #19; conservar la localización ya integrada en `Home.js`.
+- 2026-09-27: incluir solo el `alt` bilingüe de la moneda (`home.coin.alt`) para satisfacer el criterio de accesibilidad sin traducir otros textos.
+
+**Aclaración de alcance del Orquestador (2026-09-27):** autoriza únicamente localizar el `alt` de la moneda con `home.coin.alt` (“Moneda giratoria” / “Spinning coin”) y conservar paridad `es`/`en`; no se modifica ningún otro texto. Confirmada en la issue #25 actualizada.

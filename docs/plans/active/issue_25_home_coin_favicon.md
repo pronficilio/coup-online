@@ -3,7 +3,7 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/25
 - **Plan exacto:** `docs/plans/home-coin-favicon/plan_home_coin_favicon.md`
 - **Bitácora exacta:** `docs/plans/log/issue-25.jsonl`
-- **Estado:** `ACTIVE`; F1 `ACTIVE`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
+- **Estado:** `WAITING_EXECUTOR`; F1 `READY`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
 - **Modo/riesgo/verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Fase sugerida:** F1 — integrar moneda animada y favicon.
@@ -14,15 +14,17 @@
 ## Subtareas listas
 
 1. Reclamar #25 en el tracker, releerla y confirmar el claim; sincronizar con `origin/master` y revisar el `Home.js` integrado por PR #22. **Completado:** issue abierta y asignada a `pronficilio`; branch y worktree únicos desde `5de95ee`.
-2. Copiar el GIF al asset del cliente, reemplazar el pollo y ajustar estilo responsivo acotado a la imagen principal.
-3. Generar `public/favicon.ico` desde el PNG fuente con 16×16 y 32×32 px; alinear los tamaños declarados en `manifest.json`.
-4. Registrar tamaños finales, compilar el cliente y revisar manualmente escritorio y móvil. No agregar ni ejecutar tests automatizados.
+2. Copiar el GIF al asset del cliente, reemplazar el pollo y ajustar estilo responsivo acotado a la imagen principal. Usar `alt={t('home.coin.alt')}`.
+3. Cambiar solo la entrada `home.chicken.alt` por `home.coin.alt` en ambos idiomas de `translations.json`: “Moneda giratoria” (`es`) y “Spinning coin” (`en`). Preservar todas las demás traducciones y la paridad de claves.
+4. Generar `public/favicon.ico` desde el PNG fuente con 16×16 y 32×32 px; alinear los tamaños declarados en `manifest.json`.
+5. Registrar tamaños finales, revisar la paridad de `translations.json`, compilar el cliente y revisar manualmente escritorio y móvil. No agregar ni ejecutar tests automatizados.
 
 **Criterio de cierre F1:** moneda animada visible, favicon válido y compacto, layout móvil sin desbordamiento y controles principales utilizables; build correcto y evidencia registrada.
 
 ## Riesgos y límites
 
 - Conservar los textos y atributos de idioma que integró PR #22; si el diff de `origin/master` revela cambios nuevos incompatibles, detenerse y devolver el conflicto al Orquestador.
+- El único cambio de idioma autorizado es el `alt` de la moneda en las claves paralelas `es`/`en`; no ajustar copy adicional.
 - Mantener el GIF responsivo y conservar su animación. Evitar conversiones que lo vuelvan estático y copias innecesarias de las fuentes.
 - Limitar el trabajo a portada y favicon; no cambiar iconos PWA/touch, controles de partida, textos ajenos o reglas.
 - La raíz de coordinación tiene cambios locales ajenos a #25. Crear el aislamiento desde `origin/master` actualizado y mover solo los archivos de #25.
@@ -39,6 +41,7 @@
 - **Worktree destino:** `.worktrees/issue-25-home-coin-favicon`.
 - **Merge target:** `master`; una PR desde la branch #25 al fork.
 - **Secuencia:** reclamar #25 en `pronficilio/coup-online`; releer título/cuerpo/estado y confirmar el claim; crear/confirmar branch desde `origin/master` actualizado; crear/entrar al worktree; allí copiar y actualizar estos documentos, registrar `claim` y `worktree_confirmed` y commitear el control antes del código.
+- **Decisión de alcance:** el Orquestador actualizó #25 y autorizó cambiar exclusivamente el `alt` a `home.coin.alt`, localizado como “Moneda giratoria” (`es`) y “Spinning coin” (`en`). No modificar ningún otro texto.
 - **Bitácora append-only:** `docs/plans/log/issue-25.jsonl`.
 - **Delegación:** aplicar solo las reglas de delegación existentes si las subtareas llegan a ser separables; esta fase localizada puede ejecutarse de forma secuencial.
 - Al terminar, dejar la unidad `WAITING_ORCHESTRATOR`; no abrir una segunda integración ni cerrar la issue.
