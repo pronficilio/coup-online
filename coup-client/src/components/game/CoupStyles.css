@@ -1066,6 +1066,48 @@
     text-align: left;
 }
 
+.DecisionActionDetails {
+    box-sizing: border-box;
+    max-height: 140px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 160ms ease, opacity 130ms ease;
+}
+
+.DecisionActionDetails--collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+.DecisionActionDetails--prompt {
+    display: block;
+    max-height: 84px;
+}
+
+.DecisionActionDetails--prompt.DecisionActionDetails--collapsed {
+    max-height: 0;
+}
+
+.DecisionActionDetails--row {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.DecisionActionDetails--inline {
+    display: inline-flex;
+    max-width: 180px;
+    align-items: center;
+    vertical-align: middle;
+    transition: max-width 160ms ease, opacity 130ms ease;
+}
+
+.DecisionActionDetails--inline.DecisionActionDetails--collapsed {
+    max-width: 0;
+}
+
 .DecisionActionRows {
     display: flex;
     flex-direction: column;
@@ -1366,21 +1408,29 @@
     .DecisionActionPanel .DecisionActionRow,
     .DecisionActionPanel .DecisionActionTarget,
     .DecisionActionPanel .DecisionActionCancel,
-    .DecisionActionHint {
+    .DecisionActionHint,
+    .ActionDecisionRail .DecisionActionPanel,
+    .DecisionActionDetails,
+    .DecisionActionDetails--inline {
         transition: none;
     }
 }
 
 .ActionDecisionRail {
-    position: fixed;
+    position: absolute;
     z-index: 40;
-    top: 110px;
-    left: 10px;
+    top: 0;
+    left: 0;
     display: flex;
     width: min(620px, calc(100vw - 20px));
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
+}
+
+.ActionDecisionAnchorProbe {
+    visibility: hidden;
+    pointer-events: none;
 }
 
 .ActionDecisionRail .CheatSheet {
@@ -1400,12 +1450,15 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable;
+    transition: width 160ms ease;
+}
+
+.ActionDecisionRail .DecisionActionPanel.DecisionActionPanel--compact {
+    width: 50%;
 }
 
 @media only screen and (min-width: 1024px) {
     .ActionDecisionRail {
-        top: 22vh;
-        left: 10vw;
         width: min(620px, calc(100vw - 10vw - 24px));
     }
 

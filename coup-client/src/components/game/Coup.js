@@ -101,6 +101,9 @@ const ACTION_ROWS = [
     { action: 'steal', declaredRole: 'captain', blockers: ['ambassador', 'captain'], amount: 2, target: true }
 ]
 
+const ACTION_PANEL_COMPACT_DELAY_MS = 500
+const ACTION_PANEL_DETAILS_TRANSITION_MS = 180
+
 const ACTION_ROW_KEYS = new Set(ACTION_ROWS.map(({ action }) => action))
 
 const ROLE_KEYS = {
@@ -284,7 +287,12 @@ export default class Coup extends Component {
             canPlayAgain: false,
             logs: [],
             disconnected: false,
-            codexDisabled: Boolean(props.codexDisabled)
+            codexDisabled: Boolean(props.codexDisabled),
+            actionRailPosition: null,
+            actionPanelCompact: false,
+            actionPanelHasEntered: false,
+            actionPanelShowDetails: true,
+            actionPanelDetailsExpanded: true
         }
         this.pauseOverlayRef = createRef()
         this.decisionSectionRef = createRef()
@@ -293,6 +301,11 @@ export default class Coup extends Component {
         this.actionSubmissionLock = false
         this.actionRowRefs = Object.fromEntries(ACTION_ROWS.map(({ action }) => [action, React.createRef()]))
         this.firstActionTargetRef = React.createRef()
+        this.actionRailAnchorRef = React.createRef()
+        this.actionPanelCompactTimer = null
+        this.actionPanelDetailsTimer = null
+        this.actionPanelExpandFrame = null
+        this.actionPanelExpandTimer = null
 
         const socket = this.props.socket
         socket.on('disconnect', () => this.setState({ disconnected: true }))
@@ -309,17 +322,34 @@ export default class Coup extends Component {
         socket.on('g-addLog', message => this.setState(state => ({ logs: state.logs.concat(String(message)) })))
         socket.on('g-decision', decision => {
             this.actionSubmissionLock = false
+            this.clearActionPanelTimers()
+            const actionDecision = decision && decision.type === 'action'
             this.setState(state => ({
                 decision,
                 actionTarget: null,
                 submitted: false,
-                decisionError: state.gamePaused ? state.decisionError : ''
+                decisionError: state.gamePaused ? state.decisionError : '',
+                actionRailPosition: actionDecision ? this.measureActionRailPosition() : null,
+                actionPanelCompact: false,
+                actionPanelHasEntered: false,
+                actionPanelShowDetails: true,
+                actionPanelDetailsExpanded: true
             }))
         })
         socket.on('g-decisionClosed', closed => {
             if (this.state.decision && closed.decisionId === this.state.decision.decisionId) {
                 this.actionSubmissionLock = false
-                this.setState({ decision: null, actionTarget: null, submitted: false })
+                this.clearActionPanelTimers()
+                this.setState({
+                    decision: null,
+                    actionTarget: null,
+                    submitted: false,
+                    actionRailPosition: null,
+                    actionPanelCompact: false,
+                    actionPanelHasEntered: false,
+                    actionPanelShowDetails: true,
+                    actionPanelDetailsExpanded: true
+                })
             }
         })
         socket.on('g-decisionAccepted', accepted => {
@@ -344,6 +374,7 @@ export default class Coup extends Component {
                 this.pauseReturnFocus = document.activeElement
             }
             this.resumeRequestPending = false
+            this.clearActionPanelTimers()
             this.setState({
                 decision: null,
                 actionTarget: null,
@@ -352,7 +383,12 @@ export default class Coup extends Component {
                 canResume: showOverlay && Boolean(paused && paused.canResume),
                 resumePending: false,
                 pauseWaiting: Boolean(paused && paused.waitingForOwner),
-                decisionError: ''
+                decisionError: '',
+                actionRailPosition: null,
+                actionPanelCompact: false,
+                actionPanelHasEntered: false,
+                actionPanelShowDetails: true,
+                actionPanelDetailsExpanded: true
             }, () => {
                 if (showOverlay && this.pauseOverlayRef.current) this.pauseOverlayRef.current.focus({ preventScroll: true })
             })
@@ -376,12 +412,149 @@ export default class Coup extends Component {
                 }
             })
         })
-        socket.on('g-gameOver', winner => this.setState({ winner: String(winner || ''), decision: null }))
+        socket.on('g-gameOver', winner => {
+            this.clearActionPanelTimers()
+            this.setState({
+                winner: String(winner || ''),
+                decision: null,
+                actionRailPosition: null,
+                actionPanelCompact: false,
+                actionPanelHasEntered: false,
+                actionPanelShowDetails: true,
+                actionPanelDetailsExpanded: true
+            })
+        })
         socket.on('g-canPlayAgain', () => this.setState({ canPlayAgain: true }))
         socket.on('startRejected', reason => this.setState({ decisionError: t('lobby.error.startRejected', { reason: lobbyError(reason) }) }))
         socket.on('codexDisabled', status => this.setState({
             codexDisabled: Boolean(status && status.disabled)
         }))
+    }
+
+    componentDidMount() {
+        if (typeof window !== 'undefined') window.addEventListener('resize', this.handleActionRailResize)
+        if (this.state.decision && this.state.decision.type === 'action' && !this.state.actionRailPosition) {
+            const position = this.measureActionRailPosition()
+            if (position) this.setState({ actionRailPosition: position })
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const decision = this.state.decision
+        const newActionDecision = decision && decision.type === 'action'
+            && (!prevState.decision || prevState.decision.type !== 'action'
+                || prevState.decision.decisionId !== decision.decisionId)
+        if (newActionDecision && !this.state.actionRailPosition) {
+            const position = this.measureActionRailPosition()
+            if (position) this.setState({ actionRailPosition: position })
+        }
+    }
+
+    componentWillUnmount() {
+        if (typeof window !== 'undefined') window.removeEventListener('resize', this.handleActionRailResize)
+        this.clearActionPanelTimers()
+    }
+
+    measureActionRailPosition = () => {
+        if (typeof window === 'undefined' || typeof document === 'undefined') return null
+
+        let anchor = this.actionRailAnchorRef.current
+        if (!anchor) {
+            anchor = Array.from(document.querySelectorAll('.CheatSheet')).find(element =>
+                !element.closest('.ActionDecisionRail')
+            )
+        }
+
+        if (anchor) {
+            const rect = anchor.getBoundingClientRect()
+            const scrollX = window.scrollX || window.pageXOffset || 0
+            const scrollY = window.scrollY || window.pageYOffset || 0
+            return { left: rect.left + scrollX, top: rect.top + scrollY }
+        }
+
+        return this.state.actionRailPosition
+    }
+
+    handleActionRailResize = () => {
+        if (!this.state.decision || this.state.decision.type !== 'action') return
+        this.setState({ actionRailPosition: this.measureActionRailPosition() })
+    }
+
+    canCompactActionPanel = () => typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+
+    prefersReducedMotion = () => typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    clearActionPanelTimers = () => {
+        if (this.actionPanelCompactTimer !== null) clearTimeout(this.actionPanelCompactTimer)
+        if (this.actionPanelDetailsTimer !== null) clearTimeout(this.actionPanelDetailsTimer)
+        if (this.actionPanelExpandTimer !== null) clearTimeout(this.actionPanelExpandTimer)
+        if (this.actionPanelExpandFrame !== null && typeof window !== 'undefined'
+            && typeof window.cancelAnimationFrame === 'function') {
+            window.cancelAnimationFrame(this.actionPanelExpandFrame)
+        }
+        this.actionPanelCompactTimer = null
+        this.actionPanelDetailsTimer = null
+        this.actionPanelExpandTimer = null
+        this.actionPanelExpandFrame = null
+    }
+
+    handleActionPanelMouseEnter = () => {
+        if (!this.canCompactActionPanel()) return
+        this.clearActionPanelTimers()
+        const shouldExpandDetails = this.state.actionPanelCompact
+            || !this.state.actionPanelShowDetails
+            || !this.state.actionPanelDetailsExpanded
+        const shouldAnimateDetails = shouldExpandDetails && !this.prefersReducedMotion()
+
+        this.setState({
+            actionPanelHasEntered: true,
+            actionPanelCompact: false,
+            actionPanelShowDetails: true,
+            actionPanelDetailsExpanded: !shouldAnimateDetails
+        }, () => {
+            if (!shouldAnimateDetails) return
+            const expand = () => {
+                this.actionPanelExpandFrame = null
+                this.actionPanelExpandTimer = null
+                if (this.state.decision && this.state.decision.type === 'action'
+                    && this.state.actionPanelHasEntered && !this.state.actionPanelCompact) {
+                    this.setState({ actionPanelDetailsExpanded: true })
+                }
+            }
+            if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+                this.actionPanelExpandFrame = window.requestAnimationFrame(expand)
+            } else {
+                this.actionPanelExpandTimer = setTimeout(expand, 16)
+            }
+        })
+    }
+
+    handleActionPanelMouseLeave = () => {
+        if (!this.canCompactActionPanel() || !this.state.actionPanelHasEntered) return
+        this.clearActionPanelTimers()
+        this.actionPanelCompactTimer = setTimeout(() => {
+            this.actionPanelCompactTimer = null
+            if (!this.state.decision || this.state.decision.type !== 'action'
+                || !this.state.actionPanelHasEntered || !this.canCompactActionPanel()) return
+            const animateDetails = !this.prefersReducedMotion()
+            this.setState({
+                actionPanelCompact: true,
+                actionPanelDetailsExpanded: false,
+                actionPanelShowDetails: animateDetails ? this.state.actionPanelShowDetails : false
+            })
+            if (!animateDetails) return
+            this.actionPanelDetailsTimer = setTimeout(() => {
+                this.actionPanelDetailsTimer = null
+                if (this.state.decision && this.state.decision.type === 'action'
+                    && this.state.actionPanelCompact) {
+                    this.setState({ actionPanelShowDetails: false })
+                }
+            }, ACTION_PANEL_DETAILS_TRANSITION_MS)
+        }, ACTION_PANEL_COMPACT_DELAY_MS)
     }
 
     submitChoice = option => {
@@ -433,16 +606,31 @@ export default class Coup extends Component {
         const optionsByAction = actionOptionGroups(Array.isArray(decision.options) ? decision.options : [])
         const targetAction = this.state.actionTarget
         const submitted = this.state.submitted || this.state.gamePaused
+        const compact = this.state.actionPanelCompact
+        const showDetails = this.state.actionPanelShowDetails
+        const detailsExpanded = this.state.actionPanelDetailsExpanded
+        const detailsClassName = `DecisionActionDetails${detailsExpanded ? ' DecisionActionDetails--expanded' : ' DecisionActionDetails--collapsed'}`
         const selectedTargets = targetAction ? (optionsByAction.get(targetAction) || []) : []
         const selectedActionRow = ACTION_ROWS.find(({ action }) => action === targetAction)
 
-        return <section className="ActionDecision DecisionActionPanel" onKeyDown={this.handleActionDecisionKeyDown} aria-labelledby="action-decision-title">
+        return <section
+            className={`ActionDecision DecisionActionPanel${compact ? ' DecisionActionPanel--compact' : ''}`}
+            onKeyDown={this.handleActionDecisionKeyDown}
+            onMouseEnter={this.handleActionPanelMouseEnter}
+            onMouseLeave={this.handleActionPanelMouseLeave}
+            aria-labelledby="action-decision-title"
+        >
             <h2 id="action-decision-title" className="ActionDecisionTitle">
                 {targetAction ? t('game.actions.chooseTarget') : t('game.actions.turnTitle')}
             </h2>
-            {targetAction
-                ? <p className="DecisionActionPrompt">{selectedActionRow ? t(`game.actions.${ACTION_KEYS[targetAction]}.description`) : ''}</p>
-                : <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>}
+            <div
+                className={`${detailsClassName} DecisionActionDetails--prompt`}
+                aria-hidden={compact || !detailsExpanded ? 'true' : undefined}
+            >
+                {showDetails && (targetAction
+                    ? <p className="DecisionActionPrompt">{selectedActionRow ? t(`game.actions.${ACTION_KEYS[targetAction]}.description`) : ''}</p>
+                    : <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>)}
+            </div>
 
             {targetAction ? <>
                 <div className="DecisionActionTargets" role="group" aria-label={t('game.actions.chooseTarget')}>
@@ -475,19 +663,32 @@ export default class Coup extends Component {
                     const actionId = `decision-action-${action}`
                     const actionPriceLabel = actionPrice(actionRow)
                     const isTargetAction = Boolean(actionRow.target)
+                    const detailIds = detailsExpanded
+                        ? `${actionId}-description${declaredRole || blockers.length ? ` ${actionId}-roles` : ''}${available ? '' : ` ${actionId}-hint`}`
+                        : ''
                     const content = <>
                         <span className="DecisionActionContent">
                             <span className="DecisionActionHeading">
                                 <span id={`${actionId}-label`} className="DecisionActionLabel">{actionName(action)}</span>
-                                {declaredRole && <span className={`ActionRoleChip ActionRoleChip--declared ActionRoleChip--${declaredRole}`}>{roleName(declaredRole)}</span>}
+                                {declaredRole && <span
+                                    className={`${detailsClassName} DecisionActionDetails--inline`}
+                                    aria-hidden={compact || !detailsExpanded ? 'true' : undefined}
+                                >{showDetails && <span className={`ActionRoleChip ActionRoleChip--declared ActionRoleChip--${declaredRole}`}>{roleName(declaredRole)}</span>}</span>}
                             </span>
-                            <span id={`${actionId}-description`} className="DecisionActionDescription">{t(`game.actions.${ACTION_KEYS[action]}.description`)}</span>
-                            {blockers.length > 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta">
-                                <span className="ActionMetaLabel">{t('game.actions.blockedBy')}</span>
-                                {blockers.map(role => <span className={`ActionRoleChip ActionRoleChip--blocker ActionRoleChip--${role}`} key={role}>{roleName(role)}</span>)}
-                            </span>}
-                            {declaredRole && blockers.length === 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta DecisionActionMeta--unblockable">{t('game.actions.unblockable')}</span>}
-                            {!available && <span id={`${actionId}-hint`} className="DecisionActionHint" role="note">{unavailableReason}</span>}
+                            <span
+                                className={`${detailsClassName} DecisionActionDetails--row`}
+                                aria-hidden={compact || !detailsExpanded ? 'true' : undefined}
+                            >
+                                {showDetails && <>
+                                    <span id={`${actionId}-description`} className="DecisionActionDescription">{t(`game.actions.${ACTION_KEYS[action]}.description`)}</span>
+                                    {blockers.length > 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta">
+                                        <span className="ActionMetaLabel">{t('game.actions.blockedBy')}</span>
+                                        {blockers.map(role => <span className={`ActionRoleChip ActionRoleChip--blocker ActionRoleChip--${role}`} key={role}>{roleName(role)}</span>)}
+                                    </span>}
+                                    {declaredRole && blockers.length === 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta DecisionActionMeta--unblockable">{t('game.actions.unblockable')}</span>}
+                                    {!available && <span id={`${actionId}-hint`} className="DecisionActionHint" role="note">{unavailableReason}</span>}
+                                </>}
+                            </span>
                         </span>
                         <span id={`${actionId}-price`} className={`ActionPrice${actionRow.free ? ' ActionPrice--free' : ''}`} aria-label={actionPriceLabel}>
                             {actionRow.free
@@ -502,7 +703,7 @@ export default class Coup extends Component {
                             type="button"
                             ref={this.actionRowRefs[action]}
                             aria-labelledby={`${actionId}-label`}
-                            aria-describedby={`${actionId}-description ${actionId}-price${declaredRole || blockers.length ? ` ${actionId}-roles` : ''}${available ? '' : ` ${actionId}-hint`}`}
+                            aria-describedby={`${detailIds ? `${detailIds} ` : ''}${actionId}-price`}
                             aria-disabled={available ? undefined : 'true'}
                             disabled={available && submitted}
                             onClick={available ? (isTargetAction
@@ -588,8 +789,12 @@ export default class Coup extends Component {
             </div>
         }
 
+        const railPosition = this.state.actionRailPosition
+        const actionRailStyle = railPosition
+            ? { left: `${railPosition.left}px`, top: `${railPosition.top}px` }
+            : undefined
         const actionDecisionRail = actionDecision && typeof document !== 'undefined'
-            ? createPortal(<div className="ActionDecisionRail" aria-live="polite">
+            ? createPortal(<div className="ActionDecisionRail" style={actionRailStyle} aria-live="polite">
                 <CheatSheetModal />
                 {this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
             </div>, document.body)
@@ -606,6 +811,11 @@ export default class Coup extends Component {
                 </div>
                 <RulesModal />
                 {!actionDecision && <CheatSheetModal />}
+                {actionDecision && <div
+                    ref={this.actionRailAnchorRef}
+                    className="CheatSheet ActionDecisionAnchorProbe"
+                    aria-hidden="true"
+                />}
                 <EventLog logs={this.state.logs} />
             </div>
 
