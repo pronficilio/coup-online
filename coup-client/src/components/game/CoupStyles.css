@@ -193,6 +193,7 @@
     -o-animation: fadeIn ease 1s;
     -ms-animation: fadeIn ease 1s;
   }
+
   @keyframes fadeIn {
     0% {
       opacity:0;
@@ -245,6 +246,103 @@
 
 .GameContainer {
     text-align: center;
+}
+
+.PauseWaitingStatus {
+    margin: 12px auto;
+    padding: 12px 16px;
+    max-width: 42rem;
+    border-radius: 8px;
+    background: #edf2f5;
+    color: #23313a;
+}
+
+.PauseOverlay {
+    position: fixed;
+    z-index: 2001;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: clamp(16px, 4vw, 32px);
+    background: rgba(12, 18, 23, 0.78);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    color: #fff;
+}
+
+.PauseOverlay:focus {
+    outline: none;
+}
+
+.PauseDialog {
+    width: min(100%, 560px);
+    box-sizing: border-box;
+    margin: auto;
+    padding: clamp(24px, 5vw, 40px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 16px;
+    background: #182630;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.38);
+    text-align: left;
+}
+
+.PauseDialog h2 {
+    margin: 0;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.65rem, 5vw, 2.15rem);
+    line-height: 1.15;
+}
+
+.PauseDialog .PauseResumeButton {
+    min-width: 180px;
+    min-height: 48px;
+    height: auto;
+    margin: 18px 0 4px;
+    padding: 12px 20px;
+    border: 2px solid #f4c96a;
+    border-radius: 8px;
+    background: #f4c96a;
+    color: #1b242a;
+    cursor: pointer;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.PauseDialog .PauseResumeButton:hover:not([aria-disabled="true"]) {
+    background: #ffda88;
+}
+
+.PauseDialog .PauseResumeButton[aria-disabled="true"] {
+    cursor: wait;
+    opacity: 0.78;
+}
+
+.PauseDialog .PauseResumeButton:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+}
+
+.PauseDialog .PauseError {
+    margin: 18px 0 0;
+    padding: 12px 14px;
+    border-left: 4px solid #ff8c82;
+    border-radius: 4px;
+    background: rgba(119, 27, 30, 0.48);
+    color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .PauseDialog .PauseResumeButton {
+        transition: none;
+    }
 }
 
 .DecisionsSection button {

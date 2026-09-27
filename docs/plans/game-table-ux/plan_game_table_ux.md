@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `WAITING_USER`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `PENDING`. Implementación/build terminados; falta revisión visual del propietario.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. El propietario aprobó visualmente el preview; sincronización/verificaciones y PASS del Verifier independiente pendientes.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -75,19 +75,19 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; preview local para revisión visual del propietario; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F3.md`.
 
-### F4 — Revisión final independiente (`PENDING`)
+### F4 — Revisión final independiente (`ACTIVE`)
 
 - **Pregunta única:** ¿el conjunto cumple los criterios sin desplazar HUD ni publicar información privada?
-- **Entrada:** F2 y F3 cerradas.
-- **Salida:** recorrido manual y veredicto FINAL independiente.
+- **Entrada:** F2 y F3 cerradas; aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. Sincronizar desde `origin/master` vigente antes de la revisión final.
+- **Salida:** sincronización documentada, build/diff-check/comprobaciones de sintaxis y veredicto FINAL independiente.
 - **Criterio de cierre:** capturas/escalas 2, 3 y 6 jugadores en móvil y escritorio; revisar reserva superior, anclaje del conteo, intercambio pendiente/completado, desafío con reemplazo, revancha y el payload público. Refutar al menos una afirmación de éxito; corregir defectos antes del veredicto.
 - **Artefacto:** `docs/plans/game-table-ux/report_issue_28_F4.md` y evidencia visual acotada.
-- **Commit:** `COMMIT_REQUIRED`; `docs(game-ui): issue 28 F4 CLOSED ready_for_review`.
-- **Validación:** build + recorrido manual + Verifier independiente FINAL; sin tests automatizados.
+- **Commit:** `COMMIT_REQUIRED` para el sync/control de F4; el commit de veredicto/cierre se reserva hasta cumplir el criterio de F4 y recibir PASS independiente.
+- **Validación actual:** `git diff --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y build de cliente terminaron correctamente. Build informa variables sin uso en `App.js` y warnings `postcss-calc` en `ReferencePanel.css`, pero salió con código 0. No se agregaron ni ejecutaron tests automatizados. Verifier independiente FINAL sigue pendiente; no hacer push ni abrir PR antes del PASS.
 
 ## Dependencias y coordinación
 
-- El propietario reorientó el trabajo el 2026-09-27 y autorizó implementar F2/F3 desde este worktree aislado, dejando la revisión visual para el preview local. No editar ramas/worktrees #24/#26 ni copiar/cherry-pickear sus cambios. Antes del código se debe sincronizar el branch desde `origin/master` vigente; el SHA local observado antes del fetch era `3313d426ebe5cf3d0612e692e1fe44137468362f`.
+- El propietario reorientó el trabajo el 2026-09-27 y autorizó implementar F2/F3 desde este worktree aislado; después aprobó visualmente el preview y levantó el hold para continuar. La sincronización F4 usa `origin/master@5fffacfdadcf3e91453bda1d13e4c0b2e3327831`, hijo del SHA #35/#26 `12115856c71de8b8abb5d13a81cf8458a2cae240`. El merge presentó un conflicto de contenido en `CoupStyles.css`: se preservan los estilos de pausa `.Pause*` integrados desde #26 y se omite `.circle`, sin consumidores; los merges automáticos en `Coup.js`, `translations.json` y `server/game/coup.js` preservan las características integradas y el conteo Court de #28. No editar branches/worktrees hermanos, copiar ni cherry-pickear sus cambios. No hacer push ni abrir PR hasta recibir PASS del Verifier independiente.
 
 ## Riesgo y pregunta de falsificación
 
