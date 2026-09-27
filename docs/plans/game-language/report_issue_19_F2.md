@@ -2,7 +2,7 @@
 
 **Estado de la fase:** `ACTIVE`; esta tanda aislada queda completa, pero F2 no está cerrada.
 **Base sincronizada:** `origin/master` en `c0119cb70995974f6c5f5e71c19af8bba5f94011`, integrado por el merge `28e1046` (primer padre `56a41a1`).
-**Commits de la tanda:** `4b6b564` (`feat(i18n): issue 19 F2 spanish default and dictionary`) y `c9d5442` (`fix(i18n): keep issue 19 locale fallback in Spanish`).
+**Commits de la tanda:** `4b6b564` (`feat(i18n): issue 19 F2 spanish default and dictionary`), `c9d5442` (`fix(i18n): keep issue 19 locale fallback in Spanish`) y `a63336c` (`feat(i18n): issue 19 F2 localize reference panel`).
 **Fecha:** 2026-09-26.
 
 ## Trabajo de esta tanda
@@ -22,5 +22,6 @@
 - `npm run build` completó con exit 0 después de integrar ReferencePanel. CRA informó imports sin uso preexistentes en `src/App.js`; Browserslist avisó que `caniuse-lite` está desactualizado; el minificador CSS informó que `postcss-calc` no pudo parsear expresiones con `dvh` en `ReferencePanel.css` líneas 100 y 106. Son warnings, el build produjo los artefactos de producción. La advertencia anterior de `ReactModal` en `Coup.js` ya no aparece tras integrar su cambio upstream.
 - No se añadieron ni ejecutaron tests. No se hizo recorrido manual de una partida; esta evidencia cubre solo la tanda aislada, no el criterio de cierre F2.
 - La sincronización incorporó `origin/master` `c0119cb` mediante `28e1046`; solo se integraron commits publicados, no los cambios locales sin commit del worktree #14. El merge contiene la integración upstream en `Coup.js`; #19 no editó esa ruta y la reserva de #14 sigue activa.
+- Tras el commit `a63336c`, se actualizó y releyó la issue #19 por API (`2026-09-27T03:08:01Z`): permanece `OPEN`, asignada a `pronficilio`; su cuerpo refleja `sync_base`, las 190 claves, el build y F2 `ACTIVE`/F3 `BLOCKED`, sin afirmaciones obsoletas sobre sincronización o conteo.
 - Permanecen pendientes las conexiones del diccionario en componentes de lobby/decisión/tablero reservados a #14, la carga de ilustraciones españolas que monta `PlayerBoard.js` y los mensajes ingleses de `g-addLog`. F3 sigue bloqueada por #14; las brechas de accesibilidad registradas en F1 no se rediseñaron.
 - La tanda no satisface todavía la aceptación global de español en lobby, decisiones, tablero y registro; no debe tratarse como cobertura final ni como cierre de F2.
