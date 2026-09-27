@@ -23,7 +23,7 @@ const BLOCKS = {
     ]
 }
 
-const DEFAULT_TIMEOUT_MS = 60000
+const DEFAULT_TIMEOUT_MS = 120000
 
 function decisionTimeoutFromEnv() {
     const value = Number(process.env.DECISION_TIMEOUT_MS)
