@@ -1,12 +1,12 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F3/F4 `CLOSED` (`PASS`). El usuario ejecutó y confirmó el walkthrough final de AC5/AC6 en navegador.
+**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F3/F4 `CLOSED` (`PASS`); PR #30 abierta y lista para merge.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Orquestador para revisión de integración.
+**Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / [PR #30](https://github.com/pronficilio/coup-online/pull/30) a `master`.
+**Siguiente dueño:** Orquestador para completar el merge de la PR #30.
 
 ## Solicitud y éxito
 
@@ -111,6 +111,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 - 2026-09-27: el usuario validó en `http://localhost:3001` que los rectángulos blancos desaparecieron, que durante Tax solo aparecen Pass y Challenge, y que Challenge muestra el arte activo actualizado. El puerto 3000 servía un bundle viejo. F3 queda `BLOCKED` solo por el walkthrough restante de AC6 (otras respuestas, móvil, teclado/foco y movimiento reducido).
 - 2026-09-27: el usuario confirmó además que Tab funciona y que BFA, BS y BA lucen bien. En ese momento F3 seguía `BLOCKED` para verificar foco visible, ventana estrecha y reduced motion.
 - 2026-09-27: recheck F3: el usuario confirmó foco visible, layout estrecho sin recortes ni solapamientos y reduced motion sin transición junto con el walkthrough de las cinco respuestas. El estado efectivo F3 cambia a `PASS`; la primera revisión `BLOCKED` permanece como histórico. Ver `report_issue_21_F3_recheck.md`.
+- 2026-09-27: sincronizada la rama con `origin/master` en `1ff478c`; se resolvió el solapamiento de `Coup.js` preservando i18n y las imágenes de respuesta; build del cliente PASS con advertencias existentes. Rama publicada y PR #30 abierta (`MERGEABLE/CLEAN`, sin checks reportados).
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 

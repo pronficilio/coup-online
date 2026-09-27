@@ -3,13 +3,13 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F3/F4 `CLOSED` (`PASS`). El usuario ejecutó y confirmó el walkthrough final de AC5/AC6.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F3/F4 `CLOSED` (`PASS`); [PR #30](https://github.com/pronficilio/coup-online/pull/30) abierta y lista para merge.
 - **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Reporte F3 inicial (histórico):** `docs/plans/action-image-buttons/report_issue_21_F3.md` (`BLOCKED`).
 - **Recheck F3:** `docs/plans/action-image-buttons/report_issue_21_F3_recheck.md` (`PASS`, walkthrough ejecutado por el usuario).
 - **Reporte F4:** `docs/plans/action-image-buttons/report_issue_21_F4.md` (`CLOSED`).
-- **Verifier requerido ahora:** recheck F3 completado como `PASS` con la confirmación explícita del usuario: transparencia, Tax solo Pass/Challenge, Challenge activo actualizado, cinco controles de escritorio, Tab/foco visible, layout estrecho y reduced motion. Siguiente dueño: Orquestador.
+- **Estado de revisión:** PR #30 a `master`, `MERGEABLE/CLEAN`; no hay checks reportados. Build de cliente PASS con advertencias preexistentes. Siguiente dueño: Orquestador para merge.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
 - **Estado de fase:** F1, F2, F3 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. El usuario confirmó en la app los fondos transparentes, Tax solo Pass/Challenge, Challenge activo actualizado, los cinco controles en escritorio, Tab/foco visible, ventana estrecha sin recortes/solapamientos y reduced motion sin transición.
 - **Documentos fuente:** issue #21; plan exacto arriba; `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; `docs/plans/game-language/plan_game_language.md`; componentes en `coup-client/src/components/game/`.
@@ -44,12 +44,16 @@ Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y re
 - **Branch:** `issue/21-action-image-buttons`
 - **Worktree:** `.worktrees/issue-21-action-image-buttons`
 - **Merge target:** `master` de `pronficilio/coup-online`
-- **PR esperada:** una desde la rama del issue a `master`.
+- **PR:** [#30](https://github.com/pronficilio/coup-online/pull/30), abierta contra `master`; GitHub reporta `MERGEABLE/CLEAN` y no hay checks configurados.
 - **Bitácora:** `docs/plans/log/issue-21.jsonl` (append-only).
 - **Secuencia:** primero registrar claim en el issue del fork y releer; luego crear/confirmar una sola branch/worktree desde `origin/master` actualizada; dentro del worktree mover este inbox a `active/`, registrar claim/worktree/phase_start en JSONL y commitear control.
 - **Validaciones:** F1 conserva su reporte histórico de diez imágenes; el par Claim se añadió después; F2 está documentada en `report_issue_21_F2.md`; F4 registra inventario RGBA actual y resultado de build; el recorrido visual del usuario se registra en F3 recheck; no tests.
 - **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier dejó la primera pasada F3 `BLOCKED`; Alquimista cerró F4 correctiva. El usuario completó las comprobaciones restantes y el recheck F3 actualiza el dictamen a `PASS`.
 - **Verifier:** primera revisión histórica en `report_issue_21_F3.md`; recheck efectivo `PASS` en `report_issue_21_F3_recheck.md`, con procedencia explícita del walkthrough del usuario.
+
+## Sincronización y PR
+
+Rama sincronizada con `origin/master` (`1ff478c`) mediante merge local; el conflicto de `Coup.js` se resolvió conservando la localización reciente y el renderer de imágenes. El build del cliente pasó con advertencias existentes. Rama publicada y PR #30 creada; GitHub indica `MERGEABLE/CLEAN` y no informa checks.
 
 ## Confirmación de reclamo y aislamiento
 
