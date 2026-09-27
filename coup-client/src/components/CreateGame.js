@@ -21,6 +21,12 @@ export default class CreateGame extends Component {
             isGameStarted: false,
             errorMsg: '',
             isLeader: false,
+            isCodexAvailable: false,
+            isAIAuthorized: false,
+            aiCode: '',
+            aiEffort: 'medium',
+            isSpectating: false,
+            codexDisabled: false,
             socket: null,
 
         }
@@ -35,7 +41,6 @@ export default class CreateGame extends Component {
         const socket = io(`${baseUrl}/${this.state.roomCode}`);
         this.setState({ socket });
         console.log("socket created")
-        socket.emit('setName', this.state.name);
         
         socket.on("joinSuccess", function() {
             console.log("join successful")
@@ -66,9 +71,26 @@ export default class CreateGame extends Component {
             this.setState({ players })
         })
 
+        socket.on('codexAvailable', status => this.setState({
+            isCodexAvailable: Boolean(status && status.available)
+        }))
+        socket.on('codexAuthorizationResult', result => {
+            const authorized = Boolean(result && result.authorized)
+            this.setState({
+                isAIAuthorized: authorized,
+                aiCode: '',
+                errorMsg: authorized ? '' : 'AI access code was rejected.',
+                isError: !authorized
+            })
+        })
+        socket.on('codexDisabled', status => this.setState({
+            codexDisabled: Boolean(status && status.disabled)
+        }))
+
         socket.on('disconnected', function() {
             console.log("You've lost connection with the server")
         });
+        socket.emit('setName', this.state.name);
     }
 
     createParty = () => {
@@ -101,6 +123,32 @@ export default class CreateGame extends Component {
         this.state.socket.emit('startGameSignal')
     }
 
+    authorizeCodex = () => {
+        if (!this.state.socket || !this.state.aiCode) return
+        const code = this.state.aiCode
+        this.setState({ aiCode: '', errorMsg: '', isError: false })
+        this.state.socket.emit('authorizeCodexAI', { code })
+    }
+
+    addCodexSeat = () => {
+        if (this.state.socket) this.state.socket.emit('addCodexSeat', { effort: this.state.aiEffort })
+    }
+
+    removeCodexSeat = () => {
+        if (this.state.socket) this.state.socket.emit('removeCodexSeat')
+    }
+
+    setSpectating = event => {
+        const participating = event.target.checked
+        const isSpectating = !participating
+        this.setState({ isSpectating })
+        if (this.state.socket) this.state.socket.emit('setParticipating', participating)
+    }
+
+    emergencyStopCodex = () => {
+        if (this.state.socket) this.state.socket.emit('emergencyStopCodex')
+    }
+
     copyCode = () => {
         var dummy = document.createElement("textarea");
         document.body.appendChild(dummy);
@@ -113,7 +161,13 @@ export default class CreateGame extends Component {
 
     render() {
         if(this.state.isGameStarted) {
-            return (<Coup name={this.state.name} socket={this.state.socket} isLeader={this.state.isLeader}></Coup>)
+            return (<Coup
+                name={this.state.name}
+                socket={this.state.socket}
+                isLeader={this.state.isLeader}
+                isSpectator={this.state.isSpectating}
+                codexDisabled={this.state.codexDisabled}
+            />)
         }
         let error = null;
         let roomCode = null;
@@ -134,7 +188,9 @@ export default class CreateGame extends Component {
                     {this.state.copied ? <p>Copied to clipboard</p> : null}
                 </div>
         }
-        if(this.state.isLeader && this.state.players.length >= 2 && this.state.players.every(player => player.isReady)) {
+        const participantCount = this.state.players.filter(player => player.participating).length
+        const allParticipantsReady = this.state.players.every(player => player.kind === 'codex' || !player.participating || player.isReady)
+        if(this.state.isLeader && participantCount >= 2 && allParticipantsReady) {
             startGame = <button className="startGameButton" onClick={this.startGame}>Start Game</button>
         }
         return (
@@ -167,7 +223,13 @@ export default class CreateGame extends Component {
                         {this.state.players.map((item,index) => {
                             let ready = null
                             let readyUnitColor = '#E46258'
-                            if(item.isReady) {
+                            if(item.kind === 'codex') {
+                                ready = <b>GPT-6 Luna · {item.effort}</b>
+                                readyUnitColor = '#8C6CE6'
+                            } else if(!item.participating) {
+                                ready = <b>Spectator</b>
+                                readyUnitColor = '#8A8A8A'
+                            } else if(item.isReady) {
                                 ready = <b>Ready!</b>
                                 readyUnitColor = '#73C373'
                             } else {
@@ -175,12 +237,50 @@ export default class CreateGame extends Component {
                             }
                             return (
                                     <div className="readyUnit" style={{backgroundColor: readyUnitColor}} key={index}>
-                                        <p >{index+1}. {item.name} {ready}</p>
+                                        <p>{index+1}. {item.name} {ready}</p>
                                     </div>
                             )
                             })
                         }
                 </div>
+
+                {this.state.isInRoom && this.state.isLeader && <label>
+                    <input type="checkbox" checked={!this.state.isSpectating} onChange={this.setSpectating} /> Include me as a player
+                </label>}
+
+                {this.state.isInRoom && this.state.isLeader && this.state.isCodexAvailable && !this.state.codexDisabled && !this.state.isAIAuthorized && <div>
+                    <p>Enable AI seats with the shared test code</p>
+                    <input
+                        type="password"
+                        value={this.state.aiCode}
+                        autoComplete="off"
+                        aria-label="Shared AI access code"
+                        onChange={event => this.setState({ aiCode: event.target.value })}
+                    />
+                    <button onClick={this.authorizeCodex}>Enable AI seats</button>
+                </div>}
+
+                {this.state.isInRoom && this.state.isLeader && this.state.isAIAuthorized && !this.state.codexDisabled && <div>
+                    <label>
+                        Codex effort{' '}
+                        <select value={this.state.aiEffort} onChange={event => this.setState({ aiEffort: event.target.value })}>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </label>
+                    <button onClick={this.addCodexSeat} disabled={participantCount >= 6}>Add GPT-6 Luna seat</button>
+                    {this.state.players.some(player => player.kind === 'codex') && <button onClick={this.removeCodexSeat}>Remove last AI seat</button>}
+                </div>}
+
+                {this.state.isInRoom && <div>
+                    <button
+                        type="button"
+                        onClick={this.emergencyStopCodex}
+                        disabled={this.state.codexDisabled}
+                        style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginTop: 12 }}
+                    >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>
+                </div>}
                 
                 {startGame}
             </div>

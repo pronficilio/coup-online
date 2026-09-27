@@ -20,6 +20,7 @@ export default class JoinGame extends Component {
             isLoading: false,
             isError: false,
             isGameStarted: false,
+            codexDisabled: false,
             errorMsg: '',
             socket: null
         }
@@ -38,7 +39,6 @@ export default class JoinGame extends Component {
         const socket = io(`${baseUrl}/${this.state.roomCode}`);
         this.setState({ socket });
         console.log("socket created")
-        socket.emit('setName', this.state.name);
         
         socket.on("joinSuccess", function() {
             console.log("join successful")
@@ -71,10 +71,15 @@ export default class JoinGame extends Component {
             this.setState({ players })
         })
 
+        socket.on('codexDisabled', status => this.setState({
+            codexDisabled: Boolean(status && status.disabled)
+        }))
+
 
         socket.on('disconnected', function() {
             console.log("You've lost connection with the server")
         });
+        socket.emit('setName', this.state.name);
     }
 
     attemptJoinParty = () => {
@@ -136,9 +141,19 @@ export default class JoinGame extends Component {
         })
     }
 
+    emergencyStopCodex = () => {
+        if (this.state.socket) this.state.socket.emit('emergencyStopCodex')
+    }
+
     render() {
         if(this.state.isGameStarted) {
-            return (<Coup name={this.state.name} socket={this.state.socket} isLeader={this.state.isLeader}></Coup>);
+            return (<Coup
+                name={this.state.name}
+                socket={this.state.socket}
+                isLeader={this.state.isLeader}
+                isSpectator={false}
+                codexDisabled={this.state.codexDisabled}
+            />)
         }
         let error = null;
         let joinReady = null;
@@ -158,7 +173,9 @@ export default class JoinGame extends Component {
             ready = <b style={{ color: '#5FC15F' }}>You are ready!</b>
             joinReady = null
         }
-        if(this.state.isLeader && this.state.players.length >= 2 && this.state.players.every(player => player.isReady)) {
+        const participantCount = this.state.players.filter(player => player.participating).length
+        const allParticipantsReady = this.state.players.every(player => player.kind === 'codex' || !player.participating || player.isReady)
+        if(this.state.isLeader && participantCount >= 2 && allParticipantsReady) {
             startGame = <button className="startGameButton" onClick={() => this.state.socket.emit('startGameSignal')}>Start Game</button>
         }
 
@@ -198,7 +215,13 @@ export default class JoinGame extends Component {
                         {this.state.players.map((item,index) => {
                             let ready = null
                             let readyUnitColor = '#E46258'
-                            if(item.isReady) {
+                            if(item.kind === 'codex') {
+                                ready = <b>GPT-6 Luna · {item.effort}</b>
+                                readyUnitColor = '#8C6CE6'
+                            } else if(!item.participating) {
+                                ready = <b>Spectator</b>
+                                readyUnitColor = '#8A8A8A'
+                            } else if(item.isReady) {
                                 ready = <b>Ready!</b>
                                 readyUnitColor = '#73C373'
                             } else {
@@ -206,12 +229,18 @@ export default class JoinGame extends Component {
                             }
                             return (
                                     <div className="readyUnit" style={{backgroundColor: readyUnitColor}} key={index}>
-                                        <p >{index+1}. {item.name} {ready}</p>
+                                        <p>{index+1}. {item.name} {ready}</p>
                                     </div>
                             )
                             })
                         }
                 </div>
+                {this.state.isInRoom && <button
+                    type="button"
+                    onClick={this.emergencyStopCodex}
+                    disabled={this.state.codexDisabled}
+                    style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginTop: 12 }}
+                >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>}
             </div>
         )
     }

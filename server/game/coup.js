@@ -1,5 +1,10 @@
 const gameUtils = require('./utils')
 const constants = require('../utilities/constants')
+const crypto = require('node:crypto')
+const { RULESET_VERSION } = require('../ai/codex-protocol')
+
+const EFFORTS = new Set(['low', 'medium', 'high'])
+const ACTION_COSTS = { coup: 7, assassinate: 3 }
 
 const ROLE_BY_ACTION = {
     tax: constants.CardNames.DUKE,
@@ -31,11 +36,16 @@ class CoupGame {
         this.decisionTimeoutMs = Number.isFinite(options.decisionTimeoutMs) && options.decisionTimeoutMs > 0
             ? options.decisionTimeoutMs
             : decisionTimeoutFromEnv()
+        this.codexClient = options.codexClient || null
+        this.isCodexDisabled = typeof options.isCodexDisabled === 'function' ? options.isCodexDisabled : () => false
+        this.spectatorSocketIDs = Array.isArray(options.spectatorSocketIDs) ? options.spectatorSocketIDs.slice() : []
         const colors = ['#73C373', '#7AB8D3', '#DD6C75', '#8C6CE6', '#EA9158', '#CB8F8F']
         this.players = players.map((player, index) => ({
             seat: index,
             name: String(player.name || '').trim(),
-            socketID: player.socketID,
+            controller: player.controller === 'codex' ? 'codex' : 'human',
+            effort: EFFORTS.has(player.effort) ? player.effort : 'medium',
+            socketID: player.controller === 'codex' ? null : player.socketID,
             money: 0,
             influences: [],
             revealedInfluences: [],
@@ -50,6 +60,10 @@ class CoupGame {
         this.stateVersion = 0
         this.activeDecision = null
         this.decisionTimer = null
+        this.codexRequests = new Map()
+        this.publicHistory = []
+        this.turnNumber = 0
+        this.matchID = crypto.randomBytes(16).toString('hex')
         this.phase = 'lobby'
         this.previousWinner = null
         this.winner = null
@@ -58,18 +72,22 @@ class CoupGame {
 
     start() {
         if (this.players.length < 2 || this.players.length > 6) return false
-        this.players.forEach(player => {
-            const socket = this.gameSocket.sockets && this.gameSocket.sockets[player.socketID]
-            if (socket) {
-                socket.on('g-submitDecision', envelope => this.submitDecision(player.socketID, envelope))
-                socket.on('g-playAgain', payload => this.playAgain(player.socketID, payload))
-                socket.on('g-resume', payload => this.resume(player.socketID, payload))
-                socket.on('disconnect', () => this.onDisconnect(player.socketID))
+        const connectedHumanIDs = this.players.filter(player => player.controller === 'human').map(player => player.socketID)
+        const connectedIDs = new Set([...connectedHumanIDs, ...this.spectatorSocketIDs].filter(Boolean))
+        connectedIDs.forEach(socketID => {
+            const socket = this.gameSocket.sockets && this.gameSocket.sockets[socketID]
+            if (!socket) return
+            if (this.players.some(player => player.socketID === socketID)) {
+                socket.on('g-submitDecision', envelope => this.submitDecision(socketID, envelope))
+                socket.on('disconnect', () => this.onDisconnect(socketID))
             }
+            socket.on('g-playAgain', payload => this.playAgain(socketID, payload))
+            socket.on('g-resume', payload => this.resume(socketID, payload))
         })
         this.resetGame()
         this.phase = 'running'
-        const disconnected = this.players.find(player => !this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID])
+        const disconnected = this.players.find(player => player.controller === 'human'
+            && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
         if (disconnected) {
             this.pause(`${disconnected.name} disconnected before the game started.`)
             return false
@@ -88,6 +106,9 @@ class CoupGame {
         this.phase = 'running'
         this.winner = null
         this.currentAction = null
+        this.publicHistory = []
+        this.turnNumber = 0
+        this.matchID = crypto.randomBytes(16).toString('hex')
         this.deck = gameUtils.buildDeck(this.rng)
 
         if (Number.isInteger(this.previousWinner) && this.previousWinner >= 0 && this.previousWinner < this.players.length) {
@@ -122,13 +143,15 @@ class CoupGame {
     updatePlayers() {
         const publicPlayers = this.players.map(player => ({
             name: player.name,
+            controller: player.controller,
+            ...(player.controller === 'codex' ? { effort: player.effort } : {}),
             money: player.money,
             color: player.color,
             isDead: player.isDead,
             influenceCount: player.influences.length,
             revealedInfluences: player.revealedInfluences.slice()
         }))
-        this.players.forEach(player => {
+        this.players.filter(player => player.controller === 'human').forEach(player => {
             this.socketEmit(player.socketID, 'g-updatePlayers', {
                 players: publicPlayers,
                 ownInfluences: player.influences.slice(),
@@ -137,10 +160,36 @@ class CoupGame {
                 stateVersion: this.stateVersion
             })
         })
+        this.spectatorSocketIDs.forEach(socketID => this.socketEmit(socketID, 'g-updatePlayers', {
+            players: publicPlayers,
+            ownInfluences: [],
+            currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
+            phase: this.phase,
+            stateVersion: this.stateVersion,
+            spectator: true
+        }))
     }
 
     addLog(message) {
         this.publicEmit('g-addLog', message)
+    }
+
+    addHistory(event) {
+        const entry = { turn: Math.max(1, this.turnNumber), ...event }
+        this.publicHistory.push(entry)
+        if (this.publicHistory.length > 120) this.publicHistory.shift()
+        return entry
+    }
+
+    actorKey(player) {
+        return player.controller === 'codex' ? `codex:${player.seat}` : player.socketID
+    }
+
+    cancelCodexRequests(code = 'cancelled') {
+        this.codexRequests.forEach(controller => {
+            controller.abort(Object.assign(new Error(code), { code }))
+        })
+        this.codexRequests.clear()
     }
 
     bumpVersion() {
@@ -171,6 +220,7 @@ class CoupGame {
     pause(cause, { recoverable = false } = {}) {
         if (this.phase === 'paused' || this.phase === 'gameover') return
         const decision = this.activeDecision
+        this.cancelCodexRequests('cancelled')
         this.clearDecisionTimer()
         this.activeDecision = null
         this.pausedDecision = recoverable && decision ? {
@@ -205,46 +255,57 @@ class CoupGame {
     }
 
     submitDecision(socketID, envelope) {
+        const seat = this.seatForSocket(socketID)
+        if (seat < 0) {
+            this.rejectDecision(socketID, 'This socket does not control a player seat.')
+            return false
+        }
+        return this.submitChoice(seat, envelope, socketID)
+    }
+
+    submitChoice(seat, envelope, socketID = null) {
         if (!this.isEnvelope(envelope)) {
-            this.rejectDecision(socketID, 'Expected decisionId, stateVersion, and choiceId only.')
+            if (socketID) this.rejectDecision(socketID, 'Expected decisionId, stateVersion, and choiceId only.')
             return false
         }
         const decision = this.activeDecision
         if (this.phase !== 'running' || !decision) {
-            this.rejectDecision(socketID, 'There is no active decision.')
+            if (socketID) this.rejectDecision(socketID, 'There is no active decision.')
             return false
         }
         if (envelope.decisionId !== decision.id || envelope.stateVersion !== decision.stateVersion) {
-            this.rejectDecision(socketID, 'Decision is stale or belongs to another phase.')
+            if (socketID) this.rejectDecision(socketID, 'Decision is stale or belongs to another phase.')
             return false
         }
-        const allowed = decision.allowed.get(socketID)
+        const player = this.players[seat]
+        const actorKey = player && this.actorKey(player)
+        const allowed = decision.allowed.get(actorKey)
         if (!allowed) {
-            this.rejectDecision(socketID, 'This seat is not eligible for this decision.')
+            if (socketID) this.rejectDecision(socketID, 'This seat is not eligible for this decision.')
             return false
         }
         const choice = allowed.get(envelope.choiceId)
         if (!choice) {
-            this.rejectDecision(socketID, 'Choice is not available to this seat.')
+            if (socketID) this.rejectDecision(socketID, 'Choice is not available to this seat.')
             return false
         }
-        const prior = decision.responses.get(socketID)
+        const prior = decision.responses.get(actorKey)
         if (prior) {
             if (prior.choiceId === envelope.choiceId) {
-                this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
+                if (socketID) this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
                 return true
             }
-            this.rejectDecision(socketID, 'A different choice was already submitted.')
+            if (socketID) this.rejectDecision(socketID, 'A different choice was already submitted.')
             return false
         }
-        decision.responses.set(socketID, { choiceId: envelope.choiceId, choice, seat: this.seatForSocket(socketID) })
-        this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
+        decision.responses.set(actorKey, { choiceId: envelope.choiceId, choice, seat })
+        if (socketID) this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
         if (decision.responses.size === decision.allowed.size) this.closeDecision()
         return true
     }
 
     seatForSocket(socketID) {
-        return this.players.findIndex(player => player.socketID === socketID)
+        return this.players.findIndex(player => player.controller === 'human' && player.socketID === socketID)
     }
 
     createChoice(choiceId, label, value) {
@@ -260,7 +321,7 @@ class CoupGame {
             const player = this.players[seat]
             const choices = optionsFor(seat)
             const choiceMap = new Map(choices.map(choice => [choice.choiceId, choice]))
-            allowed.set(player.socketID, choiceMap)
+            allowed.set(this.actorKey(player), choiceMap)
         })
         if (!allowed.size) {
             this.bumpVersion()
@@ -273,7 +334,7 @@ class CoupGame {
     activateDecision(template) {
         this.clearDecisionTimer()
         this.bumpVersion()
-        const id = `game-${this.gameNumber}-decision-${++this.decisionSerial}`
+        const id = `game-${this.matchID}-${this.gameNumber}-decision-${++this.decisionSerial}`
         this.activeDecision = {
             id,
             stateVersion: this.stateVersion,
@@ -285,8 +346,10 @@ class CoupGame {
             priorityFrom: template.priorityFrom,
             resolve: template.resolve
         }
-        template.allowed.forEach((choices, socketID) => {
-            this.socketEmit(socketID, 'g-decision', {
+        template.allowed.forEach((choices, actorKey) => {
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (!player) return
+            if (player.controller === 'human') this.socketEmit(player.socketID, 'g-decision', {
                 decisionId: id,
                 stateVersion: this.stateVersion,
                 type: template.type,
@@ -302,6 +365,109 @@ class CoupGame {
             }
         }, this.decisionTimeoutMs)
         if (this.decisionTimer && typeof this.decisionTimer.unref === 'function') this.decisionTimer.unref()
+        template.allowed.forEach((_, actorKey) => {
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (player && player.controller === 'codex') this.requestCodexDecision(player, this.activeDecision)
+        })
+    }
+
+    codexOption(choice, decisionType) {
+        const value = choice.value || {}
+        const option = { choiceId: choice.choiceId }
+        if (value.action) {
+            option.kind = 'action'
+            option.action = value.action
+            if (value.target != null) option.targetSeat = value.target
+            option.cost = ACTION_COSTS[value.action] || 0
+        } else if (value.kind === 'challenge') {
+            option.kind = 'challenge'
+        } else if (value.kind === 'block') {
+            option.kind = 'block'
+            option.role = String(value.role).toLowerCase()
+        } else if (value.kind === 'prove') {
+            option.kind = 'prove_claim'
+            option.role = String(value.card).toLowerCase()
+        } else if (value.kind === 'lose') {
+            option.kind = 'lose_influence'
+            option.role = String(value.card).toLowerCase()
+        } else if (value.kind === 'exchange') {
+            option.kind = 'exchange'
+            option.keep = value.keep.map(role => String(role).toLowerCase())
+        } else {
+            option.kind = 'pass'
+        }
+        if (decisionType === 'challenge' || decisionType === 'block_challenge') {
+            if (option.kind === 'pass') option.kind = 'pass'
+        }
+        return option
+    }
+
+    codexObservation(player, decision) {
+        return {
+            seat: player.seat,
+            decisionType: decision.type,
+            publicState: {
+                currentSeat: this.currentPlayer,
+                players: this.players.map(candidate => ({
+                    seat: candidate.seat,
+                    coins: candidate.money,
+                    alive: !candidate.isDead,
+                    influenceCount: candidate.influences.length,
+                    revealedRoles: candidate.revealedInfluences.map(role => String(role).toLowerCase())
+                }))
+            },
+            ownInfluences: player.influences.map(role => String(role).toLowerCase()),
+            history: this.publicHistory.slice(),
+            options: Array.from(decision.allowed.get(this.actorKey(player)).values())
+                .map(choice => this.codexOption(choice, decision.type))
+        }
+    }
+
+    requestCodexDecision(player, decision) {
+        if (!this.codexClient || this.isCodexDisabled()) {
+            this.pause('Codex is disabled or unavailable. Re-enable it from the server before resuming or recreating the game.')
+            return
+        }
+        const controller = new AbortController()
+        const requestKey = `${decision.id}:${player.seat}`
+        this.codexRequests.set(requestKey, controller)
+        const startedAt = Date.now()
+        Promise.resolve().then(() => this.codexClient.choose({
+            decisionId: decision.id,
+            stateVersion: decision.stateVersion,
+            effort: player.effort,
+            observation: this.codexObservation(player, decision),
+            signal: controller.signal
+        })).then(result => {
+            this.codexRequests.delete(requestKey)
+            if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id) return
+            if (!result || result.decisionId !== decision.id || result.stateVersion !== decision.stateVersion
+                || result.rulesVersion !== RULESET_VERSION) {
+                return this.pause('Codex returned a stale or invalid decision.')
+            }
+            const accepted = this.submitChoice(player.seat, {
+                decisionId: result.decisionId,
+                stateVersion: result.stateVersion,
+                choiceId: result.choiceId
+            })
+            if (!accepted) this.pause('Codex returned an unavailable choice.')
+            else this.publicEmit('g-codexActivity', { seat: player.seat, effort: player.effort, durationMs: Date.now() - startedAt })
+        }).catch(error => {
+            this.codexRequests.delete(requestKey)
+            if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id) return
+            if (error && error.code === 'cancelled') return
+            const reason = error && ['disabled', 'codex_disabled'].includes(error.code)
+                ? 'Codex was disabled by a player.'
+                : 'Codex could not complete this decision. Check its login, usage limit, and runner, then resume or recreate the game.'
+            this.pause(reason)
+        })
+    }
+
+    disableCodex() {
+        this.cancelCodexRequests('disabled')
+        if (this.phase === 'running' && this.players.some(player => player.controller === 'codex')) {
+            this.pause('Codex was disabled by a player. The owner must re-enable it on the server before starting a new AI decision.')
+        }
     }
 
     resume(socketID, payload) {
@@ -317,7 +483,8 @@ class CoupGame {
             this.rejectDecision(socketID, 'This pause cannot be resumed; recreate the game.')
             return false
         }
-        const disconnected = this.players.find(player => !this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID])
+        const disconnected = this.players.find(player => player.controller === 'human'
+            && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
         if (disconnected) {
             this.pausedDecision = null
             this.bumpVersion()
@@ -345,8 +512,10 @@ class CoupGame {
         this.clearDecisionTimer()
         this.activeDecision = null
         this.bumpVersion()
-        decision.allowed.forEach((_, socketID) => {
-            this.socketEmit(socketID, 'g-decisionClosed', {
+        decision.allowed.forEach((_, actorKey) => {
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (!player || player.controller !== 'human') return
+            this.socketEmit(player.socketID, 'g-decisionClosed', {
                 decisionId: decision.id,
                 stateVersion: this.stateVersion
             })
@@ -392,6 +561,7 @@ class CoupGame {
         if (this.phase !== 'running') return
         const player = this.players[this.currentPlayer]
         if (!player || player.isDead) return this.advanceTurn()
+        this.turnNumber += 1
         this.publicEmit('g-updateCurrentPlayer', player.name)
         const choices = this.actionChoices(this.currentPlayer)
         this.openDecision({
@@ -442,12 +612,26 @@ class CoupGame {
         if (action.type !== 'coup' && this.players[actor].money >= 10) return this.playTurn()
         if (action.target != null && (!this.players[action.target] || this.players[action.target].isDead || action.target === actor)) return this.playTurn()
         action.cost = cost
+        action.historyEntry = this.addHistory({
+            type: 'action',
+            actorSeat: actor,
+            action: action.type,
+            ...(action.target == null ? {} : { targetSeat: action.target }),
+            result: 'resolved'
+        })
         this.currentAction = action
         if (cost) this.players[actor].money -= cost
         this.addLog(`${this.players[actor].name} used ${this.actionLabel(action.type)}${action.target == null ? '' : ` on ${this.players[action.target].name}`}.`)
         this.updatePlayers()
         const claim = ROLE_BY_ACTION[action.type]
         if (!claim) return this.afterActionClaim(action)
+        action.claimHistoryEntry = this.addHistory({
+            type: 'claim',
+            actorSeat: action.actor,
+            action: action.type,
+            claimRole: String(claim).toLowerCase(),
+            result: 'resolved'
+        })
         this.openChallengeWindow(action, claim)
     }
 
@@ -462,11 +646,17 @@ class CoupGame {
             optionForSeat: () => [this.createChoice('challenge', 'Challenge', { kind: 'challenge' })],
             resolve: selected => {
                 if (!selected) return this.afterActionClaim(action)
+                action.claimHistoryEntry.result = 'challenged'
+                this.addHistory({
+                    type: 'challenge', actorSeat: selected.seat, targetSeat: action.actor,
+                    action: action.type, claimRole: String(role).toLowerCase(), result: 'challenged'
+                })
                 this.addLog(`${this.players[selected.seat].name} challenged ${this.players[action.actor].name}.`)
                 this.openProofDecision({
                     claimant: action.actor,
                     challenger: selected.seat,
                     roles: [role],
+                    historyEntry: action.claimHistoryEntry,
                     description: `${this.players[action.actor].name} must prove the ${role} claim.`,
                     onProved: () => this.loseInfluence(selected.seat, () => {
                         if (action.type === 'assassinate' && selected.seat === action.target) {
@@ -475,6 +665,7 @@ class CoupGame {
                         this.afterActionClaim(action)
                     }),
                     onConceded: () => {
+                        action.historyEntry.result = 'failed'
                         if (action.cost) this.players[action.actor].money += action.cost
                         this.updatePlayers()
                         this.loseInfluence(action.actor, () => this.advanceTurn())
@@ -511,8 +702,15 @@ class CoupGame {
                 { kind: 'block', role: block.role }
             )),
             resolve: selected => {
-                if (!selected) return this.resolveAction(action)
+                if (!selected) {
+                    action.historyEntry.result = 'resolved'
+                    return this.resolveAction(action)
+                }
                 const block = { action, blocker: selected.seat, role: selected.choice.value.role }
+                block.historyEntry = this.addHistory({
+                    type: 'block', actorSeat: block.blocker, targetSeat: action.actor,
+                    action: action.type, claimRole: String(block.role).toLowerCase(), result: 'resolved'
+                })
                 this.addLog(`${this.players[block.blocker].name} declared a block with ${block.role}.`)
                 this.challengeBlock(block)
             }
@@ -529,7 +727,16 @@ class CoupGame {
             anchor: block.blocker,
             optionForSeat: () => [this.createChoice('challenge', 'Challenge', { kind: 'challenge' })],
             resolve: selected => {
-                if (!selected) return this.advanceTurn()
+                if (!selected) {
+                    block.historyEntry.result = 'resolved'
+                    block.action.historyEntry.result = 'blocked'
+                    return this.advanceTurn()
+                }
+                block.historyEntry.result = 'challenged'
+                this.addHistory({
+                    type: 'block_challenge', actorSeat: selected.seat, targetSeat: block.blocker,
+                    action: block.action.type, claimRole: String(block.role).toLowerCase(), result: 'challenged'
+                })
                 this.addLog(`${this.players[selected.seat].name} challenged ${this.players[block.blocker].name}'s block.`)
                 this.openProofDecision({
                     claimant: block.blocker,
@@ -537,15 +744,19 @@ class CoupGame {
                     roles: block.role === constants.CardNames.CAPTAIN || block.role === constants.CardNames.AMBASSADOR
                         ? [constants.CardNames.CAPTAIN, constants.CardNames.AMBASSADOR]
                         : [block.role],
+                    historyEntry: block.historyEntry,
                     description: `${this.players[block.blocker].name} must prove the blocking claim.`,
-                    onProved: () => this.loseInfluence(selected.seat, () => this.advanceTurn()),
+                    onProved: () => {
+                        block.action.historyEntry.result = 'blocked'
+                        this.loseInfluence(selected.seat, () => this.advanceTurn())
+                    },
                     onConceded: () => this.loseInfluence(block.blocker, () => this.resolveAction(block.action))
                 })
             }
         })
     }
 
-    openProofDecision({ claimant, challenger, roles, description, onProved, onConceded }) {
+    openProofDecision({ claimant, challenger, roles, historyEntry, description, onProved, onConceded }) {
         const player = this.players[claimant]
         const heldRoles = player.influences.filter(card => roles.includes(card))
         const choices = heldRoles.map((card, index) => this.createChoice(
@@ -565,11 +776,13 @@ class CoupGame {
                 if (!response) return this.pause('Claimant did not resolve the challenge.')
                 if (response.choice.value.kind === 'prove') {
                     const provenCard = response.choice.value.card
+                    if (historyEntry) historyEntry.result = 'proved'
                     this.addLog(`${player.name} proved the claim with ${provenCard}.`)
                     this.returnProvenInfluence(claimant, provenCard)
                     this.updatePlayers()
                     onProved()
                 } else {
+                    if (historyEntry) historyEntry.result = 'failed'
                     this.addLog(`${player.name} could not prove the claim.`)
                     onConceded()
                 }
@@ -617,6 +830,10 @@ class CoupGame {
                 player.revealedInfluences.push(card)
                 this.addLog(`${player.name} lost ${card}.`)
                 this.checkEliminated()
+                this.addHistory({
+                    type: 'influence_loss', actorSeat: seat, revealedRole: String(card).toLowerCase(),
+                    result: player.isDead ? 'eliminated' : 'resolved'
+                })
                 this.updatePlayers()
                 onLost()
             }
@@ -645,11 +862,14 @@ class CoupGame {
             target.money -= amount
             actor.money += amount
         } else if ((action.type === 'coup' || action.type === 'assassinate') && target && !target.isDead) {
+            action.historyEntry.result = 'resolved'
             return this.loseInfluence(action.target, () => this.advanceTurn())
         } else if (action.type === 'exchange') {
+            action.historyEntry.result = 'resolved'
             const drawn = [this.deck.pop(), this.deck.pop()].filter(Boolean)
             return this.openExchange(action.actor, drawn)
         }
+        if (action.historyEntry.result !== 'blocked') action.historyEntry.result = 'resolved'
         this.updatePlayers()
         this.advanceTurn()
     }
@@ -672,7 +892,7 @@ class CoupGame {
         const options = combinations.map((keptIndices, index) => {
             const kept = keptIndices.map(poolIndex => pool[poolIndex])
             const label = `Keep ${kept.join(' and ')}`
-            return this.createChoice(`exchange:${index}`, label, { kind: 'exchange', keptIndices })
+            return this.createChoice(`exchange:${index}`, label, { kind: 'exchange', keptIndices, keep: kept })
         })
         this.openDecision({
             type: 'exchange',

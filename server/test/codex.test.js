@@ -59,27 +59,63 @@ async function runnerFixture() {
 function fakeSpawn(output, closeCode = 0, control = {}) {
     const calls = []
     const spawn = (executable, args, options) => {
-        calls.push({ executable, args, options })
+        const call = { executable, args, options, sent: [] }
+        calls.push(call)
         const child = new EventEmitter()
-        child.stdin = new Writable({
-            write(_chunk, _encoding, callback) { callback() }
-        })
         child.stdout = new PassThrough()
         child.stderr = new PassThrough()
         child.killed = false
+        child.exitCode = null
+        child.stdin = new Writable({
+            write(chunk, _encoding, callback) {
+                let message
+                try { message = JSON.parse(chunk.toString('utf8')) } catch (_) { callback(); return }
+                call.sent.push(message)
+                if (control.hang) return callback()
+                if (closeCode !== 0 && message.method === 'initialize') {
+                    setImmediate(() => {
+                        child.exitCode = closeCode
+                        child.emit('close', closeCode, null)
+                    })
+                    callback()
+                    return
+                }
+                const send = response => child.stdout.write(`${JSON.stringify(response)}\n`)
+                if (message.method === 'initialize') send({ id: message.id, result: {} })
+                if (message.method === 'thread/start') send({
+                    id: message.id,
+                    result: { thread: { id: 'thread-1', ephemeral: true } }
+                })
+                if (message.method === 'turn/start') {
+                    const threadId = message.params.threadId
+                    if (control.notificationsBeforeTurnResponse) {
+                        send({ method: 'item/completed', params: {
+                            threadId, turnId: 'turn-1', item: { type: 'agentMessage', text: output }
+                        } })
+                        send({ method: 'turn/completed', params: {
+                            threadId, turn: { id: 'turn-1', status: 'completed', error: null }
+                        } })
+                    }
+                    send({ id: message.id, result: { turn: { id: 'turn-1', status: 'inProgress' } } })
+                    if (!control.notificationsBeforeTurnResponse) {
+                        send({ method: 'item/completed', params: {
+                            threadId, turnId: 'turn-1', item: { type: 'agentMessage', text: output }
+                        } })
+                        send({ method: 'turn/completed', params: {
+                            threadId, turn: { id: 'turn-1', status: 'completed', error: null }
+                        } })
+                    }
+                }
+                callback()
+            }
+        })
         child.kill = signal => {
             child.killed = true
             if (control.signals) control.signals.push(signal)
+            child.exitCode = 0
             child.emit('close', null, signal)
             return true
         }
-        child.stdin.once('finish', async () => {
-            if (control.hang) return
-            const outputIndex = args.indexOf('--output-last-message')
-            const outputPath = args[outputIndex + 1]
-            await fs.writeFile(outputPath, output)
-            child.emit('close', closeCode, null)
-        })
         return child
     }
     return { spawn, calls }
@@ -102,34 +138,20 @@ test('runner protocol rejects arbitrary player text and extra fields', () => {
     assert.throws(() => protocol.normalizeRequest(extraEnvelope), { code: 'invalid_request' })
 })
 
-test('runner schema and CLI flags pin model, effort, deny-by-default filesystem, and allowed choices', () => {
+test('runner schema and App Server flags pin model tools and legal choices', () => {
     const normalized = protocol.normalizeRequest(request({ effort: 'high' }))
     const schema = protocol.outputSchema(normalized)
     assert.deepEqual(schema.properties.choiceId.enum, ['income', 'steal:1'])
     assert.equal(schema.additionalProperties, false)
-    const args = protocol.execArgs(normalized, '/tmp/schema.json', '/tmp/result.json')
-    assert.deepEqual(args.slice(0, 6), [
-        'exec', '--skip-git-repo-check', '--ephemeral', '--ignore-user-config',
-        '--ask-for-approval', 'never'
-    ])
-    assert.equal(args[args.indexOf('--model') + 1], 'gpt-6-luna')
-    const configValues = args.reduce((values, value, index) => {
-        if (value === '--config') values.push(args[index + 1])
-        return values
-    }, [])
-    assert.ok(configValues.includes(`model_reasoning_effort='"high"'`))
-    assert.ok(configValues.includes('default_permissions="coup-ai"'))
-    assert.ok(configValues.includes('permissions.coup-ai.filesystem={":root"="deny",":minimal"="read",":tmpdir"="write",":workspace_roots"={"."="read"}}'))
-    assert.ok(configValues.includes('permissions.coup-ai.network={enabled=false}'))
-    assert.ok(configValues.includes('web_search="disabled"'))
-    assert.equal(args.includes('--sandbox'), false)
+    const args = protocol.appServerArgs()
+    assert.equal(args[0], 'app-server')
+    assert.ok(args.includes('stdio://'))
     const disabledFeatures = []
     for (let index = 0; index < args.length; index += 1) {
         if (args[index] === '--disable') disabledFeatures.push(args[index + 1])
     }
     assert.deepEqual(disabledFeatures, ['shell_tool', 'apps', 'multi_agent', 'hooks'])
-    assert.equal(args[args.indexOf('--output-schema') + 1], '/tmp/schema.json')
-    assert.equal(args.at(-1), '-')
+    assert.ok(args.includes('web_search="disabled"'))
     assert.match(protocol.promptFor(normalized), /rules reference is version b189cc0/)
 })
 
@@ -169,6 +191,30 @@ test('Codex runner executes only with an allowlisted environment and returns a l
     assert.equal('CODEX_APP_ROOT' in fake.calls[0].options.env, false)
     assert.equal('OPENAI_API_KEY' in fake.calls[0].options.env, false)
     assert.equal('CODEX_API_KEY' in fake.calls[0].options.env, false)
+    const threadStart = fake.calls[0].sent.find(message => message.method === 'thread/start')
+    assert.equal(threadStart.params.ephemeral, true)
+    assert.equal(threadStart.params.model, 'gpt-6-luna')
+    assert.equal(threadStart.params.sandbox, 'read-only')
+    const turnStart = fake.calls[0].sent.find(message => message.method === 'turn/start')
+    assert.equal(turnStart.params.model, 'gpt-6-luna')
+    assert.equal(turnStart.params.effort, 'medium')
+    assert.deepEqual(turnStart.params.outputSchema.properties.choiceId.enum, ['income', 'steal:1'])
+    assert.deepEqual(turnStart.params.sandboxPolicy, { type: 'readOnly', networkAccess: false })
+})
+
+test('runner handles App Server events that arrive before the turn/start acknowledgement', async () => {
+    const fake = fakeSpawn(JSON.stringify({ choiceId: 'steal:1' }), 0, { notificationsBeforeTurnResponse: true })
+    const fixture = await runnerFixture()
+    try {
+        const result = await runCodexDecision(request(), {
+            env: fixture.env,
+            spawn: fake.spawn,
+            tempRoot: fixture.tempRoot
+        })
+        assert.equal(result.choiceId, 'steal:1')
+    } finally {
+        await fixture.cleanup()
+    }
 })
 
 test('Codex runner rejects malformed output, illegal choices, and nonzero exits', async () => {
@@ -289,6 +335,7 @@ test('app client and isolated runner exchange one versioned choice over a Unix s
     const socketPath = path.join(directory, 'runner.sock')
     const runner = createRunnerServer({
         socketPath,
+        enabled: true,
         runDecision: async normalized => ({ choiceId: normalized.observation.options[0].choiceId })
     })
     try {
@@ -296,6 +343,7 @@ test('app client and isolated runner exchange one versioned choice over a Unix s
         const socketStat = await fs.stat(socketPath)
         assert.equal(socketStat.mode & 0o777, 0o660)
         const client = new CodexRunnerClient({ socketPath, timeoutMs: 1000 })
+        assert.deepEqual(await client.status(), { enabled: true })
         const result = await client.choose({
             decisionId: 'game-1-decision-2',
             stateVersion: 3,
@@ -316,6 +364,7 @@ test('worker aborts a running decision when its local client disconnects', async
     const startedPromise = new Promise(resolve => { started = resolve })
     const runner = createRunnerServer({
         socketPath,
+        enabled: true,
         runDecision: (_request, options) => new Promise(() => {
             options.signal.addEventListener('abort', () => { aborted = true })
             started()
@@ -329,6 +378,70 @@ test('worker aborts a running decision when its local client disconnects', async
         socket.destroy()
         await new Promise(resolve => setTimeout(resolve, 10))
         assert.equal(aborted, true)
+    } finally {
+        await runner.close()
+        await fs.rm(directory, { recursive: true, force: true })
+    }
+})
+
+test('emergency disable aborts active calls and remains disabled after runner restart', async () => {
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'coup-runner-killswitch-test-'))
+    const socketPath = path.join(directory, 'runner.sock')
+    const disabledFile = path.join(directory, 'state', 'codex-disabled')
+    let aborted = false
+    let started
+    const startedPromise = new Promise(resolve => { started = resolve })
+    const runDecision = (_request, options) => new Promise((_resolve, reject) => {
+        options.signal.addEventListener('abort', () => {
+            aborted = true
+            reject(options.signal.reason)
+        }, { once: true })
+        started()
+    })
+    let runner = createRunnerServer({ socketPath, disabledFile, enabled: true, runDecision })
+    try {
+        await runner.listen()
+        const client = new CodexRunnerClient({ socketPath, timeoutMs: 1000 })
+        const activeDecision = client.choose({
+            decisionId: 'game-1-decision-2', stateVersion: 3, observation: request().observation
+        })
+        const activeDecisionFailure = assert.rejects(activeDecision, { code: 'disabled' })
+        await startedPromise
+        assert.deepEqual(await client.disable(), { disabled: true })
+        await activeDecisionFailure
+        assert.equal(aborted, true)
+        assert.equal((await fs.readFile(disabledFile, 'utf8')).trim(), 'disabled')
+        await runner.close()
+
+        runner = createRunnerServer({ socketPath, disabledFile, enabled: true, runDecision })
+        await runner.listen()
+        assert.deepEqual(await new CodexRunnerClient({ socketPath, timeoutMs: 1000 }).status(), { enabled: false })
+        await assert.rejects(new CodexRunnerClient({ socketPath, timeoutMs: 1000 }).choose({
+            decisionId: 'game-1-decision-3', stateVersion: 4, observation: request().observation
+        }), { code: 'disabled' })
+    } finally {
+        await runner.close()
+        await fs.rm(directory, { recursive: true, force: true })
+    }
+})
+
+test('runner enforces persisted per-game and rolling hourly usage limits', async () => {
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'coup-runner-quota-test-'))
+    const socketPath = path.join(directory, 'runner.sock')
+    const usageFile = path.join(directory, 'usage.json')
+    const runner = createRunnerServer({
+        socketPath, usageFile, enabled: true, maxCallsPerGame: 1, maxCallsPerHour: 2,
+        runDecision: async normalized => ({ choiceId: normalized.observation.options[0].choiceId })
+    })
+    try {
+        await runner.listen()
+        const client = new CodexRunnerClient({ socketPath, timeoutMs: 1000 })
+        const input = { decisionId: 'game-1-decision-2', stateVersion: 3, observation: request().observation }
+        assert.equal((await client.choose(input)).choiceId, 'income')
+        await assert.rejects(client.choose({ ...input, stateVersion: 4 }), { code: 'usage_limit' })
+        const state = JSON.parse(await fs.readFile(usageFile, 'utf8'))
+        assert.equal(state.calls.length, 1)
+        assert.equal(Object.values(state.games)[0].calls, 1)
     } finally {
         await runner.close()
         await fs.rm(directory, { recursive: true, force: true })

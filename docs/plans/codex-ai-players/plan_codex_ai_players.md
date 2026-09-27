@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); tres PHASE F2 BLOCKED; el servicio endurece UMask a 0077 y deja el socket de grupo en 0660; preflight y gates oficiales pendientes
+Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2 App Server implementado y validado localmente, login/modelo real pendiente; F3 implementado y cubierto por pruebas; validación de Hetzner y revisión final pendientes
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -15,18 +15,18 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 
 - Issue #3 está cerrada y su PR #4 contiene una revisión FINAL PASS, no correcciones. El informe halló difusión de influencias privadas, handlers que confían en datos/identidad del payload, roster de anfitrión no validado, CORS abierto y falta de límites visibles. Fuentes: docs/plans/active/report_issue_3_quick_security_check_F1.md y docs/plans/active/verifier_issue_3_final.md.
 - El código actual envía influencias de todos los jugadores a toda la sala y devuelve al mazo cartas que las reglas dejan reveladas.
-- La issue #13 es la unidad canónica de despliegue. Está abierta, F0 quedó cerrado y el commit de release sigue por definir. #14 integra la funcionalidad; el despliegue la consume después.
+- La issue #13 sigue siendo la unidad del despliegue regular. Para esta prueba temporal, el usuario autorizó un release POC separado que conserva intacto el release actual como rollback.
 - El checkout raíz contiene modificaciones locales sin commit. El worktree de #14 parte del origin/master limpio; no incorporar cambios raíz sin una decisión registrada.
-- El usuario aprobó jugar con su login ChatGPT Plus mediante Codex CLI, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar el uso de Codex.
+- El usuario aprobó una prueba temporal con su login ChatGPT mediante Codex App Server, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar Codex. No se publicarán cambios al fork; el runner y el release se preparan aislados.
 - Por instrucción del usuario, se conserva el acceso/lobby actual sin cuentas ni invitaciones. Cualquier jugador conectado puede activar el apagado seguro; solo el propietario rearma Codex por SSH/consola.
 - Se versionaron desde el checkout local las reglas completas y sus tres resúmenes en `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la autoridad; F1 alineó el motor con esas reglas.
 
-## Compatibilidad Codex/Plus y límite operativo (verificado 2026-09-26)
+## Compatibilidad de App Server y acceso al modelo
 
-- La página oficial de precios lista GPT-6 Luna y Codex CLI en Plus. La documentación de modelos advierte que la disponibilidad concreta depende del rollout, método de inicio y cliente, así que sigue sin verificarse para esta cuenta/CLI. Luna se mantiene fija: si no aparece disponible, pausar, sin sustituir modelo ni usar API. El uso de Codex comparte una cuota limitada del plan y varía con modelo, contexto y trabajo; no es un presupuesto API ni una capacidad ilimitada. Fuentes: [Pricing](https://learn.chatgpt.com/docs/pricing), [Models](https://learn.chatgpt.com/docs/models).
-- La guía oficial de automatización indica que `codex exec` puede reutilizar autenticación guardada de ChatGPT, que `~/.codex/auth.json` debe tratarse como una contraseña y que este flujo no debe usarse con repositorios públicos o open source. `pronficilio/coup-online` es público.
-- Por tanto, F2 no puede tratar el login Plus como un backend ya aprobado para servicio: antes de conectar asientos de amigos, el Verifier debe confirmar que el runner local de juego queda fuera del código/repositorio público y del proceso web no confiable, y que este uso autenticado es compatible con la guía vigente. Si no se puede confirmar esa frontera/compatibilidad, F2 queda bloqueada; no se elude con una cuenta/API alternativa.
-- Fuentes: [precios y límites de Codex](https://learn.chatgpt.com/docs/pricing), [modelos y CLI](https://learn.chatgpt.com/docs/models), [modo no interactivo y autenticación](https://learn.chatgpt.com/docs/non-interactive-mode).
+- La documentación oficial presenta Codex App Server como interfaz para integrar Codex dentro de un producto, con transporte stdio/socket. También marca el protocolo como experimental y no soportado para producción: esta prueba es temporal y se podrá retirar o migrar a API.
+- El runner no monta el checkout público ni tiene acceso a la red interna de Coup. Recibe únicamente datos estructurados de una partida y solo la API conserva la sesión del juego; la auth queda en un volumen privado del sidecar.
+- La disponibilidad de `gpt-6-luna` y del inicio de sesión en esta cuenta concreta sigue sin comprobarse. El login device-code y una sola decisión real son el siguiente paso; si falla no habrá fallback ni API.
+- Referencias: [Codex App Server](https://learn.chatgpt.com/docs/app-server), [modelos](https://learn.chatgpt.com/docs/models), [CLI y login de dispositivo](https://learn.chatgpt.com/docs/developer-commands).
 
 ## Bloqueos explícitos por fase
 
@@ -36,7 +36,7 @@ F2: bloquear si el runner no puede aislarse o autenticarse con Plus; no sustitui
 F3: bloquear si se pueden saltar límites, el apagado o la reactivación de Codex desde HTTP/Socket.IO.
 F4: bloquear la integración si queda un hallazgo de privacidad, permisos, gasto o reglas críticas, o si el Verifier no da PASS.
 
-La primera fase F0 es análisis de contrato que produce evidencia documental y commit. F1 implementa privacidad/autoridad antes de F2. F2 agrega Codex CLI. F3 habilita asientos IA y kill switch conservando el lobby actual, sin cuentas ni invitaciones. F4 cierra revisión y prepara el handoff de release a #13. La issue contiene el detalle y el criterio verificable de cada fase.
+La primera fase F0 es análisis de contrato que produce evidencia documental y commit. F1 implementa privacidad/autoridad antes de F2. F2 integra Codex App Server en un sidecar aislado. F3 habilita asientos IA y kill switch conservando el lobby actual, sin cuentas ni invitaciones. F4 completa la prueba en Hetzner y la revisión final.
 ## Solicitud
 
 Agregar jugadores automáticos controlados por GPT-6 Luna a Coup Online. El propietario y sus amigos podrán jugar partidas mixtas (por ejemplo, un humano contra dos IA) y partidas IA contra IA. Las llamadas al modelo usarán Codex CLI autenticado con la suscripción ChatGPT Plus del propietario, con el esfuerzo de razonamiento elegido para cada asiento. No se usará una API key ni se activará facturación API como alternativa.
@@ -61,7 +61,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 - Definir el contrato de observación privada, las decisiones del motor y la asociación de cada asiento con un controlador humano o Codex.
 - Cerrar las filtraciones de cartas privadas y discrepancias de reglas que impidan un experimento válido; hacer que el servidor valide y resuelva las decisiones relevantes.
-- Implementar un adaptador aislado para invocaciones puntuales de `codex exec`, con `gpt-6-luna`, esfuerzo configurable, esquema de salida y manejo de errores.
+- Implementar un adaptador aislado para decisiones puntuales con Codex App Server, `gpt-6-luna`, esfuerzo configurable, esquema de salida y manejo de errores.
 - Conservar el acceso/lobby existente sin autenticación nueva; añadir límites operativos y una palanca roja global de solo apagado.
 - Permitir configurar asientos humanos/IA y esfuerzo de cada IA en la creación de partidas.
 - Dejar una guía de autenticación inicial en Hetzner mediante el flujo de inicio de sesión de Codex apropiado para un servidor remoto, sin guardar ni publicar credenciales.
@@ -100,19 +100,17 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Commit:** implementación inicial `608089d4c839f367b9b0b0e92009d3daf536ce5c` devuelta; correcciones, regresiones y evidencia revisadas en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 - **Validación:** `npm test` en `server/`, pruebas directas `node test/coup.test.js` y `node test/lobby.test.js`, `node --check`, `git diff --check` y PHASE independiente `PASS`.
 
-### F2 — Añadir el controlador Codex con la suscripción del propietario (`ACTIVE`)
+### F2 — Añadir el controlador Codex con el login del propietario (`IMPLEMENTADO; PRUEBA REAL PENDIENTE`)
 
 - **Pregunta:** ¿puede un proceso separado ejecutar una decisión Codex acotada y devolver una opción válida sin recibir secretos ajenos ni acceso operativo al servidor?
 - **Entrada:** proyecciones y decisiones autoritativas F1.
-- **Salida:** invocador `codex exec` autenticado con ChatGPT, contexto pequeño de reglas + mano propia + estado público + opciones permitidas, esquema JSON, identificador/versionado de decisión, límites de tiempo/ejecución y tratamiento de errores.
-- **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre de clientes; corre en un usuario/directorio de trabajo aislado y de solo lectura, sin montar el repo de Coup ni secretos de aplicación; no ejecuta shell pedido por jugadores; respuesta se valida contra la decisión vigente; no hay fallback a API. La documentación oficial de autenticación en automatización advierte contra este flujo con repositorios públicos/open source; como este repo es público, Verifier debe resolver compatibilidad y aislamiento del runner antes de habilitar asientos IA. También prueba de forma independiente la barrera del proceso y del gasto.
-- **Pivote:** si Codex CLI no permite una ejecución acotada y segura para una decisión de juego, bloquear F2 y presentar la limitación en lugar de sustituir autenticación/proveedor.
+- **Salida:** runner lateral `codex app-server --listen stdio://`, hilo efímero, contexto de reglas + mano propia + estado público + opciones permitidas, esquema JSON, identificador/versionado de decisión, límites de tiempo/ejecución y tratamiento de errores.
+- **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre; corre en contenedor sin checkout ni secretos del API, sin herramientas y con rootfs de solo lectura; la respuesta se valida contra la decisión vigente; no hay fallback a API. La documentación del App Server lo marca experimental, de modo que se trata de prueba temporal.
+- **Pivote:** si App Server no está disponible en la cuenta/CLI, retirar la conexión Plus y dejar registrada la limitación; no sustituir autenticación/proveedor.
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
-- **Commit:** `COMMIT_REQUIRED`; `feat(codex-player): issue 14 F2 plus-auth runtime`.
-- **Validación:** no iniciar sesión ni llamar a `codex exec` hasta que el PHASE resuelva la aplicabilidad de auth gestionada para el repo público y confirme que `gpt-6-luna` está disponible para la cuenta/CLI objetivo. Primero demostrar el aislamiento con CLI/runtime Linux sin credenciales ni modelo; después de desbloquear los gates, una prueba mínima bajo el login del propietario debe registrar éxito/error, esfuerzo, latencia y uso disponible, sin simulaciones masivas.
-- **Acotación OpenAI Docs (2026-09-27):** `codex exec` está documentado para automatización, acepta `--output-schema` y reutiliza autenticación CLI guardada. La primera prueba demostró que el sandbox antiguo `read-only` permitía leer un archivo señuelo fuera del workspace; F2 lo reemplaza por un perfil inline deny-by-default que restringe lectura al workspace vacío y permite el temporal privado del servicio. El perfil candidato omite `:slash_tmp`, separa `TMPDIR` de `XDG_RUNTIME_DIR` y deshabilita red de comandos y herramientas locales. El tercer PHASE independiente no reprodujo el arranque y falló antes del comando por el socket interno. Bajo `UMask=0007` el directorio creado fue `0770`; con `0077` y `0700` el error persistió. La unidad fija `UMask=0077` como endurecimiento y el worker asigna `0660` al socket compartido explícitamente; esto no prueba que el preflight quede resuelto. Los perfiles son Beta y el sandbox Linux depende de bubblewrap, user namespaces y kernel. La guía de auth gestionada por ChatGPT dice no usar este flujo con repositorios públicos/open source; Coup Online es público y no hay una excepción documentada para el runner de juego que no monta el repo, por lo que F2 permanece bloqueada. La página de precios lista GPT-6 Luna en Plus y Codex CLI; el acceso efectivo depende del rollout, login y cliente y esta cuenta/CLI no se verificó. No hay login ni llamadas reales. Referencias: [Non-interactive mode](https://learn.chatgpt.com/docs/non-interactive-mode), [Permissions](https://learn.chatgpt.com/docs/permissions), [Models](https://learn.chatgpt.com/docs/models), [Pricing](https://learn.chatgpt.com/docs/pricing).
+**F2 evidencia (2026-09-27):** `npm test` cubre App Server JSON-RPC, opciones legales, timeouts y cancelaciones; la CLI 0.157.1 completó localmente `initialize` y `thread/start` efímero sin login ni turno; imagen Docker construida; el contenedor pasa healthcheck y un proceso con UID/GID del API conecta al socket `0660` grupo 10002. Quedan la autorización device-code del propietario y una sola decisión real para confirmar Luna y el uso disponible.
 
-### F3 — Añadir asientos IA y palanca roja (`PENDING`)
+### F3 — Añadir asientos IA y palanca roja (`IMPLEMENTADO; REVISIÓN F4 PENDIENTE`)
 
 - **Pregunta:** ¿pueden los jugadores configurar asientos IA en el lobby actual y apagar Codex sin agregar autenticación ni permitir que un cliente lo reactive?
 - **Entrada:** controlador Codex F2 y contratos del lobby/socket.
@@ -120,19 +118,17 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** se crean partidas de una persona + dos IA y de varias IA; cualquier jugador puede activar la palanca y solo el propietario puede reactivar Codex por SSH/consola; apagar bloquea llamadas nuevas, intenta terminar las activas, invalida sus respuestas y pausa la decisión actual; tras reinicio Codex sigue apagado hasta habilitación explícita del propietario; Verifier refuta vías de bypass desde HTTP/Socket.IO.
 - **Pivote:** si apagar Codex no invalida las respuestas en curso o si el cliente puede reactivar Codex, bloquear F3 hasta corregir la palanca.
 - **Repetición:** una corrección acotada por vía de bypass demostrada.
-- **Commit:** `COMMIT_REQUIRED`; `feat(game-lobby): issue 14 F3 AI seats and kill switch`.
-- **Validación:** recorrido con el acceso actual y lectura del control de gasto/kill switch por el Verifier.
+- **Validación local:** pruebas cubren anfitrión + dos IA, IA contra IA con espectador, clave de lobby, apagado concurrente, marcador persistente y cuotas. Queda validar la operación tras login en Hetzner.
 
 ### F4 — Verificar la integración completa y preparar handoff de release (`PENDING`)
 
 - **Pregunta:** ¿se puede completar una partida mixta y apagar/recuperar Codex sin violar reglas, privacidad o el límite de gasto?
-- **Entrada:** F0–F3 cerradas.
+- **Entrada:** F0–F3 implementadas localmente.
 - **Salida:** guía de operación/auth, escenarios manuales reproducibles, resultados del Verifier y decisión de listo para integrar.
-- **Cierre:** recorrido documentado humano vs dos IA e IA vs IA; acciones/desafíos/bloqueos/intercambio/timeout y kill switch revisados; el Verifier independiente emite `PASS`; configuración de release y dependencia con #13 documentadas. No iniciar torneos de rendimiento dentro de esta issue.
+- **Cierre:** recorrido humano vs dos IA e IA vs IA en Hetzner; acciones/desafíos/bloqueos/intercambio/timeout y kill switch revisados; compilar cliente y servidor; revisión final; mantener release previo listo para rollback. No iniciar torneos masivos.
 - **Pivote:** si falla una invariante de reglas, privacidad o kill switch, devolver a su fase propietaria.
 - **Repetición:** una ronda de correcciones/revisión focalizada por criterio fallido.
-- **Commit:** `COMMIT_REQUIRED`; `feat(codex-ai): issue 14 F4 READY_FOR_REVIEW`.
-- **Validación:** revisión FINAL independiente y salida manual de los escenarios previstos.
+- **Estado:** pendiente completar device-code, modelo real y escenarios manuales.
 
 ## Riesgos y mitigaciones
 
@@ -141,14 +137,14 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Secretos Codex:** login se realiza en Hetzner como usuario del proceso o flujo remoto documentado; auth cache con permisos de propietario, nunca en logs/cliente/repositorio.
 - **Prompt injection:** no incluir chat libre; datos de juego estructurados; no abrir el modelo a archivos del proyecto ni a herramientas sobre el juego; opciones se generan y validan en servidor.
 - **Latencia/caída:** decisión con id y vencimiento; descartar respuestas tardías; pausa visible y recuperación explícita.
-- **Reglas/privacidad heredadas:** F1 cerró con PHASE `PASS`; no habilitar asientos IA desde el lobby hasta cerrar F2/F3 y sus revisiones independientes.
+- **Reglas/privacidad heredadas:** F1 cerró con PHASE `PASS`; F4 comprueba que las nuevas llamadas conservan el contrato y el kill switch durante la prueba.
 
 ## Operación
 
-- Ejecución `FULL`; riesgo `HIGH`; verificación independiente `PHASE` obligatoria en F0–F3 y `FINAL` al cierre, por permisos de socket, privacidad y concurrencia.
+- Ejecución `FULL`; riesgo `HIGH`; pruebas de motor, runner, socket, cuotas y build completadas localmente; queda prueba real de cuenta y operación de Hetzner.
 - Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
-- Siguiente dueño: Verifier F2; revisión PHASE independiente antes de F3.
+- Siguiente paso: empaquetar un release POC privado, activar device-code con el propietario y probar una sola jugada antes de invitar amigos.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
 - Merge target: `master`.
-- Release Hetzner: unidad #13; no desplegar desde este issue.
+- Release Hetzner: carpeta nueva con overlay runner; no tocar el release anterior ni publicar cambios al fork. Conservar rollback inmediato.

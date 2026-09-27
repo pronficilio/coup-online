@@ -23,6 +23,10 @@ class FakeSocket {
         this.outgoing.push({ event, payload })
     }
 
+    emit(event, payload) {
+        this.send(event, payload)
+    }
+
     last(event) {
         return this.outgoing.filter(item => item.event === event).slice(-1)[0]
     }
@@ -79,8 +83,8 @@ test('lobby authorizes the first named socket and builds its roster without clie
 
     assert.deepEqual(started, {
         roster: [
-            { name: 'Second', socketID: 'socket-first' },
-            { name: 'Leader', socketID: 'socket-leader' }
+            { name: 'Second', socketID: 'socket-first', controller: 'human' },
+            { name: 'Leader', socketID: 'socket-leader', controller: 'human' }
         ],
         leaderSocketID: 'socket-leader'
     })
@@ -89,4 +93,104 @@ test('lobby authorizes the first named socket and builds its roster without clie
     assert.equal(namespace.outgoing.some(item => item.event === 'startGame'), true)
     await new Promise(resolve => setTimeout(resolve, 60))
     assert.equal(startCalled, true)
+})
+
+test('only the leader with the shared code can add configured Codex seats', () => {
+    const namespace = new FakeNamespace()
+    let started = null
+    const lobby = openLobby(namespace, '/ROOM', {
+        aiAccessCode: 'test-shared-code-long-enough',
+        startGame(roster, leaderSocketID, spectatorSocketIDs) {
+            started = { roster, leaderSocketID, spectatorSocketIDs }
+            return { start() {} }
+        },
+        cleanup() {}
+    })
+    const leader = new FakeSocket('leader')
+    const friend = new FakeSocket('friend')
+    namespace.connect(leader)
+    namespace.connect(friend)
+    leader.receive('setName', 'Host')
+    friend.receive('setName', 'Friend')
+    friend.receive('setReady', true)
+
+    friend.receive('authorizeCodexAI', { code: 'test-shared-code-long-enough' })
+    friend.receive('addCodexSeat', { effort: 'high' })
+    leader.receive('addCodexSeat', { effort: 'invalid' })
+    assert.equal(friend.last('codexAuthorizationResult').payload.authorized, false)
+    assert.equal(lobby.started, false)
+
+    leader.receive('authorizeCodexAI', { code: 'wrong' })
+    assert.equal(leader.last('codexAuthorizationResult').payload.authorized, false)
+    leader.receive('authorizeCodexAI', { code: 'test-shared-code-long-enough' })
+    leader.receive('addCodexSeat', { effort: 'low' })
+    leader.receive('addCodexSeat', { effort: 'high' })
+    assert.deepEqual(leader.last('partyUpdate').payload.slice(-2).map(player => [player.kind, player.effort]), [
+        ['codex', 'low'], ['codex', 'high']
+    ])
+    assert.equal(JSON.stringify(leader.last('partyUpdate').payload).includes('test-shared-code'), false)
+
+    leader.receive('startGameSignal')
+    assert.equal(lobby.started, true)
+    assert.deepEqual(started, {
+        roster: [
+            { name: 'Host', socketID: 'leader', controller: 'human' },
+            { name: 'Friend', socketID: 'friend', controller: 'human' },
+            { name: 'Codex 1', controller: 'codex', effort: 'low' },
+            { name: 'Codex 2', controller: 'codex', effort: 'high' }
+        ],
+        leaderSocketID: 'leader',
+        spectatorSocketIDs: []
+    })
+})
+
+test('a host can spectate an AI-versus-AI game and any connected socket can trigger emergency stop', async () => {
+    const namespace = new FakeNamespace()
+    let started = null
+    const stopped = []
+    const lobby = openLobby(namespace, '/ROOM', {
+        aiAccessCode: 'test-shared-code-long-enough',
+        onEmergencyStop: socketID => stopped.push(socketID),
+        startGame(roster, leaderSocketID, spectatorSocketIDs) {
+            started = { roster, leaderSocketID, spectatorSocketIDs }
+            return { start() {} }
+        },
+        cleanup() {}
+    })
+    const host = new FakeSocket('host')
+    namespace.connect(host)
+    host.receive('setName', 'Watcher')
+    host.receive('authorizeCodexAI', { code: 'test-shared-code-long-enough' })
+    host.receive('addCodexSeat', { effort: 'medium' })
+    host.receive('addCodexSeat', { effort: 'low' })
+    host.receive('setParticipating', false)
+    host.receive('startGameSignal')
+
+    assert.equal(lobby.started, true)
+    assert.deepEqual(started, {
+        roster: [
+            { name: 'Codex 1', controller: 'codex', effort: 'medium' },
+            { name: 'Codex 2', controller: 'codex', effort: 'low' }
+        ],
+        leaderSocketID: 'host',
+        spectatorSocketIDs: ['host']
+    })
+    host.receive('emergencyStopCodex')
+    assert.deepEqual(stopped, ['host'])
+})
+
+test('Codex seats are rejected at game start when the AI code was not configured', () => {
+    const namespace = new FakeNamespace()
+    let startCalls = 0
+    openLobby(namespace, '/ROOM', {
+        aiAccessCode: '',
+        startGame() { startCalls += 1; return { start() {} } },
+        cleanup() {}
+    })
+    const host = new FakeSocket('host')
+    namespace.connect(host)
+    host.receive('setName', 'Host')
+    host.receive('startGameSignal')
+    assert.equal(host.last('codexAvailable').payload.available, false)
+    assert.equal(startCalls, 0)
 })

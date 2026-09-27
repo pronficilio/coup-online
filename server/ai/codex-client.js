@@ -94,6 +94,91 @@ class CodexRunnerClient {
             })
         })
     }
+
+    disable() {
+        const requestId = crypto.randomUUID()
+        return new Promise((resolve, reject) => {
+            const socket = this.connect({ path: this.socketPath })
+            let buffer = ''
+            let settled = false
+            const timeout = setTimeout(() => finish(runnerError('runner_timeout')), this.timeoutMs)
+            if (typeof timeout.unref === 'function') timeout.unref()
+            const finish = (error, value) => {
+                if (settled) return
+                settled = true
+                clearTimeout(timeout)
+                socket.removeAllListeners()
+                socket.destroy()
+                if (error) reject(error)
+                else resolve(value)
+            }
+            socket.once('connect', () => socket.write(`${JSON.stringify({ operation: 'disable', requestId })}\n`))
+            socket.on('data', chunk => {
+                buffer += chunk.toString('utf8')
+                if (Buffer.byteLength(buffer, 'utf8') > MAX_RESPONSE_BYTES) return finish(runnerError('invalid_runner_response'))
+                const newline = buffer.indexOf('\n')
+                if (newline === -1) return
+                if (buffer.slice(newline + 1).trim()) return finish(runnerError('invalid_runner_response'))
+                let response
+                try { response = JSON.parse(buffer.slice(0, newline)) } catch (_) {
+                    return finish(runnerError('invalid_runner_response'))
+                }
+                if (!response || typeof response !== 'object' || Array.isArray(response)
+                    || Object.keys(response).sort().join(',') !== 'ok,operation,requestId'
+                    || response.operation !== 'disable' || response.requestId !== requestId || response.ok !== true) {
+                    return finish(runnerError('invalid_runner_response'))
+                }
+                finish(null, { disabled: true })
+            })
+            socket.once('error', () => finish(runnerError('runner_unavailable')))
+            socket.once('end', () => {
+                if (!settled) finish(runnerError('invalid_runner_response'))
+            })
+        })
+    }
+
+    status() {
+        const requestId = crypto.randomUUID()
+        return new Promise((resolve, reject) => {
+            const socket = this.connect({ path: this.socketPath })
+            let buffer = ''
+            let settled = false
+            const timeout = setTimeout(() => finish(runnerError('runner_timeout')), this.timeoutMs)
+            if (typeof timeout.unref === 'function') timeout.unref()
+            const finish = (error, value) => {
+                if (settled) return
+                settled = true
+                clearTimeout(timeout)
+                socket.removeAllListeners()
+                socket.destroy()
+                if (error) reject(error)
+                else resolve(value)
+            }
+            socket.once('connect', () => socket.write(`${JSON.stringify({ operation: 'status', requestId })}\n`))
+            socket.on('data', chunk => {
+                buffer += chunk.toString('utf8')
+                if (Buffer.byteLength(buffer, 'utf8') > MAX_RESPONSE_BYTES) return finish(runnerError('invalid_runner_response'))
+                const newline = buffer.indexOf('\n')
+                if (newline === -1) return
+                if (buffer.slice(newline + 1).trim()) return finish(runnerError('invalid_runner_response'))
+                let response
+                try { response = JSON.parse(buffer.slice(0, newline)) } catch (_) {
+                    return finish(runnerError('invalid_runner_response'))
+                }
+                if (!response || typeof response !== 'object' || Array.isArray(response)
+                    || Object.keys(response).sort().join(',') !== 'enabled,ok,operation,requestId'
+                    || response.operation !== 'status' || response.requestId !== requestId
+                    || response.ok !== true || typeof response.enabled !== 'boolean') {
+                    return finish(runnerError('invalid_runner_response'))
+                }
+                finish(null, { enabled: response.enabled })
+            })
+            socket.once('error', () => finish(runnerError('runner_unavailable')))
+            socket.once('end', () => {
+                if (!settled) finish(runnerError('invalid_runner_response'))
+            })
+        })
+    }
 }
 
 module.exports = { CodexRunnerClient }

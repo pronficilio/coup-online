@@ -28,7 +28,8 @@ export default class Coup extends Component {
             winner: '',
             canPlayAgain: false,
             logs: [],
-            disconnected: false
+            disconnected: false,
+            codexDisabled: Boolean(props.codexDisabled)
         }
 
         const socket = this.props.socket
@@ -74,6 +75,9 @@ export default class Coup extends Component {
         socket.on('g-gameOver', winner => this.setState({ winner: `${winner} wins!`, decision: null }))
         socket.on('g-canPlayAgain', () => this.setState({ canPlayAgain: true }))
         socket.on('startRejected', reason => this.setState({ decisionError: `Unable to start: ${reason}` }))
+        socket.on('codexDisabled', status => this.setState({
+            codexDisabled: Boolean(status && status.disabled)
+        }))
     }
 
     submitChoice = option => {
@@ -98,6 +102,10 @@ export default class Coup extends Component {
         if (this.state.canResume && this.props.isLeader) this.props.socket.emit('g-resume')
     }
 
+    emergencyStopCodex = () => {
+        this.props.socket.emit('emergencyStopCodex')
+    }
+
     render() {
         const me = this.state.players.find(player => player.name === this.props.name)
         const decision = this.state.decision
@@ -117,8 +125,8 @@ export default class Coup extends Component {
         return <div className="GameContainer">
             <div className="GameHeader">
                 <div className="PlayerInfo">
-                    <p>You are: {this.props.name}</p>
-                    <p>Coins: {me ? me.money : 0}</p>
+                    <p>You are: {this.props.name}{this.props.isSpectator ? ' (spectator)' : ''}</p>
+                    {!this.props.isSpectator && <p>Coins: {me ? me.money : 0}</p>}
                 </div>
                 <div className="CurrentPlayer">
                     {this.state.currentPlayer && <p>It is <b>{this.state.currentPlayer}</b>'s turn</p>}
@@ -145,6 +153,12 @@ export default class Coup extends Component {
             />
 
             <div className="DecisionsSection" aria-live="polite">
+                <button
+                    type="button"
+                    onClick={this.emergencyStopCodex}
+                    disabled={this.state.codexDisabled}
+                    style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
+                >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>
                 {this.state.pausedCause && <p role="alert">Game paused: {this.state.pausedCause}</p>}
                 {this.state.canResume && this.props.isLeader && <button onClick={this.resumeGame}>Resume game</button>}
                 {decision && <>

@@ -2,7 +2,7 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); tres PHASE F2 BLOCKED; el último probe no reprodujo el éxito local y falló antes del comando por el directorio de socket interno
+Estado: ACTIVE; F0/F1 CLOSED (PHASE PASS); F2 App Server y runner aislado implementados, handshake local PASS; F3 IA/lobby/kill switch implementados; faltan login device-code, una decisión real y prueba en Hetzner
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -10,8 +10,8 @@ Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
-PR: todavía no existe; debe haber una sola integración a master para esta issue.
-Siguiente dueño: Ejecutor F2. El Verifier revisó el hardening en `9670526`: UMask 0077 mantiene privados los paths internos y `runner.sock` queda en 0660; la regresión pasa con UMask 0077. El PHASE de aislamiento en `d74e71c` sigue bloqueado porque el app-server falló antes del comando incluso con umask y directorios 0700. No repetirlo hasta tener un cambio que pueda resolver ese preflight. La documentación actual lista Luna para Plus y Codex CLI, pero condiciona su acceso concreto al rollout, inicio de sesión y cliente; la cuenta/CLI no se verificó. La guía de auth de CI/CD desaconseja el flujo en repos públicos y no ofrece excepción para este runner. F2 no habilita asientos IA ni autoriza login o llamadas reales.
+PR: todavía no existe; el usuario pidió una prueba temporal y no publicar cambios al fork.
+Siguiente paso: desplegar el runner como sidecar en un release nuevo, conservar `55be894` para rollback, pedir al propietario que complete el device-code y probar una sola decisión antes de invitar amigos. No se han iniciado sesiones ni llamadas al modelo.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -33,15 +33,15 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 
 ## Contrato global para las siguientes fases
 
-- Codex CLI mediante login ChatGPT Plus del propietario, GPT-6 Luna y esfuerzo low/medium/high por asiento; medium inicial.
+- Codex App Server mediante login ChatGPT del propietario, GPT-6 Luna y esfuerzo low/medium/high por asiento; medium inicial. La disponibilidad se confirmará con una llamada real.
 - Sin API key, facturación API ni fallback a otro modelo. Si Codex/Plus falla o llega a un límite, pausar con mensaje.
-- La página oficial de precios lista GPT-6 Luna y Codex CLI para Plus; la de modelos avisa que la disponibilidad concreta depende de rollout, método de inicio y cliente, así que no se ha confirmado para esta cuenta/CLI. Se mantiene Luna como modelo fijo aprobado: si no está disponible, pausar sin cambiar de modelo ni usar API. La guía de auth gestionada por ChatGPT en CI/CD dice que no se use este flujo con repositorios públicos/open source; este repo es público. La guía no explica si el runner que recibe solo JSON y no monta el repo queda fuera de la advertencia; F2 debe resolverlo y demostrar aislamiento antes de habilitar asientos IA.
+- La guía oficial ofrece App Server para integrar Codex dentro de productos, pero clasifica el protocolo como experimental/no soportado en producción; el uso aquí es una prueba temporal. El runner no monta el repo ni recibe texto libre, y el API web no ve la sesión. Si Luna no aparece en la cuenta, pausar sin cambiar de modelo ni usar API.
 - Privacidad por asiento y autoridad del servidor se implementan antes de conectar el jugador Codex.
 - Partidas humano contra dos IA e IA contra IA, dentro del lobby/acceso actual; no se agregan cuentas ni invitaciones.
 - Propuesta de operación sin auth nueva: cualquier jugador conectado puede activar la palanca roja de solo apagado; solo el propietario la vuelve a habilitar desde SSH/consola. Apagar bloquea llamadas nuevas, intenta terminar las activas, invalida respuestas y pausa partidas. Al reiniciar, Codex queda apagado.
 - Límites conservadores de concurrencia, llamadas y tiempo. Registros operativos no contienen credenciales, manos ajenas ni razonamiento privado.
 - No incluir texto libre de clientes ni acceso al repositorio/secretos en las solicitudes Codex; ejecutar en entorno aislado y de solo lectura.
-- Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
-- F0 y F1 ya cerraron tras PHASE `PASS`; F2 puede iniciar en este branch sin PR por fase. La revisión F1 no invocó Codex.
+- El usuario autorizó desplegar esta prueba en Hetzner desde un release separado y reversible; no se tocará DNS/Nginx ni el release anterior. El branch no se publicará al fork.
+- F0 y F1 cerraron con PHASE `PASS`. La guía operativa POC está en `docs/plans/codex-ai-players/poc-runbook.md`.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; F0 cerró con PHASE `PASS` en `b189cc0`. F1 cerró con PHASE `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` tras corregir el desafío perdido contra Asesinato y Exchange con una influencia. El runner F2 está implementado, pero los tres PHASE independientes reportaron `BLOCKED`. Un probe local posterior informó aislamiento correcto al omitir `:slash_tmp`; el recheck `d74e71c` no reprodujo el arranque y falló antes del comando por el socket interno, también con UMask `0077` y paths modo `0700`. El servicio conserva ahora `runner.sock` en `0660` de forma explícita; `npm test` pasa 26/26 bajo UMask `0077`. Esto no prueba el aislamiento del proceso Codex. La guía de auth pública sigue sin excepción documentada; Plus incluye Luna, pero el acceso de esta cuenta/CLI sigue sin verificar. No crear PR todavía.
+Secuencia actual: Issue #14 y branch/worktree conservados; F0 `b189cc0`; F1 `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. Se cambió el runner de `codex exec` al App Server JSON-RPC efímero, que completó localmente `initialize` y `thread/start` sin login ni llamada de modelo. Suite de servidor 36/36; build React Scripts del cliente; imagen de runner construida e iniciada localmente; verificados healthcheck, socket `0660` con GID 10002 y conexión desde UID del API. La palanca compartida se probó escribiendo como API y recreando runner: el estado quedó deshabilitado. Sin login, cuenta real o modelo. El release POC aún no se ha desplegado; no publicar PR ni branch.

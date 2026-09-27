@@ -102,7 +102,9 @@ export default function PlayerBoard(props) {
                         '--player-color': player.color
                     }}
                 >
-                    <h2 className="PlayerBoardSeatName">{player.name}</h2>
+                    <h2 className="PlayerBoardSeatName">
+                        {player.name}{player.controller === 'codex' ? <span> · IA ({player.effort})</span> : null}
+                    </h2>
                     <p className="PlayerBoardSeatCoins">Monedas: {player.money}</p>
                     <div className="PlayerBoardSeatInfluences">
                         {INFLUENCE_SLOTS.map(slotIndex =>
@@ -114,5 +116,4 @@ export default function PlayerBoard(props) {
         </div>
     )
 }
-
 

@@ -1,6 +1,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const CoupGame = require('../game/coup')
+const protocol = require('../ai/codex-protocol')
 
 class FakeSocket {
     constructor(id) {
@@ -433,4 +434,124 @@ test('lost influence stays outside the Court deck while a proven claim returns a
     assert.equal(game.players[0].influences.length, 2)
     assert.ok(game.players[0].influences.includes('ambassador'))
     assert.deepEqual(game.deck, ['duke'])
+})
+
+test('a Codex seat acts through the same legal choices and receives only its hand plus public history', async () => {
+    const human = new FakeSocket('human-socket')
+    const namespace = new FakeNamespace([human])
+    const inputs = []
+    let resolveCalled
+    const called = new Promise(resolve => { resolveCalled = resolve })
+    const codexClient = {
+        choose(input) {
+            inputs.push(input)
+            resolveCalled()
+            return Promise.resolve({
+                decisionId: input.decisionId,
+                stateVersion: input.stateVersion,
+                rulesVersion: protocol.RULESET_VERSION,
+                choiceId: input.observation.options[0].choiceId
+            })
+        }
+    }
+    const game = new CoupGame([
+        { name: 'Human', socketID: human.id, controller: 'human' },
+        { name: 'Codex 1', controller: 'codex', effort: 'medium' }
+    ], namespace, { rng: () => 0, codexClient, decisionTimeoutMs: 1000, leaderSocketID: human.id })
+    assert.equal(game.start(), true)
+    const firstAction = human.last('g-decision').payload
+    human.receive('g-submitDecision', {
+        decisionId: firstAction.decisionId, stateVersion: firstAction.stateVersion, choiceId: 'income'
+    })
+    await called
+    await new Promise(resolve => setImmediate(resolve))
+
+    assert.equal(game.players[1].money, 3)
+    assert.equal(game.currentPlayer, 0)
+    assert.equal(game.activeDecision.type, 'action')
+    const input = inputs[0]
+    assert.equal(input.effort, 'medium')
+    assert.deepEqual(input.observation.ownInfluences, game.players[1].influences)
+    assert.deepEqual(input.observation.publicState.players.map(player => player.influenceCount), [2, 2])
+    assert.equal('influences' in input.observation.publicState.players[0], false)
+    assert.equal(JSON.stringify(input).includes('human-socket'), false)
+    assert.ok(input.observation.history.some(event => event.type === 'action' && event.actorSeat === 0 && event.action === 'income'))
+    assert.doesNotThrow(() => protocol.normalizeRequest({
+        requestId: 'test-request', decisionId: input.decisionId, stateVersion: input.stateVersion,
+        effort: input.effort, observation: input.observation
+    }))
+    assert.equal(human.last('g-decision').payload.type, 'action')
+    game.pause('test cleanup')
+})
+
+test('emergency Codex shutdown aborts an AI challenge and pauses without applying its answer', async () => {
+    const human = new FakeSocket('human-socket')
+    const namespace = new FakeNamespace([human])
+    let resolveCalled
+    const called = new Promise(resolve => { resolveCalled = resolve })
+    let wasAborted = false
+    const codexClient = {
+        choose(input) {
+            resolveCalled(input)
+            return new Promise((_resolve, reject) => {
+                input.signal.addEventListener('abort', () => {
+                    wasAborted = true
+                    reject(input.signal.reason)
+                }, { once: true })
+            })
+        }
+    }
+    const game = new CoupGame([
+        { name: 'Human', socketID: human.id, controller: 'human' },
+        { name: 'Codex 1', controller: 'codex', effort: 'high' }
+    ], namespace, { rng: () => 0, codexClient, decisionTimeoutMs: 1000, leaderSocketID: human.id })
+    game.start()
+    const action = human.last('g-decision').payload
+    human.receive('g-submitDecision', {
+        decisionId: action.decisionId, stateVersion: action.stateVersion, choiceId: 'tax'
+    })
+    const input = await called
+
+    assert.equal(game.activeDecision.type, 'challenge')
+    assert.deepEqual(input.observation.options.map(option => option.choiceId), ['pass', 'challenge'])
+    assert.ok(input.observation.history.some(event => event.type === 'claim' && event.claimRole === 'duke'))
+    const moneyBefore = game.players.map(player => player.money)
+    game.disableCodex()
+    await new Promise(resolve => setImmediate(resolve))
+
+    assert.equal(wasAborted, true)
+    assert.equal(game.phase, 'paused')
+    assert.deepEqual(game.players.map(player => player.money), moneyBefore)
+    assert.match(namespace.outgoing.find(item => item.event === 'g-gamePaused').payload.cause, /disabled by a player/)
+})
+
+test('AI-versus-AI can be watched without sending either hidden hand to the spectator', async () => {
+    const spectator = new FakeSocket('spectator-socket')
+    const namespace = new FakeNamespace([spectator])
+    let resolveCalled
+    const called = new Promise(resolve => { resolveCalled = resolve })
+    const codexClient = {
+        choose(input) {
+            resolveCalled()
+            return new Promise((_resolve, reject) => {
+                input.signal.addEventListener('abort', () => reject(input.signal.reason), { once: true })
+            })
+        }
+    }
+    const game = new CoupGame([
+        { name: 'Codex 1', controller: 'codex', effort: 'low' },
+        { name: 'Codex 2', controller: 'codex', effort: 'high' }
+    ], namespace, {
+        rng: () => 0, codexClient, decisionTimeoutMs: 1000,
+        leaderSocketID: spectator.id, spectatorSocketIDs: [spectator.id]
+    })
+    assert.equal(game.start(), true)
+    await called
+    const update = spectator.last('g-updatePlayers').payload
+    assert.equal(update.spectator, true)
+    assert.deepEqual(update.ownInfluences, [])
+    assert.equal(update.players.every(player => !Object.prototype.hasOwnProperty.call(player, 'influences')), true)
+    assert.equal(spectator.last('g-decision'), undefined)
+    game.disableCodex()
+    assert.equal(game.phase, 'paused')
 })
