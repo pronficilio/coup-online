@@ -47,7 +47,7 @@ Se amplió únicamente `.ResponseImageButton__art--challenge` a x=38–80%. En 5
 
 ## Revisión humana solicitada sobre la corrección
 
-- Commit exacto servido en la revisión anterior (histórico): `0c913d859f079ce895b3ea351b751725ece8119c`, con el producto de `8d55413` y la sincronización de `master`. El Verifier debe apuntar al nuevo commit después de publicar esta corrección; no reutilizar una sesión o resultado del SHA anterior como evidencia del overlay 38–80%.
+- Commit exacto servido en la revisión anterior (histórico): `0c913d859f079ce895b3ea351b751725ece8119c`, con el producto de `8d55413` y la sincronización de `master`. Nuevo checkpoint publicado: `c9d62676ffa33a177a0edced26dfc91e2529365c`; se releen #19 `OPEN` y PR #33 `OPEN`/`DRAFT`, ambas con cuerpos actualizados. La inspección humana focalizada y la revisión independiente deben apuntar a este SHA; no reutilizar sesiones/resultados previos como evidencia del overlay 38–80%.
 - Cliente CRA: [http://127.0.0.1:3011/](http://127.0.0.1:3011/), bind local confirmado; `GET /` devuelve HTTP 200.
 - Backend de desarrollo del mismo worktree: `http://127.0.0.1:8002`, bind local confirmado; `/exists/human-review` responde `{"exists":false}` antes de crear la sala.
 - El Verifier mantiene ambos procesos en ejecución mientras espera la respuesta. Al terminar la revisión, avisar en la conversación y el Verifier los detendrá.
