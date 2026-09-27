@@ -8,7 +8,7 @@
 
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`.
 
-## Trabajo revisado
+## Trabajo del checkpoint inicial (histórico; véanse las revisiones posteriores para el comportamiento vigente)
 
 - `Coup.js` limita el nuevo renderer a `decision.type === 'action'`; los demás tipos siguen por la ruta genérica existente.
 - El menú agrupa las opciones que contiene `decision.options` por el prefijo de `choiceId`. Las filas disponibles usan los objetos originales del servidor y `submitActionChoice` comprueba que el objeto siga presente en `decision.options` antes de enviarlo. Esta revisión es estática; no se observó tráfico Socket.IO en un navegador.
@@ -63,3 +63,13 @@ La corrección acotada se delegó al Agente Menor para modificar el montaje DOM/
 Revisé el diff y `git diff --check` pasa. `npm run build` desde `coup-client` terminó con **exit 0**, “Compiled with warnings”; produce 108.22 kB JS y 6.91 kB CSS gzip. Warnings: `logo`/`Link` sin uso en `src/App.js`; `postcss-calc` no parsea `dvh` en `ReferencePanel.css:100,106`; caniuse-lite desactualizado. El build no señala los archivos editados. No ejecuté tests automatizados.
 
 El checkpoint de producto/documentación se publicó en `b59bb022ee79e455fce3bfe281255cee359f034e`. El Orquestador reinició CRA desde ese HEAD y confirmó `Compiled successfully`; `/static/js/bundle.js` respondió HTTP 200 y pesa 2,393,146 bytes. Confirmó que se creó con el nuevo `ActionDecisionRail`. El cliente está listo en `http://localhost:3006` con backend `:18000`. La usuaria aún debe inspeccionar el rail izquierdo, alineación/espaciado al scroll, overlay, divider/hover y responsive; build y carga exitosa no sustituyen su revisión visual.
+
+## Tercera revisión visual — portal y solo opciones legales
+
+La usuaria señaló que tanto el resumen como las acciones todavía se desplazaban al hacer scroll y pidió que ambos queden inmóviles en el viewport, juntos, en la misma posición y con alineación/separación constante. También cambió el contenido visible del panel: solo se muestran acciones para las que `decision.options` contiene una o más opciones; las acciones no permitidas deben desaparecer sin ocupar espacio. Se preservan en el código las ramas/estilos/hints disabled para posible reactivación, pero no se muestran ahora. El objetivo es reducir la altura inicial del panel.
+
+Revisé la cadena authored JoinGame/CreateGame → Coup y CSS. No encontré `transform`, `filter`, `perspective`, `contain` ni `will-change` en ancestros de `ActionDecisionRail`; `.GameContainer` usa `position: relative` e `isolation: isolate`, que no crean por sí solos un containing block para fixed. Para sacar el rail del árbol del juego y fijarlo al viewport real, el Agente Menor usó `createPortal(..., document.body)` solo durante una decisión action. El control se omite del header durante ese caso para evitar duplicado; las demás decisiones conservan renderer/posición previos.
+
+El renderer recorre las filas existentes y retorna `null` cuando no hay opciones, sin montar markup/handlers/IDs y conservando las ramas disabled/hint y el CSS en el código. Las opciones legales originales, destinos/cancelación, protocolo y divisores quedan intactos. Revisé el diff; `git diff --check` pasa. `npm run build` desde `coup-client` terminó **exit 0**, compilado con warnings conocidos: imports sin uso `logo`/`Link` en `src/App.js`, `postcss-calc` no parsea unidades `dvh` de `ReferencePanel.css:100,106`, y caniuse-lite desactualizado. Tamaños gzip: 108.25 kB JS y 6.91 kB CSS. No ejecuté tests automatizados.
+
+Checkpoint y recarga del preview pendientes; el Orquestador reiniciará solo CRA desde el nuevo HEAD después del push y verificará bundle/HTTP antes de que la usuaria haga su siguiente revisión. F2 permanece `ACTIVE` y la revisión visual aún no se ha aprobado.

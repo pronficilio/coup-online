@@ -1,18 +1,18 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. F2 continúa tras una segunda revisión visual de la usuaria; ahora se agrupan el control “Resumen de reglas” y la tabla de acciones en un rail compartido a la izquierda que conserve su relación al hacer scroll.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. F2 continúa tras la tercera revisión visual: portar el rail compartido al `document.body` para fijarlo realmente al viewport y mostrar solo acciones con opciones legales del servidor.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** tras el checkpoint, la usuaria inspecciona el rail compartido en el cliente local; Alquimista continúa el recorrido F2 con el feedback. F3 no está listo.
+**Siguiente dueño:** tras el checkpoint, la usuaria inspecciona que rail y resumen no se mueven con el scroll, que solo aparecen acciones permitidas y que el panel inicia con menor altura. Alquimista continúa F2. F3 no está listo.
 
 ## Solicitud y definición de éxito
 
-La persona usuaria quiere que las acciones disponibles durante su turno indiquen claramente dónde hacer clic, que el hover tenga un resalte cálido y opaco en toda la fila, y que las acciones prohibidas expliquen por qué están deshabilitadas. Las referencias visuales son `references/a_normal.png`, `references/a_hover.png` y `references/a_dis.png`, copiadas sin cambios desde `fotos/`.
+La persona usuaria quiere que las acciones disponibles durante su turno indiquen claramente dónde hacer clic, con un resalte cálido y opaco en toda la fila. La lista muestra únicamente acciones permitidas por las opciones del servidor; las filas, estilos y ayudas de disabled permanecen en el código para posible reactivación pero no se muestran ahora. Las referencias visuales son `references/a_normal.png`, `references/a_hover.png` y `references/a_dis.png`, copiadas sin cambios desde `fotos/` como contexto histórico.
 
-Éxito significa que toda acción aparece en su propia fila con estados visuales reconocibles; las elecciones activables vienen del servidor; las prohibidas explican su motivo; y elegir o cancelar un destino no envía una decisión antes de tiempo. Al elegir, se envía una sola opción con el `choiceId` entregado por el servidor.
+Éxito significa que cada acción permitida aparece una vez en su propia fila con estados visuales reconocibles; las acciones ausentes de las opciones legales no se renderizan ni ocupan espacio; y elegir o cancelar un destino no envía una decisión antes de tiempo. Al elegir, se envía una sola opción con el `choiceId` entregado por el servidor.
 
 ## Hechos, fuentes y dependencias
 
@@ -21,7 +21,7 @@ La persona usuaria quiere que las acciones disponibles durante su turno indiquen
 - El issue #14 se cerró tras integrar la PR #23. `Coup.js` ahora monta un renderer genérico para `decision.options`; el viejo `ActionDecision.js` conserva markup y estilos, pero ya no se importa desde `Coup.js`.
 - El issue #19 sigue abierto tras integrar parcialmente su PR #22 en `5de95ee`. La localización publicada ya incluye las etiquetas y descripciones de las siete acciones y las claves `es`/`en` necesarias. Sus tareas restantes requieren recorrido manual y Verifier, sin otra PR de producto abierta que reserve el renderer de #24.
 - El servidor genera los `choiceId` permitidos para cada decisión. En `actionChoices`, Coup con 10+ monedas es la única opción; por debajo se agrega Coup a partir de 7 monedas y Assassinate a partir de 3. Las opciones con objetivo combinan acción y asiento (por ejemplo `coup:<seat>`). El cliente debe enviar esos IDs exactos; el servidor conserva la autoridad de elegibilidad.
-- `g-decision` expone solo opciones legales. `Coup.js` las presenta como botones y localiza la etiqueta desde `choiceId`. El saldo del snapshot público permite explicar por qué falta una acción costosa.
+- `g-decision` expone solo opciones legales. `Coup.js` presenta solo acciones con opciones recibidas y localiza la etiqueta desde `choiceId`; el saldo público sirve para verificar los límites en el recorrido manual.
 - Las referencias visuales estaban en `fotos/`, fuera del historial versionado. Las tres copias de `references/` preservan la evidencia para el Ejecutor.
 - Reglas visibles ya comprobadas en el cliente: Assassinate requiere 3 monedas; Coup requiere 7; con 10 o más monedas solo Coup está permitido. Declarar una influencia no requiere tenerla.
 - Base rebaseada desde el remoto: `origin/master`, commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Target: `master`.
@@ -32,16 +32,16 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 1. Nombre, descripción, distintivos, precio y espacio interior de una acción disponible pertenecen a un solo control de fila; clic, teclado y toque producen la misma acción una vez.
 2. El estado normal conserva el pergamino y el layout. Hover y foco resaltan toda la fila con fondo ámbar semitransparente, contorno cálido redondeado y transición breve, sin desplazar filas.
-3. Una acción prohibida no activa selección de objetivo, no descuenta monedas y no emite la acción. Su contenido sigue legible y la explicación aparece al apuntar o enfocar; en pantallas táctiles el motivo se puede leer sin hover.
-4. Se explican las condiciones vigentes: menos de 3 monedas para Assassinate, menos de 7 para Coup y Coup obligatorio a partir de 10 monedas. Se revisan los límites de saldo 2/3, 6/7 y 9/10. Las otras acciones no ganan restricciones nuevas.
+3. Solo se renderiza una acción si `decision.options` contiene al menos una opción de esa acción. Las acciones sin opciones no ocupan espacio ni reciben controles, IDs u objetivos; el código de disabled/hints queda preservado sin mostrarse.
+4. Se comprueba que las filas permitidas siguen las opciones del servidor en los límites 2/3, 6/7 y 9/10 monedas. Las otras acciones no ganan restricciones nuevas ni el cliente fabrica opciones.
 5. Se preservan las declaraciones que pueden ser farol, el flujo de objetivos y cancelación, el cobro del servidor y el protocolo Socket.IO. Coup, Assassinate y Steal abren sus destinos legales; Cancelar regresa al menú sin emitir una decisión; elegir un destino envía una vez su `choiceId` original. Las acciones sin destino envían su opción legal al seleccionarse.
-6. Las ayudas nuevas usan el mecanismo de idioma integrado y entradas paralelas `es`/`en`, con parámetros iguales. Los botones tienen nombre y explicación accesibles; foco visible, Enter/Espacio y Escape funcionan.
-7. En escritorio y móvil se ven normal, hover/foco y deshabilitada. El hint no queda recortado por el scroll del panel ni tapa la selección de objetivos o las respuestas.
-8. Se respeta `prefers-reduced-motion`. El build y un recorrido manual quedan documentados. El Verifier independiente intenta refutar la elegibilidad, la activación de filas y la lectura de los hints. No se agregan tests automatizados.
+6. Los textos visibles usan el mecanismo de idioma integrado. Las filas permitidas tienen nombre accesible; foco visible, Enter/Espacio y Escape funcionan. Las ayudas disabled/hint ocultas y sus traducciones permanecen para posible reactivación.
+7. En escritorio y móvil aparecen las filas permitidas en estado normal y hover/foco, sin filas ni huecos para acciones omitidas. No se muestran hints disabled; se conserva su markup/helper y estilos para reactivarlos luego. El panel no tapa la selección de objetivos ni las respuestas.
+8. Se respeta `prefers-reduced-motion`. El build y un recorrido manual quedan documentados. El Verifier independiente intenta refutar que el rail permanezca fijo, que solo aparezcan opciones legales y que target/cancel/emisión sigan el contrato. No se agregan tests automatizados.
 
 ## Alcance y fuera de alcance
 
-**Incluye:** la rama `decision.type === 'action'` del renderer genérico de `Coup.js`, estilos de esa vista, metadatos localizados existentes, hints nuevos bilingües y evidencia visual/funcional de escritorio y móvil.
+**Incluye:** la rama `decision.type === 'action'` del renderer genérico de `Coup.js`, rail viewport-fixed, estilos de esa vista, metadatos localizados existentes y evidencia visual/funcional de escritorio y móvil. El contenido disabled/hint permanece en el código, pero por el feedback vigente no se monta.
 
 **Excluye:** reglas o validación server-side, agregar opciones prohibidas al payload, cambios al shape/nombre de eventos Socket.IO, cambios al motor de cobro, rediseño del tablero, controles de respuesta de #21, dependencias nuevas de animación y tests automatizados.
 
@@ -63,36 +63,39 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 ### F2 — Implementar y documentar la fila interactiva (`ACTIVE`)
 
-**Pregunta:** ¿el renderer final comunica de forma inequívoca dónde activar una acción y por qué una acción no está disponible?
+**Pregunta:** ¿el renderer comunica dónde activar las acciones legales y mantiene la lista sincronizada con las opciones del servidor?
 
 **Entrada:** F1 `CLOSED / PASS`; branch rebaseado sobre `origin/master@5de95ee`; PR #23/#22 releídas.
 
-**Subtareas:** bifurcar solo `decision.type === 'action'` hacia el menú de acciones; agrupar opciones legales por prefijo de `choiceId` para no duplicar filas por destino; usar `decision.options` como única fuente de acciones activables; al elegir Coup, Assassinate o Steal, mostrar los destinos legales y Cancelar; al elegir destino, enviar una vez la opción original; las acciones sin destino envían su opción legal al seleccionarse; mostrar como deshabilitadas las acciones omitidas por saldo o Coup obligatorio, sin inventarles `choiceId`; no emitir decisiones al enfocar, abrir destinos o cancelar; aplicar estados visuales, descripciones/personajes/precios localizados y hints accesibles; documentar capturas y recorrido.
+**Subtareas:** bifurcar solo `decision.type === 'action'`; agrupar opciones por prefijo de `choiceId`; renderizar una fila solo cuando `decision.options` contiene una o más opciones de esa acción; montar CheatSheet + panel en portal a `document.body` y fijar el rail al viewport; al elegir Coup, Assassinate o Steal, mostrar destinos legales y Cancelar; al elegir destino, enviar una vez la opción original; las filas/helpers/estilos disabled quedan preservados pero no montados; no emitir al enfocar, abrir destinos o cancelar; aplicar estado visual y descripciones accesibles a las filas permitidas.
 
 **Áreas previstas:** `coup-client/src/components/game/Coup.js`, estilos del renderer y `coup-client/src/i18n/translations.json` solo si hacen falta claves espejo nuevas. No revivir `ActionDecision.js` ni editar servidor/protocolo.
 
-**Avanzar:** criterios AC1–AC8 se observan en los límites monetarios y en escritorio/móvil con teclado/tacto; solo se emiten `choiceId` originales del servidor; build y evidencia manual quedan registrados.
-**Pivotar:** si el renderer no soporta controles de fila o hint accesible sin cambio de arquitectura, regresar al Orquestador con evidencia.
+**Avanzar:** criterios AC1–AC8 se observan en los límites monetarios y en escritorio/móvil con teclado/tacto; solo aparecen acciones presentes en las opciones legales y se emiten sus `choiceId` originales; el rail permanece viewport-fixed; build y evidencia manual quedan registrados.
+**Pivotar:** si portal/layout no mantiene el rail anclado al viewport o altera decisiones ajenas a `action`, regresar al Orquestador con reproducción.
 **Repetir:** una corrección localizada por criterio con fallo reproducible.
 **Bloquear/cancelar:** vuelve a reservarse un archivo compartido o aparece una necesidad de cambiar reglas/protocolo.
 **Commit:** `COMMIT_REQUIRED`; checkpoint previo `feat(action-rows): issue 24 F2 BLOCKED manual review`; el siguiente registra las correcciones visuales y la reanudación ACTIVE.
 **Implementación y revisión estática previa:** adaptación de `Coup.js`, estilos y claves `es`/`en` revisadas; el primer `npm run build` terminó con exit 0 y warnings en `App.js`, `ReferencePanel.css` y `caniuse-lite`. No se ejecutaron tests automatizados. El reporte del checkpoint anterior está en `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
 **Reanudación visual 1:** 2026-09-27, la usuaria inspeccionó `http://localhost:3006` con backend `:18000` y reportó que los divisores parecen extremos curvos del borde hover y que el panel action debe superponerse al tablero a la derecha, bajo la altura de “Resumen de reglas”. Esa solución fue cargada y queda como historial del checkpoint.
-**Revisión visual 2 (feedback vigente):** la usuaria corrigió la ubicación: tabla de acciones a la izquierda, alineada horizontalmente con “Resumen de reglas” y debajo; ambas deben conservar distancia vertical fija al hacer scroll, formando un rail/ancla compartido. El panel sigue superpuesto al PlayerBoard durante la decisión. No basta con mover el panel separado de derecha a izquierda ni con mover el control sin agruparlo con la tabla.
-**Trabajo activo:** conservar el divider en caja/regla independiente, sin colisión con filas disabled ni desaparición al hover; cuando exista `decision.type === 'action'`, montar resumen y acciones dentro de un rail compartido anclado a la izquierda y persistente durante scroll, con separación fija, overlay sobre PlayerBoard/cartas y fallback responsive. No alterar otras decisiones ni el contrato de IDs/protocolo.
+**Revisión visual 2:** la usuaria corrigió la ubicación: tabla de acciones a la izquierda, alineada con “Resumen de reglas” y debajo; ambas con distancia vertical fija al hacer scroll y sobre PlayerBoard. El panel fue agrupado en rail fijo. No basta con mover el panel separado.
+**Revisión visual 3 (feedback vigente):** la usuaria observó que tanto resumen como acciones se desplazan al hacer scroll; deben permanecer anclados al viewport, juntos, en el mismo punto y con alineación/separación constante. Además, la lista solo muestra acciones con al menos una opción legal en `decision.options`; acciones no permitidas no aparecen ni ocupan espacio. Se conservan su markup/helpers de disabled/hint y estilos, pero no se renderizan.
+**Investigación del containing block:** el recorrido fuente JoinGame/CreateGame → Coup y los CSS revisados no muestran `transform`, `filter`, `perspective`, `contain` ni `will-change` en los ancestros de `ActionDecisionRail`; `.GameContainer` solo usa `position: relative` e `isolation: isolate`. El rail se portará a `document.body` mediante portal para fijarlo fuera del GameContainer y de cualquier ancestro de scroll/containing block. El resto de decisiones conserva su renderer.
+**Trabajo activo:** conservar divider independiente del hover; montar resumen+acciones solo durante `action` en rail portado al body y fijo al viewport; renderizar filas solo si hay opciones legales, preservando código disabled no montado. Mantener overlay, responsive, IDs/protocolo y flujo de targets/cancelación.
 **Validación del checkpoint anterior:** `git diff --check` pasa; `npm run build` exit 0 con warnings en archivos no modificados. HMR no detectó aquellas ediciones en `/mnt/e`; el Orquestador reinició CRA desde este worktree, confirmó compilación y HTTP 200 en `localhost:3006`. No se ejecutaron tests.
-**Validación del rail:** diff revisado; `git diff --check` pasa; `npm run build` exit 0 con warnings conocidos en `App.js`, `ReferencePanel.css` (`dvh`) y caniuse-lite. Sin tests automatizados. El Orquestador reinició CRA desde el checkpoint `b59bb022ee79e455fce3bfe281255cee359f034e`, confirmó `Compiled successfully`, bundle `ActionDecisionRail` disponible en `http://localhost:3006` (HTTP 200, 2,393,146 bytes) y backend activo en `:18000`. Preview listo para inspección de la usuaria.
-**Validación pendiente:** inspección de la usuaria y recorrido visual/interactivo de AC1–AC9 (estados, saldos, mouse/teclado/tacto, destinos/cancelación, hints, recorte, reduced motion y otros tipos de decisión). No añadir tests. No se abre PR ni se cierra la issue.
+**Validación del checkpoint anterior:** diff/build pasaron y el Orquestador confirmó el bundle anterior activo en `localhost:3006`; nueva revisión visual reveló que el rail se desplazaba y pidió omitir acciones sin opciones.
+**Validación del nuevo diff:** `createPortal` hacia `document.body` y filtro de filas sin opciones revisados; `git diff --check` pasa y `npm run build` exit 0 con warnings conocidos en `App.js`, `ReferencePanel.css` (`dvh`) y caniuse-lite. No se ejecutaron tests automatizados. Falta publicar, recargar CRA si HMR no observa cambios y pedir inspección visual de la usuaria.
+**Validación pendiente:** confirmar nuevo bundle en `http://localhost:3006` con backend `:18000`; inspeccionar rail estable al scroll, filas permitidas únicamente, menor altura inicial, overlay, divider/hover, responsive y flujo de decisiones. No añadir tests. No se abre PR ni se cierra la issue.
 
 ### F3 — Verificación independiente y entrega (`PENDING`)
 
-**Pregunta:** ¿puede refutarse que la fila comunica el mismo estado que ejecuta y que ninguna acción deshabilitada se envía?
+**Pregunta:** ¿puede refutarse que solo se muestran acciones legales y que todas las filas permanecen ancladas al viewport sin cambiar el contrato de decisión?
 
 **Entrada:** F2 `CLOSED`, diff y evidencia vigentes.
 
-**Salida:** informe FINAL independiente, capturas de los estados y entrega del branch/PR canónico al Orquestador.
+**Salida:** informe FINAL independiente, capturas de estados normal/hover y rail fijo, evidencia de omisión de acciones no legales y entrega del branch/PR canónico al Orquestador.
 
-**Prueba adversarial:** intentar activar una fila deshabilitada desde nombre, descripción, precio, foco y clic rápido; comprobar que no inicia objetivo, no cambia el saldo ni produce Socket.IO. Buscar recortes del tooltip en primera/última fila, diferencias de idioma y pérdida de foco al cambiar turno.
+**Prueba adversarial:** comparar cada fila con `decision.options`; intentar confirmar que las acciones omitidas no aparecen, no ocupan huecos ni crean IDs/handlers. Hacer scroll repetido y confirmar que resumen y panel conservan punto, separación y alineación. Probar targets, cancelación, envío único, límites de monedas, diferencias de idioma, reduced motion y cambio de decisión.
 
 **Avanzar:** criterios pasan y Verifier `PASS`; dejar unidad en `WAITING_ORCHESTRATOR` para revisión de una única PR.
 **Pivotar:** devolver a F2 solo el criterio refutado con reproducción.

@@ -1,4 +1,5 @@
 import React, { Component, createRef } from 'react'
+import { createPortal } from 'react-dom'
 import PlayerBoard from './PlayerBoard'
 import './CoupStyles.css'
 import EventLog from './EventLog'
@@ -494,7 +495,7 @@ export default class Coup extends Component {
                         </span>
                     </>
 
-                    return <div className="DecisionActionEntry" key={action}>
+                    const actionRowElement = <div className="DecisionActionEntry" key={action}>
                         <button
                             className={`DecisionActionRow${available ? '' : ' DecisionActionRow--disabled'}`}
                             type="button"
@@ -509,6 +510,7 @@ export default class Coup extends Component {
                         >{content}</button>
                         {showDivider && <span className="DecisionActionDivider" aria-hidden="true" />}
                     </div>
+                    return available ? actionRowElement : null
                 })}
             </div>}
             {this.state.submitted && <p>{t('game.decision.sent')}</p>}
@@ -585,6 +587,13 @@ export default class Coup extends Component {
             </div>
         }
 
+        const actionDecisionRail = actionDecision && typeof document !== 'undefined'
+            ? createPortal(<div className="ActionDecisionRail" aria-live="polite">
+                <CheatSheetModal />
+                {this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
+            </div>, document.body)
+            : null
+
         return <div className="GameContainer" data-player-count={this.state.players.length}>
             <div className="GameHeader">
                 <div className="PlayerInfo">
@@ -599,10 +608,7 @@ export default class Coup extends Component {
                 <EventLog logs={this.state.logs} />
             </div>
 
-            {actionDecision && <div className="ActionDecisionRail" aria-live="polite">
-                <CheatSheetModal />
-                {this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
-            </div>}
+            {actionDecisionRail}
 
             <PlayerBoard
                 players={this.state.players}
