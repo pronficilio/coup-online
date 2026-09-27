@@ -1,6 +1,6 @@
 # Reducir imágenes sobredimensionadas del cliente — issue #32
 
-**Estado:** ACTIVE; unidad ACTIVE; F1 ACTIVE.
+**Estado:** WAITING_ORCHESTRATOR; unidad WAITING_ORCHESTRATOR; F1 CLOSED (PASS).
 **Issue:** https://github.com/pronficilio/coup-online/issues/32
 **Handoff:** docs/plans/inbox/issue_32_client_image_sizes.md
 **Bitácora:** docs/plans/log/issue-32.jsonl
@@ -73,7 +73,7 @@ Excluye JSX, CSS, lógica de carga, otros gráficos, limpieza de archivos sin us
 4. El diff del cambio de producto contiene únicamente esos 19 WebP. No se agregan dependencias ni se tocan assets sin uso.
 5. El Alquimista confirma formato, dimensiones, transparencia y tamaño final de los archivos. No se requieren tests automatizados, build ni Verifier independiente.
 
-## F1 — Redimensionar los WebP usados (READY)
+## F1 — Redimensionar los WebP usados (CLOSED; PASS)
 
 **Pregunta:** ¿se puede ajustar a 2× el máximo real de dibujo y reducir peso conservando legibilidad, apariencia y alfa?
 
@@ -86,6 +86,35 @@ Excluye JSX, CSS, lógica de carga, otros gráficos, limpieza de archivos sin us
 
 **Commit:** COMMIT_REQUIRED; mensaje previsto: perf(assets): issue 32 resize oversized coup-client images.
 **Validación mínima:** inspección del formato, dimensiones, alfa y bytes finales de los 19 archivos; sin tests/build y sin invocar Verifier.
+
+### Resultado F1
+
+Redimensioné los originales completos con Pillow 12.0.0 y remuestreo Lanczos. Se guardaron como WebP de calidad 95 con calidad de alfa 100; no se recortó ni desplazó contenido. La proporción se conserva con el redondeo necesario a píxeles enteros. Los 18 archivos que tenían alfa siguen con alfa; `characters/reverso.webp` sigue siendo opaco. Inspeccioné visualmente una carta, el mazo, la moneda y botones normales/activos; los detalles y textos visibles se mantienen.
+
+| Archivo | Antes (px; bytes) | Después (px; bytes) | Alfa |
+|---|---:|---:|---|
+| `characters/duque.webp` | 840×1220; 100,648 | 268×389; 41,390 | Sí |
+| `characters/capitan.webp` | 840×1220; 110,444 | 268×389; 38,928 | Sí |
+| `characters/asesino.webp` | 840×1220; 84,110 | 268×389; 31,660 | Sí |
+| `characters/condesa.webp` | 840×1220; 84,712 | 268×389; 32,854 | Sí |
+| `characters/embajador.webp` | 840×1220; 77,322 | 268×389; 32,652 | Sí |
+| `characters/reverso.webp` | 840×1220; 244,482 | 268×389; 53,914 | No |
+| `deck.webp` | 1024×1358; 376,176 | 240×318; 40,754 | Sí |
+| `player.webp` | 460×460; 13,614 | 34×34; 856 | Sí |
+| `coin.webp` | 480×460; 49,452 | 36×35; 1,782 | Sí |
+| `action-buttons/ba.webp` | 1086×362; 109,286 | 432×144; 27,930 | Sí |
+| `action-buttons/ba-active.webp` | 1086×362; 121,316 | 432×144; 31,014 | Sí |
+| `action-buttons/bfa.webp` | 512×171; 26,166 | 432×144; 20,412 | Sí |
+| `action-buttons/bfa-active.webp` | 512×171; 28,590 | 432×144; 22,948 | Sí |
+| `action-buttons/bs.webp` | 512×171; 31,780 | 432×144; 25,000 | Sí |
+| `action-buttons/bs-active.webp` | 512×171; 39,100 | 432×144; 30,492 | Sí |
+| `action-buttons/c.webp` | 512×171; 23,386 | 432×144; 18,816 | Sí |
+| `action-buttons/c-active.webp` | 512×171; 28,954 | 432×144; 23,314 | Sí |
+| `action-buttons/pass.webp` | 510×171; 23,058 | 432×145; 18,490 | Sí |
+| `action-buttons/pass-active.webp` | 510×171; 29,496 | 432×145; 22,986 | Sí |
+| **Total** | **1,602,092** | **516,192** | **−67.8% bytes** |
+
+Las 19 salidas conservan formato WebP y cumplen sus dimensiones objetivo. No se ejecutaron tests ni build; no se solicitaron.
 
 ## Coordinación y topología
 
