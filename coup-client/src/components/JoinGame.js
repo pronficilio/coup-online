@@ -16,9 +16,11 @@ export default class JoinGame extends Component {
             players: [],
             isInRoom: false,
             isReady: false,
+            isLeader: false,
             isLoading: false,
             isError: false,
             isGameStarted: false,
+            codexDisabled: false,
             errorMsg: '',
             socket: null
         }
@@ -37,7 +39,6 @@ export default class JoinGame extends Component {
         const socket = io(`${baseUrl}/${this.state.roomCode}`);
         this.setState({ socket });
         console.log("socket created")
-        socket.emit('setName', this.state.name);
         
         socket.on("joinSuccess", function() {
             console.log("join successful")
@@ -55,6 +56,12 @@ export default class JoinGame extends Component {
             socket.disconnect();
         })
 
+        socket.on('leader', () => this.setState({ isLeader: true, isReady: true }))
+        socket.on('startRejected', reason => this.setState({
+            errorMsg: `Unable to start: ${reason}`,
+            isError: true
+        }))
+
         socket.on('startGame', () => {
             this.setState({ isGameStarted: true});
         })
@@ -62,17 +69,17 @@ export default class JoinGame extends Component {
         socket.on('partyUpdate', (players) => {
             console.log(players)
             this.setState({ players })
-            if(players.length >= 3 && players.map(x => x.isReady).filter(x => x === true).length === players.length) { //TODO CHANGE 2 BACK TO 3
-                this.setState({ canStart: true })
-            } else {
-                this.setState({ canStart: false })
-            }
         })
+
+        socket.on('codexDisabled', status => this.setState({
+            codexDisabled: Boolean(status && status.disabled)
+        }))
 
 
         socket.on('disconnected', function() {
             console.log("You've lost connection with the server")
         });
+        socket.emit('setName', this.state.name);
     }
 
     attemptJoinParty = () => {
@@ -136,22 +143,36 @@ export default class JoinGame extends Component {
 
     render() {
         if(this.state.isGameStarted) {
-            return (<Coup name={this.state.name} socket={this.state.socket}></Coup>);
+            return (<Coup
+                name={this.state.name}
+                socket={this.state.socket}
+                isLeader={this.state.isLeader}
+                isSpectator={false}
+                codexDisabled={this.state.codexDisabled}
+            />)
         }
         let error = null;
         let joinReady = null;
         let ready = null;
+        let startGame = null;
         if(this.state.isError) {
             error = <b>{this.state.errorMsg}</b>
         }
         if(this.state.isInRoom) {
-            joinReady = <button className="joinButton" onClick={this.reportReady} disabled={this.state.isReady}>Ready</button>
+            if (!this.state.isReady) {
+                joinReady = <button className="joinButton" onClick={this.reportReady}>Ready</button>
+            }
         } else {
             joinReady = <button className="joinButton" onClick={this.attemptJoinParty} disabled={this.state.isLoading}>{this.state.isLoading ? 'Joining...': 'Join'}</button>
         }
         if(this.state.isReady) {
             ready = <b style={{ color: '#5FC15F' }}>You are ready!</b>
             joinReady = null
+        }
+        const participantCount = this.state.players.filter(player => player.participating).length
+        const allParticipantsReady = this.state.players.every(player => player.kind === 'codex' || !player.participating || player.isReady)
+        if(this.state.isLeader && participantCount >= 2 && allParticipantsReady) {
+            startGame = <button className="startGameButton" onClick={() => this.state.socket.emit('startGameSignal')}>Start Game</button>
         }
 
         return (
@@ -185,11 +206,18 @@ export default class JoinGame extends Component {
                 {ready}
                 <br></br>
                 {error}
+                {startGame}
                 <div className="readyUnitContainer">
                         {this.state.players.map((item,index) => {
                             let ready = null
                             let readyUnitColor = '#E46258'
-                            if(item.isReady) {
+                            if(item.kind === 'codex') {
+                                ready = <b>GPT-6 Luna · {item.effort}</b>
+                                readyUnitColor = '#8C6CE6'
+                            } else if(!item.participating) {
+                                ready = <b>Spectator</b>
+                                readyUnitColor = '#8A8A8A'
+                            } else if(item.isReady) {
                                 ready = <b>Ready!</b>
                                 readyUnitColor = '#73C373'
                             } else {
@@ -197,7 +225,7 @@ export default class JoinGame extends Component {
                             }
                             return (
                                     <div className="readyUnit" style={{backgroundColor: readyUnitColor}} key={index}>
-                                        <p >{index+1}. {item.name} {ready}</p>
+                                        <p>{index+1}. {item.name} {ready}</p>
                                     </div>
                             )
                             })
