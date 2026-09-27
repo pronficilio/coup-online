@@ -180,7 +180,16 @@
     "game.assets.cards.ambassador.description": "Intercambia cartas con el Mazo de la Corte.",
     "game.assets.cards.ambassador.block": "Bloquea robos.",
     "game.assets.cards.contessa.title": "Condesa",
-    "game.assets.cards.contessa.block": "Bloquea asesinatos."
+    "game.assets.cards.contessa.block": "Bloquea asesinatos.",
+    "referencePanel.group.label": "Referencias de juego",
+    "referencePanel.card.label": "Tarjeta",
+    "referencePanel.card.contentLabel": "Tarjeta de referencia en español",
+    "referencePanel.card.alt": "Tarjeta de referencia de Coup en español",
+    "referencePanel.table.label": "Tabla",
+    "referencePanel.table.contentLabel": "Tabla de referencia en español",
+    "referencePanel.table.alt": "Tabla de referencia de Coup en español",
+    "referencePanel.trigger.open": "Abrir {referenceName} de referencia",
+    "referencePanel.trigger.close": "Cerrar {referenceName}"
   },
   "en": {
     "home.title": "Welcome to Coup",
@@ -363,6 +372,15 @@
     "game.assets.cards.ambassador.description": "Exchange cards with Court Deck.",
     "game.assets.cards.ambassador.block": "Blocks stealing.",
     "game.assets.cards.contessa.title": "Contessa",
-    "game.assets.cards.contessa.block": "Blocks assassination."
+    "game.assets.cards.contessa.block": "Blocks assassination.",
+    "referencePanel.group.label": "Game references",
+    "referencePanel.card.label": "Card",
+    "referencePanel.card.contentLabel": "Coup reference card in Spanish",
+    "referencePanel.card.alt": "Coup reference card in Spanish",
+    "referencePanel.table.label": "Table",
+    "referencePanel.table.contentLabel": "Coup reference table in Spanish",
+    "referencePanel.table.alt": "Coup reference table in Spanish",
+    "referencePanel.trigger.open": "Open {referenceName} reference",
+    "referencePanel.trigger.close": "Close {referenceName}"
   }
 }
