@@ -5,6 +5,18 @@ import EventLog from './EventLog'
 import CheatSheetModal from '../CheatSheetModal'
 import RulesModal from '../RulesModal'
 import ReferencePanel from './ReferencePanel'
+import ResponseImageButton from './ResponseImageButton'
+import blockAssassinationImage from '../../assets/action-buttons/ba.webp'
+import blockAssassinationActiveImage from '../../assets/action-buttons/ba-active.webp'
+import blockForeignAidImage from '../../assets/action-buttons/bfa.webp'
+import blockForeignAidActiveImage from '../../assets/action-buttons/bfa-active.webp'
+import blockStealImage from '../../assets/action-buttons/bs.webp'
+import blockStealActiveImage from '../../assets/action-buttons/bs-active.webp'
+import challengeImage from '../../assets/action-buttons/c.webp'
+import challengeActiveImage from '../../assets/action-buttons/c-active.webp'
+import claimImage from '../../assets/action-buttons/claim.webp'
+import passImage from '../../assets/action-buttons/pass.webp'
+import passActiveImage from '../../assets/action-buttons/pass-active.webp'
 
 const INFLUENCE_COLORS = {
     duke: '#D55DC7',
@@ -12,6 +24,57 @@ const INFLUENCE_COLORS = {
     assassin: '#2B2B2B',
     contessa: '#E35646',
     ambassador: '#B4CA1F'
+}
+
+const RESPONSE_WINDOW_TYPES = new Set(['challenge', 'block', 'block_challenge'])
+
+function responseButtonFor(decision, option) {
+    if (!decision || !RESPONSE_WINDOW_TYPES.has(decision.type)) return null
+
+    if (option.choiceId === 'pass') {
+        return {
+            normalImage: passImage,
+            activeImage: passActiveImage,
+            accessibleLabel: option.label
+        }
+    }
+
+    if ((decision.type === 'challenge' || decision.type === 'block_challenge') && option.choiceId === 'challenge') {
+        return {
+            normalImage: challengeImage,
+            activeImage: challengeActiveImage,
+            accessibleLabel: option.label
+        }
+    }
+
+    if (decision.type !== 'block') return null
+
+    if (option.choiceId === 'block:duke') {
+        return {
+            normalImage: blockForeignAidImage,
+            activeImage: blockForeignAidActiveImage,
+            accessibleLabel: `Block Foreign Aid — ${option.label}`
+        }
+    }
+
+    if (option.choiceId === 'block:contessa') {
+        return {
+            normalImage: blockAssassinationImage,
+            activeImage: blockAssassinationActiveImage,
+            accessibleLabel: `Block Assassination — ${option.label}`
+        }
+    }
+
+    if (option.choiceId === 'block:captain' || option.choiceId === 'block:ambassador') {
+        return {
+            normalImage: blockStealImage,
+            activeImage: blockStealActiveImage,
+            accessibleLabel: `Block Steal — ${option.label}`,
+            supplementalLabel: option.label
+        }
+    }
+
+    return null
 }
 
 export default class Coup extends Component {
@@ -166,12 +229,30 @@ export default class Coup extends Component {
                 {decision && <>
                     <p className="DecisionTitle">{decision.title}</p>
                     <p>{decision.description}</p>
+                    {(decision.type === 'challenge' || decision.type === 'block_challenge') &&
+                        <img className="DecisionClaimContext" src={claimImage} alt="" aria-hidden="true" />}
                     <div className="DecisionButtonsContainer">
-                        {decision.options.map(option => <button
-                            key={option.choiceId}
-                            disabled={this.state.submitted || Boolean(this.state.pausedCause)}
-                            onClick={() => this.submitChoice(option)}
-                        >{option.label}</button>)}
+                        {decision.options.map(option => {
+                            const imageButton = responseButtonFor(decision, option)
+                            const disabled = this.state.submitted || Boolean(this.state.pausedCause)
+                            const onClick = () => this.submitChoice(option)
+
+                            if (imageButton) {
+                                return <ResponseImageButton
+                                    key={option.choiceId}
+                                    {...imageButton}
+                                    disabled={disabled}
+                                    onClick={onClick}
+                                />
+                            }
+
+                            return <button
+                                key={option.choiceId}
+                                type="button"
+                                disabled={disabled}
+                                onClick={onClick}
+                            >{option.label}</button>
+                        })}
                     </div>
                     {this.state.submitted && <p>Decision sent. Waiting for the other players.</p>}
                     {this.state.decisionError && <p role="alert">{this.state.decisionError}</p>}

@@ -39,4 +39,8 @@ No se añadieron ni ejecutaron tests automatizados, ni se ejecutó build: F1 sol
 
 ## Entrega y siguiente fase
 
-F1 queda cerrada en `94b1447bb0b5fb1613e3f7cf226993077a2f0da7` (`feat(action-images): issue 21 F1 import optimized webp controls`). F2 permanece bloqueada por la coordinación/liberación de `Coup.js` y componentes de respuesta con #14 y #19; no se editaron superficies compartidas.
+F1 quedó cerrada en `94b1447bb0b5fb1613e3f7cf226993077a2f0da7` (`feat(action-images): issue 21 F1 import optimized webp controls`). En ese momento F2 estaba pendiente por la coordinación de `Coup.js` con #14/#19; #14 se integró más tarde y F2 se reanudó sobre el renderer genérico.
+
+## Adición posterior al cierre F1: Claim
+
+Después de cerrar F1, se añadió a la issue el par fuente `claim.png` / `claim-active.png` (ambos RGB 1400×468). F2 los convirtió con el mismo pipeline determinista de Pillow 12/libwebp 1.6, LANCZOS, redondeo half-up, quality 95 y method 6, preservando canvas y RGB. Los derivados son `claim.webp` y `claim-active.webp`, ambos RGB 700×234, sin alfa; tamaños 36,732 B y 43,478 B. Esta adición no cambia el veredicto original de F1: F1 cerró sus diez archivos; la unidad queda con doce archivos WebP en seis parejas después de incorporar Claim en F2.

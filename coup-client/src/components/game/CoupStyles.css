@@ -294,6 +294,89 @@
     display: inline-block;
     font-size: 12px;
 }
+
+.DecisionsSection button.ResponseImageButton {
+    min-width: 0;
+    min-height: 48px;
+    height: auto;
+    margin: 8px;
+    padding: 4px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: #26343d;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.ResponseImageButton:focus-visible {
+    outline: 3px solid #efb84c;
+    outline-offset: 2px;
+}
+
+.ResponseImageButton:disabled {
+    cursor: not-allowed;
+}
+
+.ResponseImageButton__art {
+    position: relative;
+    display: block;
+    width: clamp(9rem, 36vw, 13.5rem);
+    max-width: 100%;
+    aspect-ratio: 3 / 1;
+    flex: 0 1 auto;
+}
+
+.ResponseImageButton__art img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.ResponseImageButton__normal {
+    opacity: 1;
+}
+
+.ResponseImageButton__active {
+    opacity: 0;
+    transform: scale(0.97);
+}
+
+.ResponseImageButton:not(:disabled):hover .ResponseImageButton__normal,
+.ResponseImageButton:not(:disabled):focus-visible .ResponseImageButton__normal,
+.ResponseImageButton:not(:disabled):active .ResponseImageButton__normal {
+    opacity: 0;
+}
+
+.ResponseImageButton:not(:disabled):hover .ResponseImageButton__active,
+.ResponseImageButton:not(:disabled):focus-visible .ResponseImageButton__active,
+.ResponseImageButton:not(:disabled):active .ResponseImageButton__active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.ResponseImageButton__supplemental {
+    line-height: 1.2;
+}
+
+.DecisionClaimContext {
+    display: block;
+    width: clamp(10rem, 46vw, 22rem);
+    max-width: 100%;
+    height: auto;
+    margin: 8px auto 12px;
+}
 #captain {
     background-color: #80C6E5;
 }
@@ -754,6 +837,10 @@
     .TurnActionPanel,
     .TurnActionPanel .ActionConfirmButton,
     .TurnActionPanel .ActionCancelButton {
+        transition: none;
+    }
+
+    .ResponseImageButton__art img {
         transition: none;
     }
 
