@@ -11,22 +11,27 @@ First create a release directory from the selected clean commit and the
 reviewed production overlay:
 
 ```sh
-deploy/package-release.sh 1e4685f0d079448fb6ca5df0aa0380632ffc2c7e /tmp/coup-release
-cd /tmp/coup-release/deploy
+deploy/package-release.sh 55be894 /tmp/coup-release-modern
+cd /tmp/coup-release-modern/deploy
 docker compose up -d --build
 docker compose ps
 docker compose logs --tail=100
 ```
 
-The web image builds the React app with `REACT_APP_BACKEND_URL` set to
+The package script records the full source SHA in `RELEASE_SHA` and sets the
+image tag from that SHA. The web image builds the React app with
+`REACT_APP_BACKEND_URL` set to
 `https://coup.ejele.net`. The API uses Node 24, listens on port 8000 inside the
 Docker network, and allows the Coup origin for HTTP and Socket.IO handshakes.
 Game rooms live in memory and are lost if the API container restarts.
 
 ## Stop and rollback
 
-Keep the complete release directory and images to support rollback. To stop
-the stack, run `docker compose down` from that release's `deploy/` directory.
+Keep the complete release directory and images to support rollback. To restore
+the previous release, run `docker compose up -d` from
+`/opt/coup/releases/1e4685f/deploy`; the release-specific `.env` selects the
+matching image tag. To stop the stack, run `docker compose down` from the
+active release's `deploy/` directory.
 
 ## Shared Nginx and TLS
 

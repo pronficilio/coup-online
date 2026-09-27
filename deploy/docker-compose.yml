@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.server
-    image: coup-api:${COUP_REVISION:-1e4685f}
+    image: coup-api:${COUP_REVISION:-55be894}
     environment:
       NODE_ENV: production
       PORT: "8000"
@@ -22,7 +22,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile.client
-    image: coup-web:${COUP_REVISION:-1e4685f}
+    image: coup-web:${COUP_REVISION:-55be894}
     restart: unless-stopped
     networks:
       - mochila_default
