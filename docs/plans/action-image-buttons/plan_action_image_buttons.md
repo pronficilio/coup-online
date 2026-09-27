@@ -1,12 +1,12 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`; F2 `BLOCKED` por superficies compartidas con #14 y #19; F3 `PENDING`.
+**Estado:** `WAITING_EXECUTOR`; F1 `CLOSED`; F2 `BLOCKED` por superficies compartidas con #14 y #19; F3 `PENDING`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Agente Alquimista, primero F1.
+**Siguiente dueño:** Orquestador para coordinar/liberar F2 con #14/#19; no iniciar F2 antes de esa liberación.
 
 ## Solicitud y éxito
 
@@ -20,8 +20,8 @@ Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c` y sus variantes `-ac
 - La issue #6 y PR #11 están cerradas/mergeadas. Esta solicitud necesita una unidad propia.
 - La issue #14 y la #19 están abiertas. Sus planes incluyen `Coup.js` y los componentes de acciones/respuesta. La rama #19 actualmente modifica otras superficies, pero su plan declara esas decisiones como trabajo pendiente. No editar componentes compartidos en F2 hasta que #14 y #19 integren/liberen esas superficies o el Orquestador registre coordinación explícita.
 - Las fuentes están en `/mnt/e/dev/coup/fotos/`, carpeta ignorada por Git. El Ejecutor debe tratarlas como solo lectura; no sobrescribir los PNG. Crear derivados dentro del worktree y versionar los WebP del cliente.
-- Dimensiones fuente vigentes por pareja: `ba` 2172×724; `bfa` 1024×341; `bs` 1024×341; `pass` 1020×341; `c` 1400×468. Fuentes RGB sin canal alfa.
-- Supuesto reversible: el exterior claro es mate de exportación y se vuelve transparente en los derivados para que las imágenes se integren con el tablero; preservar contenido, sombras/brillos propios de cada ilustración. Si la inspección visual muestra que el mate es parte deliberada del arte o la extracción degrada un borde, detenerse y registrar el contraejemplo antes de cambiar el tratamiento.
+- Dimensiones fuente vigentes por pareja: `ba` 2172×724; `bfa` 1024×341; `bs` 1024×341; `pass` 1020×341; `c` 1400×468.
+- Las fuentes son RGB sin canal alfa; los derivados conservan el canvas y el fondo de cada fuente. F1 solo reduce dimensiones y convierte formato; no extrae mate ni reconstruye el arte.
 - Mitad esperada, redondeada al píxel más cercano: `ba` 1086×362; `bfa` 512×171; `bs` 512×171; `pass` 510×171; `c` 700×234. Cada variante activa debe coincidir con las dimensiones de su par.
 
 ## Alcance
@@ -33,7 +33,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 ## Criterios de aceptación
 
 1. Los diez derivados se reducen a 50 % en ambos ejes, con relación preservada y redondeo documentado; cada pareja normal/activa tiene dimensiones coincidentes.
-2. WebP versionados bajo una ruta de assets del cliente; transparencia exterior comprobada visualmente, sin halo claro involuntario ni pérdida de contorno.
+2. WebP versionados bajo una ruta de assets del cliente; canvas y fondo RGB conservados, sin recorte ni cambio visual deliberado.
 3. Cada control visible utiliza el par correcto y conserva botón semántico, acción, destinatario, handlers, evento y payload actuales.
 4. La variante activa aparece con una transición perceptible al interactuar; no desplaza el layout ni retrasa la acción/socket.
 5. El nombre accesible, foco visible, teclado, contraste/legibilidad, ventana móvil y `prefers-reduced-motion` siguen siendo utilizables.
@@ -42,20 +42,21 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 
 ## Fases
 
-### F1 — Reducir e importar imágenes WebP (`READY`)
+### F1 — Reducir e importar imágenes WebP (`CLOSED`)
 
-**Pregunta:** ¿se pueden entregar los diez recursos a media resolución, con contorno limpio y formato WebP, sin modificar los fuentes ignorados?
+**Pregunta:** ¿se pueden entregar los diez recursos a media resolución y formato WebP, preservando el canvas RGB de las fuentes ignoradas?
 
 **Entrada:** los diez PNG de `/mnt/e/dev/coup/fotos/` y las dimensiones registradas arriba.
 
-**Tareas:** inspeccionar cada par; producir copias al 50 % con proporción mantenida; resolver el matte claro como transparente conforme al supuesto anterior; exportar a WebP con calidad visual adecuada; guardarlos en `coup-client/src/assets/action-buttons/` o una ruta ya establecida en el cliente; registrar dimensiones, alfa, tamaño de archivos y herramienta/parámetros en un reporte de fase.
+**Tareas:** producir copias al 50 % con proporción mantenida, usando redondeo al píxel más cercano (mitades hacia arriba); preservar el canvas/fondo RGB; exportar WebP con herramienta y parámetros reproducibles; guardarlos en `coup-client/src/assets/action-buttons/`; registrar dimensiones, modo, tamaño de archivos y parámetros en el reporte de fase.
 
-**Avanzar:** los diez archivos abren como WebP, dimensiones y alfa son correctas, pares coinciden y una vista contra el fondo del juego no muestra halos/recortes.
-**Pivotar:** si una fuente necesita una máscara distinta, documentar el tratamiento por archivo sin cambiar el arte.
+**Avanzar:** los diez archivos abren como WebP, tienen dimensiones esperadas y pares coincidentes; modo RGB sin alfa; revisión visual confirma canvas y contenido conservados.
+**Pivotar:** si un WebP difiere visualmente por codificación, ajustar calidad del encoder sin recortar ni alterar la fuente.
 **Repetir:** una corrección acotada por asset que falle visualmente.
-**Bloquear:** no es posible exportar WebP/transparencia con herramientas disponibles, o el fondo no puede separarse sin dañar el borde.
+**Bloquear:** no es posible reducir y exportar WebP con herramientas disponibles sin instalar dependencias externas.
 **Commit:** `COMMIT_REQUIRED`; `feat(action-images): issue 21 F1 import optimized webp controls`.
-**Validación:** inspección de dimensiones/formato/alfa y comparación visual. Sin tests.
+**Validación:** inspección de dimensiones/formato/modo, comparación visual y verificación de fuentes intactas. Sin tests.
+**Reporte:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 
 ### F2 — Integrar controles y transición (`BLOCKED` hasta liberar superficies de #14 y #19)
 
@@ -87,7 +88,9 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 
 - 2026-09-27: crear issue #21 porque #6/PR #11 ya están integradas y cerradas.
 - 2026-09-27: preservar los diez PNG fuente ignorados; procesar copias para no perder resolución.
-- 2026-09-27: usar transparencia en el exterior como supuesto de integración; reportar cualquier borde que pruebe lo contrario.
+- 2026-09-27: corrección de alcance del Orquestador: preservar el fondo RGB de las fuentes; F1 es solo reducción y conversión a WebP.
 - 2026-09-27: bloquear F2 hasta coordinar con #14 y #19 por solapamiento declarado de `Coup.js`/componentes de respuesta.
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
+
+- 2026-09-27: F1 cerrada; diez WebP RGB con canvas/fondo preservado, Pillow 12.0.0/libwebp 1.6.0, LANCZOS, quality 95, method 6. F2 sigue bloqueada por #14/#19; issue en WAITING_EXECUTOR.
