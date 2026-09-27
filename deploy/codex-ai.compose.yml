@@ -1,0 +1,90 @@
+services:
+  coup-api:
+    environment:
+      COUP_AI_ACCESS_CODE: ${COUP_AI_ACCESS_CODE:?Set COUP_AI_ACCESS_CODE in the private release .env}
+      CODEX_RUNNER_SOCKET: /run/coup-codex/runner.sock
+      CODEX_DISABLED_FILE: /var/lib/coup-codex-control/codex-disabled
+    volumes:
+      - coup_codex_socket:/run/coup-codex
+      - coup_codex_control:/var/lib/coup-codex-control
+    group_add:
+      - "10002"
+    depends_on:
+      coup-codex-runner:
+        condition: service_healthy
+
+  coup-codex-init:
+    image: node:24-bookworm-slim
+    user: "0:0"
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    command:
+      - sh
+      - -c
+      - >-
+        mkdir -p /var/lib/coup-codex/auth
+        && chown -R 10001:10001 /var/lib/coup-codex
+        && chmod 0700 /var/lib/coup-codex /var/lib/coup-codex/auth
+        && chown 10001:10002 /run/coup-codex
+        && chmod 2770 /run/coup-codex
+        && chown 0:10002 /var/lib/coup-codex-control
+        && chmod 2770 /var/lib/coup-codex-control
+    volumes:
+      - coup_codex_state:/var/lib/coup-codex
+      - coup_codex_socket:/run/coup-codex
+      - coup_codex_control:/var/lib/coup-codex-control
+    network_mode: none
+    restart: "no"
+
+  coup-codex-runner:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.codex-runner
+    image: coup-codex-runner:${COUP_REVISION:-poc}
+    environment:
+      COUP_REVISION: ${COUP_REVISION:-poc}
+    volumes:
+      - coup_codex_state:/var/lib/coup-codex
+      - coup_codex_socket:/run/coup-codex
+      - coup_codex_control:/var/lib/coup-codex-control
+    tmpfs:
+      - /run/coup-codex-scratch:rw,noexec,nosuid,nodev,size=128m,mode=1777
+    networks:
+      - codex_egress
+    depends_on:
+      coup-codex-init:
+        condition: service_completed_successfully
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    group_add:
+      - "10002"
+    pids_limit: 100
+    mem_limit: 1g
+    cpus: 1.0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "/opt/coup-runner/server/ai/codex-healthcheck.js"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
+
+volumes:
+  coup_codex_state:
+    name: coup_codex_state
+  coup_codex_socket:
+    name: coup_codex_socket
+  coup_codex_control:
+    name: coup_codex_control
+
+networks:
+  codex_egress:
+    name: coup_codex_egress
