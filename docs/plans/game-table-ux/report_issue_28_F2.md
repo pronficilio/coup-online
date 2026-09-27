@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-`CLOSED` en 4b1dc92, tras build y aprobación visual del candidato. Build y comprobaciones estáticas pasan; el propietario aprobó visualmente esta versión del preview, por lo que F4 puede repetirse. Este reporte no afirma haber inspeccionado visualmente una partida actual ni validado dispositivos reales.
+`CLOSED` en `4b1dc92`, tras build y comprobaciones estáticas. La aprobación visual anterior del propietario cubrió un preview de dos jugadores; sigue pendiente su revisión de este candidato en 5p/390 px y de los estados del halo. No repetir F4 hasta esa confirmación. Este reporte no afirma haber inspeccionado visualmente una partida actual ni validado dispositivos reales.
 
 Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost cards and board position`. Commit de cierre de seguimiento: `fix(game-ui): issue 28 F2 responsive geometry and response highlight`.
 
@@ -53,4 +53,4 @@ Los `clamp()` de las tres escalas se conservan. En desktop el piso cambia de −
 
 `Coup.js` abre `responseWindowOpen` solo si el cliente recibe una decisión de Challenge/Block/Block Challenge con `decision.options` no vacío. El servidor emite esas opciones solo a asientos elegibles. `PlayerBoard.js` asigna `PlayerBoardSeat--respondable` únicamente al asiento local; el estado formal `--current` se suspende mientras esa ventana local siga abierta. `responseAvailable` deja de iluminar en cuanto `submitChoice` pone `submitted=true`, incluso al elegir Pass; `responseWindowOpen` mantiene apagado `--current` hasta que `g-decisionClosed` elimina la decisión. Sin opciones locales, `--current` conserva su comportamiento. No se alteran reglas ni protocolo.
 
-`git diff --check` y `node --check server/game/coup.js` pasan; el parseo JSON de traducciones/bitácora pasa. `npm run build` en `coup-client` terminó con código 0 y `Compiled with warnings`: `logo`/`Link` sin uso en `App.js`, `postcss-calc` con unidades `dvh` en `ReferencePanel.css` y `caniuse-lite` desactualizado. No se agregaron ni ejecutaron tests automatizados. El preview `http://localhost:3015` responde HTTP 200. El propietario aprobó visualmente esta versión el 2026-09-27; el mismo Verifier repetirá F4 sobre el commit de seguimiento. No se afirma una inspección propia de una partida viva.
+`git diff --check` y `node --check server/game/coup.js` pasan; el parseo JSON de traducciones/bitácora pasa. `npm run build` en `coup-client` terminó con código 0 y `Compiled with warnings`: `logo`/`Link` sin uso en `App.js`, `postcss-calc` con unidades `dvh` en `ReferencePanel.css` y `caniuse-lite` desactualizado. No se agregaron ni ejecutaron tests automatizados. El preview `http://localhost:3015` responde HTTP 200. La revisión visual de 5p/390 px y de abrir/enviar/cerrar respuesta sigue pendiente; el mismo Verifier repetirá F4 solo después de esa confirmación. No se afirma una inspección propia de una partida viva.

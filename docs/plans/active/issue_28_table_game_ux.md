@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 CLOSED en 4b1dc92 tras build y aprobación visual; F4 ACTIVE, listo para repetir con el mismo Verifier.
+- **Estado:** ACTIVE; F1–F3 CLOSED; F2 cerrado en 4b1dc92 tras build y comprobaciones estáticas. F4 ACTIVE / WAITING_USER hasta que el propietario revise 5p/390 px y abrir/enviar/cerrar una respuesta en el preview; no repetir FINAL antes de esa confirmación.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -13,7 +13,7 @@
 
 El issue se asignó a `pronficilio` y se releyó en estado `OPEN`, con título y cuerpo coincidentes y sin otros assignees. La actualización visible enlaza este handoff activo en [el comentario de reclamo](https://github.com/pronficilio/coup-online/issues/28#issuecomment-5859072354). La rama `issue/28-table-game-ux` y el worktree `.worktrees/issue-28-table-game-ux` se crearon desde `origin/master` actualizado (`5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`). Se copiaron selectivamente este handoff, el plan y la bitácora; no se copiaron ni limpiaron cambios del checkout raíz.
 
-El propietario reorientó explícitamente el trabajo el 2026-09-27: autorizó implementar F2 y F3 en este único worktree pese a los solapamientos previos, pidió un preview local y reservó para sí la revisión visual. El Orquestador registró la reorientación en el issue y confirmó que los puertos 3015 y 8015 se pueden usar (no detener ni reutilizar el servicio que ya ocupa 8000). El propietario aprobó visualmente el preview y pidió continuar; el hold visual quedó levantado. Se mantienen las restricciones: no tocar worktrees/branches hermanos ni hacer cherry-pick; no hacer push ni abrir PR hasta el PASS del Verifier independiente. La rama permanece en `issue/28-table-game-ux`.
+El propietario reorientó explícitamente el trabajo el 2026-09-27: autorizó implementar F2 y F3 en este único worktree pese a los solapamientos previos, pidió un preview local y reservó para sí la revisión visual. Aprobó un preview anterior de dos jugadores; esa revisión no cubre el ajuste actual de cinco jugadores ni el halo de respuesta. Los puertos 3015 y 8015 permanecen activos. Se mantienen las restricciones: no tocar worktrees/branches hermanos ni hacer cherry-pick; no hacer push ni abrir PR hasta el PASS del Verifier independiente. La rama permanece en `issue/28-table-game-ux`.
 
 ## F4 activa: sincronización con master
 
@@ -57,7 +57,7 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en el único branch. F2 cerró en 4b1dc92 tras build, diff-check, sintaxis y aprobación visual. F4 repite ahora con el mismo Verifier. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
+Cada fase con artefactos requiere commit en el único branch. F2 cerró en 4b1dc92 tras build, diff-check, sintaxis y parseo JSON. La revisión visual de este candidato en 5p/390 px y de encendido/apagado/cierre del halo sigue pendiente del propietario; no iniciar F4 hasta su confirmación. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
 
 ## Criterio visual añadido por el propietario — incorporar en F2/F4
 
@@ -65,4 +65,4 @@ Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment
 
 Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
 
-Alquimista: F2 cerró en 4b1dc92 y el propietario aprobó visualmente el candidato. El mismo Verifier repetirá F4 para comprobar encendido, apagado tras envío y cierre del halo, además de los criterios existentes. No push/PR hasta PASS.
+Alquimista: F2 cerró en 4b1dc92. Cuando el propietario confirme visualmente el layout 5p/390 px y los estados de la respuesta, el mismo Verifier podrá repetir F4 para comprobar encendido, apagado tras envío y cierre del halo, además de los criterios existentes. No push/PR hasta PASS.
