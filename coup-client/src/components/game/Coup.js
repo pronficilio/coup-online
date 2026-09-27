@@ -22,6 +22,7 @@ export default class Coup extends Component {
              action: null,
              blockChallengeRes: null,
              players: [],
+             boardPlayers: [],
              playerIndex: null,
              currentPlayer: '',
              isChooseAction: false,
@@ -51,33 +52,37 @@ export default class Coup extends Component {
         })
 
         this.props.socket.on('g-gameOver', (winner) => {
-            bind.setState({winner: `${winner} Wins!`})
+            bind.setState({ winner: `${winner} Wins!`, isChooseAction: false })
             bind.setState({playAgain: bind.playAgainButton})
         })
         this.props.socket.on('g-updatePlayers', (players) => {
             bind.setState({playAgain: null})
             bind.setState({winner: null})
-            players = players.filter(x => !x.isDead);
+            const boardPlayers = players;
+            const activePlayers = players.filter(x => !x.isDead);
             let playerIndex = null;
-            for(let i = 0; i < players.length; i++) {
-                console.log(players[i].name, this.props.name)
-                if(players[i].name === this.props.name) {
+            for(let i = 0; i < activePlayers.length; i++) {
+                console.log(activePlayers[i].name, this.props.name)
+                if(activePlayers[i].name === this.props.name) {
                     playerIndex = i;
                     break;
                 }
             }
             if(playerIndex == null) {
-                this.setState({ isDead: true })
+                this.setState({ isDead: true, isChooseAction: false })
             }else {
                 this.setState({ isDead: false})
             }
             console.log(playerIndex)
-            bind.setState({playerIndex, players});
+            bind.setState({playerIndex, players: activePlayers, boardPlayers});
             
         });
         this.props.socket.on('g-updateCurrentPlayer', (currentPlayer) => {
             console.log('currentPlayer: ', currentPlayer)
-            bind.setState({ currentPlayer });
+            bind.setState({
+                currentPlayer,
+                isChooseAction: currentPlayer === bind.props.name ? bind.state.isChooseAction : false
+            });
         });
         this.props.socket.on('g-addLog', (log) => {
             let splitLog=  log.split(' ');
@@ -97,8 +102,11 @@ export default class Coup extends Component {
             bind.state.logs = [...bind.state.logs, coloredLog]
             bind.setState({logs :bind.state.logs})
         })
-        this.props.socket.on('g-chooseAction', () => {        
-            bind.setState({ isChooseAction: true})
+        this.props.socket.on('g-chooseAction', () => {
+            const isLocalLivePlayer = bind.state.playerIndex != null && !bind.state.isDead
+            bind.setState({
+                isChooseAction: isLocalLivePlayer && bind.state.currentPlayer === bind.props.name
+            })
         });
         this.props.socket.on('g-openExchange', (drawTwo) => {
             let influences = [...bind.state.players[bind.state.playerIndex].influences, ...drawTwo];
@@ -239,12 +247,16 @@ export default class Coup extends Component {
         let playAgain = null
         let isWaiting = true
         let waiting = null
-        if(this.state.isChooseAction && this.state.playerIndex != null) {
+        const canChooseAction = this.state.isChooseAction
+            && this.state.playerIndex != null
+            && !this.state.isDead
+            && this.state.currentPlayer === this.props.name
+        if(canChooseAction) {
             isWaiting = false;
-            actionDecision = <ActionDecision doneAction={this.doneAction} deductCoins={this.deductCoins} name={this.props.name} socket={this.props.socket} money={this.state.players[this.state.playerIndex].money} players={this.state.players}></ActionDecision>
+            actionDecision = <ActionDecision key={`${this.props.name}-${this.state.currentPlayer}`} doneAction={this.doneAction} deductCoins={this.deductCoins} name={this.props.name} socket={this.props.socket} money={this.state.players[this.state.playerIndex].money} players={this.state.players}></ActionDecision>
         }
         if(this.state.currentPlayer) {
-            currentPlayer = <p>It is <b>{this.state.currentPlayer}</b>'s turn</p>
+            currentPlayer = <p aria-live="polite" aria-atomic="true">It is <b>{this.state.currentPlayer}</b>'s turn</p>
         }
         if(this.state.revealingRes) {
             isWaiting = false;
@@ -325,12 +337,24 @@ export default class Coup extends Component {
                 <div className="InfluenceSection">
                     {influences}
                 </div>
-                <PlayerBoard players={this.state.players}></PlayerBoard>
+                <div className="TurnTableShell">
+                    <PlayerBoard
+                        players={this.state.boardPlayers}
+                        observerName={this.props.name}
+                        currentPlayer={this.state.currentPlayer}
+                    />
+                    <aside
+                        className={`TurnActionPanel ${canChooseAction ? 'TurnActionPanel--active' : 'TurnActionPanel--inactive'}`}
+                        aria-label="Your turn actions"
+                        aria-hidden={!canChooseAction}
+                    >
+                        {actionDecision}
+                    </aside>
+                </div>
                 <div className="DecisionsSection">
                     {waiting}
                     {revealDecision}
                     {chooseInfluenceDecision}
-                    {actionDecision}
                     {exchangeInfluences}
                     {challengeDecision}
                     {blockChallengeDecision}
