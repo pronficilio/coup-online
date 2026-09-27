@@ -20,7 +20,7 @@ Cuando vence una decisión, únicamente los asientos humanos que no respondieron
 
 ### Hechos confirmados
 
-- La base original de #26 fue `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. PR #27 de #25 avanzó `origin/master` a `c601410952184c85f552ee5cbb73ef6fe52519ff`; luego `1ff478c308478af3be61131daa1bd88652bdc77f` cerró #25 y sincronizó sus documentos. El branch se rebasó limpiamente sobre ambas actualizaciones; el diff #25 quedó preservado y ya no aparece como cambio local de #26.
+- La base original de #26 fue `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. PR #27 de #25 avanzó `origin/master` a `c601410952184c85f552ee5cbb73ef6fe52519ff`; luego `1ff478c308478af3be61131daa1bd88652bdc77f` cerró #25 y sincronizó sus documentos. PR #30/#21 llevó la base a `3313d426`; PR #31/#29 la avanzó a `be93e975`. Los rebases fueron limpios y preservaron, respectivamente, los botones ilustrados de #21 y los créditos de portada de #29.
 - En la base, el timeout llamaba `pause(..., { recoverable: true })`, y `g-resume` autorizaba al líder. Esa regla ha sido reemplazada para #26 por la aclaración explícita del usuario.
 - `openDecision()` guarda `allowed` y `responses`; los responsables humanos de un timeout se calculan como `allowed - responses`, con las claves resueltas a asientos desde estado servidor. Quien ya respondió nunca recibe permiso.
 - La base no ofrece reconexión/reasignación de asiento después de iniciar: `lobby.js` rechaza nuevas conexiones. Una desconexión invalida la pausa y exige recrear la partida. El propietario se guarda por número de asiento, no por socket ID, de modo que cualquier reasignación confiable futura conservará el asiento autorizado; no se aceptan IDs de asiento/socket del cliente.
@@ -68,17 +68,17 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 ### F2 — Mostrar overlay y acción autorizada (`CLOSED`, preservar respuestas y copy mínimo)
 
 - **Pregunta única:** ¿solo el responsable recibe overlay/CTA y todos los demás quedan informados sin overlay?
-- **Entrada:** F1 revalidada; base re-sincronizada a `origin/master` `3313d426ebe5cf3d0612e692e1fe44137468362f` tras PR #30/#21; conservar los botones de respuesta ilustrados de #21.
+- **Entrada:** F1 revalidada; base re-sincronizada a `origin/master` `be93e975072b364365a90206931f732fb44dc6f1` tras PR #31/#29; conservar botones ilustrados de #21 y créditos de portada de #29.
 - **Salida:** capa fija semitransparente que cubre el área de juego, bloquea controles inferiores y muestra copy accesible en español.
 - **Copy:** ES responsable/pausa no recuperable: heading «Partida en pausa»; responsable tiene además el botón «Reanudar partida». EN: “Game paused”, “Resume game”. Otros reciben únicamente el status «La partida está en pausa.» / “The game is paused.”. Eliminar causa, respuesta pendiente, conectividad y explicación de espera/no recuperación. Mantener solo errores reales del servidor con `role="alert"`.
 - **Criterio de avance:** solo responsable obtiene overlay/CTA; resto no recibe overlay y queda en status accesible no modal; el servidor rechaza líder/responsable no pendiente/spectator y payload con identidad; el CTA evita duplicados; `g-gameResumed` despeja overlay/espera; la pérdida de recuperabilidad muestra overlay sin CTA a todos. Al pausar, copiar respuestas server-side aceptadas; al reanudar, preservar esas respuestas, generar identidad/versión nuevas y pedir respuesta solo a actores aún pendientes. El diálogo identifica su título con `aria-labelledby` y no declara `aria-describedby` si no contiene descripción.
 - **Pivote:** si el servidor rechaza el caso normal de timeout o el copy exige otro contrato, detenerse y reorquestar.
 - **Repetición acotada:** una corrección de estado/foco por defecto reproducible.
 - **Bloqueo/cancelación:** bloquear si #19 inicia correcciones simultáneas en las superficies afectadas; no editar en paralelo. Cancelar solo por decisión del usuario.
-- **Artefactos:** autorización/entrega personalizada de pausa, overlay, aviso breve de espera, copy bilingüe mínimo, reporte de respuesta preservada, reporte de copy, solicitud de Verifier actualizada.
+- **Artefactos:** autorización/entrega personalizada de pausa, overlay, aviso breve de espera, copy bilingüe mínimo, `report_issue_26_F3_followup.md` histórico y `report_issue_26_F2_copy_followup.md` actual, solicitud de Verifier actualizada.
 - **Commit:** `COMMIT_REQUIRED`; `fix(game): resume timed-out decisions by pending seat`.
 - **Validación anterior:** build exit 0 con warnings preexistentes; revisión estática de ownership y conservación de `responses`; i18n 313/313; `git diff --check` exit 0. No se agregaron ni ejecutaron tests automatizados. El commit `46b0805` y su reporte F3 quedan históricos.
-- **Follow-up de copy:** compilar, revisar diff e i18n tras quitar texto accesorio y helper de causa; no agregar ni ejecutar tests. El commit `9276e0a` y `report_issue_26_F3_followup.md` son históricos para la versión anterior del copy. Solicitar prueba humana en CRA `localhost:3012` y Verifier FINAL sobre el nuevo HEAD.
+- **Follow-up de copy:** implementación en `4e3043b4c5d85e63e6aba47b0b5da7f0869ace2f`, documentada en `report_issue_26_F2_copy_followup.md`; build exit 0, diff-check e i18n 292/292. El commit `9276e0a` y `report_issue_26_F3_followup.md` son históricos para la versión anterior del copy. CRA/HMR compiló con copy nuevo; solicitar prueba humana en `localhost:3012` y Verifier FINAL sobre el HEAD actualizado.
 
 ### F3 — Revisar pausa y reanudación (`PENDING` walkthrough humano)
 
