@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. F2 corrigió el margen superior para cinco jugadores tras el `FAIL` medio del primer pase FINAL; sincronizar `master` vigente y repetir F4 con el mismo Verifier.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `RETURNED`; F3 `CLOSED`; F4 `RETURNED`. El lift de cinco jugadores ya deja 14% efectivo; el Verifier encontró posible solapamiento del asiento superior derecho con el Event Log en móvil. Resolver el criterio 2 sin mover el Event Log y repetir F4 con el mismo Verifier.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -52,7 +52,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** inspección estática/documental; no ejecutar tests.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
-### F2 — Integrar influencias perdidas y ajustar el círculo (`CLOSED`)
+### F2 — Integrar influencias perdidas y ajustar el círculo (`RETURNED`)
 
 - **Pregunta única:** ¿la mano propia y el círculo pueden ocupar la posición solicitada sin desplazar ni cubrir el resto del HUD?
 - **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y hará la revisión visual del preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
@@ -65,6 +65,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F2.md`.
 - **Seguimiento de verificación (2026-09-27):** el Verifier FINAL midió el asiento superior a aproximadamente 81 px (viewport móvil de 390 px) y 112 px (escritorio ancho) para cinco jugadores; el criterio 2 pide unos 50 px. F2 vuelve a `RETURNED` únicamente para corregir la geometría de `.PlayerBoardContainer` según las coordenadas superiores de 2–6 jugadores y el tope real de 900 px, sin desplazar HUD/controles ni recortar asientos. Build/diff-check/sintaxis requeridos antes de cerrar F2 con un commit de seguimiento; después F4 vuelve a `ACTIVE` para el mismo Verifier.
 - **Resolución del seguimiento (2026-09-27):** el layout superior de cinco jugadores queda en `top: 14%` efectivo: `.PlayerBoardContainer[data-player-count="5"]` aplica `translate: 0 -6.88%` para compensar el anillo que alcanza 20.88%. Es un ajuste del tablero cuadrado; las reglas responsive anteriores y el HUD conservan sus posiciones. `git diff --check` y `node --check server/game/coup.js` pasan; el build termina con código 0 y avisos ya observados en `App.js`, `ReferencePanel.css` y `caniuse-lite`. El preview de `localhost:3015` sigue activo. F2 queda `CLOSED`; F4 vuelve a `ACTIVE` para el mismo Verifier tras sincronizar el branch.
+- **Reapertura por segundo hallazgo (2026-09-27):** el Verifier confirmó el margen, pero devolvió F4 con severidad media porque en móvil el asiento superior derecho puede solapar texto y área desplazable del Event Log (`top: 60px`) y la capa posterior del tablero puede taparlo. Evidencia e incertidumbre de captura: `docs/plans/game-table-ux/report_issue_28_F4.md`. Ajustar solo la geometría/apilamiento responsive para conservar el Event Log anclado y usable y mantener visibles los asientos; no ocultar ni mover el Event Log ni recortar cartas. F2 vuelve a `RETURNED` hasta revisión y build.
 
 ### F3 — Mostrar el conteo autoritativo de Court (`CLOSED`)
 
@@ -77,15 +78,15 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; preview local para revisión visual del propietario; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F3.md`.
 
-### F4 — Revisión final independiente (`ACTIVE`)
+### F4 — Revisión final independiente (`RETURNED`)
 
 - **Pregunta única:** ¿el conjunto cumple los criterios sin desplazar HUD ni publicar información privada?
-- **Entrada:** F1–F3 cerradas y aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. La revisión independiente inicial devolvió F4 con `FAIL` medio por el criterio 2; el lift de cinco jugadores quedó corregido en F2 y se repite F4 con el mismo Verifier.
+- **Entrada:** F1/F3 cerradas y aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. El primer `FAIL` medio (margen superior de cinco jugadores) se corrigió en F2; el segundo pase confirmó ese margen y devolvió F4 por el posible solapamiento del Event Log a 390 px. Corregir F2 y repetir F4 con el mismo Verifier.
 - **Salida:** sincronización documentada, build/diff-check/comprobaciones de sintaxis y veredicto FINAL independiente.
 - **Criterio de cierre:** capturas/escalas 2, 3 y 6 jugadores en móvil y escritorio; revisar reserva superior, anclaje del conteo, intercambio pendiente/completado, desafío con reemplazo, revancha y el payload público. Refutar al menos una afirmación de éxito; corregir defectos antes del veredicto.
 - **Artefacto:** `docs/plans/game-table-ux/report_issue_28_F4.md` y evidencia visual acotada.
 - **Commit:** `COMMIT_REQUIRED` para el sync/control de F4; el commit de veredicto/cierre se reserva hasta cumplir el criterio de F4 y recibir PASS independiente.
-- **Revalidación:** el seguimiento F2 pasa `git diff --check`, `node --check server/game/coup.js` y build de cliente (código 0). El build conserva avisos de `App.js`, `ReferencePanel.css` y `caniuse-lite`. La rama se sincronizó sin conflictos con `origin/master@094a61e4a45b08ffb6aba68098bb424d21b9b7d2` mediante `caa39f1`; sobre el nuevo HEAD se repitieron diff-check, sintaxis, parseo JSON y build (código 0). No se agregaron ni ejecutaron tests automatizados. No hacer push ni abrir PR antes del PASS independiente.
+- **Revalidación:** la rama se sincronizó sin conflictos con `origin/master@094a61e4a45b08ffb6aba68098bb424d21b9b7d2` mediante `caa39f1`; build y comprobaciones pasan. El informe de la repetición está en `report_issue_28_F4.md`: criterios 1, 3, 4, 5 y 6 pasan; criterio 2 `FAIL` medio por Event Log potencialmente cubierto en móvil. F2 se devuelve; no hay nuevo pase independiente hasta corregir. No se agregaron ni ejecutaron tests automatizados. No hacer push ni abrir PR antes del PASS.
 
 ## Dependencias y coordinación
 
