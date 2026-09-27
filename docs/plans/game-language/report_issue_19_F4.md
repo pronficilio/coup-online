@@ -1,8 +1,8 @@
 # Reporte F4 — cobertura final y revisión independiente
 
-**Estado de fase:** `BLOCKED` mientras se espera la inspección visual humana de la corrección y el nuevo veredicto independiente. La segunda revisión FINAL devolvió `FAIL` en AC2/AC4/AC7 por píxeles de `CHALLENGE` fuera de la máscara; el recubrimiento se amplió solo en esa clase. Este documento no emite PASS general ni aceptación.
+**Estado de fase:** `BLOCKED` a la espera de inspección visual humana focalizada. El Verifier FINAL sobre el producto `c9d62676ffa33a177a0edced26dfc91e2529365c` dejó AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS estático` y AC7 `BLOCKED` porque no hubo observación humana del render/recorrido. Este documento no emite PASS general ni aceptación.
 **Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29 y llega después del merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico avanzó mediante fast-forward a `3313d42` y merge `318c119` desde `ca16e42`.
-**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED` hasta inspección visual y nuevo veredicto. Issue #19 permanece `OPEN`; PR #22 está `MERGED` y PR de continuación #33 está `DRAFT`.
+**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED` hasta inspección humana y reevaluación final de AC7. Issue #19 permanece `OPEN`; PR #22 está `MERGED` y PR de continuación #33 está `DRAFT`.
 
 ## Alcance requerido
 
@@ -47,10 +47,26 @@ Se amplió únicamente `.ResponseImageButton__art--challenge` a x=38–80%. En 5
 
 ## Revisión humana solicitada sobre la corrección
 
-- Commit exacto servido en la revisión anterior (histórico): `0c913d859f079ce895b3ea351b751725ece8119c`, con el producto de `8d55413` y la sincronización de `master`. Nuevo checkpoint publicado: `c9d62676ffa33a177a0edced26dfc91e2529365c`; se releen #19 `OPEN` y PR #33 `OPEN`/`DRAFT`, ambas con cuerpos actualizados. La inspección humana focalizada y la revisión independiente deben apuntar a este SHA; no reutilizar sesiones/resultados previos como evidencia del overlay 38–80%.
+- Commit exacto servido en la revisión anterior (histórico): `0c913d859f079ce895b3ea351b751725ece8119c`, con el producto de `8d55413` y la sincronización de `master`. El producto corregido está en `c9d62676ffa33a177a0edced26dfc91e2529365c`; el HEAD documental durante el Verifier fue `cbfaee5fa527994e186a2b9116815da7bcd13d34`. El Verifier ya revisó ese producto y dejó AC7 `BLOCKED`; la inspección humana debe asociarse al SHA de producto `c9d6267`. Comprobar que la URL local actual sirve esa versión antes del recorrido.
 - Cliente CRA: [http://127.0.0.1:3011/](http://127.0.0.1:3011/), bind local confirmado; `GET /` devuelve HTTP 200.
 - Backend de desarrollo del mismo worktree: `http://127.0.0.1:8002`, bind local confirmado; `/exists/human-review` responde `{"exists":false}` antes de crear la sala.
-- El Verifier mantiene ambos procesos en ejecución mientras espera la respuesta. Al terminar la revisión, avisar en la conversación y el Verifier los detendrá.
+- La comprobación anterior registró cliente y backend ligados a loopback. Antes del recorrido, confirmar que los servicios siguen disponibles y corresponden al producto `c9d6267`; no se asume que procesos de la revisión anterior continúen activos.
+
+## Verifier FINAL más reciente (2026-09-27)
+
+Checkpoint de producto: `c9d62676ffa33a177a0edced26dfc91e2529365c`. En la revisión el HEAD de la rama era `cbfaee5fa527994e186a2b9116815da7bcd13d34`, un commit posterior solo documental/bitácora. El Verifier no ejecutó tests/build ni observó la aplicación en navegador.
+
+| Criterio | Resultado | Evidencia / pendiente |
+|---|---|---|
+| AC1 — inventario | `PASS` | Las cinco familias en uso y variantes normal/activa están inventariadas; `claim` no se usa. |
+| AC2 — interfaz en español | `PASS estático` | Etiquetas usan el diccionario; el render requiere confirmación humana. |
+| AC3 — diccionario | `PASS` | 307 claves por idioma con marcadores paralelos; no cambió en esta corrección. |
+| AC4 — recursos visibles | `PASS estático` | En ambas imágenes de 512×171, `CHALLENGE` ocupa x≈201–399; la máscara 38–80% cubre x=194.56–409.6, con margen ~6.4/10.6 px y sin alcanzar espada/marco según la inspección del arte. |
+| AC5 — español predeterminado | `PASS` | `DEFAULT_LANGUAGE` permanece `es`; no se añadió selector. |
+| AC6 — protocolo/acciones | `PASS estático` | El cambio de producto desde la revisión previa es CSS; evento, payload y handlers no cambiaron. |
+| AC7 — recorrido | `BLOCKED` | Falta observación humana en estado normal/activo, escritorio/ancho estrecho y conservación de acciones. |
+
+Resultado global `BLOCKED`, sin PASS de F4. El comentario positivo anterior del usuario autorizó continuar, pero no describe esta inspección focalizada. Tras el recorrido, compartir evidencia exacta para que el Verifier reevalue AC7.
 
 Pasos solicitados:
 
@@ -61,14 +77,14 @@ Pasos solicitados:
 5. Elegir una acción reclamable como `Impuesto`; en la respuesta revisar `Desafiar` y `Pasar`, cada uno normal y con hover/foco. Confirmar que no queden trazos de `CHALLENGE` en los dos extremos y que `Desafiar` no se recorte.
 6. Repetir la inspección en un ancho de escritorio y en un ancho estrecho cercano a móvil. Confirmar si alguna etiqueta deja ver inglés, se recorta, se superpone al icono/marco o si una selección no conserva su acción. Revisar el nuevo límite x=38–80% de `Desafiar` y el tamaño/recorte de `Bloquear Ayuda extranjera` en móvil; confirmar que los otros labels mantienen su ajuste.
 
-Informar navegador/dispositivo, anchos aproximados y resultado concreto de cada rótulo. Esta inspección nueva es necesaria: el recorrido general reportado antes de la corrección no valida estos botones. El Verifier confirmó cliente HTTP 200 y backend de desarrollo en loopback. El checkpoint FINAL queda `BLOCKED` hasta recibir esta respuesta y volver a revisar el commit actualizado; la fase F4 permanece `BLOCKED`.
+Informar navegador/dispositivo, anchos aproximados y resultado concreto de cada rótulo. Esta inspección nueva es necesaria: el recorrido general reportado antes de la corrección no valida estos botones. El checkpoint FINAL ya dejó AC1–AC6 `PASS` (AC2/AC4 estático) y AC7 `BLOCKED`; la fase F4 permanece `BLOCKED` hasta recibir esta respuesta y reevaluar el recorrido.
 
 ## Resultado y siguiente acción
 
-El Verifier independiente informó que cinco familias de botones visibles aún mostraban palabras inglesas: `ba` (BLOCK ASSASSINATION), `bfa` (BLOCK FOREIGN AID), `bs` (BLOCK STEAL), `c` (CHALLENGE) y `pass` (PASS), incluidas variantes normales y activas. En el primer checkpoint recibió AC1/AC2/AC4/AC7 `FAIL`; AC3/AC5/AC6 `PASS`. Después la segunda revisión de `3c9a3af` falló AC2/AC4/AC7 por leakage en `CHALLENGE`. La máscara corregida está en este commit; build/diff-check y una inspección humana siguen pendientes. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no están importadas ni referenciadas por la aplicación y no se usan en esta UI.
+El Verifier independiente encontró cinco familias de botones visibles con palabras inglesas incrustadas y después detectó fuga en `CHALLENGE` bajo la máscara 40–77%. La corrección CSS x=38–80% quedó en `c9d6267`; build exit 0 con avisos existentes y diff-check limpio. El Verifier más reciente dejó AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS estático` y AC7 `BLOCKED` a la espera de revisión humana focalizada. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no están importadas ni referenciadas por la aplicación y no se usan en esta UI.
 
-La fase F4 está `BLOCKED` a la espera de la inspección focalizada; la issue #19 `OPEN`; la unidad queda `WAITING_ORCHESTRATOR` para coordinar el recorrido y revisión del commit nuevo. La PR de continuación #33 está `DRAFT`. El Verifier mantiene la URL y servicios del mismo worktree/commit activos hasta recibir la observación; después repite el veredicto FINAL. El Alquimista no reclama ni emite PASS por sí mismo.
+La fase F4 está `BLOCKED` a la espera de la inspección focalizada; issue #19 `OPEN`; unidad `WAITING_USER`. PR de continuación #33 `DRAFT`. El Verifier indicó que no observó la aplicación en navegador; tras recibir el informe humano deberá reevaluar AC7. El Alquimista no reclama ni emite PASS por sí mismo.
 
 El usuario autorizó la integración parcial; PR #22 se fusionó en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Ese merge no acepta el resultado, no marca F4 cerrada, no equivale al veredicto FINAL y no cierra #19. La issue sigue `OPEN`.
 
-La API confirmó que issue #19 sigue `OPEN`/asignada a `pronficilio`, PR #22 está `MERGED` y PR #33 permanece `DRAFT`. El último veredicto sobre `3c9a3af` fue `FAIL` en AC2/AC4/AC7 y AC1/AC3/AC5/AC6 `PASS`; la corrección 38–80% necesita inspección en el render y nuevo veredicto.
+La API confirmó issue #19 `OPEN`/asignada a `pronficilio`, PR #22 `MERGED` y PR #33 `DRAFT`. El último veredicto sobre el producto `c9d6267` fue global `BLOCKED`: AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS estático`, AC7 `BLOCKED`. Solo falta la inspección humana focalizada y reevaluar AC7; no cerrar fase/issue ni emitir PASS.
