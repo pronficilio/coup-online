@@ -1,12 +1,12 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` bajo coordinación explícita del usuario; F3 `PENDING`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por incompatibilidad con la arquitectura activa de #14; F3 `PENDING`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Agente Alquimista para completar F2 en el worktree asignado, manteniendo aislamiento de las ramas #14/#19.
+**Siguiente dueño:** Orquestador para resolver con el usuario si F2 espera el merge de #14, se implementa temporalmente sobre el legado, o se amplía para portar/adaptar el renderer genérico.
 
 ## Solicitud y éxito
 
@@ -18,7 +18,7 @@ Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c` y sus variantes `-ac
 
 - Base detectada: `master`; `origin` es `pronficilio/coup-online`; aislamiento del proyecto: worktree por issue.
 - La issue #6 y PR #11 están cerradas/mergeadas. Esta solicitud necesita una unidad propia.
-- La issue #14 y la #19 están abiertas. La rama #14 modifica `BlockChallengeDecision.js`, `BlockDecision.js`, `ChallengeDecision.js` y `Coup.js`; la PR #22 de #19 modifica otras rutas, pero su plan mantiene reservados los componentes de respuesta mientras #14 está activo. Por instrucción explícita del usuario, el Orquestador autoriza F2 ahora en la rama/worktree de #21. El Ejecutor debe contrastar los cambios vivos de #14, conservarlos conceptualmente y documentar interacciones; no fusionar, cherry-pickear ni escribir en worktrees ajenos. Si aparece una colisión semántica que no pueda resolverse con cambios acotados, detener esa parte y reportarla.
+- La issue #14 y la #19 están abiertas. La rama local #14 (`issue/14-codex-ai-players`, HEAD `cfad413`, 38 commits delante de su upstream local) modifica `Coup.js` y elimina `BlockChallengeDecision.js`, `BlockDecision.js` y `ChallengeDecision.js`; su nuevo cliente usa un renderer genérico de `decision.options`. La PR #22 de #19 está `DRAFT` en HEAD `81522a4` y su diff actual no toca esos cuatro archivos, pero mantiene la reserva por #14. El usuario autorizó iniciar F2 en el worktree #21; el Alquimista inspeccionó las ramas y comprobó una incompatibilidad arquitectónica concreta. La autorización general no decide qué renderer debe ser objetivo; no importar ni adaptar el protocolo de #14 por inferencia.
 - Las fuentes están en `/mnt/e/dev/coup/fotos/`, carpeta ignorada por Git. El Ejecutor debe tratarlas como solo lectura; no sobrescribir los PNG. Crear derivados dentro del worktree y versionar los WebP del cliente.
 - Dimensiones fuente vigentes por pareja: `ba` 2172×724; `bfa` 1024×341; `bs` 1024×341; `pass` 1020×341; `c` 1400×468.
 - Las fuentes son RGB sin canal alfa; los derivados conservan el canvas y el fondo de cada fuente. F1 solo reduce dimensiones y convierte formato; no extrae mate ni reconstruye el arte.
@@ -58,18 +58,18 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Validación:** inspección de dimensiones/formato/modo, comparación visual y verificación de fuentes intactas. Sin tests.
 **Reporte:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 
-### F2 — Integrar controles y transición (`ACTIVE`; coordinación explícita registrada)
+### F2 — Integrar controles y transición (`BLOCKED`; pendiente decisión de arquitectura)
 
 **Pregunta:** ¿la respuesta conserva el comportamiento actual al intercambiar el botón de texto por imagen?
 
-**Entrada:** F1 cerrada y autorización explícita del usuario para avanzar en el worktree de #21 mientras #14/#19 siguen abiertos.
+**Entrada:** F1 cerrada y decisión explícita sobre el renderer objetivo, dado que #14 está reemplazando la arquitectura de respuestas.
 
-**Tareas:** revisar primero los diffs activos de #14/#19 en los mismos archivos; integrar `c` en `ChallengeDecision` y `BlockChallengeDecision`; integrar `bfa`, `bs`, `ba` en `BlockDecision`; integrar `pass` en el control compartido de `Coup.js`; definir fallback textual accesible y dimensiones estables; añadir transición corta entre imagen normal/activa mediante opacidad/transform; respetar movimiento reducido y evitar retrasar los handlers. Mantener cambios en la rama de #21 y dejar documentado cómo se resuelven al integrar la rama activa de #14.
+**Tareas previstas:** integrar `c` en los dos estados de challenge, `bfa`, `bs`, `ba` en los estados de bloqueo, y `pass` en el control de paso del renderer acordado; definir fallback textual accesible y dimensiones estables; añadir transición corta entre imagen normal/activa mediante opacidad/transform; respetar movimiento reducido y evitar retrasar la respuesta. La ubicación final depende de la decisión de arquitectura.
 
 **Avanzar:** todas las ventanas usan el recurso correcto; respuestas y payloads son iguales antes/después; foco/teclado/móvil/reduced motion son correctos; el panel no se desplaza.
 **Pivotar:** si los estados activos no son visibles con click inmediato, mostrar la variante durante hover/foco/pulsación sin retrasar envío.
 **Repetir:** una corrección localizada por control.
-**Bloquear:** hay una colisión semántica no resoluble de forma acotada, se requiere cambio de lógica/protocolo, o la imagen tapa opciones de reclamo.
+**Bloquear:** el renderer de destino no está definido; adaptar el protocolo de #14 sin coordinación ampliaría el alcance y cambiaría el contrato de respuestas.
 **Commit:** `COMMIT_REQUIRED`; `feat(action-images): issue 21 F2 image response controls and transition`.
 **Validación:** build de cliente y recorrido manual; sin tests.
 
@@ -89,8 +89,8 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 - 2026-09-27: crear issue #21 porque #6/PR #11 ya están integradas y cerradas.
 - 2026-09-27: preservar los diez PNG fuente ignorados; procesar copias para no perder resolución.
 - 2026-09-27: corrección de alcance del Orquestador: preservar el fondo RGB de las fuentes; F1 es solo reducción y conversión a WebP.
-- 2026-09-27: F2 empezó bloqueada por solapamiento con #14/#19; el usuario autorizó explícitamente que el Orquestador coordinara y activara F2 en el worktree asignado de #21. Se mantiene el aislamiento y se debe cotejar la rama activa de #14.
+- 2026-09-27: el usuario ordenó invocar al Alquimista para F2; coordinación registrada en `c7c1a6b`. La inspección comprobó que #14 elimina los componentes heredados y cambia el contrato a `g-decision`/`g-submitDecision(choiceId)`. El Alquimista detuvo cambios de producto; esperar decisión del usuario sobre renderer y posible ampliación de alcance.
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 
-- 2026-09-27: F1 cerrada; diez WebP RGB con canvas/fondo preservado, Pillow 12.0.0/libwebp 1.6.0, LANCZOS, quality 95, method 6. El usuario instruyó iniciar F2 pese a las reservas; Orquestador registra coordinación explícita y activa al Ejecutor.
+- 2026-09-27: F1 cerrada; diez WebP RGB con canvas/fondo preservado, Pillow 12.0.0/libwebp 1.6.0, LANCZOS, quality 95, method 6. F2 quedó bloqueada tras comprobarse la incompatibilidad del renderer; no hay cambios de producto F2.
