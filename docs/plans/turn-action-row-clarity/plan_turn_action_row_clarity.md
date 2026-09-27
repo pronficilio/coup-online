@@ -1,12 +1,12 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `BLOCKED`; F1 `CLOSED / PASS`; F2 `BLOCKED`. La implementación y el build de F2 están listos; falta el recorrido manual obligatorio en un navegador funcional.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. F2 se reanudó tras la revisión visual de la usuaria en el cliente local; se corrigen dos defectos de presentación antes de continuar la validación.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
-**Handoff bloqueado:** `docs/plans/blocked/issue_24_turn_action_row_clarity.md`
+**Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Orquestador, para proporcionar o coordinar un navegador funcional y reanudar el recorrido manual de F2. F3 no está listo.
+**Siguiente dueño:** Orquestador reinicia CRA para refrescar HMR; la usuaria hace la siguiente inspección visual; Alquimista continúa el recorrido F2. F3 no está listo.
 
 ## Solicitud y definición de éxito
 
@@ -61,7 +61,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Commit:** `COMMIT_REQUIRED`; `docs(action-rows): issue 24 F1 generic renderer confirmed`.
 **Validación:** releer issues/PRs, inspeccionar código integrado y `git diff --check`.
 
-### F2 — Implementar y documentar la fila interactiva (`BLOCKED`)
+### F2 — Implementar y documentar la fila interactiva (`ACTIVE`)
 
 **Pregunta:** ¿el renderer final comunica de forma inequívoca dónde activar una acción y por qué una acción no está disponible?
 
@@ -75,10 +75,12 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Pivotar:** si el renderer no soporta controles de fila o hint accesible sin cambio de arquitectura, regresar al Orquestador con evidencia.
 **Repetir:** una corrección localizada por criterio con fallo reproducible.
 **Bloquear/cancelar:** vuelve a reservarse un archivo compartido o aparece una necesidad de cambiar reglas/protocolo.
-**Commit:** `COMMIT_REQUIRED`; `feat(action-rows): issue 24 F2 BLOCKED manual review`.
-**Implementación y revisión estática:** adaptación de `Coup.js`, estilos y claves `es`/`en` revisadas; `git diff --check` pasa. `npm run build` termina con exit 0, con warnings en `App.js`, `ReferencePanel.css` y `caniuse-lite`. No se ejecutaron tests automatizados.
-**Bloqueo y evidencia pendiente:** no se pudo realizar ningún recorrido manual ni captura de escritorio/móvil. Playwright, Puppeteer y Chromium no están disponibles; invocar Chrome de Windows desde WSL termina con `WSL (2 - ) ERROR: UtilBindVsockAnyPort:307: socket failed 1`. Falta verificar visualmente los tres estados y el hint, los límites 2/3, 6/7, 9/10, mouse/teclado/tacto, objetivos/cancelación y envío único de IDs originales, foco/lector de pantalla, recorte, reduced motion y conservación del renderer de otros tipos de decisión. Ver `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
-**Siguiente paso:** el Orquestador coordina un entorno de navegador funcional; luego se completa F2 y se solicita F3 a un Verifier independiente. No se abre PR ni se cierra la issue.
+**Commit:** `COMMIT_REQUIRED`; checkpoint previo `feat(action-rows): issue 24 F2 BLOCKED manual review`; el siguiente registra las correcciones visuales y la reanudación ACTIVE.
+**Implementación y revisión estática previa:** adaptación de `Coup.js`, estilos y claves `es`/`en` revisadas; el primer `npm run build` terminó con exit 0 y warnings en `App.js`, `ReferencePanel.css` y `caniuse-lite`. No se ejecutaron tests automatizados. El reporte del checkpoint anterior está en `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
+**Reanudación:** 2026-09-27, la usuaria inspeccionó la aplicación en `http://localhost:3006` con backend en `:18000` y reportó: (1) los divisores de filas parecen los extremos curvos del borde de hover; (2) el panel de acciones aparece debajo del tablero y debe situarse a la derecha, por debajo de la altura de “Resumen de reglas”, como overlay del tablero y las cartas.
+**Trabajo activo:** separar el divider de la superficie/contorno de cada fila, evitando colisión con filas deshabilitadas y conservándolo al hover; posicionar únicamente el panel de `action` a la derecha en overlay con límites responsive, sin cambiar la posición del control de reglas ni el flujo de otras decisiones.
+**Validación del checkpoint:** `git diff --check` pasa; `npm run build` exit 0 con warnings en archivos no modificados. El CRA de `localhost:3006` respondió 200, pero HMR no detectó estas ediciones en `/mnt/e`; el Orquestador reiniciará esa sesión. No se ejecutaron tests.
+**Validación pendiente:** inspección de la usuaria después del reinicio y luego recorrido visual/interactivo de AC1–AC9 (estados, saldos, mouse/teclado/tacto, destinos/cancelación, hints, recorte, reduced motion y otros tipos de decisión). No añadir tests. No se abre PR ni se cierra la issue.
 
 ### F3 — Verificación independiente y entrega (`PENDING`)
 
@@ -99,7 +101,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 ## Trazabilidad y topología
 
-Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama se rebaseó sobre `origin/master@5de95ee` antes de F2 y ahora contiene el plan, la evidencia F1, el checkpoint de reclamo y el cambio F2 bloqueado con su reporte.
+Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama se rebaseó sobre `origin/master@5de95ee` antes de F2 y contiene el plan, la evidencia F1, el checkpoint de reclamo y los cambios/documentos F2; el checkpoint `BLOCKED` anterior fue reabierto tras la revisión visual de la usuaria.
 
 ## Decisiones
 
@@ -109,3 +111,4 @@ Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad 
 - 2026-09-27: clasificar `FULL / MEDIUM / FINAL` por la adaptación investigada al renderer nuevo, el selector de destino y la revisión independiente de elegibilidad.
 - 2026-09-27: el Alquimista reclamó la issue en el fork y confirmó branch/worktree limpios; F2 comienza sobre `Coup.js`.
 - 2026-09-27: la implementación F2 y el build pasan, pero F2 queda `BLOCKED` porque no hay navegador funcional para completar el recorrido manual obligatorio. El Orquestador coordina el entorno; F3 sigue pendiente.
+- 2026-09-27: la usuaria inspeccionó el cliente en `localhost:3006` y aportó feedback visual sobre separadores y colocación del panel action. F2 vuelve a `ACTIVE` para corregir ambos puntos; no se alteran criterios ni contrato.

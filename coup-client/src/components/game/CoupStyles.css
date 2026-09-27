@@ -1069,9 +1069,23 @@
 .DecisionActionRows {
     display: flex;
     flex-direction: column;
-    gap: 2px;
     overflow: visible;
     padding: 2px 4px 4px;
+}
+
+.DecisionActionEntry {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.DecisionActionDivider {
+    display: block;
+    height: 1px;
+    flex: 0 0 1px;
+    margin: 1px 14px;
+    background: #dfd3c0;
+    pointer-events: none;
 }
 
 .DecisionsSection .DecisionActionRow {
@@ -1087,7 +1101,6 @@
     margin: 0;
     padding: 9px 11px;
     border: 2px solid transparent;
-    border-bottom-color: #dfd3c0;
     border-radius: 12px;
     background-color: transparent;
     color: #211d18;
@@ -1355,5 +1368,21 @@
     .DecisionsSection .DecisionActionCancel,
     .DecisionActionHint {
         transition: none;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .DecisionActionPanel {
+        position: fixed;
+        z-index: 40;
+        top: calc(22vh + 52px);
+        right: clamp(16px, 4vw, 64px);
+        width: min(620px, calc(100vw - 32px));
+        max-height: min(calc(100vh - 22vh - 68px), 760px);
+        margin: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
     }
 }

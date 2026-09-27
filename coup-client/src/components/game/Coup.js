@@ -462,10 +462,13 @@ export default class Coup extends Component {
                     onClick={this.cancelActionTargets}
                 >{t('game.actions.cancel')}</button>
             </> : <div className="DecisionActionRows" role="group" aria-label={t('game.actions.turnTitle')}>
-                {ACTION_ROWS.map(actionRow => {
+                {ACTION_ROWS.map((actionRow, index) => {
                     const { action, blockers, declaredRole } = actionRow
                     const options = optionsByAction.get(action) || []
+                    const nextActionRow = ACTION_ROWS[index + 1]
+                    const nextOptions = nextActionRow ? (optionsByAction.get(nextActionRow.action) || []) : []
                     const available = options.length > 0
+                    const showDivider = available && nextOptions.length > 0
                     const unavailableReason = unavailableActionReason(action, options, money)
                     const actionId = `decision-action-${action}`
                     const actionPriceLabel = actionPrice(actionRow)
@@ -491,19 +494,21 @@ export default class Coup extends Component {
                         </span>
                     </>
 
-                    return <button
-                        className={`DecisionActionRow${available ? '' : ' DecisionActionRow--disabled'}`}
-                        key={action}
-                        type="button"
-                        ref={this.actionRowRefs[action]}
-                        aria-labelledby={`${actionId}-label`}
-                        aria-describedby={`${actionId}-description ${actionId}-price${declaredRole || blockers.length ? ` ${actionId}-roles` : ''}${available ? '' : ` ${actionId}-hint`}`}
-                        aria-disabled={available ? undefined : 'true'}
-                        disabled={available && submitted}
-                        onClick={available ? (isTargetAction
-                            ? () => this.openActionTargets(action)
-                            : () => this.submitActionChoice(options[0])) : undefined}
-                    >{content}</button>
+                    return <div className="DecisionActionEntry" key={action}>
+                        <button
+                            className={`DecisionActionRow${available ? '' : ' DecisionActionRow--disabled'}`}
+                            type="button"
+                            ref={this.actionRowRefs[action]}
+                            aria-labelledby={`${actionId}-label`}
+                            aria-describedby={`${actionId}-description ${actionId}-price${declaredRole || blockers.length ? ` ${actionId}-roles` : ''}${available ? '' : ` ${actionId}-hint`}`}
+                            aria-disabled={available ? undefined : 'true'}
+                            disabled={available && submitted}
+                            onClick={available ? (isTargetAction
+                                ? () => this.openActionTargets(action)
+                                : () => this.submitActionChoice(options[0])) : undefined}
+                        >{content}</button>
+                        {showDivider && <span className="DecisionActionDivider" aria-hidden="true" />}
+                    </div>
                 })}
             </div>}
             {this.state.submitted && <p>{t('game.decision.sent')}</p>}

@@ -1,6 +1,6 @@
 # Reporte F2 — issue #24
 
-**Veredicto:** `BLOCKED`
+**Veredicto del checkpoint inicial:** `BLOCKED`; **estado actual:** `ACTIVE`
 
 **Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), sigue `OPEN` y asignada a `pronficilio`.
 
@@ -38,4 +38,18 @@ No se hizo recorrido manual ni se generaron capturas. Quedan sin observarse en e
 
 ## Motivo y siguiente paso
 
-F2 no puede recibir `CLOSED / PASS` mientras falte la validación manual explícita en el plan. El bloqueo concreto es que el worktree no tiene una vía funcional para abrir la aplicación en un navegador; instalar dependencias/herramientas nuevas no se consideró. El Orquestador debe coordinar acceso a un navegador funcional; entonces se completará el recorrido y se registrará evidencia antes de iniciar F3 con Verifier independiente. La issue continúa abierta; no se abrió PR ni se integró el branch.
+En el checkpoint inicial, F2 no pudo recibir `CLOSED / PASS` porque no se pudo abrir la aplicación en un navegador. El 2026-09-27 la usuaria inspeccionó el cliente local y reanudó F2 con dos hallazgos concretos:
+
+1. Los divisores entre filas se perciben como extremos curvos del contorno de hover. Separar cada divisor a su propia caja/regla, conservarlo al hover y evitar colisión con filas deshabilitadas.
+2. Mientras exista una decisión `action`, el panel debe estar a la derecha y por debajo de la altura del control “Resumen de reglas”, ocupando gran parte del viewport como overlay sobre PlayerBoard y cartas. Mantener responsive y no cambiar otras decisiones.
+
+El Agente Menor implementó los ajustes en `Coup.js`/`CoupStyles.css`. El divisor es un hermano decorativo que solo se inserta entre acciones disponibles contiguas; el panel queda fixed a la derecha desde 1200 px, debajo de la banda vertical de CheatSheet, con max-height/scroll, y en tablet/móvil vuelve al flujo normal. El renderer de otros tipos de decisión y el control de reglas no cambian.
+
+La nueva inspección visual y el recorrido restante siguen pendientes; esta reanudación no cambia criterios ni declara F2 cerrada. Issue abierta, sin PR ni integración.
+
+## Validación del checkpoint visual
+
+- `npm run build` desde `coup-client`: **exit 0**, compilado con los mismos warnings del checkpoint previo (imports sin uso en `App.js`, parser `postcss-calc` para `dvh` en `ReferencePanel.css`, `caniuse-lite` desactualizado). Ninguno señala archivos de este cambio.
+- `git diff --check`: **pasa**.
+- `curl -I http://localhost:3006`: **200 OK**. El bundle base servido todavía contiene la compilación previa porque el watcher HMR no detectó las ediciones en `/mnt/e`; el Orquestador confirmó el proceso CRA de este worktree y reiniciará solo esa sesión para que la usuaria pueda ver el checkpoint.
+- No se ejecutaron tests automatizados. El resultado visual de esta corrección aún no fue revisado por la usuaria.
