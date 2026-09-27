@@ -32,3 +32,7 @@ Commit prescrito: `feat(game-ui): issue 28 F2 influences, lost cards and board p
 - `coup-client/src/components/game/PlayerBoard.js`
 - `coup-client/src/components/game/PlayerBoardStyles.css`
 - `coup-client/src/i18n/translations.json`
+
+## Seguimiento del Verifier independiente (2026-09-27)
+
+La revisión FINAL devolvió F4 con `FAIL` medio en el criterio 2: en mesas de cinco jugadores, el asiento superior queda aproximadamente a 81 px del borde en móvil de 390 px y 112 px en escritorio ancho, frente al objetivo de unos 50 px. Los demás criterios pasaron estáticamente. Por ese hallazgo, F2 vuelve a `RETURNED` solo para ajustar el desplazamiento de `.PlayerBoardContainer` con base en las posiciones superiores de 2–6 jugadores, incluyendo el ancho del tablero limitado a 900 px. No cambiar HUD, controles, asientos visibles, reglas, privacidad ni protocolo. El seguimiento se cierra tras build, diff-check y sintaxis; el mismo Verifier repetirá F4.

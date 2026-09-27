@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. El propietario aprobó visualmente el preview; falta completar sincronización/verificaciones y obtener PASS del Verifier independiente.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `RETURNED`; F3 `CLOSED`; F4 `RETURNED`. El propietario aprobó visualmente el preview; el Verifier independiente devolvió F4 con `FAIL` medio por el criterio 2 en partidas de cinco jugadores. Corregir F2 y después reanudar F4 con el mismo Verifier.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -18,6 +18,8 @@ El propietario reorientó explícitamente el trabajo el 2026-09-27: autorizó im
 ## F4 activa: sincronización con master
 
 El 2026-09-27 se confirmó `origin/master@5fffacfdadcf3e91453bda1d13e4c0b2e3327831`, cuyo padre es `12115856c71de8b8abb5d13a81cf8458a2cae240` (#35/#26 integrado). Hubo un conflicto de contenido real en `coup-client/src/components/game/CoupStyles.css`: se conservan los estilos `.Pause*` que #26 integró y los estilos vigentes de #28; se omite `.circle`, que no tiene consumidores. No hay reglas `.InfluenceSection` ni `.InfluenceUnitContainer` activas. Los merges automáticos de `Coup.js`, `translations.json` y `server/game/coup.js` conservan las funciones integradas de pausa y los cambios #28 de Court/influencias; el escaneo no encontró cambio al protocolo de decisiones de #28. La sincronización quedó comprometida en `400c9e21a326c8c0cc56a37f380f10945590665b`. `git diff --check`, `node --check server/game/coup.js`, el parseo JSON de traducciones y el build de cliente pasaron. El build dejó warnings existentes de variables sin uso en `App.js` y de minificación `postcss-calc` en `ReferencePanel.css`; terminó con código 0. La issue remota fue releída en estado OPEN con F4 ACTIVE y criterios 1–6 preservados.
+
+El Verifier independiente informó `FAIL` medio para F4 el 2026-09-27: con cinco jugadores, el asiento superior quedó a unos 81 px del borde en móvil de 390 px y 112 px en escritorio ancho, frente a los ~50 px del criterio 2. Los demás criterios pasaron estáticamente. F2 se devuelve para ajustar el desplazamiento del tablero según la geometría superior de 2–6 asientos y el ancho máximo de 900 px; no se cambia el HUD, los controles ni el protocolo. F4 se reanudará para el mismo Verifier después del build y commit del seguimiento.
 
 El cuerpo actualizado de #28 también pide que las influencias perdidas permanentemente permanezcan visibles con tratamiento gris y símbolo/etiqueta accesible que no dependa solo del color; el rol debe seguir legible. No marcar cartas probadas temporalmente durante un desafío, ya que vuelven a Court, y no revelar las influencias ocultas activas de rivales.
 
@@ -47,4 +49,4 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en el único branch. F2/F3 requieren build e inspección estática. La aprobación visual del propietario ya está registrada; F4 tiene sincronización, build, diff-check y comprobaciones de sintaxis completados; falta Verifier FINAL independiente. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente. Reporta al Orquestador commit, archivos, evidencia y bloqueos.
+Cada fase con artefactos requiere commit en el único branch. F2 está `RETURNED` por el margen superior de cinco jugadores y F4 por el `FAIL` independiente. Corrige solo la geometría responsive, corre build/diff-check/sintaxis, actualiza el reporte y cierra el seguimiento F2 con commit; entonces devuelve F2 a `CLOSED` y F4 a `ACTIVE` para el mismo Verifier. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.

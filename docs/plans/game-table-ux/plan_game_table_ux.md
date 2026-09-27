@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. El propietario aprobó visualmente el preview; sincronización/verificaciones y PASS del Verifier independiente pendientes.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `RETURNED`; F3 `CLOSED`; F4 `RETURNED`. El Verifier independiente devolvió F4 con `FAIL` medio en el criterio 2 para cinco jugadores; corregir el lift responsive de F2 y repetir la revisión FINAL.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -52,7 +52,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** inspección estática/documental; no ejecutar tests.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
-### F2 — Integrar influencias perdidas y ajustar el círculo (`CLOSED`)
+### F2 — Integrar influencias perdidas y ajustar el círculo (`RETURNED`)
 
 - **Pregunta única:** ¿la mano propia y el círculo pueden ocupar la posición solicitada sin desplazar ni cubrir el resto del HUD?
 - **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y hará la revisión visual del preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
@@ -63,6 +63,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Seguimiento:** commit separado `fix(game-ui): issue 28 calibrate responsive board lift` por el tope real de 900 px del círculo.
 - **Validación:** build de cliente e inspección visual; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F2.md`.
+- **Seguimiento de verificación (2026-09-27):** el Verifier FINAL midió el asiento superior a aproximadamente 81 px (viewport móvil de 390 px) y 112 px (escritorio ancho) para cinco jugadores; el criterio 2 pide unos 50 px. F2 vuelve a `RETURNED` únicamente para corregir la geometría de `.PlayerBoardContainer` según las coordenadas superiores de 2–6 jugadores y el tope real de 900 px, sin desplazar HUD/controles ni recortar asientos. Build/diff-check/sintaxis requeridos antes de cerrar F2 con un commit de seguimiento; después F4 vuelve a `ACTIVE` para el mismo Verifier.
 
 ### F3 — Mostrar el conteo autoritativo de Court (`CLOSED`)
 
@@ -75,15 +76,15 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; preview local para revisión visual del propietario; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F3.md`.
 
-### F4 — Revisión final independiente (`ACTIVE`)
+### F4 — Revisión final independiente (`RETURNED`)
 
 - **Pregunta única:** ¿el conjunto cumple los criterios sin desplazar HUD ni publicar información privada?
-- **Entrada:** F2 y F3 cerradas; aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. Sincronizar desde `origin/master` vigente antes de la revisión final.
+- **Entrada:** F3 cerrada y aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. La revisión independiente inicial devolvió F4 con `FAIL` medio por el criterio 2; F2 se corrige y después F4 vuelve a `ACTIVE` para el mismo Verifier.
 - **Salida:** sincronización documentada, build/diff-check/comprobaciones de sintaxis y veredicto FINAL independiente.
 - **Criterio de cierre:** capturas/escalas 2, 3 y 6 jugadores en móvil y escritorio; revisar reserva superior, anclaje del conteo, intercambio pendiente/completado, desafío con reemplazo, revancha y el payload público. Refutar al menos una afirmación de éxito; corregir defectos antes del veredicto.
 - **Artefacto:** `docs/plans/game-table-ux/report_issue_28_F4.md` y evidencia visual acotada.
 - **Commit:** `COMMIT_REQUIRED` para el sync/control de F4; el commit de veredicto/cierre se reserva hasta cumplir el criterio de F4 y recibir PASS independiente.
-- **Validación actual:** `git diff --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y build de cliente terminaron correctamente. Build informa variables sin uso en `App.js` y warnings `postcss-calc` en `ReferencePanel.css`, pero salió con código 0. No se agregaron ni ejecutaron tests automatizados. Verifier independiente FINAL sigue pendiente; no hacer push ni abrir PR antes del PASS.
+- **Validación previa:** `git diff --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y build de cliente terminaron correctamente. Build informa variables sin uso en `App.js` y warnings `postcss-calc` en `ReferencePanel.css`, pero salió con código 0. F2 debe repetir build/diff-check/sintaxis después de corregir el margen superior. No se agregaron ni ejecutaron tests automatizados. Verifier independiente FINAL debe revisar el nuevo commit; no hacer push ni abrir PR antes del PASS.
 
 ## Dependencias y coordinación
 
