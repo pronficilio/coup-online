@@ -1,7 +1,7 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `ACTIVE`; F1 `ACTIVE`; F2 `READY_AFTER_F1`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
@@ -49,7 +49,7 @@ Conservar el contrato de #14: reanuda solo el líder y solo cuando `canResume` s
 
 ## Fases
 
-### F1 — Clasificar pausa y permisos (`READY`)
+### F1 — Clasificar pausa y permisos (`CLOSED`)
 
 - **Pregunta única:** ¿cada causa de `g-gamePaused` comunica de forma coherente si la partida puede reanudarse y quién puede hacerlo?
 - **Entrada:** `origin/master` actualizado; contrato `docs/plans/codex-ai-players/f0_contract.md`; `server/game/coup.js`; `coup-client/src/components/game/Coup.js`; issue #19 y PR #22.
@@ -58,11 +58,11 @@ Conservar el contrato de #14: reanuda solo el líder y solo cuando `canResume` s
 - **Pivote:** una causa no puede traducirse o recuperarse sin cambiar reglas/protocolo; elevar la decisión al Orquestador.
 - **Repetición acotada:** una segunda lectura del caso concreto si quedan rutas de pausa sin clasificar.
 - **Bloqueo/cancelación:** bloquear si la base cambió durante la auditoría o el contrato de #14 no coincide con el código integrado; cancelar solo por decisión del usuario.
-- **Artefactos:** `docs/plans/paused-game-overlay/report_issue_26_F1.md` y actualización de este plan.
+- **Artefactos:** `docs/plans/paused-game-overlay/report_issue_26_F1.md` y actualización de este plan. Resultado: cada emisor está clasificado; el timeout ordinario conserva la decisión y permite reanudar solo al líder mientras todos sigan conectados. No se requiere cambio de servidor.
 - **Commit:** `COMMIT_REQUIRED`; `docs(ui): issue 26 F1 CLOSED advance_f2`.
 - **Validación:** inspección estática de todos los emisores y del handler `g-resume`; no ejecutar tests.
 
-### F2 — Mostrar overlay y acción autorizada (`READY_AFTER_F1`)
+### F2 — Mostrar overlay y acción autorizada (`ACTIVE`)
 
 - **Pregunta única:** ¿todas las personas entienden que el juego está pausado y puede reanudarlo quien tiene permiso?
 - **Entrada:** F1 cerrada; `origin/master` actualizado al menos a `5de95ee`; comprobar que #19 no abrió una corrección concurrente; decisión del Orquestador si F1 encontró un defecto de servidor.
