@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/26
 - **Plan exacto:** `docs/plans/paused-game-overlay/plan_paused_game_overlay.md`
 - **Bitácora exacta:** `docs/plans/log/issue-26.jsonl`
-- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. La PR #35 está abierta contra `master`, con mergeability `clean`; el usuario autorizó el merge.
+- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. La PR #35 está abierta contra `master`; revisión del Orquestador PASS, mergeability `clean`, sin checks de CI reportados. El usuario autorizó el merge.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido:** PASS en [`report_issue_26_F3_copy.md`](../paused-game-overlay/report_issue_26_F3_copy.md), sobre la implementación del HEAD `b7328f7`; los commits posteriores son documentación. Los informes `report_issue_26_F3.md` (`6621255`), `report_issue_26_F3_recheck.md` (`46b0805`) y `report_issue_26_F3_followup.md` (`9276e0a`) son históricos.
 - **Criterio de falsificación:** ¿algún líder, respondedor previo o tercero puede reanudar; algún responsable pendiente queda sin CTA; se reemite decisión a quien ya respondió; hay CTA si solo falta Codex; recibe overlay alguien que no sea responsable en un timeout humano?
@@ -36,7 +36,7 @@ El recorrido humano solicitado fue aprobado. La regla de ownership por asiento y
 - **Worktree único:** `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **PR canónica:** [#35](https://github.com/pronficilio/coup-online/pull/35), desde `issue/26-paused-game-overlay` a `master`.
-- **Aislamiento confirmado:** issue OPEN y asignada a `pronficilio`; branch/worktree canónicos. Base actual `be93e975072b364365a90206931f732fb44dc6f1`; rebase limpio sobre PR #31/#29, claves de portada y cambios de #21 preservados. El checkout raíz no se modificó.
+- **Aislamiento confirmado:** issue OPEN y asignada a `pronficilio`; branch/worktree canónicos. Base de implementación `be93e975`; durante la PR, `master` avanzó a `27f46f1` con PR #34, que solo cambia recursos de imagen y documentos. El diff de #26 no se superpone; PR #35 está mergeable/clean contra esa base. El checkout raíz no se modificó.
 - **Reporte F1:** `docs/plans/paused-game-overlay/report_issue_26_F1.md`.
 - **Reporte F2:** `docs/plans/paused-game-overlay/report_issue_26_F2.md`.
 - **Siguiente dueño:** Orquestador para abrir y revisar la PR, integrarla a `master` y registrar el merge.
