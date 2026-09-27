@@ -1,7 +1,7 @@
 # Reporte F4 — cobertura final y revisión independiente
 
 **Estado:** `BLOCKED`; no se completó el recorrido manual requerido. Este documento no es un veredicto de aceptación.
-**Base inspeccionada:** worktree canónico #19, branch `issue/19-spanish-default-dictionary`, HEAD `1e28666`.
+**Base y evidencia:** producto en `9f97acb`; la comprobación local se inició desde HEAD `1e28666`, y este reporte F4 quedó versionado en `e9be456` sobre el branch canónico `issue/19-spanish-default-dictionary`.
 **Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED`. Issue #19 permanece `OPEN`; PR #22 permanece `DRAFT`.
 
 ## Alcance requerido
