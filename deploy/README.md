@@ -29,9 +29,10 @@ Game rooms live in memory and are lost if the API container restarts.
 
 Keep the complete release directory and images to support rollback. To restore
 the previous release, run `docker compose up -d` from
-`/opt/coup/releases/1e4685f/deploy`; the release-specific `.env` selects the
-matching image tag. To stop the stack, run `docker compose down` from the
-active release's `deploy/` directory.
+`/opt/coup/releases/1e4685f/deploy`; its Compose defaults select the original
+`1e4685f` images. New releases include a `.env` with their image tag. To stop
+the stack, run `docker compose down` from the active release's `deploy/`
+directory.
 
 ## Shared Nginx and TLS
 

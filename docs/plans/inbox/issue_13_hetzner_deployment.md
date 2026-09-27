@@ -6,8 +6,8 @@
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** sí; revisión final independiente antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
-- **Versión aprobada:** SHA `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. El checkout raíz tiene cambios y no se usa como fuente.
-- **Despliegue activo:** release `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e` en `/opt/coup/releases/1e4685f`; `https://coup.ejele.net`; Mochila `https://ejele.net`; www redirige al apex. Cert SAN válido hasta 2026-12-25 y renovación automática probada.
+- **Versión aprobada/desplegada:** SHA `55be894`, sincronizado con `origin/master` en el checkout raíz limpio.
+- **Despliegue activo:** release `55be894` en `/opt/coup/releases/55be894`; API `healthy`; Coup responde 200 en `https://coup.ejele.net` y sirve `main.3e4eee39.js`. Release anterior `1e4685f` sigue disponible para rollback. Mochila `https://ejele.net` responde 200; www redirige al apex. Cert SAN válido hasta 2026-12-25 y renovación automática probada.
 - **PR:** #15 está en borrador hacia `master`; no integrar todavía.
 - **Fase siguiente:** F6 — verificar de forma independiente aislamiento, rollback, CORS/API/WebSocket, coexistencia Mochila/Minecraft y TLS; después integrar PR según veredicto.
 - **Por qué sigue:** el despliegue y TLS están operativos, pero falta el verifier separado y confirmar/documentar rollback. El checkout raíz permanece sucio y no fue usado.
@@ -23,6 +23,6 @@
 - **Bitácora:** `docs/plans/log/issue-13.jsonl` (append-only).
 - **PR abierto:** #15, `issue/13-hetzner-deployment` → `master`, en borrador hasta completar F6.
 - **Secuencia de aislamiento:** reclamar en issue; volver a leer issue y descartar reclamo incompatible; usar el branch/worktree canónico ya preparado; registrar claim/worktree en log; commits de fase siempre en el mismo branch.
-- **Validaciones realizadas:** build en Hetzner; API create/exists; cliente Socket.IO creó y se unió a sala y actualizó polling→WebSocket; API reiniciado y `healthy`; TLS y redirect de los tres hosts; Certbot staging dry-run y systemd renewal service; Mochila y Minecraft siguen arriba. **Pendiente:** prueba de rollback y verificación independiente.
+- **Validaciones realizadas:** build del release moderno en Hetzner; API `healthy` y healthcheck público 200; Coup y Mochila GET HTTPS 200; bundle moderno servido; Mochila/Minecraft siguen arriba. Para el release inicial: API create/exists; cliente Socket.IO creó y se unió a sala y actualizó polling→WebSocket; API reiniciado y `healthy`; TLS/redirect; Certbot staging dry-run y systemd renewal service. **Pendiente:** repetir prueba Socket.IO sobre release moderno, prueba de rollback y verificación independiente.
 - **Verifier:** en F6, intentar refutar aislamiento, CORS/rutas, WebSocket, TLS, coexistencia y rollback; solo reporta evidencia y no modifica la implementación.
 - **Qué actualizar:** issue, plan, log y handoff con el veredicto final. La configuración live tiene copia original en `/opt/mochila/deploy/nginx.conf.bak-20260926`; no guardar secretos en Git.

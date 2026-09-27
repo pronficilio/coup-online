@@ -26,7 +26,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - Docker publica Nginx en 80/443. Su config vive en `/opt/mochila/deploy/nginx.conf`; el original se respaldó como `/opt/mochila/deploy/nginx.conf.bak-20260926`. Nginx conserva el fallback al certificado `mochila-ip` y el upstream Mochila en 8080. El vhost de `ejele.net` usa el nuevo certificado SAN; `www` redirige al apex; `coup` enruta al frontend/API.
 - Coup usa backend Node en el puerto 8000 por defecto o `PORT`; cliente CRA obtiene URL del backend al compilar mediante `REACT_APP_BACKEND_URL`. Las rutas API son `/createNamespace` y `/exists/:namespace`, además de Socket.IO.
 - El código original abría CORS. El overlay de producción acota HTTP CORS y Socket.IO a `https://coup.ejele.net`.
-- La copia compartida estaba en `master` con 67 entradas modificadas/no rastreadas. `origin/master` observado tras `git fetch` es `64593af`; la copia local `HEAD` es `1e4685f`, dos commits delante y dieciséis detrás, más cambios sin commit. Ninguno se asumirá como lanzamiento sin selección explícita.
+- El checkout local `master` quedó actualizado y limpio en `55be894`, igual a `origin/master`. Ese SHA se empaquetó desde `git archive` y se desplegó en `/opt/coup/releases/55be894`.
 - GitHub no tenía una issue previa de despliegue. Issue #5 está cerrada; issue #6 permanece abierta.
 - El usuario confirmó que compró `ejele.net`. La IP pública efectiva del servidor se verificó desde el host y un servicio externo: `178.105.138.91`.
 - Nameservers públicos: `ns19.domaincontrol.com` y `ns20.domaincontrol.com` (GoDaddy). Cloudflare y Google DNS confirman `coup.ejele.net` → `178.105.138.91` (TTL 600 s), la IP pública Hetzner.
@@ -35,7 +35,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 ## Supuestos, preguntas y riesgos
 
 - **Paso inmediato:** ninguno para DNS; el A de `coup` ya está confirmado. Preservar el registro raíz y otros servicios.
-- **Versión aprobada:** `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. El usuario eligió esa versión; el checkout local tiene cambios y no se usa como fuente.
+- **Versión aprobada/desplegada:** `55be894` (HEAD de `origin/master` al sincronizar). Sustituye el release inicial `1e4685f` solicitado previamente; el paquete moderno se construyó desde ese commit limpio.
 - El server de esa revisión tenía dependencias vulnerables. El artefacto de producción actualiza solo dependencias compatibles por lockfile y restringe el origen CORS a `https://coup.ejele.net`; permanecen cuatro avisos moderados del stack Socket.IO 2.x, cuya remediación automática requeriría una migración mayor.
 - El árbol de build frontend reporta 81 advisories (incluye 35 high y 6 critical); el contenedor final de frontend contiene Nginx y archivos estáticos, no `node_modules`. Se requiere una actualización separada de esa toolchain.
 - El usuario compró `ejele.net`; los A/CNAME ya resuelven y los tres hosts validaron HTTP-01.
@@ -75,7 +75,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Validación:** checkout limpio y SHA documentado; build reproducible en CI/local conforme al repo.
 - **Política de commit:** `COMMIT_AFTER_REVIEW`.
 - **Cierre previsto:** `docs(deploy): issue 13 F2 CLOSED pin release source`.
-- **Veredicto:** `avanzar`; el usuario aprobó el SHA `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. Se genera una exportación limpia con overlay de producción versionado en `deploy/production-overlay/`; el working tree principal sigue intacto.
+- **Veredicto original:** `avanzar`; inicialmente se publicó el SHA `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`. El usuario pidió después sincronizar y montar la versión moderna; la versión activa ahora es `55be894` (ver actualización F4).
 
 ### F3 — Preparar despliegue aislado y reproducible (`CLOSED`)
 
@@ -91,11 +91,12 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 ### F4 — Desplegar en Hetzner (`CLOSED`)
 
 - **Pregunta:** ¿funciona el stack en el host aislado y sobrevive a reinicio sin interferir con servicios actuales?
-- **Salida:** release bajo `/opt/coup/releases/1e4685f`, solo en `mochila_default`, sin ports del host publicados, instrucciones de rollback.
+- **Salida:** release moderno bajo `/opt/coup/releases/55be894`, solo en `mochila_default`, sin puertos del host publicados; release anterior `1e4685f` conservado para rollback.
 - **Criterio de avance:** front/API/crear/unirse a sala/WebSocket comprobados; API reiniciada y recuperada `healthy`; Mochila, Nginx y Minecraft siguieron `Up`.
 - **Criterio de bloqueo:** requiere abrir un puerto público adicional o cambiar el proxy existente sin un plan reversible.
 - **Política de commit:** `COMMIT_AFTER_REVIEW` (código/guía/evidencia en Git; estado remoto no se versiona).
-- **Veredicto:** `avanzar`; `deploy-coup-api-1` y `deploy-coup-web-1` están saludables/activos con `restart: unless-stopped`. Una prueba de cliente creó y unió una sala y confirmó upgrade a WebSocket; el API volvió a estado `healthy` tras un reinicio.
+- **Veredicto inicial:** `avanzar`; el primer release estuvo saludable y una prueba creó/unió una sala con upgrade a WebSocket.
+- **Actualización moderna (2026-09-27 UTC):** `coup-api:55be894` y `coup-web:55be894` construidos y activos. API `healthy`; `https://coup.ejele.net/` y `/exists/healthcheck` responden 200; se sirve el bundle `main.3e4eee39.js`. Mochila `https://ejele.net/` responde 200 por GET y Mochila/Minecraft siguen activos. La compilación React completó con warnings de imports sin uso y Browserslist desactualizado.
 - **Cierre previsto:** `ops(deploy): issue 13 F4 CLOSED stage on hetzner`.
 
 ### F5 — Vhost público y TLS (`CLOSED`)
@@ -121,14 +122,14 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Registro de decisiones
 
-1. El usuario aprobó `1e4685f0d079448fb6ca5df0aa0380632ffc2c7e`; se construye con `git archive` y overlay de producción sin los cambios del checkout raíz.
+1. El usuario pidió sincronizar el repo y publicar la versión moderna; se actualizó `master` mediante fast-forward a `55be894`, igual a `origin/master`, y ese commit se construyó con `git archive` y overlay de producción.
 2. No instalar Caddy; mantener el Nginx compartido que ya ocupa 80/443.
 3. Preservar el catch-all/mochila-ip y añadir hosts nominales solo tras backup y `nginx -t`.
 4. El stack de Coup no publica ports de host; Nginx enruta por la red externa existente.
 
 ## Estado actual / siguiente acción
 
-F0–F5 cerradas. Coup está en `https://coup.ejele.net` y Mochila en `https://ejele.net`; el certificado SAN también cubre `www.ejele.net` y su redirección va al apex. Renovación automática está instalada y probada. PR #15 está en borrador; F6 requiere revisión independiente y confirmar rollback antes de integrar/cerrar la issue.
+F0–F5 cerradas. Coup está actualizado a `55be894` en `https://coup.ejele.net`; Mochila está en `https://ejele.net`. El certificado SAN cubre `www.ejele.net` y su redirección va al apex. Renovación automática está instalada y probada. PR #15 está en borrador; F6 requiere revisión independiente y probar/documentar rollback antes de integrar/cerrar la issue.
 
 ## Fuentes
 
