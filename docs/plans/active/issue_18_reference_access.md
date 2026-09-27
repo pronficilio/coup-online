@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/18
 - **Plan exacto:** `docs/plans/reference-access/plan_reference_access.md`
 - **Bitácora exacta:** `docs/plans/log/issue-18.jsonl`
-- **Estado:** `ACTIVE`; issue #18 verificada `OPEN` y asignada a `pronficilio`; claim registrado en comentario #5851364890. Worktree confirmado desde `origin/master` en `55be894a608822f1e22b09c5338e04b658d1477d`.
+- **Estado:** `WAITING_ORCHESTRATOR`; issue #18 permanece `OPEN` y asignada a `pronficilio`; claim registrado en comentario #5851364890. Worktree confirmado desde `origin/master` en `55be894a608822f1e22b09c5338e04b658d1477d`.
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no; revisión final del Orquestador.
 - **Branch de toda la unidad:** `issue/18-reference-access`.
@@ -23,7 +23,7 @@ Antes de crear el branch/worktree, relee #18 en `pronficilio/coup-online`, recla
 
 Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica solo a `origin`. No escribas en `Cheneth/coup-online` ni en `upstream`.
 
-## Fase F1 — Accesos a referencias en la partida (`READY`)
+## Fase F1 — Accesos a referencias en la partida (`BLOCKED — revisión visual pendiente`)
 
 **Pregunta:** ¿puede cada jugador abrir la tarjeta o la tabla desde los controles inferiores derechos sin interferir con el juego?
 
@@ -47,12 +47,12 @@ Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica s
 
 ### Evidencia, validación y cierre
 
-- Registrar la composición, matriz de controles y recorrido visual en `docs/plans/reference-access/report_issue_18_F1.md`.
-- Validar con `npm run build` desde `coup-client`, `git diff --check` y recorrido manual escritorio/móvil. No añadir ni ejecutar tests automatizados.
+- Resultado actual en `docs/plans/reference-access/report_issue_18_F1.md`: el montaje y los accesos están implementados; build y diff-check pasan. La revisión manual de escritorio/móvil no se ejecutó porque el entorno no tiene navegador.
+- F1 permanece `BLOCKED`; no declarar cumplimiento visual, de interacción ni de carga por red sin el recorrido manual. No añadir ni ejecutar tests automatizados.
 - Intentar refutar el éxito: comprobar si un botón tapa una decisión en viewport estrecho, si el cierre altera una decisión/turno, si se descarga una imagen no solicitada o si el foco no vuelve al control de apertura.
-- `COMMIT_REQUIRED`: incluir código, reporte y evento `phase_verdict` en un solo commit de fase: `feat(reference-panel): issue 18 F1 CLOSED ready_review`.
+- `COMMIT_REQUIRED`: incluir código, reporte y evento `phase_verdict` en un solo commit de fase. Para el resultado actual usa `feat(reference-panel): issue 18 F1 BLOCKED manual_review_pending`; usa el mensaje `feat(reference-panel): issue 18 F1 CLOSED ready_review` únicamente después de reunir la evidencia visual exigida.
 - Al terminar, actualiza el plan, bitácora e issue; abre el único PR canónico asociado a #18 y deja la unidad en `WAITING_ORCHESTRATOR`. No abras un segundo PR, no integres y no cierres la issue.
 
 ## Delegación y condición de parada
 
-Delega subtareas ordinarias según la política de agentes/modelos del proyecto; si no hay una jerarquía aplicable, puedes ejecutar la fase directamente. Detente y devuelve a `WAITING_ORCHESTRATOR` si el dock de la captura no corresponde a la composición actual, si el montaje requiere alterar reglas/servidor, o si no hay espacio seguro para los accesos en móvil.
+Delega subtareas ordinarias según la política de agentes/modelos del proyecto; si no hay una jerarquía aplicable, puedes ejecutar la fase directamente. La siguiente acción es habilitar un navegador para revisar manualmente escritorio/móvil y registrar la evidencia. Detente y devuelve a `WAITING_ORCHESTRATOR` si el dock de la captura no corresponde a la composición actual, si el montaje requiere alterar reglas/servidor, o si no hay espacio seguro para los accesos en móvil.
