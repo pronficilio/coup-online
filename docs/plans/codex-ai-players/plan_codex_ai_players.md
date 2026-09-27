@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2 App Server implementado y validado localmente; F3 implementado y cubierto por pruebas; release POC `5a13376` activa y saludable en Hetzner; el login device-code aún no emite código y espera que el propietario habilite esa opción; no hay sesión ni llamada a Luna; escenarios manuales y revisión final pendientes
+Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2/F3 implementados; release POC `4ab5e52` activo y saludable en Hetzner; OAuth normal y una decisión real GPT-6 Luna `low` verificados; palanca roja restringida al líder autorizado por el código y rearmada; escenarios manuales y revisión final pendientes.
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -128,7 +128,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** recorrido humano vs dos IA e IA vs IA en Hetzner; acciones/desafíos/bloqueos/intercambio/timeout y kill switch revisados; compilar cliente y servidor; revisión final; mantener release previo listo para rollback. No iniciar torneos masivos.
 - **Pivote:** si falla una invariante de reglas, privacidad o kill switch, devolver a su fase propietaria.
 - **Repetición:** una ronda de correcciones/revisión focalizada por criterio fallido.
-- **Estado:** la validación local tras integrar la base activa `55be894` pasó: suite del servidor 36/36, `node --check` y build de cliente. El build conserva dos warnings existentes de imports sin uso en `src/App.js`. La release POC separada `5a13376` está activa; API y runner están healthy, la web responde HTTP 200, y el runner no comparte la red interna del juego ni publica puertos. El primer intento de login device-code falló antes de emitir código. OpenAI Docs indica que se debe habilitar el login por código de dispositivo en Settings > Security; el propietario tiene que hacerlo antes de reintentar. No hay sesión Codex ni llamada a Luna. Pendiente probar una decisión real y recorrer los escenarios manuales.
+- **Estado:** la validación local pasó (suite del servidor 36/36, `node --check` y build de cliente; se mantienen dos warnings previos en `src/App.js`). El release POC `4ab5e52` está activo en Hetzner; API y runner están saludables, la web responde HTTP 200 y el runner no comparte la red del juego ni publica puertos. OAuth normal quedó guardado y una decisión real GPT-6 Luna `low` devolvió una elección legal. Tras el apagado accidental, la palanca se restringió al socket líder con código válido tanto en cliente como en servidor; el release está desplegado y Codex rearmado. Pendiente el recorrido manual de persona vs. dos IA, IA vs. IA, desafíos/bloqueos y palanca roja.
 
 ## Riesgos y mitigaciones
 
