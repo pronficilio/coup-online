@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import io from "socket.io-client";
 import Coup from './game/Coup';
+import { t } from '../i18n'
+import { lobbyError } from '../i18n/lobby'
 
 const axios = require('axios');
 const baseUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000' 
@@ -49,7 +51,7 @@ export default class JoinGame extends Component {
         socket.on("joinFailed", function(err) {
             console.log("join failed, cause: " + err);
             bind.setState({ 
-                errorMsg: err,
+                errorMsg: lobbyError(err),
                 isError: true,
                 isLoading: false
             });
@@ -58,7 +60,7 @@ export default class JoinGame extends Component {
 
         socket.on('leader', () => this.setState({ isLeader: true, isReady: true }))
         socket.on('startRejected', reason => this.setState({
-            errorMsg: `Unable to start: ${reason}`,
+            errorMsg: t('lobby.error.startRejected', { reason: lobbyError(reason) }),
             isError: true
         }))
 
@@ -88,7 +90,7 @@ export default class JoinGame extends Component {
             //TODO  handle error
             console.log('Please enter a name');
             this.setState({ 
-                errorMsg: 'Please enter a name',
+                errorMsg: t('lobby.name.required'),
                 isError: true 
             });
             return
@@ -97,7 +99,7 @@ export default class JoinGame extends Component {
             //TODO  handle error
             console.log('Please enter a room code');
             this.setState({ 
-                errorMsg: 'Please enter a room code',
+                errorMsg: t('lobby.roomCode.required'),
                 isError: true
             });
             return
@@ -118,7 +120,7 @@ export default class JoinGame extends Component {
                     console.log('Invalid Party Code')
                     bind.setState({ 
                         isLoading: false,
-                        errorMsg: 'Invalid Party Code',
+                        errorMsg: t('lobby.join.invalidRoomCode'),
                         isError: true
                     });
                 }
@@ -128,7 +130,7 @@ export default class JoinGame extends Component {
                 console.log("error in getting exists", err);
                 bind.setState({ 
                     isLoading: false,
-                    errorMsg: 'Server error',
+                    errorMsg: t('lobby.join.serverError'),
                     isError: true
                 });
             })
@@ -160,24 +162,24 @@ export default class JoinGame extends Component {
         }
         if(this.state.isInRoom) {
             if (!this.state.isReady) {
-                joinReady = <button className="joinButton" onClick={this.reportReady}>Ready</button>
+                joinReady = <button className="joinButton" onClick={this.reportReady}>{t('lobby.ready.button')}</button>
             }
         } else {
-            joinReady = <button className="joinButton" onClick={this.attemptJoinParty} disabled={this.state.isLoading}>{this.state.isLoading ? 'Joining...': 'Join'}</button>
+            joinReady = <button className="joinButton" onClick={this.attemptJoinParty} disabled={this.state.isLoading}>{this.state.isLoading ? t('lobby.join.loading'): t('lobby.join.submit')}</button>
         }
         if(this.state.isReady) {
-            ready = <b style={{ color: '#5FC15F' }}>You are ready!</b>
+            ready = <b style={{ color: '#5FC15F' }}>{t('lobby.ready.confirmed')}</b>
             joinReady = null
         }
         const participantCount = this.state.players.filter(player => player.participating).length
         const allParticipantsReady = this.state.players.every(player => player.kind === 'codex' || !player.participating || player.isReady)
         if(this.state.isLeader && participantCount >= 2 && allParticipantsReady) {
-            startGame = <button className="startGameButton" onClick={() => this.state.socket.emit('startGameSignal')}>Start Game</button>
+            startGame = <button className="startGameButton" onClick={() => this.state.socket.emit('startGameSignal')}>{t('lobby.start')}</button>
         }
 
         return (
             <div className="joinGameContainer">
-                <p>Your Name</p>
+                <p>{t('lobby.name.label')}</p>
                 <input
                     type="text" value={this.state.name} disabled={this.state.isLoading}
                     onChange={e => {
@@ -189,13 +191,13 @@ export default class JoinGame extends Component {
                             this.onNameChange(e.target.value);
                         } else {
                             this.setState({
-                                errorMsg: 'Name must be less than 9 characters',
+                                errorMsg: t('lobby.join.nameMaxLength'),
                                 isError: true
                             })
                         }
                     }}
                 />
-                <p>Room Code</p>
+                <p>{t('lobby.roomCode.inputLabel')}</p>
                 <input
                     type="text" value={this.state.roomCode} disabled={this.state.isLoading}
                     onChange={e => this.onCodeChange(e.target.value)}
@@ -212,16 +214,16 @@ export default class JoinGame extends Component {
                             let ready = null
                             let readyUnitColor = '#E46258'
                             if(item.kind === 'codex') {
-                                ready = <b>GPT-6 Luna · {item.effort}</b>
+                                ready = <b>{t('lobby.ai.seat.status', { effort: t(`lobby.ai.effort.${item.effort}`) })}</b>
                                 readyUnitColor = '#8C6CE6'
                             } else if(!item.participating) {
-                                ready = <b>Spectator</b>
+                                ready = <b>{t('lobby.player.spectator')}</b>
                                 readyUnitColor = '#8A8A8A'
                             } else if(item.isReady) {
-                                ready = <b>Ready!</b>
+                                ready = <b>{t('lobby.player.ready')}</b>
                                 readyUnitColor = '#73C373'
                             } else {
-                                ready = <b>Not Ready</b>
+                                ready = <b>{t('lobby.player.notReady')}</b>
                             }
                             return (
                                     <div className="readyUnit" style={{backgroundColor: readyUnitColor}} key={index}>

@@ -2,6 +2,7 @@ const gameUtils = require('./utils')
 const constants = require('../utilities/constants')
 const crypto = require('node:crypto')
 const { RULESET_VERSION } = require('../ai/codex-protocol')
+const { translate, roleLabel, actionLabel } = require('../i18n')
 
 const EFFORTS = new Set(['low', 'medium', 'high'])
 const ACTION_COSTS = { coup: 7, assassinate: 3 }
@@ -621,7 +622,12 @@ class CoupGame {
         })
         this.currentAction = action
         if (cost) this.players[actor].money -= cost
-        this.addLog(`${this.players[actor].name} used ${this.actionLabel(action.type)}${action.target == null ? '' : ` on ${this.players[action.target].name}`}.`)
+        const logKey = action.target == null ? 'game.log.actionUsed' : 'game.log.actionUsedTarget'
+        this.addLog(translate(logKey, {
+            playerName: this.players[actor].name,
+            actionLabel: actionLabel(action.type),
+            targetName: action.target == null ? '' : this.players[action.target].name
+        }))
         this.updatePlayers()
         const claim = ROLE_BY_ACTION[action.type]
         if (!claim) return this.afterActionClaim(action)
@@ -651,7 +657,10 @@ class CoupGame {
                     type: 'challenge', actorSeat: selected.seat, targetSeat: action.actor,
                     action: action.type, claimRole: String(role).toLowerCase(), result: 'challenged'
                 })
-                this.addLog(`${this.players[selected.seat].name} challenged ${this.players[action.actor].name}.`)
+                this.addLog(translate('game.log.challengeStarted', {
+                    challengerName: this.players[selected.seat].name,
+                    challengeeName: this.players[action.actor].name
+                }))
                 this.openProofDecision({
                     claimant: action.actor,
                     challenger: selected.seat,
@@ -711,7 +720,10 @@ class CoupGame {
                     type: 'block', actorSeat: block.blocker, targetSeat: action.actor,
                     action: action.type, claimRole: String(block.role).toLowerCase(), result: 'resolved'
                 })
-                this.addLog(`${this.players[block.blocker].name} declared a block with ${block.role}.`)
+                this.addLog(translate('game.log.blockDeclared', {
+                    blockerName: this.players[block.blocker].name,
+                    roleLabel: roleLabel(block.role)
+                }))
                 this.challengeBlock(block)
             }
         })
@@ -737,7 +749,10 @@ class CoupGame {
                     type: 'block_challenge', actorSeat: selected.seat, targetSeat: block.blocker,
                     action: block.action.type, claimRole: String(block.role).toLowerCase(), result: 'challenged'
                 })
-                this.addLog(`${this.players[selected.seat].name} challenged ${this.players[block.blocker].name}'s block.`)
+                this.addLog(translate('game.log.blockChallengeStarted', {
+                    challengerName: this.players[selected.seat].name,
+                    blockerName: this.players[block.blocker].name
+                }))
                 this.openProofDecision({
                     claimant: block.blocker,
                     challenger: selected.seat,
@@ -777,13 +792,16 @@ class CoupGame {
                 if (response.choice.value.kind === 'prove') {
                     const provenCard = response.choice.value.card
                     if (historyEntry) historyEntry.result = 'proved'
-                    this.addLog(`${player.name} proved the claim with ${provenCard}.`)
+                    this.addLog(translate('game.log.claimProved', {
+                        playerName: player.name,
+                        roleLabel: roleLabel(provenCard)
+                    }))
                     this.returnProvenInfluence(claimant, provenCard)
                     this.updatePlayers()
                     onProved()
                 } else {
                     if (historyEntry) historyEntry.result = 'failed'
-                    this.addLog(`${player.name} could not prove the claim.`)
+                    this.addLog(translate('game.log.claimNotProved', { playerName: player.name }))
                     onConceded()
                 }
             }
@@ -828,7 +846,10 @@ class CoupGame {
                 if (cardIndex < 0) return this.pause('Influence changed during a loss decision.')
                 const [card] = this.players[seat].influences.splice(cardIndex, 1)
                 player.revealedInfluences.push(card)
-                this.addLog(`${player.name} lost ${card}.`)
+                this.addLog(translate('game.log.influenceLost', {
+                    playerName: player.name,
+                    roleLabel: roleLabel(card)
+                }))
                 this.checkEliminated()
                 this.addHistory({
                     type: 'influence_loss', actorSeat: seat, revealedRole: String(card).toLowerCase(),
@@ -845,7 +866,7 @@ class CoupGame {
             if (!player.isDead && player.influences.length === 0) {
                 player.isDead = true
                 player.money = 0
-                this.addLog(`${player.name} is out.`)
+                this.addLog(translate('game.log.playerEliminated', { playerName: player.name }))
             }
         })
     }
