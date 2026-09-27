@@ -1,13 +1,17 @@
-# Reporte F2 — issue #19, avances parciales
+# Reporte F2 — issue #19
 
-**Estado actual de la fase:** `ACTIVE`; además de las superficies previas, esta tanda localiza los rótulos de las cinco familias de botones ilustrados que se integraron después de PR #22. El usuario informó que recorrió portada, lobby y una partida completa y que ve todo en orden; el Verifier encontró después los rótulos ingleses de los nuevos assets. F4 está `ACTIVE`, pendiente de revisión independiente tras esta corrección.
-**Estado de F3:** `ACTIVE`; las ocho emisiones actuales de `g-addLog` están localizadas en origen. El reporte del usuario incluye una partida completa, sin pasos/detalles de registro especificados (ver reporte F4).
-**PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22) se fusionó mediante `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; merge parcial para revisión incremental, sin aceptación F4 ni cierre de #19.
+**Estado final de F2:** `CLOSED`, integrado en PR #33 (`45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`). El Verifier FINAL dio `PASS` sobre el árbol integrado. `translations.json` contiene 292 claves `es` y 292 `en`, con paridad confirmada. El build asociado al producto terminó exit 0; no se ejecutaron tests.
+**Estado final de F3:** `CLOSED`, con los mensajes localizados en origen y el protocolo preservado; ver el reporte F3 y el veredicto final de F4.
+**Issue/tracker:** PR #33 está `MERGED`; la PR documental de cierre [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión. #19 permanece `OPEN` hasta integrarla y que Orquestación cierre la unidad. Unidad `WAITING_ORCHESTRATOR`.
+
+## Historial de tandas previas a la integración de PR #33
+
+Los conteos y estados `ACTIVE` que aparecen en las siguientes notas describen sus respectivos checkpoints, no el estado integrado actual. La rama previa al merge `1b65425` registraba 307/307; el merge `45a3eaa` contiene 292/292. Se preservan ambos conteos sin inferir la causa de la diferencia.
 **Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29; integrada por merge `318c119` después del fast-forward inicial a `origin/master@3313d42` (merge de PR #30/#21) desde `ca16e42`. La base de PR #23 (`2d82fa1`, merge local `74432a6`) queda como antecedente.
 **Commits de la unidad:** `4b6b564`, `c9d5442`, `a63336c` y `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`), publicado en `origin/issue/19-spanish-default-dictionary`. La sincronización de tracker se registró en un commit documental posterior.
 **Fecha:** 2026-09-27.
 
-## Tanda posterior a PR #23 — estado actual
+## Tanda posterior a PR #23 — checkpoint histórico
 
 PR #23 de #14 está integrada en `origin/master` `2d82fa1`; se verificó el merge publicado y se integró a #19 mediante `74432a6`. Las rutas de lobby, decisiones, partida, tablero y servidor antes reservadas quedaron liberadas por la integración publicada; no se copiaron cambios locales desde el worktree #14.
 
@@ -47,7 +51,7 @@ PR #23 de #14 está integrada en `origin/master` `2d82fa1`; se verificó el merg
 - Sin tests. En ese punto el Alquimista aún no había hecho el recorrido manual; después el usuario informó el suyo (ver F4). F2/F3 permanecen `ACTIVE` y F4 no tiene cierre.
 - Base vigente `origin/master@2d82fa1`, merge de sincronización `74432a6`. PR #23 liberó las rutas publicadas; no se copiaron cambios locales de otros worktrees.
 
-## Addendum tras sincronizar PR #30/#21
+## Addendum tras sincronizar PR #30/#21 — checkpoint histórico
 
 - La reauditoría de `origin/master@3313d42` encontró texto inglés en las cinco familias de botones de decisión usadas por `game/Coup.js`: `ba` (BLOCK ASSASSINATION), `bfa` (BLOCK FOREIGN AID), `bs` (BLOCK STEAL), `c` (CHALLENGE) y `pass` (PASS), incluidas sus variantes `-active.webp`. El par `claim` dice `CLAIM`, pero no se importa ni referencia desde `coup-client/src`.
 - `Coup.js` conecta cada imagen usada a la frase española ya existente en el diccionario; las cinco claves tienen pares `es`/`en`, así que permanecen 307 claves por idioma. `ResponseImageButton` presenta un rótulo español sobre el texto incrustado en normal y active, manteniendo imágenes, iconos, marcos, `choiceId`, `onClick` y protocolo. No se alteró el servidor.
