@@ -33,7 +33,9 @@ export default class Home extends Component {
 
                 
             </div>
-            <p className="footer">{t('home.credit.prefix')} <a className="website-link" href="https://github.com/cheneth" target="_blank" rel="noopener noreferrer">Ethan Chen</a></p>
+            <p className="footer">
+                {t('home.credit.modifiedBy')} <a className="website-link" href="https://github.com/pronficilio" target="_blank" rel="noopener noreferrer">Pronficilio</a>; {t('home.credit.originalAuthor')} <a className="website-link" href="https://github.com/cheneth" target="_blank" rel="noopener noreferrer">Ethan Chen</a>
+            </p>
             <p className="version-number">{t('home.version')}</p>
             </>
         )

@@ -24,7 +24,7 @@ El glosario sigue los recursos españoles existentes `card-es.webp`, `table-es.w
 | `Home.js`, enlaces | `home.create`, `home.join` | `Create Game`; `Join Game` | `Crear partida`; `Unirse a una partida` | — | Texto visible; traducible |
 | `RulesModal.js`, acceso en portada y partida | `common.rules` | `Rules` | `Reglas` | — | Texto visible; aparece en dos contextos |
 | `Home.js`, imagen decorativa con alt | `home.chicken.alt` | `chicken-leg` | `Pierna de pollo` | — | Accesibilidad; el `Chicken.svg` no tiene texto incrustado |
-| `Home.js`, crédito | `home.credit` | `Made by {authorName}` | `Creado por {authorName}` | `authorName` = nombre propio Ethan Chen | Texto visible; no traducir el nombre propio |
+| `Home.js`, crédito | `home.credit.modifiedBy`, `home.credit.originalAuthor` | `Modified by`; `original author:` | `Modificado por`; `autor original:` | Pronficilio = perfil que modificó el proyecto; Ethan Chen = autor original; no traducir nombres propios | Texto visible; conservar los enlaces a ambos perfiles |
 | `Home.js`, distintivo de versión | `home.version` | `Beta v0.9` | `Versión beta 0.9` | versión fija actual | Texto visible; traducción propuesta, conservar número |
 | `public/index.html`, idioma del documento | `meta.documentLanguage` | `lang="en"` | `lang="es"` | — | Metadato de accesibilidad/localización; no es una frase del diccionario |
 | `public/index.html`, título de pestaña | `meta.documentTitle` | `Coup Online` | `Coup en línea` | — | Texto visible del navegador; mantener `Coup` como nombre del juego |

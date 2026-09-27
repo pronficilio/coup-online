@@ -1,6 +1,6 @@
 # Coup Online
 
-This project is an online port of the card game Coup. It is currently hosted at [here](https://www.chickenkoup.com/).
+This project is an online port of the card game Coup. Try the current version at [coup.ejele.net](https://coup.ejele.net); the original project is at [chickenkoup.com](https://www.chickenkoup.com/).
 
 Perfect to play with friends during quarantine c:
 ## About the project
