@@ -10,8 +10,8 @@ Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
-PR: el usuario autorizó prepararlo contra `master`; documentación y revisión de rama en curso. No fusionar.
-Siguiente paso: preparar el PR de `issue/14-codex-ai-players` con la guía `docs/codex-ai-players/README.md`. Antes de marcarlo listo para merge, completar la prueba manual en `https://coup.ejele.net`: persona contra dos IA, IA contra IA con el creador como espectador, desafíos/bloqueos y palanca roja. El código compartido se lee desde el `.env` privado por SSH y se introduce en el campo del lobby; no va en la URL. Si se activa la palanca roja, el rearme es manual desde el servidor. No fusionar el PR sin esas comprobaciones.
+PR: [Draft #23](https://github.com/pronficilio/coup-online/pull/23), base `master`, head `issue/14-codex-ai-players`. No fusionar todavía.
+Siguiente paso: completar la prueba manual en `https://coup.ejele.net`: persona contra dos IA, IA contra IA con el creador como espectador, desafíos/bloqueos y palanca roja. El código compartido se lee desde el `.env` privado por SSH y se introduce en el campo del lobby; no va en la URL. Si se activa la palanca roja, el rearme es manual desde el servidor. Actualizar el draft con resultados antes de marcarlo listo para merge.
 
 ## Contrato F0 y decisiones de producto definidos
 
