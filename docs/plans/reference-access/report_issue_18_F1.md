@@ -1,8 +1,8 @@
 # Reporte issue #18 — F1: accesos a referencias
 
-**Veredicto:** `BLOCKED`; el montaje y los accesos están implementados, pero falta la revisión manual visual requerida.  
-**Build:** `npm run build` desde `coup-client`, exit 0, compilado con warnings.  
-**Diff:** `git diff --check`, PASS.  
+**Veredicto:** `BLOCKED`; el montaje y los accesos están implementados, pero falta la revisión manual visual requerida.
+**Build:** `npm run build` desde `coup-client`, exit 0, compilado con warnings.
+**Diff:** `git diff --check`, PASS.
 **Tests automatizados:** no añadidos ni ejecutados.
 
 ## Implementación observada
