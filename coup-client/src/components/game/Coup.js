@@ -36,7 +36,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: passImage,
             activeImage: passActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.common.pass'),
+            imageLabelStyle: 'pass'
         }
     }
 
@@ -44,7 +46,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: challengeImage,
             activeImage: challengeActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.challenge.button'),
+            imageLabelStyle: 'challenge'
         }
     }
 
@@ -54,7 +58,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: blockForeignAidImage,
             activeImage: blockForeignAidActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.block.foreignAid.button'),
+            imageLabelStyle: 'blockForeignAid'
         }
     }
 
@@ -62,7 +68,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: blockAssassinationImage,
             activeImage: blockAssassinationActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.block.assassination.button'),
+            imageLabelStyle: 'blockAssassination'
         }
     }
 
@@ -71,7 +79,9 @@ function responseButtonFor(decision, option, localizedLabel) {
             normalImage: blockStealImage,
             activeImage: blockStealActiveImage,
             accessibleLabel: localizedLabel,
-            supplementalLabel: localizedLabel
+            supplementalLabel: localizedLabel,
+            imageLabel: t('game.block.steal.button'),
+            imageLabelStyle: 'blockSteal'
         }
     }
 
