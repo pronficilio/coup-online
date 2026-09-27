@@ -1,6 +1,6 @@
 # Reporte F4 — cobertura final y revisión independiente
 
-**Estado de fase:** `BLOCKED` a la espera de inspección visual humana focalizada. El Verifier FINAL sobre el producto `c9d62676ffa33a177a0edced26dfc91e2529365c` dejó AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS estático` y AC7 `BLOCKED` porque no hubo observación humana del render/recorrido. Este documento no emite PASS general ni aceptación.
+**Estado de fase:** `BLOCKED` a la espera de los datos faltantes para AC7. El usuario respondió exactamente «se ve bien»; el Verifier acepta esto como aprobación visual general para AC2/AC4. No se infieren navegador, dispositivo, ancho, controles o detalles adicionales. Verifier FINAL: AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS` por aprobación visual general, AC7 `BLOCKED` porque siguen sin confirmarse conservación de acciones ni los resultados concretos en escritorio/ancho estrecho. No hay PASS general ni cierre de F4.
 **Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29 y llega después del merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico avanzó mediante fast-forward a `3313d42` y merge `318c119` desde `ca16e42`.
 **Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED` hasta inspección humana y reevaluación final de AC7. Issue #19 permanece `OPEN`; PR #22 está `MERGED` y PR de continuación #33 está `DRAFT`.
 
@@ -52,7 +52,7 @@ Se amplió únicamente `.ResponseImageButton__art--challenge` a x=38–80%. En 5
 - Backend de desarrollo del mismo worktree: `http://127.0.0.1:8002`, bind local confirmado; `/exists/human-review` responde `{"exists":false}` antes de crear la sala.
 - La comprobación anterior registró cliente y backend ligados a loopback. Antes del recorrido, confirmar que los servicios siguen disponibles y corresponden al producto `c9d6267`; no se asume que procesos de la revisión anterior continúen activos.
 
-## Verifier FINAL más reciente (2026-09-27)
+## Verifier FINAL previo a la respuesta humana general (2026-09-27)
 
 Checkpoint de producto: `c9d62676ffa33a177a0edced26dfc91e2529365c`. En la revisión el HEAD de la rama era `cbfaee5fa527994e186a2b9116815da7bcd13d34`, un commit posterior solo documental/bitácora. El Verifier no ejecutó tests/build ni observó la aplicación en navegador.
 
@@ -66,7 +66,13 @@ Checkpoint de producto: `c9d62676ffa33a177a0edced26dfc91e2529365c`. En la revisi
 | AC6 — protocolo/acciones | `PASS estático` | El cambio de producto desde la revisión previa es CSS; evento, payload y handlers no cambiaron. |
 | AC7 — recorrido | `BLOCKED` | Falta observación humana en estado normal/activo, escritorio/ancho estrecho y conservación de acciones. |
 
-Resultado global `BLOCKED`, sin PASS de F4. El comentario positivo anterior del usuario autorizó continuar, pero no describe esta inspección focalizada. Tras el recorrido, compartir evidencia exacta para que el Verifier reevalue AC7.
+Resultado de ese checkpoint global `BLOCKED`. La respuesta humana y su evaluación actual quedan registradas a continuación.
+
+## Respuesta humana general y estado vigente (2026-09-27)
+
+El usuario respondió exactamente: «se ve bien». El Verifier acepta esa respuesta como aprobación visual general para AC2 (interfaz en español) y AC4 (recursos visibles). No se infieren navegador, dispositivo, ancho, qué botón/estado se vio ni pasos de selección.
+
+Estado evaluado por el Verifier: AC1/AC3/AC5/AC6 `PASS`; AC2/AC4 `PASS` por aprobación visual general; AC7 `BLOCKED`. La respuesta no confirma si las selecciones conservaron su acción ni qué se vio en escritorio y ancho estrecho respecto a inglés restante, recorte o contacto con icono/marco. Por ello el resultado global permanece `BLOCKED`; no hay PASS ni cierre de F4.
 
 Pasos solicitados:
 
@@ -77,14 +83,14 @@ Pasos solicitados:
 5. Elegir una acción reclamable como `Impuesto`; en la respuesta revisar `Desafiar` y `Pasar`, cada uno normal y con hover/foco. Confirmar que no queden trazos de `CHALLENGE` en los dos extremos y que `Desafiar` no se recorte.
 6. Repetir la inspección en un ancho de escritorio y en un ancho estrecho cercano a móvil. Confirmar si alguna etiqueta deja ver inglés, se recorta, se superpone al icono/marco o si una selección no conserva su acción. Revisar el nuevo límite x=38–80% de `Desafiar` y el tamaño/recorte de `Bloquear Ayuda extranjera` en móvil; confirmar que los otros labels mantienen su ajuste.
 
-Informar navegador/dispositivo, anchos aproximados y resultado concreto de cada rótulo. Esta inspección nueva es necesaria: el recorrido general reportado antes de la corrección no valida estos botones. El checkpoint FINAL ya dejó AC1–AC6 `PASS` (AC2/AC4 estático) y AC7 `BLOCKED`; la fase F4 permanece `BLOCKED` hasta recibir esta respuesta y reevaluar el recorrido.
+Para desbloquear AC7, falta confirmar: (1) si las selecciones conservaron sus acciones, y (2) qué se observó en escritorio y ancho estrecho sobre texto inglés visible, recorte y contacto con icono/marco. No hace falta agregar navegador, dispositivo o anchos numéricos si el usuario no desea reportarlos. El Verifier acepta «se ve bien» para AC2/AC4, pero la fase F4 permanece `BLOCKED` hasta recibir los datos faltantes y reevaluar AC7.
 
 ## Resultado y siguiente acción
 
-El Verifier independiente encontró cinco familias de botones visibles con palabras inglesas incrustadas y después detectó fuga en `CHALLENGE` bajo la máscara 40–77%. La corrección CSS x=38–80% quedó en `c9d6267`; build exit 0 con avisos existentes y diff-check limpio. El Verifier más reciente dejó AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS estático` y AC7 `BLOCKED` a la espera de revisión humana focalizada. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no están importadas ni referenciadas por la aplicación y no se usan en esta UI.
+El Verifier independiente encontró cinco familias de botones visibles con palabras inglesas incrustadas y después detectó fuga en `CHALLENGE` bajo la máscara 40–77%. La corrección CSS x=38–80% quedó en `c9d6267`; build exit 0 con avisos existentes y diff-check limpio. Con la respuesta «se ve bien», el Verifier acepta AC2/AC4; AC1/AC3/AC5/AC6 `PASS`; AC7 `BLOCKED` hasta confirmar acciones y detalles de escritorio/ancho estrecho. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no están importadas ni referenciadas por la aplicación y no se usan en esta UI.
 
 La fase F4 está `BLOCKED` a la espera de la inspección focalizada; issue #19 `OPEN`; unidad `WAITING_USER`. PR de continuación #33 `DRAFT`. El Verifier indicó que no observó la aplicación en navegador; tras recibir el informe humano deberá reevaluar AC7. El Alquimista no reclama ni emite PASS por sí mismo.
 
 El usuario autorizó la integración parcial; PR #22 se fusionó en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Ese merge no acepta el resultado, no marca F4 cerrada, no equivale al veredicto FINAL y no cierra #19. La issue sigue `OPEN`.
 
-La API confirmó issue #19 `OPEN`/asignada a `pronficilio`, PR #22 `MERGED` y PR #33 `DRAFT`. El último veredicto sobre el producto `c9d6267` fue global `BLOCKED`: AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS estático`, AC7 `BLOCKED`. Solo falta la inspección humana focalizada y reevaluar AC7; no cerrar fase/issue ni emitir PASS.
+La API confirmó issue #19 `OPEN`/asignada a `pronficilio`, PR #22 `MERGED` y PR #33 `DRAFT`. El estado vigente sobre el producto `c9d6267` sigue global `BLOCKED`: AC1/AC3/AC5/AC6 `PASS`; AC2/AC4 `PASS` por aprobación general del usuario; AC7 `BLOCKED`. Solo falta confirmar conservación de acciones y lo observado en escritorio/ancho estrecho sobre inglés, recorte y contacto con icono/marco; después reevaluar AC7. No cerrar fase/issue ni emitir PASS.
