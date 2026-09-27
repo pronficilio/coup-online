@@ -1,12 +1,12 @@
 # URL de prueba y crédito de la portada — issue #29
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
+**Estado:** `COMPLETED`; F1 `CLOSED`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/29
 **Handoff:** `docs/plans/active/issue_29_readme_site_credit.md`
 **Bitácora:** `docs/plans/log/issue-29.jsonl`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
-**Siguiente dueño:** Orquestador.
-**Integración única:** [PR #31](https://github.com/pronficilio/coup-online/pull/31), de `issue/29-readme-site-credit` a `master`.
+**Siguiente dueño:** ninguno.
+**Integración única:** [PR #31](https://github.com/pronficilio/coup-online/pull/31), integrada a `master` con merge commit `3a128ce4b24cc495c87907a297ec7078a28c7d92`.
 
 ## Objetivo y éxito
 
@@ -40,7 +40,7 @@ Fuera de alcance: cambios de reglas o lógica del juego, despliegue, cambios de 
 **Verifier:** no requerido (`NONE`).
 **Commit:** `COMMIT_REQUIRED`; cierre previsto `docs(home): issue 29 F1 CLOSED ready_for_review`.
 
-**Veredicto F1 (2026-09-27):** `CLOSED` en `8d29a1c`. La revisión del diff confirmó el enlace de prueba y el de chickenkoup.com, ambos créditos enlazados y las etiquetas en español/inglés. `git diff --check` pasó; no se ejecutaron pruebas. La rama se sincronizó con `origin/master@3313d42` mediante el merge `5dcc69f`, sin conflictos. La PR #31 está abierta para revisión del Orquestador.
+**Veredicto F1 (2026-09-27):** `CLOSED` en `8d29a1c`. La revisión del diff confirmó el enlace de prueba y el de chickenkoup.com, ambos créditos enlazados y las etiquetas en español/inglés. `git diff --check` pasó; no se ejecutaron pruebas. La rama se sincronizó con `origin/master@3313d42` mediante el merge `5dcc69f`, sin conflictos. El Orquestador revisó y aprobó la PR #31; se integró a `master` con `3a128ce4b24cc495c87907a297ec7078a28c7d92` y cerró #29.
 
 ## Falsificación
 
