@@ -144,7 +144,7 @@ test('only the leader with the shared code can add configured Codex seats', () =
     })
 })
 
-test('a host can spectate an AI-versus-AI game and any connected socket can trigger emergency stop', async () => {
+test('only the code-authorized lobby leader can trigger emergency stop', async () => {
     const namespace = new FakeNamespace()
     let started = null
     const stopped = []
@@ -158,8 +158,15 @@ test('a host can spectate an AI-versus-AI game and any connected socket can trig
         cleanup() {}
     })
     const host = new FakeSocket('host')
+    const friend = new FakeSocket('friend')
     namespace.connect(host)
+    namespace.connect(friend)
     host.receive('setName', 'Watcher')
+    host.receive('emergencyStopCodex')
+    assert.deepEqual(stopped, [])
+    friend.receive('emergencyStopCodex')
+    assert.deepEqual(stopped, [])
+
     host.receive('authorizeCodexAI', { code: 'test-shared-code-long-enough' })
     host.receive('addCodexSeat', { effort: 'medium' })
     host.receive('addCodexSeat', { effort: 'low' })
@@ -175,6 +182,8 @@ test('a host can spectate an AI-versus-AI game and any connected socket can trig
         leaderSocketID: 'host',
         spectatorSocketIDs: ['host']
     })
+    friend.receive('emergencyStopCodex')
+    assert.deepEqual(stopped, [])
     host.receive('emergencyStopCodex')
     assert.deepEqual(stopped, ['host'])
 })

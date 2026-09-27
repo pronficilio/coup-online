@@ -122,6 +122,7 @@ function openLobby(gameSocket, namespace, { startGame, cleanup, aiAccessCode = p
         })
 
         socket.on('emergencyStopCodex', () => {
+            if (socket.id !== leaderSocketID || !authorizedSockets.has(socket.id)) return
             if (typeof onEmergencyStop === 'function') onEmergencyStop(socket.id)
         })
 

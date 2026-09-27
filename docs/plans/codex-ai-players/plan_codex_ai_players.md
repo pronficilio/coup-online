@@ -18,14 +18,14 @@ El cuerpo de la issue #14 contiene objetivo, criterios de aceptación, alcance, 
 - La issue #13 sigue siendo la unidad del despliegue regular. Para esta prueba temporal, el usuario autorizó un release POC separado que conserva intacto el release actual como rollback.
 - El checkout raíz contiene modificaciones locales sin commit. El worktree de #14 parte del origin/master limpio; no incorporar cambios raíz sin una decisión registrada.
 - El usuario aprobó una prueba temporal con su login ChatGPT mediante Codex App Server, Luna como modelo inicial, acceso para él y amigos, y una palanca roja para apagar Codex. No se publicarán cambios al fork; el runner y el release se preparan aislados.
-- Por instrucción del usuario, se conserva el acceso/lobby actual sin cuentas ni invitaciones. Cualquier jugador conectado puede activar el apagado seguro; solo el propietario rearma Codex por SSH/consola.
+- Por instrucción del usuario, se conserva el acceso/lobby actual sin cuentas ni invitaciones. Solo el líder del lobby que validó el código compartido puede activar el apagado seguro; interfaz y servidor comprueban el permiso. Solo el propietario rearma Codex por SSH/consola.
 - Se versionaron desde el checkout local las reglas completas y sus tres resúmenes en `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md` y `docs/coup_llm_summary.md`. La transcripción es la autoridad; F1 alineó el motor con esas reglas.
 
 ## Compatibilidad de App Server y acceso al modelo
 
 - La documentación oficial presenta Codex App Server como interfaz para integrar Codex dentro de un producto, con transporte stdio/socket. También marca el protocolo como experimental y no soportado para producción: esta prueba es temporal y se podrá retirar o migrar a API.
 - El runner no monta el checkout público ni tiene acceso a la red interna de Coup. Recibe únicamente datos estructurados de una partida y solo la API conserva la sesión del juego; la auth queda en un volumen privado del sidecar.
-- La disponibilidad de `gpt-6-luna` y del inicio de sesión en esta cuenta concreta sigue sin comprobarse. El login device-code y una sola decisión real son el siguiente paso; si falla no habrá fallback ni API.
+- La disponibilidad de `gpt-6-luna` se confirmó mediante OAuth normal y una decisión real `low` a través de API → runner; la selección legal fue `steal:1`. No hay fallback ni API.
 - Referencias: [Codex App Server](https://learn.chatgpt.com/docs/app-server), [modelos](https://learn.chatgpt.com/docs/models), [CLI y login de dispositivo](https://learn.chatgpt.com/docs/developer-commands).
 
 ## Bloqueos explícitos por fase
@@ -51,7 +51,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 2. El servidor deriva el actor del socket ligado al asiento actual y es autoridad para acciones permitidas, monedas, desafíos, bloqueos, pérdidas de influencia y avance del turno. Las decisiones humanas e IA se validan antes de ejecutarse.
 3. Las partidas admiten humanos e IA en varios asientos, incluida una persona contra dos IA e IA contra IA. Cada asiento Codex permite seleccionar `low`, `medium` o `high`; GPT-6 Luna `medium` es el valor inicial recomendado.
 4. Codex CLI usa el inicio de sesión ChatGPT del propietario y entrega una selección legible por máquina entre opciones de decisión preparadas por el servidor. Las respuestas inválidas, duplicadas, tardías o pertenecientes a un estado anterior no cambian la partida.
-5. Se conserva el acceso/lobby actual: no se agregan cuentas, login ni invitaciones. Cualquier jugador conectado puede apagar Codex con la palanca roja; solo el propietario puede volver a encenderlo desde la consola/SSH del servidor.
+5. Se conserva el acceso/lobby actual: no se agregan cuentas, login ni invitaciones. Solo el líder que validó el código compartido puede ver y activar la palanca roja; la autorización se comprueba también en el servidor. Solo el propietario puede volver a encenderlo desde la consola/SSH del servidor.
 6. Al activar la palanca roja, el servidor bloquea nuevas invocaciones, termina las invocaciones activas cuando sea posible, invalida sus respuestas y pausa las partidas que esperan una decisión IA. Rehabilitar Codex no reproduce respuestas antiguas: el propietario reanuda o solicita una decisión nueva.
 7. Se limitan la concurrencia, el tiempo de espera y las llamadas por partida/ventana temporal. Un límite, fallo de login, proceso caído o cuota agotada pausa las partidas afectadas y muestra una causa; nunca cambia silenciosamente a API de pago.
 8. Los registros operativos pueden incluir partida/decisión, modelo, esfuerzo, duración, salida de proceso y contadores de uso disponibles. No guardan credenciales, manos rivales, razonamiento interno ni entradas arbitrarias de jugadores.
@@ -62,7 +62,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - Definir el contrato de observación privada, las decisiones del motor y la asociación de cada asiento con un controlador humano o Codex.
 - Cerrar las filtraciones de cartas privadas y discrepancias de reglas que impidan un experimento válido; hacer que el servidor valide y resuelva las decisiones relevantes.
 - Implementar un adaptador aislado para decisiones puntuales con Codex App Server, `gpt-6-luna`, esfuerzo configurable, esquema de salida y manejo de errores.
-- Conservar el acceso/lobby existente sin autenticación nueva; añadir límites operativos y una palanca roja global de solo apagado.
+- Conservar el acceso/lobby existente sin autenticación nueva; añadir límites operativos y una palanca roja global de solo apagado, disponible solo para el líder que autorizó asientos IA con el código.
 - Permitir configurar asientos humanos/IA y esfuerzo de cada IA en la creación de partidas.
 - Dejar una guía de autenticación inicial en Hetzner mediante el flujo de inicio de sesión de Codex apropiado para un servidor remoto, sin guardar ni publicar credenciales.
 - Producir evidencia de verificación independiente FINAL sobre privacidad, autenticación, costo/kill switch y reglas del juego.
@@ -108,14 +108,14 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** usa `gpt-6-luna` y esfuerzo por asiento `low|medium|high`; no inyecta texto libre; corre en contenedor sin checkout ni secretos del API, sin herramientas y con rootfs de solo lectura; la respuesta se valida contra la decisión vigente; no hay fallback a API. La documentación del App Server lo marca experimental, de modo que se trata de prueba temporal.
 - **Pivote:** si App Server no está disponible en la cuenta/CLI, retirar la conexión Plus y dejar registrada la limitación; no sustituir autenticación/proveedor.
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
-**F2 evidencia (2026-09-26):** `npm test` cubre App Server JSON-RPC, opciones legales, timeouts y cancelaciones; la CLI 0.157.1 completó localmente `initialize` y `thread/start` efímero sin login ni turno; imagen Docker construida; el contenedor pasa healthcheck y un proceso con UID/GID del API conecta al socket `0660` grupo 10002. Quedan la autorización device-code del propietario y una sola decisión real para confirmar Luna y el uso disponible.
+**F2 evidencia (2026-09-26):** `npm test` cubre App Server JSON-RPC, opciones legales, timeouts y cancelaciones; la CLI 0.157.1 completó localmente `initialize` y `thread/start` efímero sin login ni turno; imagen Docker construida; el contenedor pasa healthcheck y un proceso con UID/GID del API conecta al socket `0660` grupo 10002. F4 completó después el OAuth de navegador y la primera decisión real de GPT-6 Luna `low` en Hetzner.
 
 ### F3 — Añadir asientos IA y palanca roja (`IMPLEMENTADO; REVISIÓN F4 PENDIENTE`)
 
 - **Pregunta:** ¿pueden los jugadores configurar asientos IA en el lobby actual y apagar Codex sin agregar autenticación ni permitir que un cliente lo reactive?
 - **Entrada:** controlador Codex F2 y contratos del lobby/socket.
 - **Salida:** selección de tipo de asiento/esfuerzo en el lobby actual, límites por partida/ventana y palanca roja global de solo apagado.
-- **Cierre:** se crean partidas de una persona + dos IA y de varias IA; cualquier jugador puede activar la palanca y solo el propietario puede reactivar Codex por SSH/consola; apagar bloquea llamadas nuevas, intenta terminar las activas, invalida sus respuestas y pausa la decisión actual; tras reinicio Codex sigue apagado hasta habilitación explícita del propietario; Verifier refuta vías de bypass desde HTTP/Socket.IO.
+- **Cierre:** se crean partidas de una persona + dos IA y de varias IA; solo el socket líder autorizado con el código puede activar la palanca, y solo el propietario puede reactivar Codex por SSH/consola; apagar bloquea llamadas nuevas, intenta terminar las activas, invalida sus respuestas y pausa la decisión actual; tras reinicio Codex sigue apagado hasta habilitación explícita del propietario; Verifier refuta vías de bypass desde HTTP/Socket.IO.
 - **Pivote:** si apagar Codex no invalida las respuestas en curso o si el cliente puede reactivar Codex, bloquear F3 hasta corregir la palanca.
 - **Repetición:** una corrección acotada por vía de bypass demostrada.
 - **Validación local:** pruebas cubren anfitrión + dos IA, IA contra IA con espectador, clave de lobby, apagado concurrente, marcador persistente y cuotas. Queda validar la operación tras login en Hetzner.
@@ -133,7 +133,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 ## Riesgos y mitigaciones
 
 - **Plus/cuota compartida:** máximo de invocaciones activas y decisiones por partida/ventana; pausa al llegar a límite. Registrar contadores sin afirmar que hay acceso a un saldo exacto de Plus.
-- **Acceso abierto del lobby actual:** no se agrega autenticación; toda conexión puede usar IA, así que se aplican límites globales conservadores y cualquier jugador puede apagar Codex, sin opción web para reactivarlo.
+- **Acceso abierto del lobby actual:** no se agrega autenticación; toda conexión puede unirse al juego, pero agregar IA y activar la palanca roja requiere que el líder valide el código compartido. Se aplican límites globales conservadores y no existe opción web para reactivar Codex.
 - **Secretos Codex:** login se realiza en Hetzner como usuario del proceso o flujo remoto documentado; auth cache con permisos de propietario, nunca en logs/cliente/repositorio.
 - **Prompt injection:** no incluir chat libre; datos de juego estructurados; no abrir el modelo a archivos del proyecto ni a herramientas sobre el juego; opciones se generan y validan en servidor.
 - **Latencia/caída:** decisión con id y vencimiento; descartar respuestas tardías; pausa visible y recuperación explícita.

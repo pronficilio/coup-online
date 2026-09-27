@@ -53,7 +53,7 @@ Abrir en el navegador del mismo equipo la URL OAuth que imprime el CLI y complet
 
 No copiar `auth.json` fuera del volumen del runner. Comprobar después `codex login status` y el healthcheck del runner, crear una sala, habilitar IA con el código compartido y jugar una mano corta. El primer uso real confirma si la cuenta ofrece `gpt-6-luna` mediante App Server; si el modelo o el login no están disponibles, el turno se pausa y no hay fallback ni API.
 
-Probar en este orden: persona contra una IA, persona contra dos IA, IA contra IA con el creador como espectador, desafío/blocaje, apagado durante un turno y reinicio del servidor. El botón rojo está disponible a cualquier jugador conectado y detiene los procesos activos; no requiere el código compartido.
+Probar en este orden: persona contra una IA, persona contra dos IA, IA contra IA con el creador como espectador, desafío/bloqueo, apagado durante un turno y reinicio del servidor. La palanca roja aparece una sola vez en el lobby y solo para el líder que validó el código compartido. El servidor aplica el mismo permiso al evento, incluso si otro socket intenta emitirlo manualmente. Al activarla se apaga Codex globalmente y el propietario debe rearmarlo desde SSH.
 
 ## Palanca roja y rearme
 

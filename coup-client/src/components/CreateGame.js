@@ -273,7 +273,7 @@ export default class CreateGame extends Component {
                     {this.state.players.some(player => player.kind === 'codex') && <button onClick={this.removeCodexSeat}>Remove last AI seat</button>}
                 </div>}
 
-                {this.state.isInRoom && <div>
+                {this.state.isInRoom && this.state.isLeader && this.state.isAIAuthorized && <div>
                     <button
                         type="button"
                         onClick={this.emergencyStopCodex}
