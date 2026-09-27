@@ -3,13 +3,14 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `BLOCKED`.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; F3 `BLOCKED` hasta que el usuario valide visualmente los assets y se complete walkthrough con navegador.
 - **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Reporte F3:** `docs/plans/action-image-buttons/report_issue_21_F3.md` (`BLOCKED`).
-- **Verifier requerido ahora:** revisión independiente completada; falta walkthrough en navegador para desbloquear F3.
+- **Reporte F4:** `docs/plans/action-image-buttons/report_issue_21_F4.md` (`CLOSED`).
+- **Verifier requerido ahora:** falta validación visual del usuario y walkthrough en navegador para desbloquear F3.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
-- **Estado de fase:** F1 y F2 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió Claim como contexto no interactivo. F3 confirmó el build, contrato estático e inventario WebP, pero permanece bloqueada porque no hay navegador para completar el recorrido visual/teclado en escritorio y móvil.
+- **Estado de fase:** F1, F2 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. F3 sigue bloqueada hasta validación visual del usuario y walkthrough de las cinco respuestas con navegador en escritorio y móvil.
 - **Documentos fuente:** issue #21; plan exacto arriba; `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; `docs/plans/game-language/plan_game_language.md`; componentes en `coup-client/src/components/game/`.
 
 ## Subtareas listas
@@ -20,7 +21,7 @@
 4. F1 verificada visualmente y por formato/dimensiones/modo; reporte `docs/plans/action-image-buttons/report_issue_21_F1.md`; commit `feat(action-images): issue 21 F1 import optimized webp controls`.
 5. #14 PR #23 se integró a `master`; #21 se sincronizó en `b93a67c`. F2 activa sobre `Coup.js` genérico; conservar `decision.options` y `g-submitDecision({decisionId,stateVersion,choiceId})`.
 6. Mapear Challenge (`challenge`), Pass (`pass`), Block Foreign Aid (`block:duke`), Block Steal (`block:captain`/`block:ambassador`) y Block Assassination (`block:contessa`) a sus imágenes. Mantener el texto de Captain/Ambassador y otros tipos de opción.
-7. Añadir Claim al 50 % como imagen contextual no interactiva solo en descripciones de `challenge`/`block_challenge`; no crear opción Claim.
+7. F2 añadió el par Claim al inventario sin crear opción Claim; F4 quitó la imagen contextual. Las descripciones textuales permanecen.
 8. Añadir transición breve entre estados normal/activo con nombre accesible, foco, teclado y `prefers-reduced-motion`; compilar y recorrer manualmente.
 9. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar. Preparar material para Verifier independiente FINAL.
 
@@ -28,13 +29,14 @@
 
 Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y recorrido manual registrados en los reportes; no añadir ni ejecutar tests automatizados. Fuera de alcance: acciones principales, reglas, servidor, Socket.IO, nueva dependencia de animación.
 
-**Riesgo/bloqueos:** archivos fuente ignorados en RGB; preservar el canvas y el fondo. No hay navegador ejecutable desde esta sesión WSL: Chrome del host (`/mnt/c/Program Files/Google/Chrome/Application/chrome.exe`) falla antes de iniciar con `UtilBindVsockAnyPort:307`; no se instalaron navegadores. Se requiere walkthrough de las cinco respuestas y contexto Claim en escritorio/móvil, teclado/foco y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` tienen 1024×342 RGB y mtime posterior a F1; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
+**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. No hay navegador ejecutable desde esta sesión WSL: Chrome del host (`/mnt/c/Program Files/Google/Chrome/Application/chrome.exe`) falla antes de iniciar con `UtilBindVsockAnyPort:307`; no se instalaron navegadores. El usuario debe validar visualmente los assets y hace falta walkthrough de las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
 
 ## Commits por fase
 
 - F1 `94b1447bb0b5fb1613e3f7cf226993077a2f0da7`: `feat(action-images): issue 21 F1 import optimized webp controls`
 - F2 `4d288199d14ccfeeeaec5a35dd4230b893ee0b4f`: `feat(action-images): issue 21 F2 image response controls and transition`
 - F3: commit local de documentación con reporte `BLOCKED`; el recorrido manual sigue pendiente antes de revisión de integración.
+- F4: cierre canónico en esta fase; corrección de alfa, retirada de Claim decorativo, build y revisión de previews.
 
 ## Topología y reclamo
 
@@ -44,8 +46,8 @@ Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y re
 - **PR esperada:** una desde la rama del issue a `master`.
 - **Bitácora:** `docs/plans/log/issue-21.jsonl` (append-only).
 - **Secuencia:** primero registrar claim en el issue del fork y releer; luego crear/confirmar una sola branch/worktree desde `origin/master` actualizada; dentro del worktree mover este inbox a `active/`, registrar claim/worktree/phase_start en JSONL y commitear control.
-- **Validaciones:** F1 conserva su reporte de diez imágenes; Claim y F2 están documentados en `report_issue_21_F2.md`; `npm run build` pasó; recorrido visual pendiente por falta de navegador; no tests.
-- **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier independiente completó F3 como `BLOCKED`.
+- **Validaciones:** F1 conserva su reporte histórico de diez imágenes; el par Claim se añadió después; F2 está documentada en `report_issue_21_F2.md`; F4 registra inventario RGBA actual y resultado de build; recorrido visual en navegador pendiente; no tests.
+- **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier dejó F3 `BLOCKED`; Alquimista cerró F4 correctiva y mantiene F3 bloqueada hasta validación visual del usuario.
 - **Verifier:** revisión F3 independiente registrada en `report_issue_21_F3.md`; está `BLOCKED` por falta de navegador para el walkthrough de AC6.
 
 ## Confirmación de reclamo y aislamiento
@@ -54,4 +56,8 @@ Issue #21 releída antes de reanudar F2: OPEN, sin assignee, con reclamo F1 y co
 
 ## F1 entregada
 
-F1 produjo diez derivados WebP al 50 %, preservando los canvas RGB. Después se añadió Claim; F2 generó sus dos variantes al 50 % con el mismo encoder, pero usa solo `claim.webp` como contexto visual no interactivo. Ver `docs/plans/action-image-buttons/report_issue_21_F1.md` y `report_issue_21_F2.md`.
+F1 produjo diez derivados WebP al 50 %, preservando los canvas RGB. Después se añadió Claim; F2 generó sus dos variantes como recursos contextuales no interactivos. F4 regeneró las doce salidas con alfa y retiró Claim visual del renderer. Ver `docs/plans/action-image-buttons/report_issue_21_F1.md`, `report_issue_21_F2.md` y `report_issue_21_F4.md`.
+
+## Corrección visual F4
+
+F4 generó las seis parejas desde las fuentes RGB actuales a WebP RGBA al 50 %, sin modificar PNG. `c`/`c-active` actuales miden 1024×342 y sus salidas, 512×171 (F1 conserva el dato histórico de 1400×468). Las previews revisadas conservan arte, bordes y halos sin matte rectangular. El Claim gráfico no se muestra; la descripción de la decisión mantiene ese contexto. F3 sigue `BLOCKED` hasta validación visual del usuario y walkthrough en navegador.

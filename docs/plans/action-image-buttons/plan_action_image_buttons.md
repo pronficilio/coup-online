@@ -1,18 +1,18 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `BLOCKED`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; F3 `BLOCKED` hasta validación visual del usuario y walkthrough en navegador.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Orquestador; F3 requiere un entorno con navegador para completar el recorrido manual.
+**Siguiente dueño:** Orquestador; F3 requiere validación visual del usuario y un entorno con navegador para completar el recorrido manual.
 
 ## Solicitud y éxito
 
-Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c` y sus variantes `-active`, reducir cada fuente al 50 % de su tamaño actual manteniendo proporción, exportar WebP y colocarlos en el cliente React. Después del cierre F1 se añadió el par `claim`/`claim-active` para usar `claim` como contexto visual no interactivo. Reemplazar los botones de respuesta correspondientes y animar el cambio visual de estado.
+Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c`, `claim` y sus variantes `-active`, reducir cada fuente al 50 % de su tamaño actual manteniendo proporción, exportar WebP y colocarlos en el cliente React. Reemplazar los botones de respuesta correspondientes y animar el cambio visual de estado. F4 removió el fondo exterior de los WebP y quitó Claim decorativo del renderer; la descripción textual conserva ese contexto.
 
-Éxito significa que las cinco acciones usan su ilustración correcta en las ventanas de respuesta, Claim aparece junto al contexto del reclamo y no como una opción, los doce archivos son WebP a la mitad de sus dimensiones de origen, las variantes activas se perciben con una transición breve y las reglas, elegibilidad, opciones y payloads permanecen intactos. La interacción conserva acceso por teclado, foco visible y movimiento reducido.
+Éxito significa que las cinco acciones usan su ilustración correcta en las ventanas de respuesta, los doce archivos son WebP con alfa a la mitad de sus dimensiones de origen actual, los halos y bordes permanecen visibles, las variantes activas se perciben con una transición breve y las reglas, elegibilidad, opciones y payloads permanecen intactos. La interacción conserva acceso por teclado, foco visible y movimiento reducido. F3 sigue `BLOCKED` hasta que el usuario valide visualmente los recursos corregidos y se realice walkthrough en navegador.
 
 ## Hechos, supuesto y dependencias
 
@@ -20,20 +20,20 @@ Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c` y sus variantes `-ac
 - La issue #6 y PR #11 están cerradas/mergeadas. Esta solicitud necesita una unidad propia.
 - La PR #23 de #14 ya se integró en `master` en `2d82fa1e0d67ba9e48d7885f9c3ae171360425bd`; el worktree canónico #21 se sincronizó en el merge `b93a67c`. F2 ahora se implementa sobre el renderer genérico de `decision.options` y conserva `g-submitDecision({decisionId,stateVersion,choiceId})`. La PR #22 de #19 no toca `Coup.js` ni cambia este flujo.
 - Las fuentes están en `/mnt/e/dev/coup/fotos/`, carpeta ignorada por Git. El Ejecutor debe tratarlas como solo lectura; no sobrescribir los PNG. Crear derivados dentro del worktree y versionar los WebP del cliente.
-- Dimensiones fuente: `ba` 2172×724; `bfa` 1024×341; `bs` 1024×341; `pass` 1020×341; `c` 1400×468; `claim` 1400×468 (este último par se agregó después del cierre F1).
-- Las fuentes son RGB sin canal alfa; los derivados conservan el canvas y el fondo de cada fuente. F1 solo reduce dimensiones y convierte formato; no extrae mate ni reconstruye el arte.
-- Mitad esperada, redondeada al píxel más cercano: `ba` 1086×362; `bfa` 512×171; `bs` 512×171; `pass` 510×171; `c` 700×234; `claim` 700×234. Cada variante activa coincide con su par. F1 cerró sus diez imágenes originales; `claim`/`claim-active` son una adición de alcance procesada durante F2 con el mismo pipeline.
+- Dimensiones de fuentes RGB actuales en `/mnt/e/dev/coup/fotos/`: `ba` 2172×724; `bfa` 1024×341; `bs` 1024×341; `pass` 1020×341; `c` 1024×342; `claim` 1400×468. Los PNG se tratan como solo lectura.
+- F1 cerró diez WebP RGB preservando canvas/fondo. Claim se añadió como par después del cierre F1 y F2 lo exportó como RGB. F4 regeneró las doce salidas en RGBA, haciendo transparente el fondo exterior conectado a los bordes; el arte interior, los bordes y halos activos se conservan según la revisión de previews.
+- Dimensiones actuales al 50 %, redondeadas al píxel más cercano: `ba` 1086×362; `bfa` 512×171; `bs` 512×171; `pass` 510×171; `c` 512×171; `claim` 700×234. Cada variante activa coincide con su par. F1 documenta que la fuente de `c` entonces era 1400×468; la copia fuente actual es 1024×342 y F4 usa esta última.
 
 ## Alcance
 
-Incluye doce recursos (los diez entregados por F1 más `claim` y `claim-active` añadidos en F2) y los controles de respuesta `Challenge`, `Block Foreign Aid`, `Block Steal`, `Block Assassination` y `Pass`. Mapeo sobre el renderer genérico: `challenge` + choice `challenge` → `c`; choice `pass` → `pass`; tipo `block` + `block:duke` → `bfa`, `block:captain`/`block:ambassador` → `bs` con la elección textual preservada, y `block:contessa` → `ba`. `claim` aparece como recurso no interactivo en el contexto visual de las descripciones `challenge`/`block_challenge`; no crea una opción. Las variantes activas de los botones se usan en hover, foco visible y pulsación, con transición breve.
+Incluye doce recursos (diez entregados por F1 más `claim` y `claim-active` añadidos después del cierre F1) y los controles de respuesta `Challenge`, `Block Foreign Aid`, `Block Steal`, `Block Assassination` y `Pass`. Mapeo sobre el renderer genérico: `challenge` + choice `challenge` → `c`; choice `pass` → `pass`; tipo `block` + `block:duke` → `bfa`, `block:captain`/`block:ambassador` → `bs` con la elección textual preservada, y `block:contessa` → `ba`. Claim no crea una opción ni se renderiza como imagen desde F4 porque la descripción textual basta. Las variantes activas de los botones se usan en hover, foco visible y pulsación, con transición breve.
 
 Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`, `Coup`, `Steal`, `Exchange`, `Assassinate`), reglas de juego, servidor, forma de Socket.IO, nombres de eventos/payloads y nueva biblioteca de animación.
 
 ## Criterios de aceptación
 
-1. Los diez derivados originales se reducen a 50 % en F1 y el par `claim` se añade durante F2; en total son doce WebP, con relación preservada y cada pareja normal/activa en dimensiones coincidentes.
-2. WebP versionados bajo una ruta de assets del cliente; canvas y fondo RGB conservados, sin recorte ni cambio visual deliberado.
+1. Los diez derivados originales se reducen a 50 % en F1 y el par `claim` se añade después; en total son doce WebP RGBA al 50 % de la fuente actual, con proporción preservada y parejas normal/activa en dimensiones coincidentes.
+2. WebP versionados bajo una ruta de assets del cliente; fondo exterior transparente, sin matte rectangular ni pérdida visible de arte, bordes o halos.
 3. Cada control visible utiliza el par correcto y conserva botón semántico, acción, destinatario, handlers, evento y payload actuales.
 4. La variante activa aparece con una transición perceptible al interactuar; no desplaza el layout ni retrasa la acción/socket.
 5. El nombre accesible, foco visible, teclado, contraste/legibilidad, ventana móvil y `prefers-reduced-motion` siguen siendo utilizables.
@@ -78,13 +78,23 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Pregunta:** ¿se puede refutar que los recursos y controles son consistentes y utilizables?
 
 **Entrada:** F1/F2 cerradas y diff consolidado.
-**Evidencia:** build de producción, dimensiones y tamaños de los doce WebP, recorrido de las cinco respuestas y del contexto Claim en escritorio/móvil, foco/teclado y reduced motion; reporte F3 y dictamen independiente.
+**Evidencia:** build de producción, dimensiones y tamaños de los doce WebP, recorrido de las cinco respuestas en escritorio/móvil, foco/teclado y reduced motion; reporte F3 y dictamen independiente. La imagen Claim se retiró en F4; la descripción conserva el texto.
 **Falsificación:** buscar un par con escala incorrecta, halo o texto ilegible; activar acción con jugador no elegible; encontrar un evento/payload distinto, una respuesta inaccesible, un layout shift o transición que atrase el envío.
 **Avanzar:** AC1–AC6 sustentados y Verifier `PASS`; entregar a `WAITING_ORCHESTRATOR` para una PR única.
 **Bloquear:** build/recorrido imposible o F2 sigue sin liberar superficies compartidas.
 **Commit:** commit local de documentación F3 con veredicto `BLOCKED`; no marcar listo para revisión.
 
 **Resultado de revisión independiente (2026-09-27):** `BLOCKED`. El build y las inspecciones estáticas/formato pasaron; no hay navegador disponible para ejecutar el recorrido manual exigido por AC6 y verificar render móvil, foco e interacción. Ver `report_issue_21_F3.md`. No instalar dependencias ni navegador para esta revisión.
+
+### F4 — Corregir fondos WebP (`CLOSED`; F3 continúa `BLOCKED`)
+
+**Pregunta:** ¿se elimina el fondo exterior sin perder los bordes ni los halos de las imágenes?
+
+**Entrada:** feedback visual del usuario y fuentes PNG actuales en `/mnt/e/dev/coup/fotos/`.
+**Tareas:** regenerar las doce salidas WebP en RGBA al 50 % de las fuentes actuales, revisar previews compuestos sobre fondo slate y retirar el Claim decorativo de la ventana challenge.
+**Avanzar:** formato/modo/dimensiones verificados; los previews conservan el arte y halos y no muestran matte rectangular; build del cliente y `git diff --check` pasan.
+**Resultado:** F4 cierra la corrección local tras revisión visual/build. El par Claim permanece en el inventario pero no se muestra; no es una opción. F3 sigue bloqueada hasta validación visual del usuario y walkthrough manual en navegador.
+**Reporte:** `docs/plans/action-image-buttons/report_issue_21_F4.md`.
 
 ## Decisiones e historial
 
@@ -95,6 +105,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 - 2026-09-27: #14 PR #23 integrada en `master` en `2d82fa1`; worktree #21 sincronizado con merge `b93a67c`. El usuario confirmó F2 sobre el renderer genérico y añadió `claim`/`claim-active` 1400×468 como contexto no interactivo. Claim se procesa al 50 % con el pipeline F1; diez WebP F1 más dos WebP Claim.
 - 2026-09-27: F2 completada en `feat(action-images): issue 21 F2 image response controls and transition`. `npm run build` compiló; no había navegador para recorrido visual, lo cual queda anotado en el reporte. La unidad espera Orquestador/Verifier para F3.
 - 2026-09-27: Verifier independiente F3: build y revisión estática PASS; formato/dimensiones/modo de doce WebP coinciden con el inventario F1/F2. F3 `BLOCKED`: no hay navegador para el walkthrough obligatorio; además, las copias ignoradas actuales de `c.png`/`c-active.png` son posteriores a F1 y no permiten confirmar la fuente histórica. Sin tests.
+- 2026-09-27: F4 correctiva por feedback visual: regenerados los doce WebP con alfa desde los PNG actuales (sin modificarlos), incluyendo `c`/`c-active` actuales 1024×342 → 512×171. Revisión de doce previews sin pérdida visible de halos/bordes ni matte rectangular; se retiró Claim decorativo del renderer. F3 continúa `BLOCKED` hasta validación visual del usuario y walkthrough; ver `report_issue_21_F4.md`.
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 

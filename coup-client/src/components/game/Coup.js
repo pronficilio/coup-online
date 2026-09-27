@@ -14,7 +14,6 @@ import blockStealImage from '../../assets/action-buttons/bs.webp'
 import blockStealActiveImage from '../../assets/action-buttons/bs-active.webp'
 import challengeImage from '../../assets/action-buttons/c.webp'
 import challengeActiveImage from '../../assets/action-buttons/c-active.webp'
-import claimImage from '../../assets/action-buttons/claim.webp'
 import passImage from '../../assets/action-buttons/pass.webp'
 import passActiveImage from '../../assets/action-buttons/pass-active.webp'
 
@@ -229,8 +228,6 @@ export default class Coup extends Component {
                 {decision && <>
                     <p className="DecisionTitle">{decision.title}</p>
                     <p>{decision.description}</p>
-                    {(decision.type === 'challenge' || decision.type === 'block_challenge') &&
-                        <img className="DecisionClaimContext" src={claimImage} alt="" aria-hidden="true" />}
                     <div className="DecisionButtonsContainer">
                         {decision.options.map(option => {
                             const imageButton = responseButtonFor(decision, option)

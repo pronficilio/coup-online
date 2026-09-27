@@ -370,13 +370,6 @@
     line-height: 1.2;
 }
 
-.DecisionClaimContext {
-    display: block;
-    width: clamp(10rem, 46vw, 22rem);
-    max-width: 100%;
-    height: auto;
-    margin: 8px auto 12px;
-}
 #captain {
     background-color: #80C6E5;
 }
