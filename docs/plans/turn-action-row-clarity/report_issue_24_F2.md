@@ -8,7 +8,7 @@
 
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`.
 
-**Comportamiento vigente:** cuarta iteración de F2. El rail action es `position: absolute` en portal a `document.body`, con coords documentales medidas desde CheatSheet; al salir con mouse se compacta tras 500 ms solo si ya recibió mouseenter. La inspección visual nueva sigue pendiente.
+**Comportamiento vigente:** quinta iteración de F2. Además del rail document-absolute y el ciclo mouse de 500 ms, los títulos de las filas se reducen al 70% mientras el panel está compacto y vuelven al 100% al expandir. La inspección visual sigue pendiente.
 
 ## Trabajo del checkpoint inicial (histórico; véanse las revisiones posteriores para el comportamiento vigente)
 
@@ -85,3 +85,11 @@ En cada nueva decisión action, el panel empieza expandido. En `(hover: hover) a
 Revisé el diff de `Coup.js` / `CoupStyles.css` y añadí medición de recuperación en `componentDidMount` por si el evento action precediera al primer render medible. `git diff --check`: **pasa**. `npm run build` desde `coup-client`: **exit 0**, compilado con warnings. Warnings observados: `logo` y `Link` sin uso en `src/App.js`; `postcss-calc` no parsea unidades `dvh` en `ReferencePanel.css:100,106`; caniuse-lite desactualizado. Ningún warning apunta a los archivos de esta modificación. Tamaños gzip: 109.37 kB JS y 7.07 kB CSS. No se ejecutaron tests automatizados ni recorrido visual en navegador; el build no comprueba la relación al scroll ni los tiempos/reacción del mouse. El código de producto quedó en commit `e77415d`; el checkpoint principal de documentación quedó en `a9c9287`, con sincronización del tracker en commit posterior. El Orquestador debe recargar solo CRA desde el HEAD publicado y confirmar que el bundle nuevo está listo; backend `:18000` permanece activo.
 
 F2 sigue `ACTIVE`; la usuaria aún debe revisar absolute/scroll, ancho y desmontaje/re-montaje de detalles, reentrada antes de 500 ms, touch/no-hover, reduced-motion y responsive. Issue abierta; no hay PR ni integración.
+
+## Quinta revisión visual — escala de títulos compactos
+
+La usuaria pidió reducir 30% el tamaño de los nombres de cada acción cuando el panel está compacto, con transición rápida, dejando intacto el encabezado general. Añadí únicamente estilos a `.DecisionActionLabel`: 0.812rem frente a 1.16rem normal en escritorio (70%) y 0.728rem frente a 1.04rem bajo 560px (70%). `font-size` transiciona en 120 ms; `prefers-reduced-motion: reduce` desactiva esa transición. Al quitar `DecisionActionPanel--compact`, los títulos regresan a tamaño normal junto con el ancho y los detalles rehidratados. No cambian renderer, ciclo de timers, opciones ni protocolo.
+
+`git diff --check`: **pasa**. `npm run build` desde `coup-client`: **exit 0**, “Compiled with warnings”. Warnings preexistentes: `logo`/`Link` sin uso en `App.js`, `postcss-calc` no parsea `dvh` en `ReferencePanel.css:100,106`, caniuse-lite desactualizado; ninguno apunta a `CoupStyles.css`. Gzip: JS 109.37 kB, CSS 7.11 kB (+35 B). No se ejecutaron tests automatizados ni recorrido visual para esta corrección. La inspección del tamaño/timing queda pendiente de la usuaria en `http://localhost:3006` tras recarga CRA desde el nuevo HEAD; F2 continúa ACTIVE.
+
+El cambio CSS de esta revisión está en commit de producto `9af435d`; el commit de sincronización documental sigue inmediatamente después. No afecta al resto del ciclo de compactación ni a los detalles que se remontan al expandir.
