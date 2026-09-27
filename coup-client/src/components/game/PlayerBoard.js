@@ -1,14 +1,15 @@
 import React from 'react'
 import courtDeckImage from '../../assets/deck.webp'
-import dukeImage from '../../assets/characters/duke.webp'
-import captainImage from '../../assets/characters/captain.webp'
-import assassinImage from '../../assets/characters/assassin.webp'
-import contessaImage from '../../assets/characters/contessa.webp'
-import ambassadorImage from '../../assets/characters/ambassador.webp'
+import dukeImage from '../../assets/characters/duque.webp'
+import captainImage from '../../assets/characters/capitan.webp'
+import assassinImage from '../../assets/characters/asesino.webp'
+import contessaImage from '../../assets/characters/condesa.webp'
+import ambassadorImage from '../../assets/characters/embajador.webp'
 import cardBackImage from '../../assets/characters/reverso.webp'
 import playerIconImage from '../../assets/player.webp'
 import coinImage from '../../assets/coin.webp'
 import { getPlayerBoardSeats } from './playerBoardLayout'
+import { t } from '../../i18n'
 import './PlayerBoardStyles.css'
 
 const INFLUENCE_SLOTS = [0, 1]
@@ -18,6 +19,19 @@ const INFLUENCE_IMAGES = {
     assassin: assassinImage,
     contessa: contessaImage,
     ambassador: ambassadorImage
+}
+
+const ROLE_KEYS = {
+    duke: 'game.roles.duke',
+    captain: 'game.roles.captain',
+    assassin: 'game.roles.assassin',
+    contessa: 'game.roles.contessa',
+    ambassador: 'game.roles.ambassador'
+}
+
+function roleLabel(role) {
+    const key = ROLE_KEYS[String(role).toLowerCase()]
+    return key ? t(key) : t('game.roles.unknown')
 }
 
 function getInfluenceImage(influence) {
@@ -43,7 +57,7 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
         return <span
             className="PlayerInfluenceSlot PlayerInfluenceSlot--face"
             role="img"
-            aria-label={`Influencia revelada: ${influence}`}
+            aria-label={t('game.playerBoard.influenceVisible', { roleLabel: roleLabel(influence) })}
             key={slotIndex}
         >
             <img
@@ -60,7 +74,7 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
     return <span
         className="PlayerInfluenceSlot PlayerInfluenceSlot--back"
         role="img"
-        aria-label="Influencia oculta"
+        aria-label={t('game.playerBoard.influenceHidden')}
         key={slotIndex}
     >
         <img
@@ -78,12 +92,12 @@ export default function PlayerBoard(props) {
     const seats = getPlayerBoardSeats(players, props.observerName)
 
     return (
-        <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label="Tablero de jugadores">
+        <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label={t('game.playerBoard.label')}>
             <div className="PlayerBoardCenter" aria-hidden="true" />
             <img
                 className="PlayerBoardDeck"
                 src={courtDeckImage}
-                alt="Mazo central de la Corte"
+                alt={t('game.playerBoard.deckAlt')}
                 draggable="false"
             />
             {seats.map(({ player, seatIndex, left, top, isObserver }) => {
@@ -134,13 +148,13 @@ export default function PlayerBoard(props) {
                                 draggable="false"
                             />
                             <span className="PlayerBoardSeatNameText">
-                                {player.name}{player.controller === 'codex' ? ` · IA (${player.effort})` : ''}
+                                {player.name}{player.controller === 'codex' ? ` · ${t('lobby.ai.label')} (${t(`lobby.ai.effort.${player.effort}`)})` : ''}
                             </span>
                         </h2>
                         <p
                             className="PlayerBoardSeatCoins"
                             role="img"
-                            aria-label={`${player.money} monedas`}
+                            aria-label={t('game.player.coinsAccessible', { coins: player.money })}
                         >
                             <img
                                 className="PlayerBoardCoinIcon"

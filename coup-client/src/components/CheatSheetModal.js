@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
 import CheatSheet from '../assets/CheatSheet.svg'
+import { t } from '../i18n'
 
 export default class CheatSheetModal extends Component {
 
@@ -24,7 +25,7 @@ export default class CheatSheetModal extends Component {
         return (
             <>
             <div className="CheatSheet" onClick={this.handleOpenCheatSheetModal}>
-                <p>Cheat Sheet</p>  
+                <p>{t('help.open')}</p>
                 <svg className="InfoIcon"xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 21 22">
                     <g id="more_info" data-name="more info" transform="translate(-39 -377)">
                         <g id="Ellipse_1" data-name="Ellipse 1" className="cls-1" transform="translate(39 377)">
@@ -37,7 +38,7 @@ export default class CheatSheetModal extends Component {
             </div>
             <ReactModal 
             isOpen={this.state.showCheatSheetModal}
-            contentLabel="Minimal Modal Example"
+            contentLabel={t('help.modal.a11yLabel')}
             onRequestClose={this.handleCloseCheatSheetModal}
             shouldCloseOnOverlayClick={true}
             className="CheatSheetModal"
@@ -57,7 +58,7 @@ export default class CheatSheetModal extends Component {
             </div>
            
             <div className="CheatSheetContainer">
-                <img src={CheatSheet} alt="Cheat-Sheet"/>
+                <img src={CheatSheet} alt={t('help.cheatSheet.alt')}/>
             </div>
             </ReactModal>
             </>

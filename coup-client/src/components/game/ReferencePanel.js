@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
+import { t } from '../../i18n';
 import cardSpanish from '../../assets/references/card-es.webp';
 import tableSpanish from '../../assets/references/table-es.webp';
 import './ReferencePanel.css';
@@ -7,19 +8,19 @@ import './ReferencePanel.css';
 const references = [
     {
         key: 'card',
-        label: 'Tarjeta',
-        contentLabel: 'Tarjeta de referencia en español',
+        labelKey: 'referencePanel.card.label',
+        contentLabelKey: 'referencePanel.card.contentLabel',
         image: cardSpanish,
-        alt: 'Tarjeta de referencia de Coup en español',
+        altKey: 'referencePanel.card.alt',
         width: 1024,
         height: 1536
     },
     {
         key: 'table',
-        label: 'Tabla',
-        contentLabel: 'Tabla de referencia en español',
+        labelKey: 'referencePanel.table.label',
+        contentLabelKey: 'referencePanel.table.contentLabel',
         image: tableSpanish,
-        alt: 'Tabla de referencia de Coup en español',
+        altKey: 'referencePanel.table.alt',
         width: 1024,
         height: 768
     }
@@ -55,19 +56,22 @@ export default class ReferencePanel extends Component {
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         return (
-            <div className="reference-panel__triggers" role="group" aria-label="Referencias de juego">
+            <div className="reference-panel__triggers" role="group" aria-label={t('referencePanel.group.label')}>
                 {references.map((reference) => {
                     const isOpen = openReference === reference.key;
+                    const label = t(reference.labelKey);
+                    const referenceName = label.toLowerCase();
+                    const contentLabel = t(reference.contentLabelKey);
                     return (
                         <React.Fragment key={reference.key}>
                             <button
                                 type="button"
                                 className="reference-panel__trigger"
                                 onClick={() => this.openReference(reference.key)}
-                                aria-label={`Abrir ${reference.label.toLowerCase()} de referencia`}
+                                aria-label={t('referencePanel.trigger.open', { referenceName })}
                                 aria-haspopup="dialog"
                                 aria-expanded={isOpen}
-                                title={reference.label}
+                                title={label}
                             >
                                 <svg className="reference-panel__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                     {reference.key === 'card' ? (
@@ -87,7 +91,7 @@ export default class ReferencePanel extends Component {
                             <ReactModal
                                 isOpen={isOpen}
                                 onRequestClose={this.closeReference}
-                                contentLabel={reference.contentLabel}
+                                contentLabel={contentLabel}
                                 className={{
                                     base: `reference-panel__modal reference-panel__modal--${reference.key}`,
                                     afterOpen: 'reference-panel__modal--open',
@@ -103,19 +107,19 @@ export default class ReferencePanel extends Component {
                                 shouldCloseOnEsc
                                 shouldReturnFocusAfterClose
                             >
-                                <section className="reference-panel" aria-label={reference.contentLabel}>
+                                <section className="reference-panel" aria-label={contentLabel}>
                                     <button
                                         type="button"
                                         className="reference-panel__close"
                                         onClick={this.closeReference}
-                                        aria-label={`Cerrar ${reference.label.toLowerCase()}`}
+                                        aria-label={t('referencePanel.trigger.close', { referenceName })}
                                     >
                                         <span aria-hidden="true">×</span>
                                     </button>
                                     <img
                                         className="reference-panel__image"
                                         src={isOpen ? reference.image : undefined}
-                                        alt={reference.alt}
+                                        alt={t(reference.altKey)}
                                         decoding="async"
                                         loading="eager"
                                         width={reference.width}

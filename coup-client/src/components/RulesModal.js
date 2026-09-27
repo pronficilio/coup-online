@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactModal from 'react-modal';
+import { t } from '../i18n'
 
 export default class RulesModal extends Component {
 
@@ -22,7 +23,7 @@ export default class RulesModal extends Component {
     render() {
         let modal = <ReactModal 
         isOpen={this.state.showRulesModal}
-        contentLabel="Minimal Modal Example"
+        contentLabel={t('rules.modal.a11yLabel')}
         onRequestClose={this.handleCloseRulesModal}
         shouldCloseOnOverlayClick={true}
     >
@@ -42,39 +43,28 @@ export default class RulesModal extends Component {
    
     <div className="RulesContainer">
         <div className="RulesContent">
-            <h2>Rules</h2>
-            <p>2-6 players</p>
-            <p>On your turn, you may choose an action to play. The action you choose may or may not correspond to the influences that you possess. 
-                For the action that you choose, other players may potentially block or challenge it. </p>
-            <p><b>Challenge</b>: When a player declares an action they are declaring to the rest of the players that they have a certain influence, 
-                and any other player can challenge it. When a player is challenged, the challenged player must reveal the correct influence 
-                associated with their action. If they reveal the correct influence, the challenger player will lose an influence. However, 
-                if they fail to reveal the correct influence the challenged player will lose their incorrectly revealed influence.</p>
-            <p><b>Block</b>: When the any of the actions "Foreign Aid", "Steal", and "Assasinate" are used, they can be blocked. Once again, 
-                any player can claim to have the correct influence to block. However, blocks can also be challenged by any player. If a block 
-                fails, the original action will take place.
-            </p>
-            <p>
-                If a player loses all their influences, they are out of the game. The last player standing wins!
-            </p>
-            <p>
-                At this time, if a player disconnects, the game must be recreated.
-            </p>
-            <h2>Influences</h2>
-            <h3>Captain</h3>
-            <p><b id="captain-color">STEAL</b>: Steal 2 coins from a target. Blockable by <hl id="captain-color">Captain</hl> or <hl id="ambassador-color">Ambassador</hl>. Can block <hl id="captain-color">STEAL</hl></p>
-            <h3>Assassin</h3>
-            <p><b id="assassin-color">ASSASSINATE</b>: Pay 3 coins to choose a target to assassinate (target loses an influence). Blockable by <hl id="contessa-color">Contessa</hl>.</p>
-            <h3>Duke</h3>
-            <p><b id="duke-color">TAX</b>: Collect 3 coins from the treasury. Not blockable. Can block Foreign Aid.</p>
-            <h3>Ambassador</h3>
-            <p><b id="ambassador-color">EXCHANGE</b>: Draw 2 influences into your hand and pick any 2 influences to put back. Not blockable. Can block <hl id="captain-color">STEAL</hl></p>
-            <h3>Contessa</h3>
-            <p><b id="contessa-color">BLOCK ASSASSINATION</b>: Can block <b id="assassin-color">assassinations</b>. Not blockable.</p>
-            <h3>Other Actions</h3>
-            <p><b>INCOME</b>: Collect 1 coins from the treasury.</p>
-            <p><b>FOREIGN AID</b>: Collect 2 coins from the treasury. Blockable by <hl id="duke-color">Duke</hl>.</p>
-            <p><b>COUP</b>: Pay 7 coins and choose a target to lose an influence. If a player starts their turn with 10 or more coins, they must Coup. Not Blockable.</p>
+            <h2>{t('rules.modal.title')}</h2>
+            <p>{t('rules.playerCount')}</p>
+            <p>{t('rules.turn.intro')}</p>
+            <p><b>{t('rules.challenge.heading')}</b>: {t('rules.challenge.body')}</p>
+            <p><b>{t('rules.block.heading')}</b>: {t('rules.block.body')}</p>
+            <p>{t('rules.elimination')}</p>
+            <p>{t('rules.disconnect')}</p>
+            <h2>{t('rules.influences.title')}</h2>
+            <h3>{t('rules.cards.captain.title')}</h3>
+            <p><b id="captain-color">{t('game.actions.steal.label').toUpperCase()}</b>: {t('rules.cards.captain.effect')}<hl id="captain-color">{t('game.roles.captain')}</hl>{t('rules.cards.captain.roleConnector')}<hl id="ambassador-color">{t('game.roles.ambassador')}</hl>{t('rules.cards.captain.canBlock')}<hl id="captain-color">{t('game.actions.steal.label').toUpperCase()}</hl></p>
+            <h3>{t('rules.cards.assassin.title')}</h3>
+            <p><b id="assassin-color">{t('game.actions.assassinate.label').toUpperCase()}</b>: {t('rules.cards.assassin.effect')}<hl id="contessa-color">{t('game.roles.contessa')}</hl>.</p>
+            <h3>{t('rules.cards.duke.title')}</h3>
+            <p><b id="duke-color">{t('game.actions.tax.label').toUpperCase()}</b>: {t('rules.cards.duke.effect')}</p>
+            <h3>{t('rules.cards.ambassador.title')}</h3>
+            <p><b id="ambassador-color">{t('game.actions.exchange.label').toUpperCase()}</b>: {t('rules.cards.ambassador.effect')}<hl id="captain-color">{t('game.actions.steal.label').toUpperCase()}</hl></p>
+            <h3>{t('rules.cards.contessa.title')}</h3>
+            <p><b id="contessa-color">{t('rules.cards.contessa.action')}</b>: {t('rules.cards.contessa.effect')}</p>
+            <h3>{t('rules.otherActions.title')}</h3>
+            <p><b>{t('game.actions.income.label').toUpperCase()}</b>: {t('rules.actions.income.effect')}</p>
+            <p><b>{t('game.actions.foreignAid.label').toUpperCase()}</b>: {t('rules.actions.foreignAid.effect')}<hl id="duke-color">{t('game.roles.duke')}</hl>.</p>
+            <p><b>{t('game.actions.coup.label').toUpperCase()}</b>: {t('rules.actions.coup.effect')}</p>
         </div>
     </div>
     </ReactModal>
@@ -82,7 +72,7 @@ export default class RulesModal extends Component {
             return(
                 <>
                     <div className="HomeRules" onClick={this.handleOpenRulesModal}>
-                        <p>Rules </p>  
+                        <p>{t('common.rules')}</p>
                         <svg className="InfoIcon"xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 21 22">
                             <g id="more_info" data-name="more info" transform="translate(-39 -377)">
                                 <g id="Ellipse_1" data-name="Ellipse 1" className="cls-1" transform="translate(39 377)">
@@ -100,7 +90,7 @@ export default class RulesModal extends Component {
         return (
             <>
             <div className="Rules" onClick={this.handleOpenRulesModal}>
-                <p>Rules </p>  
+                <p>{t('common.rules')}</p>
                 <svg className="InfoIcon"xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 21 22">
                     <g id="more_info" data-name="more info" transform="translate(-39 -377)">
                         <g id="Ellipse_1" data-name="Ellipse 1" className="cls-1" transform="translate(39 377)">

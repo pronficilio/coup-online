@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import io from "socket.io-client";
 import Coup from './game/Coup';
+import { t } from '../i18n'
+import { lobbyError } from '../i18n/lobby'
 
 const axios = require('axios');
 const baseUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"
@@ -57,7 +59,7 @@ export default class CreateGame extends Component {
 
         socket.on('startGame', () => this.setState({ isGameStarted: true }))
         socket.on('startRejected', reason => this.setState({
-            errorMsg: `Unable to start: ${reason}`,
+            errorMsg: t('lobby.error.startRejected', { reason: lobbyError(reason) }),
             isError: true
         }))
 
@@ -79,7 +81,7 @@ export default class CreateGame extends Component {
             this.setState({
                 isAIAuthorized: authorized,
                 aiCode: '',
-                errorMsg: authorized ? '' : 'AI access code was rejected.',
+                errorMsg: authorized ? '' : t('lobby.ai.codeRejected'),
                 isError: !authorized
             })
         })
@@ -97,7 +99,7 @@ export default class CreateGame extends Component {
         if(this.state.name === '') {
             //TODO  handle error
             console.log('Please enter a name');
-            this.setState({ errorMsg: 'Please enter a name' });
+            this.setState({ errorMsg: t('lobby.name.required') });
             this.setState({ isError: true });
             return
         }
@@ -114,7 +116,7 @@ export default class CreateGame extends Component {
                 //TODO  handle error
                 console.log("error in creating namespace", err);
                 bind.setState({ isLoading: false });
-                bind.setState({ errorMsg: 'Error creating room, server is unreachable' });
+                bind.setState({ errorMsg: t('lobby.create.serverUnavailable') });
                 bind.setState({ isError: true });
             })
     }
@@ -176,7 +178,7 @@ export default class CreateGame extends Component {
         let createButton = null;
         if(!this.state.isInRoom) {
             createButton = <>
-            <button className="createButton" onClick={this.createParty} disabled={this.state.isLoading}>{this.state.isLoading ? 'Creating...': 'Create'}</button>
+            <button className="createButton" onClick={this.createParty} disabled={this.state.isLoading}>{this.state.isLoading ? t('lobby.create.loading'): t('lobby.create.submit')}</button>
             <br></br>
             </>
         }
@@ -185,18 +187,18 @@ export default class CreateGame extends Component {
         }
         if(this.state.roomCode !== '' && !this.state.isLoading) {
             roomCode = <div>
-                    <p>ROOM CODE: <br></br> <br></br><b className="RoomCode" onClick={this.copyCode}>{this.state.roomCode} <span className="iconify" data-icon="typcn-clipboard" data-inline="true"></span></b></p>
-                    {this.state.copied ? <p>Copied to clipboard</p> : null}
+                    <p>{t('lobby.roomCode.label')} <br></br> <br></br><b className="RoomCode" onClick={this.copyCode}>{this.state.roomCode} <span className="iconify" data-icon="typcn-clipboard" data-inline="true"></span></b></p>
+                    {this.state.copied ? <p>{t('lobby.roomCode.copied')}</p> : null}
                 </div>
         }
         const participantCount = this.state.players.filter(player => player.participating).length
         const allParticipantsReady = this.state.players.every(player => player.kind === 'codex' || !player.participating || player.isReady)
         if(this.state.isLeader && participantCount >= 2 && allParticipantsReady) {
-            startGame = <button className="startGameButton" onClick={this.startGame}>Start Game</button>
+            startGame = <button className="startGameButton" onClick={this.startGame}>{t('lobby.start')}</button>
         }
         return (
             <div className="createGameContainer">
-                <p>Please enter your name</p>
+                <p>{t('lobby.name.label')}</p>
                 <input
                     type="text" value={this.state.name} disabled={this.state.isLoading || this.state.isInRoom}
                     onChange={e => {
@@ -208,7 +210,7 @@ export default class CreateGame extends Component {
                             this.onNameChange(e.target.value);
                         } else {
                             this.setState({
-                                errorMsg: 'Name must be less than 11 characters',
+                                errorMsg: t('lobby.create.nameMaxLength'),
                                 isError: true
                             })
                         }
@@ -225,16 +227,16 @@ export default class CreateGame extends Component {
                             let ready = null
                             let readyUnitColor = '#E46258'
                             if(item.kind === 'codex') {
-                                ready = <b>GPT-6 Luna · {item.effort}</b>
+                                ready = <b>{t('lobby.ai.seat.status', { effort: t(`lobby.ai.effort.${item.effort}`) })}</b>
                                 readyUnitColor = '#8C6CE6'
                             } else if(!item.participating) {
-                                ready = <b>Spectator</b>
+                                ready = <b>{t('lobby.player.spectator')}</b>
                                 readyUnitColor = '#8A8A8A'
                             } else if(item.isReady) {
-                                ready = <b>Ready!</b>
+                                ready = <b>{t('lobby.player.ready')}</b>
                                 readyUnitColor = '#73C373'
                             } else {
-                                ready = <b>Not Ready</b>
+                                ready = <b>{t('lobby.player.notReady')}</b>
                             }
                             return (
                                     <div className="readyUnit" style={{backgroundColor: readyUnitColor}} key={index}>
@@ -246,32 +248,32 @@ export default class CreateGame extends Component {
                 </div>
 
                 {this.state.isInRoom && this.state.isLeader && <label>
-                    <input type="checkbox" checked={!this.state.isSpectating} onChange={this.setSpectating} /> Include me as a player
+                    <input type="checkbox" checked={!this.state.isSpectating} onChange={this.setSpectating} /> {t('lobby.ai.includeMe')}
                 </label>}
 
                 {this.state.isInRoom && this.state.isLeader && this.state.isCodexAvailable && !this.state.codexDisabled && !this.state.isAIAuthorized && <div>
-                    <p>Enable AI seats with the shared test code</p>
+                    <p>{t('lobby.ai.code.prompt')}</p>
                     <input
                         type="password"
                         value={this.state.aiCode}
                         autoComplete="off"
-                        aria-label="Shared AI access code"
+                        aria-label={t('lobby.ai.code.label')}
                         onChange={event => this.setState({ aiCode: event.target.value })}
                     />
-                    <button onClick={this.authorizeCodex}>Enable AI seats</button>
+                    <button onClick={this.authorizeCodex}>{t('lobby.ai.enable')}</button>
                 </div>}
 
                 {this.state.isInRoom && this.state.isLeader && this.state.isAIAuthorized && !this.state.codexDisabled && <div>
                     <label>
-                        Codex effort{' '}
+                        {t('lobby.ai.effort.label')}{' '}
                         <select value={this.state.aiEffort} onChange={event => this.setState({ aiEffort: event.target.value })}>
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
+                            <option value="low">{t('lobby.ai.effort.low')}</option>
+                            <option value="medium">{t('lobby.ai.effort.medium')}</option>
+                            <option value="high">{t('lobby.ai.effort.high')}</option>
                         </select>
                     </label>
-                    <button onClick={this.addCodexSeat} disabled={participantCount >= 6}>Add GPT-6 Luna seat</button>
-                    {this.state.players.some(player => player.kind === 'codex') && <button onClick={this.removeCodexSeat}>Remove last AI seat</button>}
+                    <button onClick={this.addCodexSeat} disabled={participantCount >= 6}>{t('lobby.ai.seat.add')}</button>
+                    {this.state.players.some(player => player.kind === 'codex') && <button onClick={this.removeCodexSeat}>{t('lobby.ai.seat.remove')}</button>}
                 </div>}
 
                 {this.state.isInRoom && this.state.isLeader && this.state.isAIAuthorized && <div>
@@ -280,7 +282,7 @@ export default class CreateGame extends Component {
                         onClick={this.emergencyStopCodex}
                         disabled={this.state.codexDisabled}
                         style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginTop: 12 }}
-                    >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>
+                    >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>
                 </div>}
                 
                 {startGame}
