@@ -1,8 +1,10 @@
 # Reporte F4 — cobertura final y revisión independiente
 
-**Estado de fase:** `BLOCKED` a la espera de los datos faltantes para AC7. El usuario respondió exactamente «se ve bien»; el Verifier acepta esto como aprobación visual general para AC2/AC4. No se infieren navegador, dispositivo, ancho, controles o detalles adicionales. Verifier FINAL: AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS` por aprobación visual general, AC7 `BLOCKED` porque siguen sin confirmarse conservación de acciones ni los resultados concretos en escritorio/ancho estrecho. No hay PASS general ni cierre de F4.
+**Estado final de fase:** `CLOSED`. Verifier FINAL `PASS` sobre el merge integrado de PR #33, `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`; AC1–AC7 `PASS`. El usuario, tras completar el checklist, respondió exactamente «he probado y todo luce en orden, sugiero comenzar con el cierre del issue 19». El Verifier acepta este informe para AC7. No se infieren navegador, dispositivo ni anchos exactos, que no fueron indicados.
+**Estado de unidad:** F1–F4 `CLOSED`; `WAITING_ORCHESTRATOR`. PR #33 está `MERGED`. Issue #19 permanece `OPEN` hasta integrar la PR documental de cierre y que Orquestación cierre la unidad.
+**Árbol integrado:** `translations.json` contiene 292 claves `es` y 292 `en`; el Verifier confirmó paridad. La rama anterior al merge (`1b65425`) tenía 307/307; se preservan ambos conteos vinculados a sus árboles, sin inferir por qué difieren. El build del producto ya registrado terminó con exit 0. No se ejecutaron tests.
 **Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29 y llega después del merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico avanzó mediante fast-forward a `3313d42` y merge `318c119` desde `ca16e42`.
-**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED` hasta inspección humana y reevaluación final de AC7. Issue #19 permanece `OPEN`; PR #22 está `MERGED` y PR de continuación #33 está `DRAFT`.
+**Estado de fases en el checkpoint inicial de este reporte (histórico):** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED`. Ese estado fue reemplazado por el cierre final documentado arriba.
 
 ## Alcance requerido
 
@@ -68,7 +70,7 @@ Checkpoint de producto: `c9d62676ffa33a177a0edced26dfc91e2529365c`. En la revisi
 
 Resultado de ese checkpoint global `BLOCKED`. La respuesta humana y su evaluación actual quedan registradas a continuación.
 
-## Respuesta humana general y estado vigente (2026-09-27)
+## Respuesta humana general y evaluación provisional (histórico, 2026-09-27)
 
 El usuario respondió exactamente: «se ve bien». El Verifier acepta esa respuesta como aprobación visual general para AC2 (interfaz en español) y AC4 (recursos visibles). No se infieren navegador, dispositivo, ancho, qué botón/estado se vio ni pasos de selección.
 
@@ -85,12 +87,20 @@ Pasos solicitados:
 
 Para desbloquear AC7, falta confirmar: (1) si las selecciones conservaron sus acciones, y (2) qué se observó en escritorio y ancho estrecho sobre texto inglés visible, recorte y contacto con icono/marco. No hace falta agregar navegador, dispositivo o anchos numéricos si el usuario no desea reportarlos. El Verifier acepta «se ve bien» para AC2/AC4, pero la fase F4 permanece `BLOCKED` hasta recibir los datos faltantes y reevaluar AC7.
 
-## Resultado y siguiente acción
+## Resultado provisional anterior (histórico; superado por el PASS final)
 
 El Verifier independiente encontró cinco familias de botones visibles con palabras inglesas incrustadas y después detectó fuga en `CHALLENGE` bajo la máscara 40–77%. La corrección CSS x=38–80% quedó en `c9d6267`; build exit 0 con avisos existentes y diff-check limpio. Con la respuesta «se ve bien», el Verifier acepta AC2/AC4; AC1/AC3/AC5/AC6 `PASS`; AC7 `BLOCKED` hasta confirmar acciones y detalles de escritorio/ancho estrecho. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no están importadas ni referenciadas por la aplicación y no se usan en esta UI.
 
-La fase F4 está `BLOCKED` a la espera de la inspección focalizada; issue #19 `OPEN`; unidad `WAITING_USER`. PR de continuación #33 `DRAFT`. El Verifier indicó que no observó la aplicación en navegador; tras recibir el informe humano deberá reevaluar AC7. El Alquimista no reclama ni emite PASS por sí mismo.
+En ese checkpoint la fase F4 estaba `BLOCKED`, issue #19 `OPEN`, unidad `WAITING_USER`, y PR #33 `DRAFT`. El siguiente evento de aceptación se registra en la sección final añadida abajo.
 
 El usuario autorizó la integración parcial; PR #22 se fusionó en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Ese merge no acepta el resultado, no marca F4 cerrada, no equivale al veredicto FINAL y no cierra #19. La issue sigue `OPEN`.
 
-La API confirmó issue #19 `OPEN`/asignada a `pronficilio`, PR #22 `MERGED` y PR #33 `DRAFT`. El estado vigente sobre el producto `c9d6267` sigue global `BLOCKED`: AC1/AC3/AC5/AC6 `PASS`; AC2/AC4 `PASS` por aprobación general del usuario; AC7 `BLOCKED`. Solo falta confirmar conservación de acciones y lo observado en escritorio/ancho estrecho sobre inglés, recorte y contacto con icono/marco; después reevaluar AC7. No cerrar fase/issue ni emitir PASS.
+En ese checkpoint la API confirmó #19 `OPEN`, PR #22 `MERGED` y PR #33 `DRAFT`. El bloqueo de AC7 fue superado por el checklist posterior del usuario y el PASS FINAL sobre el merge integrado de PR #33.
+
+## Veredicto final tras merge e informe del usuario (2026-09-27)
+
+PR #33 se integró en `master` mediante `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. El Verifier FINAL confirmó `PASS` para AC1–AC7 en el árbol integrado. Tras completar el checklist, el usuario informó: «he probado y todo luce en orden, sugiero comenzar con el cierre del issue 19». El Verifier acepta este informe como evidencia de AC7; no se atribuyen datos de navegador, dispositivo, secuencia de pasos ni anchos exactos.
+
+El árbol integrado presenta 292/292 claves `es`/`en` con paridad confirmada. La rama previa al merge (`1b65425`) registraba 307/307; no se infiere la causa de la diferencia. El build registrado previamente dio exit 0; no se ejecutaron tests.
+
+**Cierre:** F4 `CLOSED`; junto con ella F1–F3 `CLOSED`. Unidad `WAITING_ORCHESTRATOR`. La PR documental debe integrarse antes de que Orquestación cierre la issue; #19 se mantiene `OPEN` hasta entonces.
