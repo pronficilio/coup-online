@@ -1,6 +1,6 @@
 # Plan: acceso a referencias desde la partida
 
-**Estado:** `WAITING_ORCHESTRATOR` — F1 `BLOCKED`; build y diff-check pasan, revisión visual pendiente por falta de navegador.
+**Estado:** `WAITING_ORCHESTRATOR` — F1 `BLOCKED`; build y diff-check pasan, revisión visual pendiente por falta de navegador. [PR draft #20](https://github.com/pronficilio/coup-online/pull/20).
 **Issue:** https://github.com/pronficilio/coup-online/issues/18
 **Origen:** continuación acotada del acceso pendiente de la issue #8; activos y componente aislado integrados por [PR #12](https://github.com/pronficilio/coup-online/pull/12).
 **Handoff:** `docs/plans/active/issue_18_reference_access.md`
@@ -44,4 +44,4 @@ Riesgo `LOW`: cambio visual localizado y reversible en cliente. Verificación in
 
 ## Integración
 
-El ejecutor entrega una sola rama y un PR vinculado a #18 en `WAITING_ORCHESTRATOR`. El Orquestador revisa diff, build, recorrido/evidencia y topología; solo él integra y cierra después de verificar.
+El ejecutor entregó una sola rama y el [PR draft #20](https://github.com/pronficilio/coup-online/pull/20), vinculado a #18, en `WAITING_ORCHESTRATOR`. El Orquestador revisa diff, build, recorrido/evidencia y topología; solo él integra y cierra después de verificar.

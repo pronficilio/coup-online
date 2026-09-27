@@ -9,7 +9,7 @@
 - **Branch de toda la unidad:** `issue/18-reference-access`.
 - **Worktree de toda la unidad:** `.worktrees/issue-18-reference-access`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR esperado:** una sola integración canónica desde esta rama a `master`, vinculada a #18; el Alquimista la deja en `WAITING_ORCHESTRATOR`, sin integrar ni cerrar.
+- **PR canónico:** [draft #20](https://github.com/pronficilio/coup-online/pull/20), desde esta rama a `master`, vinculado a #18. Permanece draft mientras la revisión visual esté pendiente.
 
 ## Solicitud y objetivo
 
@@ -51,7 +51,7 @@ Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica s
 - F1 permanece `BLOCKED`; no declarar cumplimiento visual, de interacción ni de carga por red sin el recorrido manual. No añadir ni ejecutar tests automatizados.
 - Intentar refutar el éxito: comprobar si un botón tapa una decisión en viewport estrecho, si el cierre altera una decisión/turno, si se descarga una imagen no solicitada o si el foco no vuelve al control de apertura.
 - `COMMIT_REQUIRED`: incluir código, reporte y evento `phase_verdict` en un solo commit de fase. Para el resultado actual usa `feat(reference-panel): issue 18 F1 BLOCKED manual_review_pending`; usa el mensaje `feat(reference-panel): issue 18 F1 CLOSED ready_review` únicamente después de reunir la evidencia visual exigida.
-- Al terminar, actualiza el plan, bitácora e issue; abre el único PR canónico asociado a #18 y deja la unidad en `WAITING_ORCHESTRATOR`. No abras un segundo PR, no integres y no cierres la issue.
+- Al terminar, actualiza el plan, bitácora e issue; conserva el único PR canónico (#20) en `WAITING_ORCHESTRATOR`. No abras un segundo PR, no integres y no cierres la issue.
 
 ## Delegación y condición de parada
 
