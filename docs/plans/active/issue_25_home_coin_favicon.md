@@ -1,6 +1,7 @@
 # Handoff para Agente Alquimista — issue #25
 
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/25
+- **PR draft:** https://github.com/pronficilio/coup-online/pull/27
 - **Plan exacto:** `docs/plans/home-coin-favicon/plan_home_coin_favicon.md`
 - **Bitácora exacta:** `docs/plans/log/issue-25.jsonl`
 - **Estado:** `WAITING_ORCHESTRATOR`; F1 `BLOCKED`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
