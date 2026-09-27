@@ -1,7 +1,7 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 revalidada `CLOSED`; F2 follow-up de copy validado; F3 requiere revisión visual humana y Verifier FINAL sobre el HEAD nuevo.
+- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. El usuario aprobó el recorrido manual solicitado y autorizó abrir PR y hacer merge a `master`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` (cambio de autorización server-side).
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
@@ -78,20 +78,22 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 - **Artefactos:** autorización/entrega personalizada de pausa, overlay, aviso breve de espera, copy bilingüe mínimo, `report_issue_26_F3_followup.md` histórico y `report_issue_26_F2_copy_followup.md` actual, solicitud de Verifier actualizada.
 - **Commit:** `COMMIT_REQUIRED`; `fix(game): resume timed-out decisions by pending seat`.
 - **Validación anterior:** build exit 0 con warnings preexistentes; revisión estática de ownership y conservación de `responses`; i18n 313/313; `git diff --check` exit 0. No se agregaron ni ejecutaron tests automatizados. El commit `46b0805` y su reporte F3 quedan históricos.
-- **Follow-up de copy:** implementación en `4e3043b4c5d85e63e6aba47b0b5da7f0869ace2f`, documentada en `report_issue_26_F2_copy_followup.md`; build exit 0, diff-check e i18n 292/292. El commit `9276e0a` y `report_issue_26_F3_followup.md` son históricos para la versión anterior del copy. CRA/HMR compiló con copy nuevo; solicitar prueba humana en `localhost:3012` y Verifier FINAL sobre el HEAD actualizado.
+- **Follow-up de copy:** implementación en `4e3043b4c5d85e63e6aba47b0b5da7f0869ace2f`, documentada en `report_issue_26_F2_copy_followup.md`; build exit 0, diff-check e i18n 292/292. El commit `9276e0a` y `report_issue_26_F3_followup.md` son históricos para la versión anterior del copy. CRA/HMR compiló con copy nuevo; el usuario completó y aprobó el recorrido solicitado en `localhost:3012`, y el Verifier emitió PASS en `report_issue_26_F3_copy.md`.
 
-### F3 — Revisar pausa y reanudación (`PENDING` walkthrough humano)
+### F3 — Revisar pausa y reanudación (`CLOSED`; Verifier FINAL PASS)
 
 - **Pregunta única:** ¿el overlay orienta a cada participante sin sugerir acciones rechazadas ni ocultar un fallo real de reanudación?
 - **Entrada:** F1 y F2 cerradas; copy mínimo implementado y compilado; nuevo Verifier FINAL solicitado sobre el HEAD tras commit.
-- **Salida:** recorrido manual en escritorio, móvil y teclado, más revisión independiente FINAL.
+- **Salida:** recorrido humano aprobado sobre `localhost:3012` y revisión independiente FINAL.
 - **Criterio de cierre:** validar responsable, líder no responsable, respondedor previo (no recibe una segunda decisión), varios actores pendientes, timeout con Codex solamente, payload falsificado/no vacío, desconexión, respuestas aceptadas preservadas bajo ID/versión nueva, `g-gameResumed`, teclado/foco, copy mínimo exacto, status de otros sin detalles, error real como `role="alert"` y espera sin overlay. Registrar build, evidencia visual/manual y Verifier FINAL independiente en el commit nuevo.
+- **Evidencia manual aprobada:** el usuario confirmó que completó los pasos solicitados: timeout recuperable con tres jugadores, estados del responsable y los demás, reanudación conservando la respuesta previa, teclado y viewport estrecho. El reporte F3 registra PASS independiente sobre la implementación `b7328f7`; los commits posteriores solo documentan resultados.
 - **Pivote:** cualquier CTA no autorizado, decisión antigua aplicada o ventana sin recuperación debe regresar a la fase propietaria.
 - **Repetición acotada:** una ronda de corrección y revisión por hallazgo material.
-- **Bloqueo/cancelación:** el agente no tiene navegador integrado; el Orquestador reinició CRA y confirmó compilación y bundle con el copy nuevo. La prueba humana en `localhost:3012` sigue pendiente. Los F3 de `6621255`, `46b0805` y `9276e0a` son históricos de sus hashes. No declarar PASS global sin recorrido visual.
-- **Artefactos:** conservar `report_issue_26_F3.md`, `report_issue_26_F3_recheck.md` y `report_issue_26_F3_followup.md` como reportes históricos; pedir un nuevo veredicto para el hash con copy mínimo.
-- **Commit:** `COMMIT_REQUIRED`; `docs(game-ui): issue 26 F3 READY_FOR_REVIEW`.
-- **Validación:** build, inspección manual y Verifier independiente. No ejecutar tests automatizados.
+- **Límites de evidencia:** el recorrido humano no incluyó una pausa no recuperable; ese estado se verificó estáticamente y el reporte no lo presenta como prueba visual. No se agregaron ni ejecutaron tests automatizados según la política de la issue. Los F3 de `6621255`, `46b0805` y `9276e0a` son históricos de sus hashes.
+- **Cobertura restante no manual:** Codex-only, payload falsificado, desconexión durante pausa y rechazo real no formaron parte de los pasos que recibió el usuario; su comportamiento de servidor se revisó estáticamente en el informe independiente previo `report_issue_26_F3_followup.md` (hash histórico `9276e0a`). La autorización posterior del usuario cubre PR y merge; estos casos no se declaran visualmente probados.
+- **Artefactos:** `report_issue_26_F3_copy.md` (Verifier FINAL PASS) junto con `report_issue_26_F3.md`, `report_issue_26_F3_recheck.md` y `report_issue_26_F3_followup.md` como históricos.
+- **Commit:** cierre F3 documentado en `66675d2`; Orquestador actualizará el handoff y bitácora antes de abrir la integración.
+- **Validación:** build exit 0 con warnings preexistentes, `git diff --check`, paridad i18n 292/292, revisión estática independiente y recorrido humano aprobado. No ejecutar tests automatizados.
 
 ## Riesgos y pregunta de falsificación
 
@@ -103,4 +105,4 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 
 Antes de crear branch/worktree, el Ejecutor relee la issue #26 en `pronficilio/coup-online`, registra claim visible y confirma que no existe uno incompatible. Después crea un único branch y worktree desde `origin/master` actualizado. El control local de esta unidad está preparado en `docs/plans/`; copiar selectivamente plan, handoff y bitácora a ese worktree, sin copiar ni limpiar otros cambios del checkout raíz. Toda implementación ocurre en ese worktree y termina en una sola PR hacia `master` del fork.
 
-Branch/worktree de #26 son canónicos y están aislados; no hay PR abierta ni despliegue. Orquestador asigna el Verifier FINAL nuevo y consigue navegador para el recorrido manual pendiente.
+Branch/worktree de #26 son canónicos y están aislados. El usuario autorizó abrir una PR única hacia `master` y hacer merge después de la revisión de integración. No desplegar.

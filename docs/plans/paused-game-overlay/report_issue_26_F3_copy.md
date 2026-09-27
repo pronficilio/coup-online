@@ -9,7 +9,7 @@
 
 ## Veredicto
 
-**PASS** — además de la inspección estática y los gates, el usuario confirmó que realizó los pasos solicitados y aprobó el resultado.
+**PASS** — la inspección estática y los gates pasaron, y el usuario aprobó los recorridos visuales e interactivos que se le solicitaron. La pausa no recuperable quedó cubierta solo por inspección estática; no se atribuye una prueba visual humana de ese estado.
 
 ## CLAIM y revisión estática
 
@@ -24,10 +24,10 @@ El copy reducido da una señal breve: solo quien puede reanudar ve un overlay co
 ## CI_GATES / ADVERSARIAL_CHECK
 
 - **CI_GATES: PASS.** `npm run build` ejecutado independientemente desde el worktree terminó con código 0 y generó el bundle. CRA emitió los warnings conocidos: imports `logo`/`Link` sin uso en `src/App.js`, `postcss-calc` no interpreta `dvh` de `ReferencePanel.css` y `caniuse-lite` está desactualizado. El diff check pasó y las traducciones tienen paridad.
-- **ADVERSARIAL_CHECK: PASS.** La inspección estática no encontró copy explicativo residual en los tres estados previstos; el usuario confirmó que ejecutó los pasos visuales y de interacción listados abajo y que todo funcionó.
+- **ADVERSARIAL_CHECK: PASS.** La inspección estática no encontró copy explicativo residual en los estados previstos; el usuario confirmó que ejecutó los pasos visuales y de interacción solicitados y que todo funcionó.
 - **OVERALL: PASS.** Los criterios estáticos, los gates y el checklist humano solicitado quedaron satisfechos según la aprobación recibida.
 
-## Recorrido humano — aprobado por el usuario
+## Recorrido humano — aprobación de los pasos solicitados
 
 La instancia existente está disponible en **http://localhost:3012**. El backend existente de Socket.IO/API usa el puerto **8012** y `DECISION_TIMEOUT_MS=30000` según la configuración informada por el Orquestador. No inicié ni reinicié servicios duplicados.
 
@@ -39,15 +39,17 @@ Comprobaciones de disponibilidad, sin crear salas ni un socket de juego:
 
 **Actualización operativa posterior a la aprobación:** el Orquestador informa que envió `Ctrl+C` a las sesiones temporales originales después de la prueba aprobada. Actualmente el cliente en el puerto 3012 no acepta conexiones. El Verifier no inició, reinició ni detuvo servicios; este cambio de disponibilidad ocurrió después del recorrido humano y no altera la evidencia ni la aprobación registradas arriba.
 
-**Evidencia humana recibida:** el usuario confirmó: «He realizado los pasos y todo funciona muy bien. Aprobado.» Esto se toma como aprobación global de los cuatro pasos pedidos. No se proporcionaron navegador, capturas ni medidas exactas del viewport, por lo que no atribuyo esos detalles.
+**Evidencia humana recibida:** el usuario confirmó: «He realizado los pasos y todo funciona muy bien. Aprobado.» La aprobación se aplica al recorrido pedido: timeout recuperable con tres jugadores (responsable y otros participantes), reanudación conservando la respuesta previa, teclado y viewport estrecho. No se proporcionaron navegador, capturas ni medidas exactas del viewport, por lo que no atribuyo esos detalles.
 
-1. **Overlay recuperable, responsable:** PASS — cubierto por la confirmación global tras dejar pendiente una respuesta y reanudar desde su CTA.
-2. **Otras personas durante pausa recuperable:** PASS — cubierto por la confirmación global del aviso no modal sin overlay para quienes no eran responsables.
-3. **Pausa no recuperable:** PASS — cubierto por la confirmación global del caso de pausa no recuperable, con overlay sin CTA.
-4. **Teclado y viewport estrecho:** PASS — cubierto por la confirmación global de foco, navegación/activación por teclado y vista estrecha. No se registra una anchura o navegador concretos.
+1. **Timeout recuperable con tres jugadores, responsable pendiente:** PASS — cubierto por la aprobación global del recorrido solicitado.
+2. **Otros participantes durante la pausa:** PASS — cubierto por la aprobación global del recorrido solicitado.
+3. **Reanudación con respuesta previa conservada:** PASS — cubierto por la aprobación global del recorrido solicitado.
+4. **Teclado y viewport estrecho:** PASS — cubierto por la aprobación global del recorrido solicitado. No se registra una anchura o navegador concretos.
+
+**Pausa no recuperable, evidencia estática:** PASS — el código renderiza el encabezado y condiciona el CTA a `canResume` (`Coup.js:465-485`), por lo que el caso sin permiso no presenta el botón. No se pidió al usuario probar visualmente esta pausa y la aprobación recibida no se considera evidencia manual de ese estado.
 
 ## Limitaciones y siguiente dueño
 
-El Verifier no dispone de navegador propio, así que la evidencia visual proviene de la confirmación del usuario y no de observación directa de esta sesión. La aprobación se limita a los cuatro pasos pedidos; no afirma una combinación concreta de navegador/dispositivo ni evidencia visual adjunta. No queda recorrido obligatorio de F3 pendiente según esa confirmación.
+El Verifier no dispone de navegador propio, así que la evidencia visual de los recorridos solicitados proviene de la confirmación del usuario y no de observación directa de esta sesión. La aprobación se limita a esos pasos; no afirma una combinación concreta de navegador/dispositivo ni evidencia visual adjunta. El estado no recuperable se verificó estáticamente, no mediante un recorrido humano. No queda pendiente ningún paso del checklist solicitado.
 
 El Verifier no ejecutó tests automatizados, no modificó código de producto, no abrió PR ni inició o detuvo servicios.
