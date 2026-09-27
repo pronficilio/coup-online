@@ -28,7 +28,7 @@
 - F4: registrar el `FAIL` específico del Verifier, integrar la corrección puntual y solicitar nueva revisión FINAL independiente. El recorrido fue informado por el usuario, no observado por el Alquimista.
 - **Evidencia de recorrido reportada por usuario:** recorrió portada, lobby y partida completa, y ve todo en orden. No se proporcionaron datos del navegador/dispositivo, secuencia de pasos ni capturas. El reporte no constituye veredicto independiente ni PASS.
 - **Hallazgo de cobertura posterior a #22:** los 10 WebP normal/active de `ba`, `bfa`, `bs`, `c` y `pass` contienen texto inglés visible. Se conectaron a claves `es`/`en` ya existentes mediante etiquetas superpuestas, sin alterar acciones/Socket.IO. `claim`/`claim-active` contienen inglés pero no tienen uso en código. No se afirma que la corrección visual haya sido aceptada hasta revisar el resultado y repetir el Verifier.
-- **Sincronización y merge:** PR #22 está `MERGED`/cerrada mediante `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; #19 sigue `OPEN`. Worktree #19 se actualizó por fast-forward de `ca16e42` a `origin/master@3313d42` sin conflicto. No abrir otra PR ni cerrar issue; F4 `ACTIVE` a la espera del Verifier FINAL.
+- **Excepción de integración reorquestada:** PR #22 ya se fusionó parcialmente; PR #30/#21 añadió después los cinco rótulos ingleses descubiertos. La corrección se terminó en la misma rama y worktree de #19. Orquestación abrirá una PR de continuación a `master` para revisión; esta excepción al patrón de una PR por issue queda documentada por la integración parcial previa y el hallazgo tardío. No hacer merge hasta completar la revisión FINAL y la aprobación del usuario; #19 sigue `OPEN`.
 - No implementar selector, detección, preferencia persistente ni otra ruta para elegir idioma; no añadir ni ejecutar tests automatizados.
 
 ## Dependencias y límites
@@ -52,9 +52,9 @@
 
 - **Branch destino:** `issue/19-spanish-default-dictionary`.
 - **Worktree destino:** `.worktrees/issue-19-spanish-default-dictionary`.
-- **Merge target:** `master`; **PR esperada:** una, desde el branch de #19 a `master` en el fork.
-- **PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22), `MERGED`/cerrada el 2026-09-27 con merge commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. La issue #19 permanece `OPEN`; el merge fue parcial y no constituye aceptación F4 ni cierre de issue.
+- **Merge target:** `master`; se conserva el branch y worktree únicos de #19. Por la integración parcial de #22, se autoriza documentadamente una PR de continuación desde ese mismo branch.
+- **PR histórica:** [#22](https://github.com/pronficilio/coup-online/pull/22), `MERGED`/cerrada el 2026-09-27 con merge commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. La issue #19 permanece `OPEN`; ese merge parcial no constituye aceptación F4 ni cierre.
 - **Secuencia obligatoria:** registrar claim visible en tracker; releer y confirmar issue; crear/confirmar branch desde `origin/master` actualizado; crear/entrar al único worktree; allí mover `inbox/` a `active/`, registrar `claim` y `worktree_confirmed` y commitear el control antes del trabajo técnico.
 - **Bitácora:** append-only `docs/plans/log/issue-19.jsonl`.
 - **Delegación:** dividir subtareas ordinarias según la política local; si hay Agentes Menores disponibles, asignarles tareas atómicas con este plan y aislamiento; de lo contrario ejecutar la fase desde el Alquimista.
-- **Actualizaciones:** mantener issue, plan, fase, bitácora y reportes alineados. Al terminar, dejar la unidad `WAITING_ORCHESTRATOR`; no abrir integración adicional ni cerrar issue.
+- **Actualizaciones:** mantener issue, plan, fase, bitácora y reportes alineados. Al terminar, dejar la unidad `WAITING_ORCHESTRATOR`; Orquestación abrirá y registrará la PR de continuación, sin cerrar la issue.
