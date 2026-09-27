@@ -1,12 +1,12 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `PENDING`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `BLOCKED`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Verifier independiente para la revisión FINAL F3, bajo coordinación del Orquestador.
+**Siguiente dueño:** Orquestador; F3 requiere un entorno con navegador para completar el recorrido manual.
 
 ## Solicitud y éxito
 
@@ -73,7 +73,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Commit:** `COMMIT_REQUIRED`; `feat(action-images): issue 21 F2 image response controls and transition`.
 **Validación:** build producción PASS con warnings preexistentes; recorrido manual no disponible por falta de navegador; static audit del contrato completada; sin tests automatizados.
 
-### F3 — Revisión final independiente (`PENDING`)
+### F3 — Revisión final independiente (`BLOCKED`)
 
 **Pregunta:** ¿se puede refutar que los recursos y controles son consistentes y utilizables?
 
@@ -82,7 +82,9 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Falsificación:** buscar un par con escala incorrecta, halo o texto ilegible; activar acción con jugador no elegible; encontrar un evento/payload distinto, una respuesta inaccesible, un layout shift o transición que atrase el envío.
 **Avanzar:** AC1–AC6 sustentados y Verifier `PASS`; entregar a `WAITING_ORCHESTRATOR` para una PR única.
 **Bloquear:** build/recorrido imposible o F2 sigue sin liberar superficies compartidas.
-**Commit:** `COMMIT_REQUIRED`; `docs(action-images): issue 21 F3 CLOSED ready_for_review`.
+**Commit:** commit local de documentación F3 con veredicto `BLOCKED`; no marcar listo para revisión.
+
+**Resultado de revisión independiente (2026-09-27):** `BLOCKED`. El build y las inspecciones estáticas/formato pasaron; no hay navegador disponible para ejecutar el recorrido manual exigido por AC6 y verificar render móvil, foco e interacción. Ver `report_issue_21_F3.md`. No instalar dependencias ni navegador para esta revisión.
 
 ## Decisiones e historial
 
@@ -92,6 +94,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 - 2026-09-27: el usuario ordenó invocar al Alquimista para F2; coordinación registrada en `c7c1a6b`. La inspección comprobó que #14 elimina los componentes heredados y cambia el contrato a `g-decision`/`g-submitDecision(choiceId)`. El Alquimista detuvo cambios de producto; esperar decisión del usuario sobre renderer y posible ampliación de alcance.
 - 2026-09-27: #14 PR #23 integrada en `master` en `2d82fa1`; worktree #21 sincronizado con merge `b93a67c`. El usuario confirmó F2 sobre el renderer genérico y añadió `claim`/`claim-active` 1400×468 como contexto no interactivo. Claim se procesa al 50 % con el pipeline F1; diez WebP F1 más dos WebP Claim.
 - 2026-09-27: F2 completada en `feat(action-images): issue 21 F2 image response controls and transition`. `npm run build` compiló; no había navegador para recorrido visual, lo cual queda anotado en el reporte. La unidad espera Orquestador/Verifier para F3.
+- 2026-09-27: Verifier independiente F3: build y revisión estática PASS; formato/dimensiones/modo de doce WebP coinciden con el inventario F1/F2. F3 `BLOCKED`: no hay navegador para el walkthrough obligatorio; además, las copias ignoradas actuales de `c.png`/`c-active.png` son posteriores a F1 y no permiten confirmar la fuente histórica. Sin tests.
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 
