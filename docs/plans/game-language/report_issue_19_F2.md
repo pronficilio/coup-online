@@ -2,12 +2,13 @@
 
 **Estado de la fase:** `ACTIVE`; esta tanda aislada queda completa, pero F2 no está cerrada.
 **Base / commit de reorquestación:** `a0900ab` (`docs(i18n): issue 19 replan F2 isolated surfaces`).
+**Commit principal de la tanda:** `4b6b564` (`feat(i18n): issue 19 F2 spanish default and dictionary`); se agrega un commit correctivo para eliminar el fallback al mapa inglés.
 **Fecha:** 2026-09-26.
 
 ## Trabajo de esta tanda
 
 - Se agregó `coup-client/src/i18n/translations.json` con 181 claves paralelas `es`/`en`, incluidas las cadenas cliente F1 de rutas todavía reservadas para que puedan adoptarlas en tandas posteriores. Los emisores de `g-addLog` no se incluyen: F3 permanece bloqueada.
-- Se agregó `coup-client/src/i18n/index.js`. La función `t(key, params)` usa siempre `es`, interpola marcadores con nombre y exporta los mapas para una futura integración; no existe selector, detección ni persistencia de idioma.
+- Se agregó `coup-client/src/i18n/index.js`. La función `t(key, params)` usa siempre `es`, interpola marcadores con nombre y devuelve la clave si falta una entrada `es` (nunca recurre a `en`); el diccionario queda exportado para una futura integración, sin selector, detección ni persistencia de idioma.
 - Se localizaron las cadenas permitidas en `Home.js`, `RulesModal.js`, `CheatSheetModal.js` y el título de `EventLog.js`. Se conservaron las negritas, los colores y las etiquetas de roles/acciones de las reglas. El crédito de portada conserva el enlace al nombre propio y toma su prefijo del diccionario.
 - Se fijó `lang="es"`, y se tradujeron título, metadatos sociales/búsqueda y texto `<noscript>` en `coup-client/public/index.html`; también se localizaron `short_name` y `name` de la PWA.
 - Se tradujeron los nodos de texto visibles de `coup-client/src/assets/CheatSheet.svg`. El efecto del Golpe/Asesinato se compactó a «Elige quién pierde 1 influencia» para ajustarse a la columna del recurso.
@@ -15,6 +16,7 @@
 ## Validación y límites
 
 - JSON válido; `es` y `en` tienen 181 claves idénticas y todos sus marcadores dinámicos coinciden.
+- El helper selecciona explícitamente `es`; su fallback no consulta el mapa inglés.
 - `git diff --check`: sin errores.
 - `npm ci` completó con `coup-client/package-lock.json`; después, `npm run build` compiló producción correctamente. CRA reportó avisos ESLint preexistentes en `src/App.js` (imports sin uso) y `src/components/game/Coup.js` (`ReactModal` sin uso); ambas rutas están fuera de esta tanda y no se editaron.
 - No se añadieron ni ejecutaron tests. No se hizo recorrido manual de una partida; esta evidencia cubre solo la tanda aislada, no el criterio de cierre F2.
