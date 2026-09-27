@@ -375,8 +375,8 @@
 }
 
 .ResponseImageButton__art--challenge {
-    --response-label-left: 40%;
-    --response-label-right: 23%;
+    --response-label-left: 38%;
+    --response-label-right: 20%;
     --response-label-background: linear-gradient(180deg, #8e1a13, #72110e 52%, #7d1711);
     --response-label-background-active: linear-gradient(180deg, #ff4334, #ee2119 52%, #f73526);
 }
