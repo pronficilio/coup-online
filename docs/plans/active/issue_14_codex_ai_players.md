@@ -1,8 +1,8 @@
-# Handoff para el agente ejecutor
+# Registro de cierre administrativo — issue #14
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0/F1 CLOSED (PHASE PASS); F2 App Server y runner aislado implementados; F3 IA/lobby/kill switch implementados. En Hetzner, `coup-web:84b6f96` sirve el cliente y API/runner `4ab5e52` están `healthy`; el runner está habilitado. OAuth normal persiste en el volumen privado; una decisión real de GPT-6 Luna con esfuerzo `low` pasó por API → runner y devolvió una opción legal (`steal:1`). Tras un apagado accidental, el botón quedó limitado al líder que autorizó con el código compartido y el servidor aplica la misma validación.
+Estado: `CLOSED` administrativamente por solicitud del propietario. El PR #23 está integrado en `master` con merge commit `2d82fa1e0d67ba9e48d7885f9c3ae171360425bd`. El propietario confirmó una partida Codex vs. Codex completada sin problemas. F0/F1 tienen PHASE PASS; F2/F3 están implementadas y la POC se desplegó en Hetzner. Esta aceptación registra la prueba manual indicada por el propietario; no equivale a un veredicto FINAL independiente ni afirma que se hayan repetido todos los escenarios originales.
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -10,8 +10,8 @@ Bitácora: docs/plans/log/issue-14.jsonl
 Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
-PR: [Draft #23](https://github.com/pronficilio/coup-online/pull/23), base `master`, head `issue/14-codex-ai-players`. No fusionar todavía.
-Siguiente paso: completar la prueba manual en `https://coup.ejele.net`: persona contra dos IA, IA contra IA con el creador como espectador, desafíos/bloqueos y palanca roja. El código compartido se lee desde el `.env` privado por SSH y se introduce en el campo del lobby; no va en la URL. Si se activa la palanca roja, el rearme es manual desde el servidor. Actualizar el draft con resultados antes de marcarlo listo para merge.
+PR: [#23](https://github.com/pronficilio/coup-online/pull/23), fusionado a `master`.
+Siguiente paso: ninguno para #14; la issue quedó cerrada administrativamente tras la validación Codex vs. Codex reportada por el propietario. La checklist completa original no se certifica con esta única prueba.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -41,7 +41,7 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Sin auth nueva: solo el líder del lobby que validó el código compartido puede activar la palanca roja; la interfaz y el servidor aplican el mismo permiso. El apagado sigue siendo global, bloquea llamadas nuevas, intenta terminar las activas, invalida respuestas y pausa partidas. Solo el propietario rearma por SSH/consola; al reiniciar, Codex queda apagado.
 - Límites conservadores de concurrencia, llamadas y tiempo. Registros operativos no contienen credenciales, manos ajenas ni razonamiento privado.
 - No incluir texto libre de clientes ni acceso al repositorio/secretos en las solicitudes Codex; ejecutar en entorno aislado y de solo lectura.
-- El usuario autorizó desplegar esta prueba en Hetzner desde un release separado y reversible; no se tocará DNS/Nginx ni el release anterior. Después autorizó preparar un PR contra `master`; la prueba manual completa sigue pendiente.
+- El usuario autorizó desplegar esta prueba en Hetzner desde un release separado y reversible, sin cambiar DNS/Nginx ni el release anterior. PR #23 se fusionó a `master`; posteriormente el propietario validó una partida Codex vs. Codex sin problemas y pidió cerrar #14 administrativamente.
 - F0 y F1 cerraron con PHASE `PASS`. La guía operativa POC está en `docs/plans/codex-ai-players/poc-runbook.md`.
 
-Secuencia actual: Issue #14 y branch/worktree conservados; F0 `b189cc0`; F1 `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. API/runner `4ab5e52` permanecen activos, y solo se actualizó el contenedor web a `84b6f96`, conservando `466a3b5`, `5a13376` y `55be894` para rollback. Compose del release nuevo valida, el web sirve HTTP 200 y API/runner siguen saludables; la actualización web no reinició el API ni cerró salas. OAuth persiste en `coup_codex_state`; el runner permanece en `coup_codex_egress`, sin puertos publicados y está rearmado. Smoke real API→runner→GPT-6 Luna `low` PASS con opción legal `steal:1`. Tras un apagado accidental, el control rojo quedó restringido al líder que validó el código: no aparece en la pantalla de invitados y se conserva para ese líder en lobby/partida; el backend rechaza cualquier otro socket. Las pruebas del servidor pasan 36/36 y el build del cliente pasa; hay warnings preexistentes de imports sin uso en `src/App.js` y del minificador CSS en unidades `dvh` del panel de referencias. Faltan las comprobaciones manuales del lobby (humano vs. dos IA, IA vs. IA, desafío/bloqueo y palanca roja). El usuario pidió preparar el PR #23; no fusionar hasta completar revisión y pruebas manuales.
+Registro histórico de la POC: la API y el runner `4ab5e52` estaban saludables junto al web `84b6f96`; OAuth persistía en `coup_codex_state` y el runner, aislado en `coup_codex_egress`, no publicaba puertos. El smoke API→runner→GPT-6 Luna `low` devolvió la opción legal `steal:1`. Tras un apagado accidental, el control rojo quedó restringido al líder que validó el código y el backend rechazó cualquier otro socket. La suite del servidor pasó 36/36 y el build del cliente pasó, con warnings preexistentes de imports sin uso en `src/App.js` y de `dvh` en el panel de referencias. Después, el propietario confirmó una partida Codex vs. Codex completada sin problemas; PR #23 se integró y #14 se cerró administrativamente a petición suya. No quedan pasos pendientes para #14. El cierre no registra un veredicto FINAL independiente ni afirma que se repitieran todos los escenarios de la checklist original.
