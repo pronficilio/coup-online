@@ -3,14 +3,14 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; el usuario confirmó los arreglos visuales de F4; F3 `BLOCKED` hasta completar el walkthrough amplio de AC6.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; el usuario confirmó los arreglos visuales de F4 y los cinco controles de escritorio; F3 `BLOCKED` hasta completar el walkthrough restante de AC6.
 - **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Reporte F3:** `docs/plans/action-image-buttons/report_issue_21_F3.md` (`BLOCKED`).
 - **Reporte F4:** `docs/plans/action-image-buttons/report_issue_21_F4.md` (`CLOSED`).
-- **Verifier requerido ahora:** el usuario ya confirmó transparencia, ausencia de Claim en la ventana de Tax y Challenge activo actualizado. Falta walkthrough de las demás respuestas y revisión en escritorio/móvil con teclado, foco y reduced motion para desbloquear F3.
+- **Verifier requerido ahora:** el usuario confirmó transparencia, ausencia de Claim en la ventana de Tax, Challenge activo actualizado, aspecto de los tres bloqueos y navegación con Tab. Falta confirmar foco visible, layout estrecho/móvil y reduced motion para desbloquear F3.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
-- **Estado de fase:** F1, F2 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. El usuario validó que desaparecieron los fondos blancos, que en Tax solo aparecen Pass/Challenge y que Challenge muestra el arte activo actualizado. F3 sigue bloqueada por el walkthrough restante de AC6 en escritorio/móvil, teclado/foco y reduced motion.
+- **Estado de fase:** F1, F2 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. El usuario validó los fondos transparentes, la ausencia de Claim en Tax, el arte activo de Challenge, la apariencia de los tres botones de bloqueo y navegación con Tab. F3 sigue bloqueada por foco visible, layout estrecho/móvil y reduced motion.
 - **Documentos fuente:** issue #21; plan exacto arriba; `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; `docs/plans/game-language/plan_game_language.md`; componentes en `coup-client/src/components/game/`.
 
 ## Subtareas listas
@@ -29,7 +29,7 @@
 
 Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y recorrido manual registrados en los reportes; no añadir ni ejecutar tests automatizados. Fuera de alcance: acciones principales, reglas, servidor, Socket.IO, nueva dependencia de animación.
 
-**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. El usuario ya validó la corrección visual de F4 en navegador; esta sesión WSL no puede ejecutar Chrome (`UtilBindVsockAnyPort:307`). Sigue pendiente walkthrough de las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
+**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. El usuario validó visualmente los cinco controles de escritorio y Tab; esta sesión WSL no puede ejecutar Chrome (`UtilBindVsockAnyPort:307`). Sigue pendiente confirmar foco visible, layout estrecho/móvil y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
 
 ## Commits por fase
 
@@ -47,7 +47,7 @@ Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y re
 - **Bitácora:** `docs/plans/log/issue-21.jsonl` (append-only).
 - **Secuencia:** primero registrar claim en el issue del fork y releer; luego crear/confirmar una sola branch/worktree desde `origin/master` actualizada; dentro del worktree mover este inbox a `active/`, registrar claim/worktree/phase_start en JSONL y commitear control.
 - **Validaciones:** F1 conserva su reporte histórico de diez imágenes; el par Claim se añadió después; F2 está documentada en `report_issue_21_F2.md`; F4 registra inventario RGBA actual y resultado de build; recorrido visual en navegador pendiente; no tests.
-- **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier dejó F3 `BLOCKED`; Alquimista cerró F4 correctiva y mantiene F3 bloqueada hasta validación visual del usuario.
+- **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier dejó F3 `BLOCKED`; Alquimista cerró F4 correctiva. El usuario ya validó los controles en escritorio; F3 espera las comprobaciones restantes de móvil/estrecho, foco visible y reduced motion.
 - **Verifier:** revisión F3 independiente registrada en `report_issue_21_F3.md`; está `BLOCKED` por falta de navegador para el walkthrough de AC6.
 
 ## Confirmación de reclamo y aislamiento

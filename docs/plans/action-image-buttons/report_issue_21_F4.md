@@ -50,8 +50,8 @@ Es una inspección local de previews, no una validación final de la interfaz. E
 
 ## Confirmación visual del usuario
 
-El 2026-09-27, el usuario revisó la instancia corregida en `http://localhost:3001` y confirmó que no ve rectángulos blancos, que la ventana de desafío de Tax muestra solo Pass y Challenge, y que Challenge usa la variante activa actualizada. La URL anterior en el puerto 3000 servía un bundle obsoleto; por eso no reflejaba los cambios. Se comprobó que el bundle del puerto 3001 ya no incluye `DecisionClaimContext` y que los WebP de Pass/Challenge servidos tienen alfa transparente en las esquinas.
+El 2026-09-27, el usuario revisó la instancia corregida en `http://localhost:3001` y confirmó que no ve rectángulos blancos, que la ventana de desafío de Tax muestra solo Pass y Challenge, y que Challenge usa la variante activa actualizada. Después confirmó que Tab funciona y que Block Foreign Aid, Block Steal y Block Assassination lucen bien. La URL anterior en el puerto 3000 servía un bundle obsoleto; por eso no reflejaba los cambios. Se comprobó que el bundle del puerto 3001 ya no incluye `DecisionClaimContext` y que los WebP de Pass/Challenge servidos tienen alfa transparente en las esquinas.
 
 ## Estado y límite
 
-F4 cierra la corrección local y los tres defectos visuales reportados quedan validados por el usuario. F3 continúa `BLOCKED` hasta completar el walkthrough manual de AC6: las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion. No hice push, PR, merge ni cierre de issue.
+F4 cierra la corrección local y los tres defectos visuales reportados quedan validados por el usuario. F3 continúa `BLOCKED` hasta revisar el diseño en móvil/ventana estrecha, confirmar el indicador visual de foco y probar reduced motion. El usuario ya confirmó navegación con Tab y el aspecto de las cinco respuestas en escritorio. No hice push, PR, merge ni cierre de issue.
