@@ -1183,6 +1183,11 @@
     font-weight: 700;
     line-height: 1.15;
     text-transform: uppercase;
+    transition: font-size 120ms ease;
+}
+
+.DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
+    font-size: 0.812rem;
 }
 
 .DecisionActionDescription {
@@ -1381,6 +1386,10 @@
         font-size: 1.04rem;
     }
 
+    .DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
+        font-size: 0.728rem;
+    }
+
     .DecisionActionDescription {
         font-size: 0.91rem;
     }
@@ -1406,6 +1415,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .DecisionActionPanel .DecisionActionRow,
+    .DecisionActionPanel .DecisionActionLabel,
     .DecisionActionPanel .DecisionActionTarget,
     .DecisionActionPanel .DecisionActionCancel,
     .DecisionActionHint,
