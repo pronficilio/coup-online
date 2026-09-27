@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/26
 - **Plan exacto:** `docs/plans/paused-game-overlay/plan_paused_game_overlay.md`
 - **Bitácora exacta:** `docs/plans/log/issue-26.jsonl`
-- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. El usuario aprobó el recorrido manual solicitado y pidió explícitamente abrir PR y hacer merge a `master`.
+- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. La PR #35 está abierta contra `master`, con mergeability `clean`; el usuario autorizó el merge.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido:** PASS en [`report_issue_26_F3_copy.md`](../paused-game-overlay/report_issue_26_F3_copy.md), sobre la implementación del HEAD `b7328f7`; los commits posteriores son documentación. Los informes `report_issue_26_F3.md` (`6621255`), `report_issue_26_F3_recheck.md` (`46b0805`) y `report_issue_26_F3_followup.md` (`9276e0a`) son históricos.
 - **Criterio de falsificación:** ¿algún líder, respondedor previo o tercero puede reanudar; algún responsable pendiente queda sin CTA; se reemite decisión a quien ya respondió; hay CTA si solo falta Codex; recibe overlay alguien que no sea responsable en un timeout humano?
@@ -35,11 +35,11 @@ El recorrido humano solicitado fue aprobado. La regla de ownership por asiento y
 - **Branch único:** `issue/26-paused-game-overlay`.
 - **Worktree único:** `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR esperado:** una sola PR desde el branch de #26 a `master`, ahora autorizada por el usuario.
+- **PR canónica:** [#35](https://github.com/pronficilio/coup-online/pull/35), desde `issue/26-paused-game-overlay` a `master`.
 - **Aislamiento confirmado:** issue OPEN y asignada a `pronficilio`; branch/worktree canónicos. Base actual `be93e975072b364365a90206931f732fb44dc6f1`; rebase limpio sobre PR #31/#29, claves de portada y cambios de #21 preservados. El checkout raíz no se modificó.
 - **Reporte F1:** `docs/plans/paused-game-overlay/report_issue_26_F1.md`.
 - **Reporte F2:** `docs/plans/paused-game-overlay/report_issue_26_F2.md`.
 - **Siguiente dueño:** Orquestador para abrir y revisar la PR, integrarla a `master` y registrar el merge.
 - **Commits históricos:** `6621255` (leader-only), `46b0805` (permiso por asiento, sin conservar respuestas) y `9276e0a` (conserva respuestas; copy anterior).
 - **Validación:** `npm run build` exit 0 con warnings existentes; `git diff --check` exit 0; i18n 292/292 claves/placeholders; Orquestador confirmó HMR con strings esperadas y sin texto anterior; recorrido humano solicitado aprobado; Verifier FINAL PASS en `report_issue_26_F3_copy.md`. No agregar ni ejecutar tests automatizados.
-- **Estado del tracker:** issue #26 sigue OPEN/asignada; el usuario autorizó PR y merge a `master`. La PR aún no se ha creado. Sin despliegue.
+- **Estado del tracker:** issue #26 sigue OPEN/asignada; PR #35 OPEN y merge autorizado. Sin despliegue.

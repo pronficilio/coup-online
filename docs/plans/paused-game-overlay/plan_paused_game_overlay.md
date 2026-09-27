@@ -1,7 +1,7 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. El usuario aprobó el recorrido manual solicitado y autorizó abrir PR y hacer merge a `master`.
+- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. La PR #35 está abierta contra `master`, con mergeability `clean`; el usuario autorizó el merge.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` (cambio de autorización server-side).
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
@@ -105,4 +105,4 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 
 Antes de crear branch/worktree, el Ejecutor relee la issue #26 en `pronficilio/coup-online`, registra claim visible y confirma que no existe uno incompatible. Después crea un único branch y worktree desde `origin/master` actualizado. El control local de esta unidad está preparado en `docs/plans/`; copiar selectivamente plan, handoff y bitácora a ese worktree, sin copiar ni limpiar otros cambios del checkout raíz. Toda implementación ocurre en ese worktree y termina en una sola PR hacia `master` del fork.
 
-Branch/worktree de #26 son canónicos y están aislados. El usuario autorizó abrir una PR única hacia `master` y hacer merge después de la revisión de integración. No desplegar.
+Branch/worktree de #26 son canónicos y están aislados. La PR única es [#35](https://github.com/pronficilio/coup-online/pull/35), hacia `master`; el usuario autorizó su merge después de la revisión de integración. No desplegar.
