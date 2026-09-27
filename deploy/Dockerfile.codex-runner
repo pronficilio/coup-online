@@ -1,0 +1,37 @@
+FROM node:24-bookworm-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && test -s /etc/ssl/certs/ca-certificates.crt
+
+RUN groupadd --gid 10001 coup-codex \
+    && groupadd --gid 10002 coup-codex-ipc \
+    && useradd --uid 10001 --gid 10001 --groups 10002 --no-create-home --shell /usr/sbin/nologin coup-codex \
+    && npm install --global --no-audit --no-fund @openai/codex@0.157.1 \
+    && install -d -o 10001 -g 10001 -m 0700 /opt/coup-online /var/lib/coup-codex/auth
+
+WORKDIR /opt/coup-runner
+COPY --chown=10001:10001 server/ai/codex-worker.js server/ai/codex-protocol.js server/ai/codex-healthcheck.js ./server/ai/
+COPY --chown=10001:10001 deploy/codex-runner-entrypoint.sh ./
+RUN chmod 0555 /opt/coup-runner/codex-runner-entrypoint.sh
+
+ENV CODEX_BIN=/usr/local/bin/codex \
+    CODEX_HOME=/var/lib/coup-codex/auth \
+    CODEX_APP_ROOT=/opt/coup-online \
+    CODEX_WORKDIR=/run/coup-codex-scratch/work \
+    CODEX_RUNTIME_DIR=/run/coup-codex-scratch/runtime \
+    TMPDIR=/run/coup-codex-scratch/tmp \
+    XDG_RUNTIME_DIR=/run/coup-codex-scratch/runtime \
+    CODEX_RUNNER_SOCKET=/run/coup-codex/runner.sock \
+    CODEX_DISABLED_FILE=/var/lib/coup-codex-control/codex-disabled \
+    CODEX_USAGE_FILE=/var/lib/coup-codex/usage.json \
+    CODEX_ENABLED=true \
+    CODEX_DECISION_TIMEOUT_MS=45000 \
+    CODEX_MAX_CONCURRENCY=2 \
+    CODEX_MAX_PENDING=12 \
+    CODEX_MAX_CALLS_PER_GAME=120 \
+    CODEX_MAX_CALLS_PER_HOUR=240
+
+USER 10001:10002
+ENTRYPOINT ["/opt/coup-runner/codex-runner-entrypoint.sh"]
