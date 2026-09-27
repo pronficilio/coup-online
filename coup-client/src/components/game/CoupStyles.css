@@ -1088,7 +1088,7 @@
     pointer-events: none;
 }
 
-.DecisionsSection .DecisionActionRow {
+.DecisionActionPanel .DecisionActionRow {
     position: relative;
     display: flex;
     width: 100%;
@@ -1193,7 +1193,7 @@
     background-color: rgba(227, 166, 51, 0.36);
 }
 
-.DecisionsSection .DecisionActionRow--disabled {
+.DecisionActionPanel .DecisionActionRow--disabled {
     border-color: #ddd1c0;
     background-color: rgba(255, 255, 255, 0.18);
     background-image: repeating-linear-gradient(135deg, rgba(117, 99, 77, 0.065) 0, rgba(117, 99, 77, 0.065) 5px, transparent 5px, transparent 11px);
@@ -1270,8 +1270,8 @@
     margin: 12px 0;
 }
 
-.DecisionsSection .DecisionActionTarget,
-.DecisionsSection .DecisionActionCancel {
+.DecisionActionPanel .DecisionActionTarget,
+.DecisionActionPanel .DecisionActionCancel {
     box-sizing: border-box;
     min-width: 110px;
     min-height: 44px;
@@ -1289,24 +1289,24 @@
     touch-action: manipulation;
 }
 
-.DecisionsSection .DecisionActionTarget {
+.DecisionActionPanel .DecisionActionTarget {
     border: 1px solid #6f5133;
     background: #6f5133;
     color: #fff;
 }
 
-.DecisionsSection .DecisionActionTarget:hover:not(:disabled) {
+.DecisionActionPanel .DecisionActionTarget:hover:not(:disabled) {
     border-color: #8a633d;
     background: #8a633d;
 }
 
-.DecisionsSection .DecisionActionCancel {
+.DecisionActionPanel .DecisionActionCancel {
     border: 1px solid #8e795e;
     background: rgba(255, 255, 255, 0.74);
     color: #433727;
 }
 
-.DecisionsSection .DecisionActionCancel:hover:not(:disabled) {
+.DecisionActionPanel .DecisionActionCancel:hover:not(:disabled) {
     border-color: #6f5133;
     background: #efe4d2;
 }
@@ -1329,7 +1329,7 @@
         padding-left: 2px;
     }
 
-    .DecisionsSection .DecisionActionRow {
+    .DecisionActionPanel .DecisionActionRow {
         min-height: 68px;
         gap: 8px;
         padding: 8px;
@@ -1363,26 +1363,53 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .DecisionsSection .DecisionActionRow,
-    .DecisionsSection .DecisionActionTarget,
-    .DecisionsSection .DecisionActionCancel,
+    .DecisionActionPanel .DecisionActionRow,
+    .DecisionActionPanel .DecisionActionTarget,
+    .DecisionActionPanel .DecisionActionCancel,
     .DecisionActionHint {
         transition: none;
     }
 }
 
-@media only screen and (min-width: 1200px) {
-    .DecisionActionPanel {
-        position: fixed;
-        z-index: 40;
-        top: calc(22vh + 52px);
-        right: clamp(16px, 4vw, 64px);
-        width: min(620px, calc(100vw - 32px));
-        max-height: min(calc(100vh - 22vh - 68px), 760px);
-        margin: 0;
-        overflow-x: hidden;
-        overflow-y: auto;
-        overscroll-behavior: contain;
-        scrollbar-gutter: stable;
+.ActionDecisionRail {
+    position: fixed;
+    z-index: 40;
+    top: 110px;
+    left: 10px;
+    display: flex;
+    width: min(620px, calc(100vw - 20px));
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.ActionDecisionRail .CheatSheet {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    align-self: flex-start;
+}
+
+.ActionDecisionRail .DecisionActionPanel {
+    position: static;
+    width: 100%;
+    max-height: calc(100vh - 166px);
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+@media only screen and (min-width: 1024px) {
+    .ActionDecisionRail {
+        top: 22vh;
+        left: 10vw;
+        width: min(620px, calc(100vw - 10vw - 24px));
+    }
+
+    .ActionDecisionRail .DecisionActionPanel {
+        max-height: min(calc(100vh - 22vh - 52px), 760px);
     }
 }

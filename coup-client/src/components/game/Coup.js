@@ -562,6 +562,7 @@ export default class Coup extends Component {
     render() {
         const me = this.state.players.find(player => player.name === this.props.name)
         const decision = this.state.decision
+        const actionDecision = decision && decision.type === 'action'
         const ownInfluences = this.state.ownInfluences
         const responseWindowOpen = Boolean(
             decision &&
@@ -594,9 +595,14 @@ export default class Coup extends Component {
                     {this.state.currentPlayer && <p>{t('game.turn.current', { playerName: this.state.currentPlayer })}</p>}
                 </div>
                 <RulesModal />
-                <CheatSheetModal />
+                {!actionDecision && <CheatSheetModal />}
                 <EventLog logs={this.state.logs} />
             </div>
+
+            {actionDecision && <div className="ActionDecisionRail" aria-live="polite">
+                <CheatSheetModal />
+                {this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
+            </div>}
 
             <PlayerBoard
                 players={this.state.players}

@@ -1,12 +1,12 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. F2 se reanudó tras la revisión visual de la usuaria en el cliente local; se corrigen dos defectos de presentación antes de continuar la validación.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. F2 continúa tras una segunda revisión visual de la usuaria; ahora se agrupan el control “Resumen de reglas” y la tabla de acciones en un rail compartido a la izquierda que conserve su relación al hacer scroll.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** la usuaria hace la siguiente inspección visual; Alquimista continúa el recorrido F2 con el feedback. F3 no está listo.
+**Siguiente dueño:** tras el checkpoint, la usuaria inspecciona el rail compartido en el cliente local; Alquimista continúa el recorrido F2 con el feedback. F3 no está listo.
 
 ## Solicitud y definición de éxito
 
@@ -77,10 +77,12 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Bloquear/cancelar:** vuelve a reservarse un archivo compartido o aparece una necesidad de cambiar reglas/protocolo.
 **Commit:** `COMMIT_REQUIRED`; checkpoint previo `feat(action-rows): issue 24 F2 BLOCKED manual review`; el siguiente registra las correcciones visuales y la reanudación ACTIVE.
 **Implementación y revisión estática previa:** adaptación de `Coup.js`, estilos y claves `es`/`en` revisadas; el primer `npm run build` terminó con exit 0 y warnings en `App.js`, `ReferencePanel.css` y `caniuse-lite`. No se ejecutaron tests automatizados. El reporte del checkpoint anterior está en `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
-**Reanudación:** 2026-09-27, la usuaria inspeccionó la aplicación en `http://localhost:3006` con backend en `:18000` y reportó: (1) los divisores de filas parecen los extremos curvos del borde de hover; (2) el panel de acciones aparece debajo del tablero y debe situarse a la derecha, por debajo de la altura de “Resumen de reglas”, como overlay del tablero y las cartas.
-**Trabajo activo:** separar el divider de la superficie/contorno de cada fila, evitando colisión con filas deshabilitadas y conservándolo al hover; posicionar únicamente el panel de `action` a la derecha en overlay con límites responsive, sin cambiar la posición del control de reglas ni el flujo de otras decisiones.
-**Validación del checkpoint:** `git diff --check` pasa; `npm run build` exit 0 con warnings en archivos no modificados. HMR no detectó estas ediciones en `/mnt/e`; el Orquestador reinició CRA desde este worktree, confirmó compilación exitosa y HTTP 200 en `localhost:3006`. No se ejecutaron tests.
-**Validación pendiente:** inspección de la usuaria después del reinicio y luego recorrido visual/interactivo de AC1–AC9 (estados, saldos, mouse/teclado/tacto, destinos/cancelación, hints, recorte, reduced motion y otros tipos de decisión). No añadir tests. No se abre PR ni se cierra la issue.
+**Reanudación visual 1:** 2026-09-27, la usuaria inspeccionó `http://localhost:3006` con backend `:18000` y reportó que los divisores parecen extremos curvos del borde hover y que el panel action debe superponerse al tablero a la derecha, bajo la altura de “Resumen de reglas”. Esa solución fue cargada y queda como historial del checkpoint.
+**Revisión visual 2 (feedback vigente):** la usuaria corrigió la ubicación: tabla de acciones a la izquierda, alineada horizontalmente con “Resumen de reglas” y debajo; ambas deben conservar distancia vertical fija al hacer scroll, formando un rail/ancla compartido. El panel sigue superpuesto al PlayerBoard durante la decisión. No basta con mover el panel separado de derecha a izquierda ni con mover el control sin agruparlo con la tabla.
+**Trabajo activo:** conservar el divider en caja/regla independiente, sin colisión con filas disabled ni desaparición al hover; cuando exista `decision.type === 'action'`, montar resumen y acciones dentro de un rail compartido anclado a la izquierda y persistente durante scroll, con separación fija, overlay sobre PlayerBoard/cartas y fallback responsive. No alterar otras decisiones ni el contrato de IDs/protocolo.
+**Validación del checkpoint anterior:** `git diff --check` pasa; `npm run build` exit 0 con warnings en archivos no modificados. HMR no detectó aquellas ediciones en `/mnt/e`; el Orquestador reinició CRA desde este worktree, confirmó compilación y HTTP 200 en `localhost:3006`. No se ejecutaron tests.
+**Validación del rail:** diff revisado; `git diff --check` pasa; `npm run build` exit 0 con warnings conocidos en `App.js`, `ReferencePanel.css` (`dvh`) y caniuse-lite. Sin tests automatizados. El bundle servido en `localhost:3006` todavía no contiene `ActionDecisionRail`, aunque el cliente responde; el Orquestador reinicia CRA desde el HEAD publicado porque HMR no detecta cambios en `/mnt/e`.
+**Validación pendiente:** confirmar bundle nuevo en `http://localhost:3006` con backend `:18000`; luego inspección de la usuaria y recorrido visual/interactivo de AC1–AC9 (estados, saldos, mouse/teclado/tacto, destinos/cancelación, hints, recorte, reduced motion y otros tipos de decisión). No añadir tests. No se abre PR ni se cierra la issue.
 
 ### F3 — Verificación independiente y entrega (`PENDING`)
 
