@@ -1,7 +1,7 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `BLOCKED`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
@@ -62,7 +62,7 @@ Conservar el contrato de #14: reanuda solo el líder y solo cuando `canResume` s
 - **Commit:** `COMMIT_REQUIRED`; `docs(ui): issue 26 F1 CLOSED advance_f2`.
 - **Validación:** inspección estática de todos los emisores y del handler `g-resume`; no ejecutar tests.
 
-### F2 — Mostrar overlay y acción autorizada (`ACTIVE`)
+### F2 — Mostrar overlay y acción autorizada (`CLOSED`)
 
 - **Pregunta única:** ¿todas las personas entienden que el juego está pausado y puede reanudarlo quien tiene permiso?
 - **Entrada:** F1 cerrada; `origin/master` actualizado al menos a `5de95ee`; comprobar que #19 no abrió una corrección concurrente; decisión del Orquestador si F1 encontró un defecto de servidor.
@@ -74,9 +74,9 @@ Conservar el contrato de #14: reanuda solo el líder y solo cuando `canResume` s
 - **Bloqueo/cancelación:** bloquear si #19 inicia correcciones simultáneas en las superficies afectadas; no editar en paralelo. Cancelar solo por decisión del usuario.
 - **Artefactos:** código del overlay, claves bilingües y reporte F2.
 - **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 26 fullscreen pause overlay`.
-- **Validación:** build del cliente y recorrido manual; no agregar ni ejecutar tests automatizados.
+- **Validación:** build del cliente, revisión estática de condiciones/estados, claves bilingües y `git diff --check` pasaron. El recorrido manual no estuvo disponible en este entorno y se conserva como requisito de F3; no agregar ni ejecutar tests automatizados.
 
-### F3 — Revisar pausa y reanudación (`PENDING`)
+### F3 — Revisar pausa y reanudación (`BLOCKED`)
 
 - **Pregunta única:** ¿el overlay orienta a cada participante sin sugerir acciones rechazadas ni ocultar un fallo real de reanudación?
 - **Entrada:** F1 y F2 cerradas.
@@ -84,7 +84,7 @@ Conservar el contrato de #14: reanuda solo el líder y solo cuando `canResume` s
 - **Criterio de cierre:** revisar timeout recuperable visto por líder y no líder, desconexión durante la pausa, rechazo de `g-resume`, confirmación `g-gameResumed`, foco/lector de pantalla y ausencia de interacción con el tablero bajo el overlay. Registrar build, evidencia y resultado del Verifier.
 - **Pivote:** cualquier CTA no autorizado, decisión antigua aplicada o ventana sin recuperación debe regresar a la fase propietaria.
 - **Repetición acotada:** una ronda de corrección y revisión por hallazgo material.
-- **Bloqueo/cancelación:** bloquear si falta la liberación de #19 o Verifier FINAL; cancelar solo por decisión del usuario.
+- **Bloqueo/cancelación:** bloqueada: no hay navegador local ni herramienta de navegador expuesta; Verifier FINAL independiente sigue pendiente. Orquestador debe proveer/reclamar un entorno navegable y asignar Verifier. Cancelar solo por decisión del usuario.
 - **Artefactos:** `docs/plans/paused-game-overlay/report_issue_26_F3.md` y evidencia visual/manual pertinente.
 - **Commit:** `COMMIT_REQUIRED`; `docs(game-ui): issue 26 F3 READY_FOR_REVIEW`.
 - **Validación:** build, inspección manual y Verifier independiente. No ejecutar tests automatizados.
