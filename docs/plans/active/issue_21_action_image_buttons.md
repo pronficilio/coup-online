@@ -3,14 +3,15 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; el usuario confirmó los arreglos visuales de F4 y los cinco controles de escritorio; F3 `BLOCKED` hasta completar el walkthrough restante de AC6.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F3/F4 `CLOSED` (`PASS`). El usuario ejecutó y confirmó el walkthrough final de AC5/AC6.
 - **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-- **Reporte F3:** `docs/plans/action-image-buttons/report_issue_21_F3.md` (`BLOCKED`).
+- **Reporte F3 inicial (histórico):** `docs/plans/action-image-buttons/report_issue_21_F3.md` (`BLOCKED`).
+- **Recheck F3:** `docs/plans/action-image-buttons/report_issue_21_F3_recheck.md` (`PASS`, walkthrough ejecutado por el usuario).
 - **Reporte F4:** `docs/plans/action-image-buttons/report_issue_21_F4.md` (`CLOSED`).
-- **Verifier requerido ahora:** el usuario confirmó transparencia, ausencia de Claim en la ventana de Tax, Challenge activo actualizado, aspecto de los tres bloqueos y navegación con Tab. Falta confirmar foco visible, layout estrecho/móvil y reduced motion para desbloquear F3.
+- **Verifier requerido ahora:** recheck F3 completado como `PASS` con la confirmación explícita del usuario: transparencia, Tax solo Pass/Challenge, Challenge activo actualizado, cinco controles de escritorio, Tab/foco visible, layout estrecho y reduced motion. Siguiente dueño: Orquestador.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
-- **Estado de fase:** F1, F2 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. El usuario validó los fondos transparentes, la ausencia de Claim en Tax, el arte activo de Challenge, la apariencia de los tres botones de bloqueo y navegación con Tab. F3 sigue bloqueada por foco visible, layout estrecho/móvil y reduced motion.
+- **Estado de fase:** F1, F2, F3 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. El usuario confirmó en la app los fondos transparentes, Tax solo Pass/Challenge, Challenge activo actualizado, los cinco controles en escritorio, Tab/foco visible, ventana estrecha sin recortes/solapamientos y reduced motion sin transición.
 - **Documentos fuente:** issue #21; plan exacto arriba; `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; `docs/plans/game-language/plan_game_language.md`; componentes en `coup-client/src/components/game/`.
 
 ## Subtareas listas
@@ -29,13 +30,13 @@
 
 Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y recorrido manual registrados en los reportes; no añadir ni ejecutar tests automatizados. Fuera de alcance: acciones principales, reglas, servidor, Socket.IO, nueva dependencia de animación.
 
-**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. El usuario validó visualmente los cinco controles de escritorio y Tab; esta sesión WSL no puede ejecutar Chrome (`UtilBindVsockAnyPort:307`). Sigue pendiente confirmar foco visible, layout estrecho/móvil y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
+**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. El verifier no pudo iniciar Chrome desde WSL, pero el usuario ejecutó el walkthrough en `localhost:3001` y confirmó los criterios visuales/interactivos; ver el recheck F3. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
 
 ## Commits por fase
 
 - F1 `94b1447bb0b5fb1613e3f7cf226993077a2f0da7`: `feat(action-images): issue 21 F1 import optimized webp controls`
 - F2 `4d288199d14ccfeeeaec5a35dd4230b893ee0b4f`: `feat(action-images): issue 21 F2 image response controls and transition`
-- F3: commit local de documentación con reporte `BLOCKED`; el recorrido manual sigue pendiente antes de revisión de integración.
+- F3: commit local de primera pasada `BLOCKED`; recheck documental posterior `PASS` basado en recorrido ejecutado y reportado por el usuario.
 - F4: cierre canónico en esta fase; corrección de alfa, retirada de Claim decorativo, build y revisión de previews.
 
 ## Topología y reclamo
@@ -46,9 +47,9 @@ Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y re
 - **PR esperada:** una desde la rama del issue a `master`.
 - **Bitácora:** `docs/plans/log/issue-21.jsonl` (append-only).
 - **Secuencia:** primero registrar claim en el issue del fork y releer; luego crear/confirmar una sola branch/worktree desde `origin/master` actualizada; dentro del worktree mover este inbox a `active/`, registrar claim/worktree/phase_start en JSONL y commitear control.
-- **Validaciones:** F1 conserva su reporte histórico de diez imágenes; el par Claim se añadió después; F2 está documentada en `report_issue_21_F2.md`; F4 registra inventario RGBA actual y resultado de build; recorrido visual en navegador pendiente; no tests.
-- **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier dejó F3 `BLOCKED`; Alquimista cerró F4 correctiva. El usuario ya validó los controles en escritorio; F3 espera las comprobaciones restantes de móvil/estrecho, foco visible y reduced motion.
-- **Verifier:** revisión F3 independiente registrada en `report_issue_21_F3.md`; está `BLOCKED` por falta de navegador para el walkthrough de AC6.
+- **Validaciones:** F1 conserva su reporte histórico de diez imágenes; el par Claim se añadió después; F2 está documentada en `report_issue_21_F2.md`; F4 registra inventario RGBA actual y resultado de build; el recorrido visual del usuario se registra en F3 recheck; no tests.
+- **Delegación:** Alquimista cerró F2 en el worktree canónico actualizado tras #14 PR #23; Verifier dejó la primera pasada F3 `BLOCKED`; Alquimista cerró F4 correctiva. El usuario completó las comprobaciones restantes y el recheck F3 actualiza el dictamen a `PASS`.
+- **Verifier:** primera revisión histórica en `report_issue_21_F3.md`; recheck efectivo `PASS` en `report_issue_21_F3_recheck.md`, con procedencia explícita del walkthrough del usuario.
 
 ## Confirmación de reclamo y aislamiento
 
@@ -60,4 +61,4 @@ F1 produjo diez derivados WebP al 50 %, preservando los canvas RGB. Después se 
 
 ## Corrección visual F4
 
-F4 generó las seis parejas desde las fuentes RGB actuales a WebP RGBA al 50 %, sin modificar PNG. `c`/`c-active` actuales miden 1024×342 y sus salidas, 512×171 (F1 conserva el dato histórico de 1400×468). Las previews revisadas conservan arte, bordes y halos sin matte rectangular. El Claim gráfico no se muestra; la descripción de la decisión mantiene ese contexto. F3 sigue `BLOCKED` hasta validación visual del usuario y walkthrough en navegador.
+F4 generó las seis parejas desde las fuentes RGB actuales a WebP RGBA al 50 %, sin modificar PNG. `c`/`c-active` actuales miden 1024×342 y sus salidas, 512×171 (F1 conserva el dato histórico de 1400×468). Las previews revisadas conservan arte, bordes y halos sin matte rectangular. El Claim gráfico no se muestra; la descripción de la decisión mantiene ese contexto. F3 quedó `PASS` tras el walkthrough visual ejecutado y reportado por el usuario en `report_issue_21_F3_recheck.md`.

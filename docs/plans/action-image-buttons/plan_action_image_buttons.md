@@ -1,18 +1,18 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; el usuario confirmó la corrección visual de F4. F3 `BLOCKED` hasta completar el walkthrough amplio de AC6 en navegador.
+**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F3/F4 `CLOSED` (`PASS`). El usuario ejecutó y confirmó el walkthrough final de AC5/AC6 en navegador.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Orquestador; F3 requiere el recorrido manual restante de AC6 en navegador.
+**Siguiente dueño:** Orquestador para revisión de integración.
 
 ## Solicitud y éxito
 
 Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c`, `claim` y sus variantes `-active`, reducir cada fuente al 50 % de su tamaño actual manteniendo proporción, exportar WebP y colocarlos en el cliente React. Reemplazar los botones de respuesta correspondientes y animar el cambio visual de estado. F4 removió el fondo exterior de los WebP y quitó Claim decorativo del renderer; la descripción textual conserva ese contexto.
 
-Éxito significa que las cinco acciones usan su ilustración correcta en las ventanas de respuesta, los doce archivos son WebP con alfa a la mitad de sus dimensiones de origen actual, los halos y bordes permanecen visibles, las variantes activas se perciben con una transición breve y las reglas, elegibilidad, opciones y payloads permanecen intactos. La interacción conserva acceso por teclado, foco visible y movimiento reducido. El usuario confirmó las correcciones visuales de F4, el aspecto de los cinco controles de respuesta en escritorio y navegación con Tab. F3 sigue `BLOCKED` hasta confirmar el foco visible, el diseño en móvil/ventana estrecha y reduced motion.
+Éxito significa que las cinco acciones usan su ilustración correcta en las ventanas de respuesta, los doce archivos son WebP con alfa a la mitad de sus dimensiones de origen actual, los halos y bordes permanecen visibles, las variantes activas se perciben con una transición breve y las reglas, elegibilidad, opciones y payloads permanecen intactos. La interacción conserva acceso por teclado, foco visible y movimiento reducido. El usuario confirmó los cinco controles en escritorio, Tab/foco visible, ventana estrecha sin recortes/solapamientos y reduced motion sin transición.
 
 ## Hechos, supuesto y dependencias
 
@@ -73,27 +73,29 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Commit:** `COMMIT_REQUIRED`; `feat(action-images): issue 21 F2 image response controls and transition`.
 **Validación:** build producción PASS con warnings preexistentes; recorrido manual no disponible por falta de navegador; static audit del contrato completada; sin tests automatizados.
 
-### F3 — Revisión final independiente (`BLOCKED`)
+### F3 — Revisión final independiente (`PASS`; recheck posterior)
 
 **Pregunta:** ¿se puede refutar que los recursos y controles son consistentes y utilizables?
 
-**Entrada:** F1/F2 cerradas y diff consolidado.
-**Evidencia:** build de producción, dimensiones y tamaños de los doce WebP, recorrido de las cinco respuestas en escritorio/móvil, foco/teclado y reduced motion; reporte F3 y dictamen independiente. La imagen Claim se retiró en F4; la descripción conserva el texto.
+**Entrada:** F1/F2/F4 cerradas y diff consolidado.
+**Evidencia:** build de producción, dimensiones y tamaños de los doce WebP, recorrido de las cinco respuestas en escritorio y ventana estrecha, foco/teclado y reduced motion; reporte F3 y dictamen independiente. La imagen Claim se retiró en F4; la descripción conserva el texto.
 **Falsificación:** buscar un par con escala incorrecta, halo o texto ilegible; activar acción con jugador no elegible; encontrar un evento/payload distinto, una respuesta inaccesible, un layout shift o transición que atrase el envío.
 **Avanzar:** AC1–AC6 sustentados y Verifier `PASS`; entregar a `WAITING_ORCHESTRATOR` para una PR única.
 **Bloquear:** build/recorrido imposible o F2 sigue sin liberar superficies compartidas.
-**Commit:** commit local de documentación F3 con veredicto `BLOCKED`; no marcar listo para revisión.
+**Commit:** primera pasada documental `BLOCKED`; recheck local documental `PASS`, basado en evidencia del usuario.
 
-**Resultado de revisión independiente (2026-09-27):** `BLOCKED`. El build y las inspecciones estáticas/formato pasaron; no hay navegador disponible para ejecutar el recorrido manual exigido por AC6 y verificar render móvil, foco e interacción. Ver `report_issue_21_F3.md`. No instalar dependencias ni navegador para esta revisión.
+**Historial:** la primera pasada quedó `BLOCKED` porque el verifier no pudo ejecutar un navegador desde WSL; ese reporte permanece intacto en `report_issue_21_F3.md`.
 
-### F4 — Corregir fondos WebP (`CLOSED`; F3 continúa `BLOCKED`)
+**Resultado efectivo del recheck (2026-09-27):** `PASS`. El usuario ejecutó el walkthrough en `http://localhost:3001` y confirmó las cinco respuestas, el foco visible por Tab, la ventana estrecha sin recortes/solapamientos y reduced motion sin transición. Ver `report_issue_21_F3_recheck.md`; el verifier no afirma haber manejado el navegador.
+
+### F4 — Corregir fondos WebP (`CLOSED`; F3 recheck posterior `PASS`)
 
 **Pregunta:** ¿se elimina el fondo exterior sin perder los bordes ni los halos de las imágenes?
 
 **Entrada:** feedback visual del usuario y fuentes PNG actuales en `/mnt/e/dev/coup/fotos/`.
 **Tareas:** regenerar las doce salidas WebP en RGBA al 50 % de las fuentes actuales, revisar previews compuestos sobre fondo slate y retirar el Claim decorativo de la ventana challenge.
 **Avanzar:** formato/modo/dimensiones verificados; los previews conservan el arte y halos y no muestran matte rectangular; build del cliente y `git diff --check` pasan.
-**Resultado:** F4 cierra la corrección local tras revisión visual/build. El par Claim permanece en el inventario pero no se muestra; no es una opción. El usuario confirmó en navegador transparencia, ausencia de Claim en la ventana de Tax, el arte activo actualizado de Challenge, aspecto correcto de los tres botones de bloqueo y navegación con Tab. F3 sigue bloqueada hasta confirmar foco visible, diseño móvil/ventana estrecha y reduced motion.
+**Resultado:** F4 cierra la corrección local tras revisión visual/build. El par Claim permanece en el inventario pero no se muestra; no es una opción. El usuario confirmó en navegador transparencia, ausencia de Claim en la ventana de Tax, el arte activo actualizado de Challenge, aspecto correcto de los tres botones de bloqueo y navegación con Tab. En el recheck posterior, confirmó también foco visible, ventana estrecha y reduced motion; F3 quedó `PASS`.
 **Reporte:** `docs/plans/action-image-buttons/report_issue_21_F4.md`.
 
 ## Decisiones e historial
@@ -107,7 +109,8 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 - 2026-09-27: Verifier independiente F3: build y revisión estática PASS; formato/dimensiones/modo de doce WebP coinciden con el inventario F1/F2. F3 `BLOCKED`: no hay navegador para el walkthrough obligatorio; además, las copias ignoradas actuales de `c.png`/`c-active.png` son posteriores a F1 y no permiten confirmar la fuente histórica. Sin tests.
 - 2026-09-27: F4 correctiva por feedback visual: regenerados los doce WebP con alfa desde los PNG actuales (sin modificarlos), incluyendo `c`/`c-active` actuales 1024×342 → 512×171. Revisión de doce previews sin pérdida visible de halos/bordes ni matte rectangular; se retiró Claim decorativo del renderer. F3 continúa `BLOCKED` hasta validación visual del usuario y walkthrough; ver `report_issue_21_F4.md`.
 - 2026-09-27: el usuario validó en `http://localhost:3001` que los rectángulos blancos desaparecieron, que durante Tax solo aparecen Pass y Challenge, y que Challenge muestra el arte activo actualizado. El puerto 3000 servía un bundle viejo. F3 queda `BLOCKED` solo por el walkthrough restante de AC6 (otras respuestas, móvil, teclado/foco y movimiento reducido).
-- 2026-09-27: el usuario confirmó además que Tab funciona y que BFA, BS y BA lucen bien. La cobertura de escritorio incluye los cinco controles; F3 sigue `BLOCKED` para verificar foco visible, ventana estrecha/móvil y reduced motion.
+- 2026-09-27: el usuario confirmó además que Tab funciona y que BFA, BS y BA lucen bien. En ese momento F3 seguía `BLOCKED` para verificar foco visible, ventana estrecha y reduced motion.
+- 2026-09-27: recheck F3: el usuario confirmó foco visible, layout estrecho sin recortes ni solapamientos y reduced motion sin transición junto con el walkthrough de las cinco respuestas. El estado efectivo F3 cambia a `PASS`; la primera revisión `BLOCKED` permanece como histórico. Ver `report_issue_21_F3_recheck.md`.
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 

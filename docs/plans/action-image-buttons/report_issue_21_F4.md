@@ -1,6 +1,6 @@
 # Reporte F4 — issue #21: corrección visual de fondos WebP
 
-**Estado:** `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F3 permanece `BLOCKED` para el walkthrough amplio de AC6.
+**Estado:** `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F3 pasó de una primera revisión `BLOCKED` a `PASS` en un recheck posterior basado en el walkthrough ejecutado por el usuario.
 **Branch/worktree:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons`.
 **Base revisada:** F3 documental `c88a223`; rama #21 conserva el merge de base `b93a67c` que integra #14 PR #23 (`2d82fa1`).
 **Motivo:** feedback visual del usuario: eliminar el fondo exterior de las imágenes y conservar todos los bordes y resplandores.
@@ -54,4 +54,8 @@ El 2026-09-27, el usuario revisó la instancia corregida en `http://localhost:30
 
 ## Estado y límite
 
-F4 cierra la corrección local y los tres defectos visuales reportados quedan validados por el usuario. F3 continúa `BLOCKED` hasta revisar el diseño en móvil/ventana estrecha, confirmar el indicador visual de foco y probar reduced motion. El usuario ya confirmó navegación con Tab y el aspecto de las cinco respuestas en escritorio. No hice push, PR, merge ni cierre de issue.
+F4 cierra la corrección local y los tres defectos visuales reportados quedan validados por el usuario. Al cerrar F4, F3 continuaba `BLOCKED` hasta revisar el diseño en móvil/ventana estrecha, confirmar el indicador visual de foco y probar reduced motion. El usuario ya había confirmado navegación con Tab y el aspecto de las cinco respuestas en escritorio. No hice push, PR, merge ni cierre de issue.
+
+## Actualización posterior: recheck F3
+
+Después del cierre F4, el usuario ejecutó y confirmó el walkthrough restante en `http://localhost:3001`: Tab muestra foco visible, la ventana estrecha no tiene recortes ni solapamientos y reduced motion desactiva la transición. Junto con la validación previa de los cinco controles de escritorio, esto completa la evidencia manual de AC5/AC6. El recheck F3 queda `PASS` en `report_issue_21_F3_recheck.md`; el usuario recorrió la app y el verifier no afirma haber controlado un navegador.
