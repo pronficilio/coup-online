@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` hasta registrar el seguimiento validado; F3 `CLOSED`; F4 `ACTIVE`, listo para repetición independiente tras aprobación visual del propietario. El `z-index` registrado en `cbc0892` no cerró el cruce geométrico.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 CLOSED en 4b1dc92; F4 ACTIVE, listo para repetición FINAL del mismo Verifier tras aprobación visual. El z-index registrado en cbc0892 no cerró el cruce geométrico.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -53,10 +53,10 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** inspección estática/documental; no ejecutar tests.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
-### F2 — Integrar influencias perdidas, ajustar el círculo y resaltar respuestas (`ACTIVE`)
+### F2 — Integrar influencias perdidas, ajustar el círculo y resaltar respuestas (`CLOSED`)
 
 - **Pregunta única:** ¿la mano, el círculo y el estado visual de quien puede responder representan correctamente la partida sin desplazar ni cubrir el resto del HUD?
-- **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y hará la revisión visual del preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
+- **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y aprobó visualmente el preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
 - **Salida:** nombres de roles traducidos bajo las cartas propias, sin sección/título/bolitas globales; influencias perdidas permanentemente grises con símbolo/etiqueta accesible y rol legible; círculo algo más arriba con unos 50 px hasta el primer encabezado superior; asiento local iluminado mientras su cliente ofrece opciones de respuesta.
 - **Criterio de cierre:** build de cliente y revisión estática; conservar controles y Event Log en sus coordenadas declaradas. Confirmar que el resaltado aparece para una decisión respondible, sigue mientras hay opción y se apaga al enviar (incluido Pass) o al cerrar; no debe señalar clientes sin opciones. No cambiar reglas ni protocolo. El propietario aprobó visualmente el preview actualizado; no afirmar inspección manual propia de estados de juego.
 - **Artefacto:** código y reporte F2.
@@ -70,7 +70,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Corrección del cierre prematuro (2026-09-27):** `cbc0892` declaró F2 `CLOSED` tras poner `.GameHeader { z-index: 4 }`; el cambio solo alteraba qué capa pintaba encima y no separaba las cajas. El Verifier encontró además saturación del lift en escritorios altos. La bitácora conserva ese evento y registra la devolución correctiva; no se considera evidencia de cierre.
 - **Resolución F2 (2026-09-27):** el Event Log conserva su anclaje responsive actual: `top:10vh; right:10vw` hasta 1199 px y `top:60px; right:15px` fuera de esa media query; no se mueve. En cinco jugadores se limita su ancho a 100–130 px y se conserva 9vh de scroll con wrap. Las cotas estáticas de 390×844 dan log x≈221–351, asiento superior izquierdo x≈47–122 y derecho x≈134–203; a 320×844, log x≈188–288, izquierdo x≈29–95 y derecho x≈106–163. Los halos de nombre e influencia activa se compactan solo en móvil de cinco jugadores. `responseWindowOpen` requiere tipo de respuesta y opciones locales de `g-decision`; `responseAvailable` se apaga en `submitted`, el cierre borra la decisión y `--current` se suspende durante esa ventana hasta el cierre para que el rojo desaparezca tras enviar. No cambia el protocolo. El lift responsive usa `min(-40px, calc(...))`, por lo que no se satura en pantallas altas. `git diff --check`, `node --check server/game/coup.js`, JSON de traducciones/bitácora y build pasan; build código 0 con avisos existentes de `App.js`, `ReferencePanel.css` y `caniuse-lite`. El build, diff-check y sintaxis pasan; el propietario aprobó visualmente este preview y F4 puede repetirse.
 
-- **Seguimiento final F2 (2026-09-27):** el Event Log conserva top:60px; right:15px en móvil (desktop desde 1024 px: top:10vh; right:10vw); en 5p y hasta 520 px se estrecha a 100–130 px, mientras se compactan/desplazan los dos asientos superiores. Las cajas CSS calculadas quedan separadas en 390×844 y 320×844; estas estimaciones no son capturas. El lift usa min(-40px, calc(...)) y no satura en 1200–1440 px. Se registran halo local y cierre en report_issue_28_F2.md. Build terminó con código 0; diff-check, sintaxis y JSON pasan. El propietario aprobó visualmente el preview y F4 está listo para repetición. F2 sigue ACTIVE hasta este commit de seguimiento.
+- **Seguimiento final F2 (2026-09-27):** el Event Log conserva top:60px; right:15px en móvil (desktop desde 1024 px: top:10vh; right:10vw); en 5p y hasta 520 px se estrecha a 100–130 px, mientras se compactan/desplazan los dos asientos superiores. Las cajas CSS calculadas quedan separadas en 390×844 y 320×844; estas estimaciones no son capturas. El lift usa min(-40px, calc(...)) y no satura en 1200–1440 px. Se registran halo local y cierre en report_issue_28_F2.md. Build terminó con código 0; diff-check, sintaxis y JSON pasan. El propietario aprobó visualmente el preview y F4 está listo para repetición. F2 queda CLOSED en 4b1dc92 tras build y aprobación visual.
 
 ### F3 — Mostrar el conteo autoritativo de Court (`CLOSED`)
 

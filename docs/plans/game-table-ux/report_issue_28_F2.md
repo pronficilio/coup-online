@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-`ACTIVE` hasta registrar el seguimiento corregido. Build y comprobaciones estáticas pasan; el propietario aprobó visualmente esta versión del preview, por lo que F4 puede repetirse. Este reporte no afirma haber inspeccionado visualmente una partida actual ni validado dispositivos reales.
+`CLOSED` en 4b1dc92, tras build y aprobación visual del candidato. Build y comprobaciones estáticas pasan; el propietario aprobó visualmente esta versión del preview, por lo que F4 puede repetirse. Este reporte no afirma haber inspeccionado visualmente una partida actual ni validado dispositivos reales.
 
 Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost cards and board position`. Commit de cierre de seguimiento: `fix(game-ui): issue 28 F2 responsive geometry and response highlight`.
 

@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1–F3 `CLOSED`; F4 `ACTIVE / WAITING_USER` hasta que el propietario revise en preview el layout de 5p/390 px y los estados del halo respondible. La aprobación visual anterior cubrió el preview de 2p, no este seguimiento.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 CLOSED en 4b1dc92 tras build y aprobación visual; F4 ACTIVE, listo para repetir con el mismo Verifier.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -57,7 +57,7 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en el único branch. F2 queda `CLOSED` tras el commit de seguimiento y validación estática; F4 permanece `ACTIVE / WAITING_USER` hasta revisar visualmente 5p/390 px y encendido/apagado/cierre del halo. No iniciar la repetición independiente antes de esa revisión. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
+Cada fase con artefactos requiere commit en el único branch. F2 cerró en 4b1dc92 tras build, diff-check, sintaxis y aprobación visual. F4 repite ahora con el mismo Verifier. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
 
 ## Criterio visual añadido por el propietario — incorporar en F2/F4
 
@@ -65,4 +65,4 @@ Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment
 
 Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
 
-Alquimista: registra el commit de seguimiento F2. Cuando el propietario confirme visualmente 5p/390 px y los estados de respuesta, pide al mismo Verifier repetir F4 sobre ese SHA; comprobar encendido, apagado tras envío y cierre del halo, además de los criterios existentes. No push/PR hasta PASS.
+Alquimista: F2 cerró en 4b1dc92 y el propietario aprobó visualmente el candidato. El mismo Verifier repetirá F4 para comprobar encendido, apagado tras envío y cierre del halo, además de los criterios existentes. No push/PR hasta PASS.
