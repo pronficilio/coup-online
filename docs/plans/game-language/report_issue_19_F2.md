@@ -1,7 +1,7 @@
 # Reporte F2 — issue #19, avances parciales
 
-**Estado actual de la fase:** `ACTIVE`; las rutas antes compartidas ya están integradas en master y localizadas en #19. Falta recorrido manual y revisión F4.
-**Estado de F3:** `ACTIVE`; las ocho emisiones actuales de `g-addLog` están localizadas en origen. Falta completar el recorrido/manual F4.
+**Estado actual de la fase:** `ACTIVE`; las rutas antes compartidas ya están integradas en master y localizadas en #19. El recorrido manual está bloqueado por falta de navegador y F4 está `BLOCKED`.
+**Estado de F3:** `ACTIVE`; las ocho emisiones actuales de `g-addLog` están localizadas en origen. El recorrido manual del registro está bloqueado (ver reporte F4).
 **PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22), `DRAFT`, abierta por solicitud del usuario para validar el avance parcial; no está lista para fusionarse.
 **Base sincronizada:** `origin/master` en `2d82fa1`, integrado por el merge `74432a6`; la base anterior `c0119cb`/merge `28e1046` queda como antecedente.
 **Commits de la unidad:** `4b6b564`, `c9d5442`, `a63336c` y `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`), publicado en `origin/issue/19-spanish-default-dictionary`. La sincronización de tracker se registró en un commit documental posterior.
@@ -17,7 +17,7 @@ PR #23 de #14 está integrada en `origin/master` `2d82fa1`; se verificó el merg
 - F3 modifica solo las ocho llamadas `addLog()` de `server/game/coup.js`. `server/index.js` no emite `g-addLog` en la base sincronizada. El payload sigue siendo un `string`; nombres de jugadores son valores y acciones/roles se localizan solo para mostrarlos.
 - `npm run build` en `coup-client` terminó con exit 0. Warnings observados: imports `logo`/`Link` sin uso en `src/App.js`, `caniuse-lite` desactualizado y `postcss-calc` que no parsea `dvh` preexistente en `ReferencePanel.css:100/106`; no aparecieron warnings nuevos en las superficies localizadas.
 - La comprobación de claves/parámetros dio 307/307 sin diferencias; `git diff --check`, `node --check server/i18n.js` y `node --check server/game/coup.js` limpios. No se añadieron ni ejecutaron tests.
-- F2 y F3 permanecen `ACTIVE` mientras no se complete el recorrido manual y F4. F4 permanece `PENDING`; no se afirma cobertura verificada por recorrido ni veredicto independiente.
+- F2 y F3 permanecen `ACTIVE` mientras no se complete el recorrido manual y F4. F4 está `BLOCKED` por falta de navegador; no se afirma cobertura verificada por recorrido ni veredicto independiente.
 - Tras `9f97acb`, se reemplazaron y releyeron los cuerpos de issue #19 y PR #22: #19 continúa `OPEN` y asignada a `pronficilio`; PR #22 continúa `OPEN`/`DRAFT`. La bitácora registra esta sincronización.
 
 ## Tanda inicial F2 — histórico (2026-09-26)

@@ -1,11 +1,11 @@
 # Idioma español predeterminado y diccionario bilingüe — issue #19
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `PENDING`.
+**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `BLOCKED` por falta de entorno de navegador para recorrido manual.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Alquimista para completar el recorrido manual de F2/F3 y dejar la evidencia lista para F4; Verifier independiente requerido en F4.
+**Siguiente dueño:** Orquestación debe habilitar un entorno local con navegador; después Alquimista completa el recorrido manual y Orquestación delega Verifier FINAL independiente.
 **Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) se abrió como borrador por solicitud explícita del usuario para validar el avance parcial; es la única PR de esta unidad.
 
 ## Solicitud y definición de éxito
@@ -111,7 +111,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Commit:** `COMMIT_REQUIRED`; `feat(i18n): issue 19 F3 spanish game log messages`.
 **Validación:** inspección de los emisores y reproducción manual de mensajes disponibles sin modificar las decisiones; `git diff --check`; no añadir ni ejecutar tests.
 
-### F4 — Cerrar cobertura y revisión independiente (`PENDING`)
+### F4 — Cerrar cobertura y revisión independiente (`BLOCKED`)
 
 **Pregunta:** ¿la implementación satisface los criterios y no dejó texto en inglés visible ni una forma de seleccionar inglés?
 
@@ -127,6 +127,8 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Bloquear/cancelar:** falta entorno de recorrido/build o permanece una dependencia de #14/#18 sin liberar.
 **Commit:** `COMMIT_REQUIRED`; `docs(i18n): issue 19 F4 CLOSED ready_for_review`.
 **Validación:** verificación independiente FINAL; no añadir ni ejecutar tests automatizados.
+
+**Bloqueo observado (2026-09-27):** en el worktree #19 no se encontraron `chromium`, `chromium-browser`, `google-chrome`, `google-chrome-stable`, `chrome` ni `firefox` en `PATH`. `coup-client/package.json` declara `start`, `build`, `test` y `eject`, sin Playwright, Puppeteer ni WebDriver. No hay medio local disponible para observar portada, lobby, decisiones, partida y registro; no se inició ni se inventó un recorrido. No instalar dependencias para simular un navegador. El build de cliente ya documentado no sustituye el recorrido. F4 queda `BLOCKED`; el Verifier FINAL independiente no se ha asignado ni emitió veredicto. Orquestación debe asignarlo después de disponer de entorno manual.
 
 ## Topología, riesgos y decisiones
 
@@ -146,5 +148,7 @@ Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas 
 - 2026-09-27: durante la tanda aislada F2, el Orquestador confirmó que PR #20 de #18 se fusionó como `64a507d` y liberó `ReferencePanel.js`/`.css`; después la issue #18 se cerró (2026-09-27T02:37:50Z). `Coup.js` continúa reservado por #14. El worktree #19 no se sincronizó en esta tanda; la siguiente sincronizará `origin/master` antes de editar las rutas liberadas.
 - 2026-09-26: se verificaron de nuevo issue #19 y worktrees #14/#18; #14 mantiene cambios locales en rutas reservadas y #18 está cerrada. `origin/master` `c0119cb` se integró en #19 con merge `28e1046`; se registra `sync_base`. La integración upstream modifica `Coup.js` para montar `ReferencePanel`, pero #19 conserva esa modificación sin editarla. Se conectó únicamente `ReferencePanel.js` al diccionario y se añadieron 9 claves (190 total); F2 permanece `ACTIVE` y F3 `BLOCKED`.
 - 2026-09-26: por solicitud explícita del usuario de validar los cambios, el Orquestador publicó `issue/19-spanish-default-dictionary` en `origin` y abrió la PR única #22 como `DRAFT` hacia `master`. La PR cubre el avance parcial de F2; no autoriza merge ni cierre de #19. F2 `ACTIVE`, F3 `BLOCKED` por #14.
-- 2026-09-27: PR #23 de #14 se integró en `origin/master@2d82fa1`; #19 sincronizó mediante merge `74432a6` y registró `sync_base`. Se localizaron las superficies liberadas de lobby/decisiones/partida/tablero y las ocho emisiones actuales de `g-addLog`; diccionario 307/307, build del cliente y revisión sintáctica server completados. F2/F3 `ACTIVE`; F4 `PENDING` por recorrido manual y Verifier.
+- 2026-09-27 (registro de esa tanda; estado después actualizado): PR #23 de #14 se integró en `origin/master@2d82fa1`; #19 sincronizó mediante merge `74432a6` y registró `sync_base`. Se localizaron las superficies liberadas de lobby/decisiones/partida/tablero y las ocho emisiones actuales de `g-addLog`; diccionario 307/307, build del cliente y revisión sintáctica server completados. F2/F3 `ACTIVE`; F4 estaba `PENDING` en esa anotación, pero ahora está `BLOCKED` por falta de navegador para el recorrido manual.
 - 2026-09-27: commit `9f97acb` publicó la tanda actual F2/F3 en el branch de #19. Después se reemplazaron y releyeron los cuerpos de issue #19 y PR #22; #19 sigue `OPEN` y asignada a `pronficilio`, PR #22 sigue `OPEN`/`DRAFT`. La tanda de tracker está registrada en `issue-19.jsonl`; no hubo cierre de fase ni merge.
+- 2026-09-27: al iniciar F4 se comprobó que no hay navegador instalado/en `PATH` ni dependencia Playwright/Puppeteer/WebDriver en `coup-client`. No se hizo el recorrido manual; F4 `BLOCKED` hasta disponer de navegador/entorno seguro y después obtener Verifier FINAL independiente. Issue #19 permanece `OPEN`; PR #22 `DRAFT`; F2/F3 `ACTIVE`.
+- 2026-09-27: se reemplazaron y releyeron los cuerpos de #19 y PR #22 para registrar el bloqueo F4 observado. La API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`; ambos describen F4 `BLOCKED` y declaran que no hubo recorrido manual. Evento append-only en `issue-19.jsonl`.

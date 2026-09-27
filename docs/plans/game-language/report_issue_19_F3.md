@@ -1,6 +1,6 @@
 # Reporte F3 — mensajes `g-addLog` de issue #19
 
-**Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. Falta el recorrido manual del registro, que se coordinará con F4.
+**Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. El recorrido manual del registro está bloqueado por falta de navegador local (ver `report_issue_19_F4.md`).
 **Base:** `origin/master@2d82fa1`, integrada en #19 por `74432a6`.
 **PR:** [#22](https://github.com/pronficilio/coup-online/pull/22), debe permanecer `DRAFT`; issue #19 permanece `OPEN`.
 **Commit publicado:** `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`); la sincronización de los cuerpos de tracker se registró después en un commit documental.

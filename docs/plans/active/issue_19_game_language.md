@@ -3,13 +3,13 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/19
 - **Plan exacto:** `docs/plans/game-language/plan_game_language.md`
 - **Bitácora exacta:** `docs/plans/log/issue-19.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `PENDING`. Issue abierta y asignada a `pronficilio`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) está `DRAFT` por solicitud del usuario para validar el avance parcial; no está lista para fusionarse.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `BLOCKED` por falta de navegador local para recorrido manual. Issue abierta y asignada a `pronficilio`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) está `DRAFT` por solicitud del usuario para validar el avance parcial; no está lista para fusionarse.
 - **Modo/riesgo/verificación:** `FULL` / `MEDIUM` / `FINAL`.
-- **Verifier requerido ahora:** no. Requerido en F4 antes de revisión de integración.
+- **Verifier requerido ahora:** sí para cierre de F4, pero aún no asignado; Orquestación debe delegar el verificador FINAL independiente cuando se complete el recorrido manual. El Alquimista no autocertifica.
 - **Pregunta de falsificación:** ¿puede una persona en un recorrido normal encontrar texto inglés visible/accesible o activar inglés pese a no existir selector?
 - **F1 cerrada:** `docs/plans/game-language/translation_inventory.md` inventaría texto visible/accesible, errores, decisiones, reglas, HTML/PWA, assets y mensajes `g-addLog`; no hubo cambios de producto.
-- **Tanda actual F2/F3 tras PR #23:** PR #23 de #14 está integrada en `origin/master@2d82fa1`; #19 la incorporó mediante merge `74432a6` y registró `sync_base`. Se localizaron CreateGame, JoinGame, decisiones, Coup, PlayerBoard y las cinco imágenes españolas; `g-addLog` se localizó en sus ocho emisores actuales en `server/game/coup.js`. El diccionario contiene 307 claves `es`/`en` con marcadores concordantes. Build del cliente exit 0 con warnings preexistentes; `git diff --check` y `node --check` de los archivos server limpios. F2/F3 siguen ACTIVE mientras faltan recorrido manual y F4. Issue #19 debe seguir OPEN; PR #22 DRAFT; no selector ni cambio real de idioma.
-- **Publicación y tracker (2026-09-27):** commit `9f97acb` está publicado en `origin/issue/19-spanish-default-dictionary`. Los cuerpos de issue #19 y PR #22 se reemplazaron para reflejar 307 claves, F2/F3 `ACTIVE`, F4 `PENDING` y la validación actual; ambos se releyeron y mantienen #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`. Se registra la sincronización en la bitácora.
+- **Tanda actual F2/F3 tras PR #23:** PR #23 de #14 está integrada en `origin/master@2d82fa1`; #19 la incorporó mediante merge `74432a6` y registró `sync_base`. Se localizaron CreateGame, JoinGame, decisiones, Coup, PlayerBoard y las cinco imágenes españolas; `g-addLog` se localizó en sus ocho emisores actuales en `server/game/coup.js`. El diccionario contiene 307 claves `es`/`en` con marcadores concordantes. Build del cliente exit 0 con warnings preexistentes; `git diff --check` y `node --check` de los archivos server limpios. F2/F3 siguen ACTIVE; el recorrido manual está bloqueado por falta de navegador local y F4 está `BLOCKED`. Issue #19 debe seguir OPEN; PR #22 DRAFT; no selector ni cambio real de idioma.
+- **Publicación y tracker (2026-09-27, estado anterior):** commit `9f97acb` se publicó en `origin/issue/19-spanish-default-dictionary`. En esa actualización los cuerpos de #19/#22 describían F4 como `PENDING`; el estado actual cambió a `BLOCKED` tras confirmar que no hay navegador para hacer el recorrido manual. Se mantuvieron #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`.
 - **Documentos fuente:** issue #19; plan indicado arriba; reglas `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md`; recursos de referencia descritos en el plan.
 
 ## Subtareas auditadas en F1
@@ -26,6 +26,7 @@
 - F2: terminar revisión/manual de las superficies ahora integradas en master: lobby, decisiones, partida y tablero; documentar cobertura y brechas de accesibilidad sin rediseñar controles. El diccionario y carga de imágenes españolas están implementados.
 - F3: revisar manualmente las ocho plantillas localizadas en `server/game/coup.js`; los emisores están liberados por PR #23. Mantener payload string, eventos, acciones, cartas, reglas y nombres internos.
 - F4: compilar cliente, recorrer portada/lobby/partida manualmente, revisar cobertura y solicitar Verifier FINAL independiente.
+- **Bloqueo F4 (2026-09-27):** no se encontró un navegador ejecutable (`chromium`, `chromium-browser`, Chrome, `chrome` o `firefox`) ni dependencia Playwright/Puppeteer/WebDriver. No se inició recorrido ni se instalaron dependencias. F4 `BLOCKED`; preparar/reclamar Verifier después de habilitar recorrido seguro. A las 17:20:35Z se actualizaron y releyeron los cuerpos de #19/#22; #19 sigue `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`.
 - No implementar selector, detección, preferencia persistente ni otra ruta para elegir idioma; no añadir ni ejecutar tests automatizados.
 
 ## Dependencias y límites
