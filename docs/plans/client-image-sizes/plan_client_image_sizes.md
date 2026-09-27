@@ -6,6 +6,7 @@
 **Bitácora:** docs/plans/log/issue-32.jsonl
 **Modo / riesgo / verificación:** LIGHT / LOW / NONE.
 **Branch / worktree / merge target:** issue/32-client-image-sizes / .worktrees/issue-32-client-image-sizes / master.
+**PR:** https://github.com/pronficilio/coup-online/pull/34, abierta hacia `master`.
 **Siguiente dueño:** un Agente Alquimista.
 
 ## Solicitud y definición de éxito
