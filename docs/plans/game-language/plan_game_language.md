@@ -1,6 +1,6 @@
 # Idioma español predeterminado y diccionario bilingüe — issue #19
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `ACTIVE`, con corrección de un hallazgo del Verifier y nueva revisión FINAL pendiente.
+**Estado:** `WAITING_USER`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `BLOCKED` hasta la revisión visual de la corrección y el cierre del Verifier FINAL.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
@@ -87,7 +87,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED` ni tratar la rama como aceptada hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. Reorquestación aprobada explícitamente por el usuario (2026-09-27) permitió integrar PR #22 parcialmente en `master` para revisión incremental mientras F4 estaba bloqueada; PR #22 se fusionó con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. El merge no satisface criterios, no cierra F2/F3/F4 ni issue #19, y no reemplaza el Verifier FINAL.
 
-**Hallazgo tardío de assets y corrección en curso (2026-09-27):** al revisar `origin/master@3313d42` tras la fusión de #22 se encontraron cinco familias usadas por `Coup.js` cuyo arte normal y activo muestra `BLOCK ASSASSINATION`, `BLOCK FOREIGN AID`, `BLOCK STEAL`, `CHALLENGE` y `PASS`. El Verifier reportó `FAIL` para AC1/AC2/AC4/AC7 por esos rótulos; AC3/AC5/AC6 pasaron. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no tienen importaciones ni referencias en `coup-client/src` y no se usan en la UI actual; se registran como dormidos. F2 agrega el hallazgo al inventario y conecta las cinco etiquetas a las claves `es`/`en` ya existentes. `ResponseImageButton` cubre el texto incrustado con una etiqueta española, preservando marco/icono y estados activo/inactivo. La lógica, los IDs y el protocolo permanecen intactos. Esta tanda requiere build y revisión visual/Verifier; F2 y F4 siguen `ACTIVE`, sin declaración de aceptación.
+**Hallazgo tardío de assets y corrección (2026-09-27):** al revisar `origin/master@3313d42` tras la fusión de #22 se encontraron cinco familias usadas por `Coup.js` cuyo arte normal y activo muestra `BLOCK ASSASSINATION`, `BLOCK FOREIGN AID`, `BLOCK STEAL`, `CHALLENGE` y `PASS`. El Verifier reportó `FAIL` para AC1/AC2/AC4/AC7 por esos rótulos; AC3/AC5/AC6 pasaron. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no tienen importaciones ni referencias en `coup-client/src` y no se usan en la UI actual; se registran como dormidos. F2 agrega el hallazgo al inventario y conecta las cinco etiquetas a las claves `es`/`en` ya existentes. `ResponseImageButton` cubre el texto incrustado con una etiqueta española, preservando marco/icono y estados activo/inactivo. La lógica, los IDs y el protocolo permanecen intactos. El build terminó; la nueva revisión FINAL dejó AC1/AC3/AC5/AC6 `PASS` y AC2/AC4/AC7 `BLOCKED` hasta la observación visual; F2/F4 no se declaran cerradas.
 
 **Avanzar:** recorridos del cliente muestran etiquetas, decisiones y ayudas en español; ambos mapas tienen la misma estructura; solo se importa `es`; no existe selector, detección ni persistencia.
 **Pivotar:** si una etiqueta dinámica no cabe en un string de diccionario sin cambiar el payload, usar marcadores nombrados en presentación.
@@ -113,7 +113,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Commit:** `COMMIT_REQUIRED`; `feat(i18n): issue 19 F3 spanish game log messages`.
 **Validación:** inspección de los emisores y reproducción manual de mensajes disponibles sin modificar las decisiones; `git diff --check`; no añadir ni ejecutar tests.
 
-### F4 — Cerrar cobertura y revisión independiente (`ACTIVE`)
+### F4 — Cerrar cobertura y revisión independiente (`BLOCKED`)
 
 **Pregunta:** ¿la implementación satisface los criterios y no dejó texto en inglés visible ni una forma de seleccionar inglés?
 
@@ -125,6 +125,8 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Revisión independiente anterior:** el Verifier informó `FAIL` en AC1/AC2/AC4/AC7 al encontrar texto inglés incrustado en las cinco familias de botones usadas; informó `PASS` en AC3/AC5/AC6. La corrección puntual está publicada y exige nueva revisión visual independiente. El reporte previo del usuario (recorrido de portada, lobby y partida completa, todo en orden) se conserva como cita de su experiencia, sin inferir dispositivo/navegador/pasos ni convertirlo en veredicto; ocurrió antes de la corrección.
 
+**Revisión FINAL de la corrección:** el Verifier inspeccionó el commit `0c913d8` sin ejecutar tests ni build. Resultado general `BLOCKED`: AC1/AC3/AC5/AC6 `PASS`; AC2/AC4/AC7 `BLOCKED` hasta obtener observación humana del render y el ajuste responsive. La app local está activa y los pasos requeridos están en el reporte F4.
+
 **Avanzar:** criterios AC1–AC7 sustentados y Verifier `PASS`; dejar la unidad `WAITING_ORCHESTRATOR` para revisión de PR #33.
 **Pivotar:** devolver a F2/F3 solo el criterio refutado con reproducción concreta.
 **Repetir:** una ronda focalizada tras una corrección y repetir el chequeo del criterio afectado.
@@ -132,7 +134,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Commit:** `COMMIT_REQUIRED`; `docs(i18n): issue 19 F4 CLOSED ready_for_review`.
 **Validación:** verificación independiente FINAL; no añadir ni ejecutar tests automatizados.
 
-**Comprobación de entorno anterior (2026-09-27):** en el worktree #19 no se encontraron `chromium`, `chromium-browser`, `google-chrome`, `google-chrome-stable`, `chrome` ni `firefox` en `PATH`; `coup-client/package.json` no declara Playwright/Puppeteer/WebDriver. En ese entorno no se inició recorrido ni se instaló nada; F4 quedó `BLOCKED`. Después el usuario informó haber recorrido portada, lobby y una partida completa, y dijo que todo se veía en orden. No informó navegador, dispositivo, pasos específicos ni capturas; no se infieren. F4 está ahora `ACTIVE`, pendiente del Verifier FINAL independiente, sin veredicto todavía.
+**Comprobación de entorno anterior (2026-09-27):** en el worktree #19 no se encontraron `chromium`, `chromium-browser`, `google-chrome`, `google-chrome-stable`, `chrome` ni `firefox` en `PATH`; `coup-client/package.json` no declara Playwright/Puppeteer/WebDriver. En ese entorno no se inició recorrido ni se instaló nada; F4 quedó `BLOCKED`. Después el usuario informó haber recorrido portada, lobby y una partida completa, y dijo que todo se veía en orden. No informó navegador, dispositivo, pasos específicos ni capturas; no se infiere que haya verificado los cinco rótulos corregidos. El Verifier FINAL pasó AC1/AC3/AC5/AC6 y dejó AC2/AC4/AC7 `BLOCKED` hasta el recorrido visual focalizado.
 
 ## Topología, riesgos y decisiones
 
@@ -159,4 +161,4 @@ Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas 
 - 2026-09-27 (histórico, antes del merge): el usuario autorizó explícitamente integrar PR #22 parcialmente para revisión incremental aunque F4 estuviera `BLOCKED`; no equivalía a aceptación/veredicto ni cierre de #19.
 - 2026-09-27: #22 fue fusionada con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; issue #19 sigue `OPEN`. `origin/master` avanzó a `3313d42`; el branch #19 se sincronizó por fast-forward limpio desde `ca16e42`.
 - 2026-09-27: antes de abrir la PR de continuación, #19 integró `origin/master@be93e97` (PR #31/#29) mediante merge limpio `318c119`; se conserva el branch/worktree único de la issue.
-- 2026-09-27: el usuario informó exactamente que recorrió portada, lobby y partida completa y que ve todo en orden. Sin detalles de navegador/dispositivo/pasos. F4 `ACTIVE`, pendiente del Verifier independiente; F2/F3 siguen `ACTIVE`, sin cierre ni PASS.
+- 2026-09-27: el usuario informó exactamente que recorrió portada, lobby y partida completa y que ve todo en orden. Sin detalles de navegador/dispositivo/pasos; el informe corresponde al recorrido previo a la corrección de los rótulos. F4 `BLOCKED` hasta verificar los botones corregidos; F2/F3 siguen `ACTIVE`, sin cierre ni PASS.
