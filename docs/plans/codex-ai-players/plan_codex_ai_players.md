@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2 App Server implementado y validado localmente, login/modelo real pendiente; F3 implementado y cubierto por pruebas; validación de Hetzner y revisión final pendientes
+Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2 App Server implementado y validado localmente; F3 implementado y cubierto por pruebas; release POC `5a13376` activa y saludable en Hetzner; el login device-code aún no emite código y espera que el propietario habilite esa opción; no hay sesión ni llamada a Luna; escenarios manuales y revisión final pendientes
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -128,7 +128,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** recorrido humano vs dos IA e IA vs IA en Hetzner; acciones/desafíos/bloqueos/intercambio/timeout y kill switch revisados; compilar cliente y servidor; revisión final; mantener release previo listo para rollback. No iniciar torneos masivos.
 - **Pivote:** si falla una invariante de reglas, privacidad o kill switch, devolver a su fase propietaria.
 - **Repetición:** una ronda de correcciones/revisión focalizada por criterio fallido.
-- **Estado:** la validación local tras integrar la base activa `55be894` pasó: suite del servidor 36/36, `node --check` y build de cliente. El build conserva dos warnings existentes de imports sin uso en `src/App.js`. Pendiente crear la release POC separada, completar device-code, probar una decisión real y recorrer los escenarios manuales.
+- **Estado:** la validación local tras integrar la base activa `55be894` pasó: suite del servidor 36/36, `node --check` y build de cliente. El build conserva dos warnings existentes de imports sin uso en `src/App.js`. La release POC separada `5a13376` está activa; API y runner están healthy, la web responde HTTP 200, y el runner no comparte la red interna del juego ni publica puertos. El primer intento de login device-code falló antes de emitir código. OpenAI Docs indica que se debe habilitar el login por código de dispositivo en Settings > Security; el propietario tiene que hacerlo antes de reintentar. No hay sesión Codex ni llamada a Luna. Pendiente probar una decisión real y recorrer los escenarios manuales.
 
 ## Riesgos y mitigaciones
 
@@ -143,7 +143,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 - Ejecución `FULL`; riesgo `HIGH`; pruebas de motor, runner, socket, cuotas y build completadas localmente; queda prueba real de cuenta y operación de Hetzner.
 - Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
-- Siguiente paso: empaquetar un release POC privado como carpeta nueva, conservar `55be894` para rollback, activar device-code con el propietario y probar una sola jugada antes de invitar amigos. La comprobación de solo lectura del host encontró 16 GB libres; la release activa sigue siendo `55be894` y aún no se ha modificado.
+- Siguiente paso: el release POC privado ya está en `/opt/coup/releases/5a13376`; la release anterior `55be894` queda disponible para rollback. Esperar a que el propietario habilite device-code, iniciar un nuevo flujo y probar una sola jugada antes de invitar amigos. No se ha llamado al modelo.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
 - Merge target: `master`.

@@ -20,6 +20,8 @@ El runner solo tiene salida de red para login y servicio Codex; no comparte la r
 
 ## Autorizar la cuenta y probar
 
+Antes del flujo remoto, habilitar el inicio con código de dispositivo en ChatGPT > Settings > Security (cuenta personal) o en los permisos del workspace. OpenAI documenta que este ajuste es requisito para `codex login --device-auth` en máquinas headless: [autenticación de Codex](https://learn.chatgpt.com/docs/auth). Si el ajuste no está disponible, no copies `auth.json` por el chat; pausa aquí y elige el siguiente método de login con el propietario.
+
 Iniciar el flujo de dispositivo dentro del runner:
 
 ```sh
