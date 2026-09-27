@@ -3,7 +3,8 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_EXECUTOR`; F1 `CLOSED`; F2 `BLOCKED` por #14 y #19.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por #14 y #19.
+- **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Verifier requerido ahora:** no; requerido en F3 antes de revisión de integración.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
@@ -29,7 +30,7 @@ Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y re
 
 ## Commits por fase
 
-- F1 `COMMIT_REQUIRED`: `feat(action-images): issue 21 F1 import optimized webp controls`
+- F1 `94b1447bb0b5fb1613e3f7cf226993077a2f0da7`: `feat(action-images): issue 21 F1 import optimized webp controls`
 - F2 `COMMIT_REQUIRED`: `feat(action-images): issue 21 F2 image response controls and transition`
 - F3 `COMMIT_REQUIRED`: `docs(action-images): issue 21 F3 CLOSED ready_for_review`
 

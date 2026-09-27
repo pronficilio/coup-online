@@ -1,6 +1,6 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `WAITING_EXECUTOR`; F1 `CLOSED`; F2 `BLOCKED` por superficies compartidas con #14 y #19; F3 `PENDING`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por superficies compartidas con #14 y #19; F3 `PENDING`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
@@ -54,7 +54,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Pivotar:** si un WebP difiere visualmente por codificación, ajustar calidad del encoder sin recortar ni alterar la fuente.
 **Repetir:** una corrección acotada por asset que falle visualmente.
 **Bloquear:** no es posible reducir y exportar WebP con herramientas disponibles sin instalar dependencias externas.
-**Commit:** `COMMIT_REQUIRED`; `feat(action-images): issue 21 F1 import optimized webp controls`.
+**Commit:** `94b1447bb0b5fb1613e3f7cf226993077a2f0da7` — `feat(action-images): issue 21 F1 import optimized webp controls`.
 **Validación:** inspección de dimensiones/formato/modo, comparación visual y verificación de fuentes intactas. Sin tests.
 **Reporte:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 
@@ -93,4 +93,4 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 
-- 2026-09-27: F1 cerrada; diez WebP RGB con canvas/fondo preservado, Pillow 12.0.0/libwebp 1.6.0, LANCZOS, quality 95, method 6. F2 sigue bloqueada por #14/#19; issue en WAITING_EXECUTOR.
+- 2026-09-27: F1 cerrada; diez WebP RGB con canvas/fondo preservado, Pillow 12.0.0/libwebp 1.6.0, LANCZOS, quality 95, method 6. F2 sigue bloqueada por #14/#19; unidad en WAITING_ORCHESTRATOR.

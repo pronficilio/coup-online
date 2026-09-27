@@ -1,6 +1,7 @@
 # Reporte F1 — issue #21: reducción e importación WebP
 
 **Estado:** `CLOSED`
+**Estado de la unidad:** `WAITING_ORCHESTRATOR`; F2 espera coordinación/liberación por #14/#19.
 **Branch/worktree:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons`
 **Scope aplicado:** reducir las diez fuentes al 50 % y convertirlas a WebP, preservando el canvas RGB y el fondo. No se extrajo transparencia ni se reconstruyó el arte.
 
@@ -38,4 +39,4 @@ No se añadieron ni ejecutaron tests automatizados, ni se ejecutó build: F1 sol
 
 ## Entrega y siguiente fase
 
-F1 queda cerrada en el commit `feat(action-images): issue 21 F1 import optimized webp controls`. F2 permanece bloqueada por la coordinación/liberación de `Coup.js` y componentes de respuesta con #14 y #19; no se editaron superficies compartidas.
+F1 queda cerrada en `94b1447bb0b5fb1613e3f7cf226993077a2f0da7` (`feat(action-images): issue 21 F1 import optimized webp controls`). F2 permanece bloqueada por la coordinación/liberación de `Coup.js` y componentes de respuesta con #14 y #19; no se editaron superficies compartidas.
