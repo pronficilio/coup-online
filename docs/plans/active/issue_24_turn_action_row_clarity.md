@@ -2,8 +2,8 @@
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Plan exacto:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`
-**Estado:** `WAITING_EXECUTOR`; F1 `CLOSED / PASS`; F2 `READY`.
-**Fase sugerida:** F2 — implementar las filas de acción en el renderer genérico integrado.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`.
+**Fase activa:** F2 — implementar las filas de acción en el renderer genérico integrado.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; Verifier independiente requerido en F3.
 **Bitácora exacta:** `docs/plans/log/issue-24.jsonl`.
 **Branch / worktree / merge target:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / `master` de `pronficilio/coup-online`.
@@ -11,7 +11,7 @@
 
 ## Reclamo y aislamiento
 
-Issue #24 sigue abierta y sin asignación. Antes de trabajar, reclama la unidad en `pronficilio/coup-online`, relee título/cuerpo/estado y confirma que no haya reclamo incompatible. Usa la rama y worktree canónicos indicados; la rama ya existe y fue rebaseada por el Orquestador a `origin/master@5de95ee`. Comprueba su estado limpio, registra `claim` y `worktree_confirmed` en la bitácora y empieza F2 después.
+Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440, volvió a leer el título/cuerpo/estado y confirmó que no hay otro reclamo incompatible. El único branch/worktree canónico es el indicado; la rama está rebaseada por el Orquestador sobre `origin/master@5de95ee`. La comprobación observada confirmó el worktree exacto, branch correcto, HEAD `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`, seguimiento alineado con `origin/issue/24-turn-action-row-clarity` y árbol limpio. Claim/worktree quedan registrados en la bitácora.
 
 ## Fase activa F2 — filas para opciones de acción
 

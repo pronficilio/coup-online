@@ -1,8 +1,8 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `WAITING_EXECUTOR`; F1 `CLOSED / PASS`; F2 `READY`. El usuario liberó la dependencia y pidió rebasear esta rama; el Orquestador auditó el renderer vigente y preparó la fase ejecutable.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. El Alquimista reclamó #24 y confirmó el aislamiento canónico para ejecutar F2.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
-**Handoff:** `docs/plans/inbox/issue_24_turn_action_row_clarity.md`
+**Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
@@ -61,7 +61,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Commit:** `COMMIT_REQUIRED`; `docs(action-rows): issue 24 F1 generic renderer confirmed`.
 **Validación:** releer issues/PRs, inspeccionar código integrado y `git diff --check`.
 
-### F2 — Implementar y documentar la fila interactiva (`READY`)
+### F2 — Implementar y documentar la fila interactiva (`ACTIVE`)
 
 **Pregunta:** ¿el renderer final comunica de forma inequívoca dónde activar una acción y por qué una acción no está disponible?
 
@@ -105,3 +105,4 @@ Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad 
 - 2026-09-27: por instrucción explícita del usuario, rebasear #24; PR #23 está integrada y PR #22 publicó el renderer y las cadenas necesarias para F2. #19 continúa abierta solo por sus verificaciones manuales/Verifier.
 - 2026-09-27: adaptar F2 al renderer genérico y agrupar `choiceId` por acción/destino. La interfaz no amplía las opciones legales del servidor.
 - 2026-09-27: clasificar `FULL / MEDIUM / FINAL` por la adaptación investigada al renderer nuevo, el selector de destino y la revisión independiente de elegibilidad.
+- 2026-09-27: el Alquimista reclamó la issue en el fork y confirmó branch/worktree limpios; F2 comienza sobre `Coup.js`.
