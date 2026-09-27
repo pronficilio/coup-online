@@ -3,12 +3,12 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por #14 y #19.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` por coordinación explícita del usuario mientras #14/#19 siguen abiertos.
 - **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Verifier requerido ahora:** no; requerido en F3 antes de revisión de integración.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
-- **Estado de fase:** F1 cerrada; F2 espera coordinación/liberación de superficies compartidas con #14 y #19.
+- **Estado de fase:** F1 cerrada; F2 activa por instrucción explícita del usuario. El Ejecutor trabaja solo en #21, compara los diffs de #14/#19 y reporta colisiones semánticas sin resolver.
 - **Documentos fuente:** issue #21; plan exacto arriba; `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; `docs/plans/game-language/plan_game_language.md`; componentes en `coup-client/src/components/game/`.
 
 ## Subtareas listas
@@ -17,7 +17,7 @@
 2. Crear/confirmar branch y worktree canónicos, registrar `claim` y `worktree_confirmed`, mover inbox a active y hacer el commit de control antes de cambios de producto.
 3. F1 completada: diez WebP bajo `coup-client/src/assets/action-buttons/`; fuentes PNG RGB en `/mnt/e/dev/coup/fotos/` se mantuvieron de solo lectura e intactas.
 4. F1 verificada visualmente y por formato/dimensiones/modo; reporte `docs/plans/action-image-buttons/report_issue_21_F1.md`; commit `feat(action-images): issue 21 F1 import optimized webp controls`.
-5. No empezar F2 hasta confirmar que #14 y #19 liberaron/integraron `Coup.js` y los componentes de respuesta, o recibir coordinación registrada del Orquestador. No resolver conflictos por inferencia.
+5. F2 autorizada por el usuario en el worktree asignado aunque #14/#19 sigan activos. Antes de editar, comparar sus cambios vivos en `Coup.js` y componentes de respuesta; preservar su intención, no tocar sus worktrees ni incorporar sus ramas. Si hay colisión semántica incierta, detener esa parte y reportarla al Orquestador.
 6. Tras la liberación, sustituir solamente Challenge, Block Foreign Aid, Block Steal, Block Assassination y Pass; preservar handlers, elegibilidad, destinos y payloads. Mantener Ambassador/Captain como elecciones de reclamo.
 7. Añadir transición ligera entre estados normal/activo con nombre accesible, foco, teclado y `prefers-reduced-motion`; compilar y recorrer manualmente.
 8. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar. Preparar material para Verifier independiente FINAL.
@@ -26,7 +26,7 @@
 
 Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y recorrido manual registrados en los reportes; no añadir ni ejecutar tests automatizados. Fuera de alcance: acciones principales, reglas, servidor, Socket.IO, nueva dependencia de animación.
 
-**Riesgo/bloqueos:** archivos origen ignorados en RGB; preservar el canvas y el fondo. F2 bloqueada por #14/#19.
+**Riesgo/bloqueos:** archivos origen ignorados en RGB; preservar el canvas y el fondo. F2 tiene solapamiento con #14/#19; autorización temporal registrada, cambios aislados en #21.
 
 ## Commits por fase
 
@@ -43,7 +43,7 @@ Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y re
 - **Bitácora:** `docs/plans/log/issue-21.jsonl` (append-only).
 - **Secuencia:** primero registrar claim en el issue del fork y releer; luego crear/confirmar una sola branch/worktree desde `origin/master` actualizada; dentro del worktree mover este inbox a `active/`, registrar claim/worktree/phase_start en JSONL y commitear control.
 - **Validaciones:** dimensiones/formato/modo/comparación visual documentadas para F1; `npm run build` desde `coup-client` y recorrido manual para F2/F3; no tests.
-- **Delegación:** dividir subtareas visuales atómicas según la política local, sin escribir en superficies compartidas hasta resolver los bloqueos.
+- **Delegación:** F2 autorizada para el Alquimista en el worktree canónico de #21; no editar los worktrees de #14/#19 ni asumir una resolución de colisiones.
 - **Verifier:** invocar independiente en F3 para intentar refutar AC1–AC6.
 
 ## Confirmación de reclamo y aislamiento
@@ -52,4 +52,4 @@ Issue #21 releída después del reclamo: OPEN, sin assignee previo; el comentari
 
 ## F1 entregada
 
-F1 produjo diez derivados WebP al 50 %, preservando los canvas RGB. El reporte registra dimensiones, bytes, alfa, encoder y revisión visual. El siguiente trabajo es F2, que permanece bloqueada hasta coordinar #14/#19; no se modificaron componentes.
+F1 produjo diez derivados WebP al 50 %, preservando los canvas RGB. El reporte registra dimensiones, bytes, alfa, encoder y revisión visual. Por instrucción explícita del usuario, F2 se activa ahora en este worktree con coordinación de solapamiento; no modificar los worktrees ajenos.
