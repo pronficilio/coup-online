@@ -3,6 +3,7 @@
 **Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. Falta el recorrido manual del registro, que se coordinará con F4.
 **Base:** `origin/master@2d82fa1`, integrada en #19 por `74432a6`.
 **PR:** [#22](https://github.com/pronficilio/coup-online/pull/22), debe permanecer `DRAFT`; issue #19 permanece `OPEN`.
+**Commit publicado:** `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`); la sincronización de los cuerpos de tracker se registró después en un commit documental.
 
 ## Cambios
 
@@ -20,3 +21,4 @@
 - `npm run build` del cliente: exit 0; warnings por imports sin uso preexistentes en `App.js`, `caniuse-lite` desactualizado y `postcss-calc` con unidades `dvh` en `ReferencePanel.css:100/106`.
 - `git diff --check`: limpio.
 - No se añadieron ni ejecutaron tests. No se hizo una partida manual; falta confirmar visualmente los mensajes del registro.
+- Tras publicar `9f97acb`, se actualizaron y releyeron los cuerpos de #19 y #22. #19 sigue `OPEN`/asignada a `pronficilio`; #22 sigue `OPEN`/`DRAFT`.
