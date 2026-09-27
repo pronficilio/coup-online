@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `RETURNED`; F3 `CLOSED`; F4 `RETURNED`. El Verifier independiente devolvió F4 con `FAIL` medio en el criterio 2 para cinco jugadores; corregir el lift responsive de F2 y repetir la revisión FINAL.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. F2 corrigió el margen superior para cinco jugadores tras el `FAIL` medio del primer pase FINAL; sincronizar `master` vigente y repetir F4 con el mismo Verifier.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -52,7 +52,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** inspección estática/documental; no ejecutar tests.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
-### F2 — Integrar influencias perdidas y ajustar el círculo (`RETURNED`)
+### F2 — Integrar influencias perdidas y ajustar el círculo (`CLOSED`)
 
 - **Pregunta única:** ¿la mano propia y el círculo pueden ocupar la posición solicitada sin desplazar ni cubrir el resto del HUD?
 - **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y hará la revisión visual del preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
@@ -64,6 +64,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** build de cliente e inspección visual; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F2.md`.
 - **Seguimiento de verificación (2026-09-27):** el Verifier FINAL midió el asiento superior a aproximadamente 81 px (viewport móvil de 390 px) y 112 px (escritorio ancho) para cinco jugadores; el criterio 2 pide unos 50 px. F2 vuelve a `RETURNED` únicamente para corregir la geometría de `.PlayerBoardContainer` según las coordenadas superiores de 2–6 jugadores y el tope real de 900 px, sin desplazar HUD/controles ni recortar asientos. Build/diff-check/sintaxis requeridos antes de cerrar F2 con un commit de seguimiento; después F4 vuelve a `ACTIVE` para el mismo Verifier.
+- **Resolución del seguimiento (2026-09-27):** el layout superior de cinco jugadores queda en `top: 14%` efectivo: `.PlayerBoardContainer[data-player-count="5"]` aplica `translate: 0 -6.88%` para compensar el anillo que alcanza 20.88%. Es un ajuste del tablero cuadrado; las reglas responsive anteriores y el HUD conservan sus posiciones. `git diff --check` y `node --check server/game/coup.js` pasan; el build termina con código 0 y avisos ya observados en `App.js`, `ReferencePanel.css` y `caniuse-lite`. El preview de `localhost:3015` sigue activo. F2 queda `CLOSED`; F4 vuelve a `ACTIVE` para el mismo Verifier tras sincronizar el branch.
 
 ### F3 — Mostrar el conteo autoritativo de Court (`CLOSED`)
 
@@ -76,19 +77,19 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; preview local para revisión visual del propietario; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F3.md`.
 
-### F4 — Revisión final independiente (`RETURNED`)
+### F4 — Revisión final independiente (`ACTIVE`)
 
 - **Pregunta única:** ¿el conjunto cumple los criterios sin desplazar HUD ni publicar información privada?
-- **Entrada:** F3 cerrada y aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. La revisión independiente inicial devolvió F4 con `FAIL` medio por el criterio 2; F2 se corrige y después F4 vuelve a `ACTIVE` para el mismo Verifier.
+- **Entrada:** F1–F3 cerradas y aprobación visual del propietario recibida el 2026-09-27; hold visual levantado. La revisión independiente inicial devolvió F4 con `FAIL` medio por el criterio 2; el lift de cinco jugadores quedó corregido en F2 y se repite F4 con el mismo Verifier.
 - **Salida:** sincronización documentada, build/diff-check/comprobaciones de sintaxis y veredicto FINAL independiente.
 - **Criterio de cierre:** capturas/escalas 2, 3 y 6 jugadores en móvil y escritorio; revisar reserva superior, anclaje del conteo, intercambio pendiente/completado, desafío con reemplazo, revancha y el payload público. Refutar al menos una afirmación de éxito; corregir defectos antes del veredicto.
 - **Artefacto:** `docs/plans/game-table-ux/report_issue_28_F4.md` y evidencia visual acotada.
 - **Commit:** `COMMIT_REQUIRED` para el sync/control de F4; el commit de veredicto/cierre se reserva hasta cumplir el criterio de F4 y recibir PASS independiente.
-- **Validación previa:** `git diff --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y build de cliente terminaron correctamente. Build informa variables sin uso en `App.js` y warnings `postcss-calc` en `ReferencePanel.css`, pero salió con código 0. F2 debe repetir build/diff-check/sintaxis después de corregir el margen superior. No se agregaron ni ejecutaron tests automatizados. Verifier independiente FINAL debe revisar el nuevo commit; no hacer push ni abrir PR antes del PASS.
+- **Revalidación:** el seguimiento F2 pasa `git diff --check`, `node --check server/game/coup.js` y build de cliente (código 0). El build conserva avisos de `App.js`, `ReferencePanel.css` y `caniuse-lite`. `origin/master` vigente confirmado por GitHub en `094a61e4a45b08ffb6aba68098bb424d21b9b7d2`; sincronizar antes del nuevo pase. No se agregaron ni ejecutaron tests automatizados. No hacer push ni abrir PR antes del PASS independiente.
 
 ## Dependencias y coordinación
 
-- El propietario reorientó el trabajo el 2026-09-27 y autorizó implementar F2/F3 desde este worktree aislado; después aprobó visualmente el preview y levantó el hold para continuar. La sincronización F4 usa `origin/master@5fffacfdadcf3e91453bda1d13e4c0b2e3327831`, hijo del SHA #35/#26 `12115856c71de8b8abb5d13a81cf8458a2cae240`; merge/control comprometido en `400c9e21a326c8c0cc56a37f380f10945590665b`. El merge presentó un conflicto de contenido en `CoupStyles.css`: se preservan los estilos de pausa `.Pause*` integrados desde #26 y se omite `.circle`, sin consumidores; los merges automáticos en `Coup.js`, `translations.json` y `server/game/coup.js` preservan las características integradas y el conteo Court de #28. La issue remota fue actualizada y releída: OPEN, F4 ACTIVE y criterios 1–6 presentes. No editar branches/worktrees hermanos, copiar ni cherry-pickear sus cambios. No hacer push ni abrir PR hasta recibir PASS del Verifier independiente.
+- El propietario reorientó el trabajo el 2026-09-27 y autorizó implementar F2/F3 desde este worktree aislado; después aprobó visualmente el preview y levantó el hold para continuar. La sincronización F4 previa incorporó `origin/master@5fffacfdadcf3e91453bda1d13e4c0b2e3327831` en `400c9e21a326c8c0cc56a37f380f10945590665b`; hubo conflicto de contenido en `CoupStyles.css`, resuelto conservando `.Pause*` de #26 y omitiendo `.circle` sin consumidores. Para la revisión final se sincronizará además el master vigente `094a61e4a45b08ffb6aba68098bb424d21b9b7d2` (#36 integrado). La issue remota sigue OPEN con criterios 1–6. No editar branches/worktrees hermanos, copiar ni cherry-pickear sus cambios. No hacer push ni abrir PR hasta recibir PASS del Verifier independiente.
 
 ## Riesgo y pregunta de falsificación
 

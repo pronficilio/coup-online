@@ -8,6 +8,11 @@
     transform: translateY(clamp(-180px, calc(108px - 15vh - min(14vw, 126px)), -40px));
 }
 
+/* A five-seat ring tops out at 20.88% instead of the 14% used by the other layouts. */
+.PlayerBoardContainer[data-player-count="5"] {
+    translate: 0 -6.88%;
+}
+
 @media only screen and (min-width: 521px) and (max-width: 1023px) {
     .PlayerBoardContainer {
         transform: translateY(clamp(-240px, calc(100px - 22vh - min(14vw, 126px)), -40px));

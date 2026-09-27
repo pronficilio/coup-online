@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-`CLOSED` para la implementación F2 y su build. La revisión visual queda pendiente del propietario en el preview local solicitado; este reporte no afirma haber validado partidas en vivo ni los 2–6 asientos en dispositivos reales. El propietario autorizó continuar F3 en paralelo con esa revisión.
+`CLOSED` para la implementación F2 y su seguimiento responsive. El propietario revisó y aprobó visualmente el preview local, y autorizó continuar. El Verifier FINAL encontró después un margen superior mayor al objetivo con cinco jugadores; se corrigió en el seguimiento documentado abajo. Este reporte no afirma haber recorrido partidas en vivo ni validado dispositivos reales.
 
 Commit prescrito: `feat(game-ui): issue 28 F2 influences, lost cards and board position`.
 
@@ -36,3 +36,9 @@ Commit prescrito: `feat(game-ui): issue 28 F2 influences, lost cards and board p
 ## Seguimiento del Verifier independiente (2026-09-27)
 
 La revisión FINAL devolvió F4 con `FAIL` medio en el criterio 2: en mesas de cinco jugadores, el asiento superior queda aproximadamente a 81 px del borde en móvil de 390 px y 112 px en escritorio ancho, frente al objetivo de unos 50 px. Los demás criterios pasaron estáticamente. Por ese hallazgo, F2 vuelve a `RETURNED` solo para ajustar el desplazamiento de `.PlayerBoardContainer` con base en las posiciones superiores de 2–6 jugadores, incluyendo el ancho del tablero limitado a 900 px. No cambiar HUD, controles, asientos visibles, reglas, privacidad ni protocolo. El seguimiento se cierra tras build, diff-check y sintaxis; el mismo Verifier repetirá F4.
+
+### Resolución F2 del margen superior
+
+Se añadió `.PlayerBoardContainer[data-player-count="5"] { translate: 0 -6.88%; }`. El tablero es cuadrado y tiene ancho máximo de 900 px; el ajuste compensa la diferencia entre la coordenada superior de 20.88% en el anillo de cinco jugadores y el 14% usado por los otros layouts. No cambia los transforms responsive existentes ni los controles fuera del tablero.
+
+Verificación del seguimiento: `git diff --check` pasó, `node --check server/game/coup.js` pasó y `npm run build` en `coup-client` terminó con código 0. Persisten los avisos de `logo`/`Link` sin uso en `App.js`, `postcss-calc` con `dvh` en `ReferencePanel.css` y `caniuse-lite` desactualizado; la corrección no añadió warnings. No se ejecutaron tests automatizados. El preview `http://localhost:3015` sigue activo. F2 queda `CLOSED`; F4 está `ACTIVE` para repetir la revisión independiente después de sincronizar `master` vigente.
