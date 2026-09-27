@@ -32,3 +32,7 @@ Resolver el solapamiento para los viewports estrechos manteniendo el Event Log y
 ## Limitaciones
 
 El análisis del solapamiento proviene de anclajes CSS, orden del DOM y apilamiento; no de una captura renderizada. No se ejecutaron pruebas automatizadas.
+
+## Seguimiento F2 antes de repetir F4
+
+Se añadió `z-index: 4` a `.GameHeader`, que ya usa `position: relative`. El header sigue en la misma posición y conserva el fondo transparente, pero su contexto de apilamiento ahora se pinta por encima del tablero transformado. Esto prioriza los controles y el texto/scroll del Event Log si las cajas se cruzan. `git diff --check`, `node --check server/game/coup.js` y el build del cliente pasaron; el build terminó con código 0 y los avisos conocidos. Es una corrección pendiente de aprobación independiente: F4 aún no tiene nuevo veredicto.

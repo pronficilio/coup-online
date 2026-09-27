@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `RETURNED`; F3 `CLOSED`; F4 `RETURNED`. El propietario aprobó visualmente el preview; un pase independiente corrigió el margen de cinco jugadores, y el siguiente detectó un posible solapamiento entre el asiento superior derecho y el área del Event Log en móvil. Véase `docs/plans/game-table-ux/report_issue_28_F4.md`. Resolver el solapamiento sin mover el Event Log ni ocultar cartas; después repetir F4 con el mismo Verifier.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `ACTIVE`. El propietario aprobó visualmente el preview. F2 conserva el margen de cinco jugadores y eleva el stacking context del encabezado sobre el tablero, sin mover el Event Log; el build pasó. El mismo Verifier repetirá F4.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -23,7 +23,9 @@ El Verifier independiente informó `FAIL` medio para F4 el 2026-09-27: con cinco
 
 El seguimiento F4 sincronizó después `origin/master@094a61e4a45b08ffb6aba68098bb424d21b9b7d2` (#37/#36, recuperación de recursos de cartas) en `caa39f1ec82eca193ce00f8b0e0f3707db142cf9`, sin conflictos. Sobre este HEAD pasan `git diff origin/master...HEAD --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y bitácora JSONL; el build de cliente termina con código 0 y conserva solo los avisos conocidos. El cliente continúa respondiendo HTTP 200 en `localhost:3015`; no se ejecutaron tests automatizados. La issue #28 fue actualizada y conserva los criterios 1–6.
 
-La repetición independiente de F4 en `a9cbeb21b6581af78d16018cd9d4ba2b178476aa` informó un segundo `FAIL` medio: el asiento superior derecho a cinco jugadores puede solapar con el Event Log a 390 px; la capa del tablero (después del encabezado, `z-index: 3`) puede cubrir texto o el scroll, cuyo contenedor se ancla en `top: 60px`. La revisión fue estática y no midió una captura. Los criterios 1, 3, 4, 5 y 6 pasaron; el margen superior de cinco jugadores ya coincide con 14%. F2 y F4 vuelven a `RETURNED` para resolver el criterio 2, manteniendo el Event Log en su posición y dejando accesibles tanto el log como los asientos.
+La repetición independiente de F4 en `a9cbeb21b6581af78d16018cd9d4ba2b178476aa` informó un segundo `FAIL` medio: el asiento superior derecho a cinco jugadores puede solapar con el Event Log a 390 px; la capa del tablero (`z-index: 3`) puede cubrir texto o scroll, cuyo contenedor se ancla en `top: 60px`. La revisión fue estática y no midió una captura. Los criterios 1, 3, 4, 5 y 6 pasaron; el margen superior ya coincide con 14%. F2 y F4 volvieron a `RETURNED` para resolver el criterio 2.
+
+El seguimiento de F2 añadió `z-index: 4` a `.GameHeader`, que conserva su posición y fondo transparente. El encabezado y el Event Log quedan por encima del contexto transformado del tablero; el log conserva su anclaje y área desplazable. `git diff --check`, `node --check server/game/coup.js` y el build de cliente pasan con avisos conocidos. El mismo Verifier repetirá F4; preview activo en `http://localhost:3015`.
 
 El cuerpo actualizado de #28 también pide que las influencias perdidas permanentemente permanezcan visibles con tratamiento gris y símbolo/etiqueta accesible que no dependa solo del color; el rol debe seguir legible. No marcar cartas probadas temporalmente durante un desafío, ya que vuelven a Court, y no revelar las influencias ocultas activas de rivales.
 
@@ -53,4 +55,4 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en el único branch. El margen de cinco jugadores quedó corregido, pero el Verifier encontró un posible solapamiento entre ese asiento y el Event Log móvil; F2 y F4 están `RETURNED`. El informe está en `docs/plans/game-table-ux/report_issue_28_F4.md`. Conserva el anclaje y la funcionalidad del Event Log y evita cubrir cartas; build/diff-check/sintaxis y nueva verificación por el mismo agente son requisitos del siguiente cierre F2/F4. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
+Cada fase con artefactos requiere commit en el único branch. F2 cierra el apilamiento del encabezado sobre el tablero; F4 está `ACTIVE` para revisión por el mismo Verifier. Build/diff-check/sintaxis pasan. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
