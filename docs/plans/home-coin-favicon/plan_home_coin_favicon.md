@@ -1,11 +1,11 @@
 # Moneda animada en la portada y favicon optimizado — issue #25
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `BLOCKED`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/25
 **Handoff:** `docs/plans/active/issue_25_home_coin_favicon.md`
 **Bitácora:** `docs/plans/log/issue-25.jsonl`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
-**Siguiente dueño:** Agente Orquestador para completar revisión visual manual y decidir el cierre de F1.
+**Siguiente dueño:** Agente Orquestador; revisión aprobada, integración en curso.
 **Integración esperada:** `issue/25-home-coin-favicon` en `.worktrees/issue-25-home-coin-favicon`, una PR a `master`.
 
 ## Solicitud y definición de éxito
@@ -39,7 +39,7 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 
 ## Fase única
 
-### F1 — Integrar moneda de portada y favicon (`BLOCKED` — revisión visual pendiente)
+### F1 — Integrar moneda de portada y favicon (`CLOSED`)
 
 **Pregunta:** ¿la portada puede mostrar la moneda animada y usar un favicon derivado pequeño sin saturar la vista móvil ni aumentar innecesariamente los recursos?
 
@@ -62,9 +62,9 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 - **Favicon:** ICO válido con imágenes PNG de 16×16 y 32×32, 3,596 bytes. El manifest declara `32x32 16x16`; el build contiene el favicon y no usa el PNG fuente de 408,320 bytes.
 - **Build:** `npm run build` en `coup-client` terminó con exit 0 (“Compiled with warnings”). Los warnings observados son imports `logo` y `Link` sin uso en `src/App.js` y `postcss-calc` con `dvh` en `game/ReferencePanel.css:100,106`.
 - **Tamaño responsive estático:** CSS calcula 256×256 en 1440×900; 175.5×175.5 en 390×844; 160×160 en 360×640. `height: auto` preserva la relación cuadrada.
-- **AC5 parcial:** el build y la inspección de artefactos están completos, pero no se pudo abrir un navegador en el entorno (Chrome, Chromium y Firefox no están disponibles; tampoco hay herramienta de navegador integrada). No se verificaron visualmente los controles de escritorio/móvil. No se agregaron ni ejecutaron tests.
-- **PR draft:** [#27](https://github.com/pronficilio/coup-online/pull/27) hacia `master`.
-- **Veredicto:** F1 `BLOCKED` por falta de renderer local; unidad `WAITING_ORCHESTRATOR`. Siguiente acción concreta: revisar visualmente la PR #27 en escritorio y móvil, verificando que Create/Join y reglas sigan visibles/usables, y luego actualizar el veredicto. No se declara F1 cerrada.
+- **AC5:** el servidor de desarrollo se levantó desde el worktree en `http://localhost:3003`; el usuario revisó la portada en su navegador y aprobó el resultado (“está super bonito”), sin reportar defectos. `npm run build` pasó. No se agregaron ni ejecutaron tests automatizados.
+- **PR:** [#27](https://github.com/pronficilio/coup-online/pull/27) hacia `master`, lista para integración.
+- **Veredicto:** F1 `CLOSED` tras la validación manual del usuario y la revisión del Orquestador; la unidad sigue `WAITING_ORCHESTRATOR` solo para integrar la PR #27.
 
 ## Topología y coordinación
 
