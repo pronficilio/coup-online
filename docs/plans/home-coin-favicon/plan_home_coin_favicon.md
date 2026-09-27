@@ -1,11 +1,11 @@
 # Moneda animada en la portada y favicon optimizado — issue #25
 
-**Estado:** `WAITING_EXECUTOR`; F1 `READY`.
+**Estado:** `ACTIVE`; F1 `ACTIVE`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/25
 **Handoff:** `docs/plans/active/issue_25_home_coin_favicon.md`
 **Bitácora:** `docs/plans/log/issue-25.jsonl`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
-**Siguiente dueño:** Agente Menor de implementación, gobernado por el Agente Alquimista.
+**Siguiente dueño:** Agente Menor de implementación, ejecutando bajo revisión del Agente Alquimista.
 **Integración esperada:** `issue/25-home-coin-favicon` en `.worktrees/issue-25-home-coin-favicon`, una PR a `master`.
 
 ## Solicitud y definición de éxito

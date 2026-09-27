@@ -3,7 +3,7 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/25
 - **Plan exacto:** `docs/plans/home-coin-favicon/plan_home_coin_favicon.md`
 - **Bitácora exacta:** `docs/plans/log/issue-25.jsonl`
-- **Estado:** `WAITING_EXECUTOR`; F1 `READY`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
+- **Estado:** `ACTIVE`; F1 `ACTIVE`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
 - **Modo/riesgo/verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Fase sugerida:** F1 — integrar moneda animada y favicon.
