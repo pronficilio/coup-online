@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
-- **Issue:** [#28 — Ajustar tablero, influencias y contador del mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2/F3 `BLOCKED` por solapamiento de superficies; F4 `PENDING`.
+- **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `PENDING`; F4 `PENDING`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -10,7 +10,7 @@
 
 ## Solicitud reescrita
 
-Quitar el bloque global de influencias, mostrar solo los nombres debajo de las cartas del asiento local, subir moderadamente el tablero circular sin mover los controles superiores y mostrar sobre el mazo Court el número de cartas que realmente quedan en él.
+Quitar el bloque global de influencias, mostrar solo los nombres debajo de las cartas del asiento local, marcar las influencias perdidas permanentemente con un símbolo/etiqueta accesible, subir moderadamente el tablero circular sin mover los controles superiores y mostrar sobre el mazo Court el número de cartas que realmente quedan en él.
 
 ## Objetivo y definición de éxito
 
@@ -27,6 +27,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 ## Alcance
 
 - Mover los nombres traducidos de las influencias propias al asiento local, bajo sus cartas; retirar `InfluenceSection`, su título y sus círculos de colores. Usar las claves `game.roles.*` vigentes.
+- Marcar solo las influencias perdidas permanentemente con tratamiento gris y símbolo/etiqueta accesible; mantener legible el nombre del rol, no marcar cartas probadas temporalmente en desafíos y no revelar cartas rivales ocultas.
 - Reubicar solo `PlayerBoardContainer` para dejar aproximadamente 50 px de margen superior hasta el encabezado del asiento más alto, manteniendo los componentes del `GameHeader` en sus posiciones.
 - Proyectar el tamaño público de Court con la instantánea que ya reciben todos los jugadores y mostrarlo inmediatamente encima de la imagen del mazo, con una etiqueta accesible localizada en el diccionario `es`/`en`.
 - Actualizar el dato cuando Court cambia, incluyendo el intervalo de elección de Exchange, la resolución de Exchange, los reemplazos por desafío y una revancha.
@@ -51,25 +52,25 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** inspección estática/documental; no ejecutar tests.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
-### F2 — Integrar influencias y ajustar el círculo (`BLOCKED`)
+### F2 — Integrar influencias perdidas y ajustar el círculo (`ACTIVE`)
 
 - **Pregunta única:** ¿la mano propia y el círculo pueden ocupar la posición solicitada sin desplazar ni cubrir el resto del HUD?
-- **Entrada:** F1 cerrada y liberación de las ediciones de `Coup.js`/`CoupStyles.css` en #24 y del overlay planeado en #26. Sincronizar la rama desde `origin/master` después de las integraciones; no copiar cambios de worktrees ajenos.
-- **Salida:** nombres de roles traducidos bajo las cartas propias, sin sección/título/bolitas globales; círculo algo más arriba con unos 50 px hasta el primer encabezado superior.
-- **Criterio de cierre:** probar visualmente 2–6 jugadores en escritorio y móvil; conservar los controles y el Event Log en sus coordenadas existentes, sin solapamiento, recorte ni movimiento de la sección de decisiones.
+- **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y hará la revisión visual del preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
+- **Salida:** nombres de roles traducidos bajo las cartas propias, sin sección/título/bolitas globales; influencias perdidas permanentemente grises con símbolo/etiqueta accesible y rol legible; círculo algo más arriba con unos 50 px hasta el primer encabezado superior.
+- **Criterio de cierre:** build de cliente, revisión estática y preview listo; mantener controles y Event Log en sus coordenadas, sin cambiar reglas ni protocolo de decisiones. La revisión visual del propietario queda pendiente explícitamente; no afirmar inspección manual propia de estados de juego.
 - **Artefacto:** código y reporte F2.
-- **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 28 F2 player influences and board position`.
+- **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 28 F2 influences, lost cards and board position`.
 - **Validación:** build de cliente e inspección visual; no añadir ni ejecutar tests automatizados.
 
-### F3 — Mostrar el conteo autoritativo de Court (`BLOCKED`)
+### F3 — Mostrar el conteo autoritativo de Court (`PENDING`)
 
 - **Pregunta única:** ¿el valor visible coincide con las cartas que están en Court en cada etapa del flujo?
-- **Entrada:** F2 cerrada; F1 confirma las rutas de mutación; superficies compartidas liberadas por el Orquestador.
+- **Entrada:** F2 implementada en este worktree; F1 confirma las rutas de mutación. F2/F3 cuentan con autorización explícita del propietario pese a los solapamientos; no copiar cambios de otras ramas.
 - **Salida:** campo numérico público en `g-updatePlayers` derivado de `this.deck.length` y contador localizado inmediatamente encima del mazo central, compartido por todas las vistas sin exponer cartas.
 - **Criterio de cierre:** parte de 15 menos las cartas repartidas; baja dos mientras Exchange espera elección y vuelve al valor inicial cuando devuelve dos; no cambia por un reemplazo uno-a-uno tras desafío; se reinicia correctamente al jugar otra vez. Controles del protocolo permanecen iguales.
 - **Artefacto:** código y reporte F3.
 - **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 28 F3 court deck count`.
-- **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; no añadir ni ejecutar tests automatizados.
+- **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; preview local para revisión visual del propietario; no añadir ni ejecutar tests automatizados.
 
 ### F4 — Revisión final independiente (`PENDING`)
 
@@ -83,8 +84,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 
 ## Dependencias y coordinación
 
-- Estado del Orquestador (2026-09-27): la rama remota de #24 está limpia, pero F2 espera revisión visual manual e integración; #26 tiene cambios de producto aún no confirmados en `Coup.js`, `CoupStyles.css`, traducciones y servidor. No editar esas superficies en paralelo.
-- F1 puede auditar reglas y código desde su worktree propio; F2 y F3 permanecen bloqueadas hasta que el Orquestador confirme liberación/integración de #24/#26. Antes de F2, sincronizar el branch desde `origin/master` vigente; durante F1 `origin/master` avanzó de `5de95ee` a `c601410` al integrarse PR #27.
+- El propietario reorientó el trabajo el 2026-09-27 y autorizó implementar F2/F3 desde este worktree aislado, dejando la revisión visual para el preview local. No editar ramas/worktrees #24/#26 ni copiar/cherry-pickear sus cambios. Antes del código se debe sincronizar el branch desde `origin/master` vigente; el SHA local observado antes del fetch era `3313d426ebe5cf3d0612e692e1fe44137468362f`.
 
 ## Riesgo y pregunta de falsificación
 
