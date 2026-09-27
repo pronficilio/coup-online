@@ -49,19 +49,44 @@
 }
 
 .PlayerBoardDeck {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+    filter:
+        drop-shadow(1px 4px 1px rgba(0, 0, 0, 0.34))
+        drop-shadow(3px 8px 2px rgba(0, 0, 0, 0.22))
+        drop-shadow(0 13px 5px rgba(0, 0, 0, 0.15));
+}
+
+.PlayerBoardCourt {
     position: absolute;
     z-index: 2;
     top: 50%;
     left: 50%;
     width: clamp(68px, 16%, 120px);
-    height: auto;
-    object-fit: contain;
-    pointer-events: none;
     transform: translate(-50%, -50%);
-    filter:
-        drop-shadow(1px 4px 1px rgba(0, 0, 0, 0.34))
-        drop-shadow(3px 8px 2px rgba(0, 0, 0, 0.22))
-        drop-shadow(0 13px 5px rgba(0, 0, 0, 0.15));
+}
+
+.PlayerBoardCourtCount {
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    min-width: max-content;
+    padding: 4px 8px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(91, 69, 42, 0.25);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.17);
+    color: #3f3427;
+    font-size: clamp(0.7rem, 1.5vw, 0.88rem);
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
 }
 
 .PlayerBoardSeat {
@@ -335,6 +360,11 @@
 
     .PlayerInfluenceSlot {
         width: clamp(58px, 15.5vw, 82px);
+    }
+
+    .PlayerBoardCourtCount {
+        padding: 3px 7px;
+        font-size: 0.68rem;
     }
 
     .PlayerBoardSeat--observer .PlayerInfluenceEntry {

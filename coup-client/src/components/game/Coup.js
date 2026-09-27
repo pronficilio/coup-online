@@ -233,6 +233,7 @@ export default class Coup extends Component {
         this.state = {
             players: [],
             ownInfluences: [],
+            courtCount: null,
             currentPlayer: '',
             decision: null,
             submitted: false,
@@ -253,6 +254,7 @@ export default class Coup extends Component {
             this.setState({
                 players: snapshot.players,
                 ownInfluences: Array.isArray(snapshot.ownInfluences) ? snapshot.ownInfluences : [],
+                courtCount: Number.isFinite(snapshot.courtCount) ? snapshot.courtCount : null,
                 currentPlayer: snapshot.currentPlayer || this.state.currentPlayer
             })
         })
@@ -355,6 +357,7 @@ export default class Coup extends Component {
                 observerName={this.props.name}
                 observerInfluences={ownInfluences}
                 currentPlayer={this.state.currentPlayer}
+                courtCount={this.state.courtCount}
             />
             <ReferencePanel />
 

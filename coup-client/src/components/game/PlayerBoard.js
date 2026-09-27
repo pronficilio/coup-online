@@ -105,12 +105,17 @@ export default function PlayerBoard(props) {
     return (
         <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label={t('game.playerBoard.label')}>
             <div className="PlayerBoardCenter" aria-hidden="true" />
-            <img
-                className="PlayerBoardDeck"
-                src={courtDeckImage}
-                alt={t('game.playerBoard.deckAlt')}
-                draggable="false"
-            />
+            <div className="PlayerBoardCourt">
+                {Number.isFinite(props.courtCount) && <span className="PlayerBoardCourtCount" role="status" aria-live="polite">
+                    {t('game.playerBoard.courtCount', { count: props.courtCount })}
+                </span>}
+                <img
+                    className="PlayerBoardDeck"
+                    src={courtDeckImage}
+                    alt={t('game.playerBoard.deckAlt')}
+                    draggable="false"
+                />
+            </div>
             {seats.map(({ player, seatIndex, left, top, isObserver }) => {
                 const isCurrentPlayer = player.name === props.currentPlayer
                 const seatEdge = left <= 15

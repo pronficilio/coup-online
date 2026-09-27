@@ -156,6 +156,7 @@ class CoupGame {
             this.socketEmit(player.socketID, 'g-updatePlayers', {
                 players: publicPlayers,
                 ownInfluences: player.influences.slice(),
+                courtCount: this.deck.length,
                 currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
                 phase: this.phase,
                 stateVersion: this.stateVersion
@@ -164,6 +165,7 @@ class CoupGame {
         this.spectatorSocketIDs.forEach(socketID => this.socketEmit(socketID, 'g-updatePlayers', {
             players: publicPlayers,
             ownInfluences: [],
+            courtCount: this.deck.length,
             currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
             phase: this.phase,
             stateVersion: this.stateVersion,
@@ -888,6 +890,7 @@ class CoupGame {
         } else if (action.type === 'exchange') {
             action.historyEntry.result = 'resolved'
             const drawn = [this.deck.pop(), this.deck.pop()].filter(Boolean)
+            this.updatePlayers()
             return this.openExchange(action.actor, drawn)
         }
         if (action.historyEntry.result !== 'blocked') action.historyEntry.result = 'resolved'

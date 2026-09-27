@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` (implementación/build; inspección visual del propietario pendiente); F3 `ACTIVE`; F4 `PENDING`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` (implementación/build; inspección visual del propietario pendiente); F3 `CLOSED` (implementación/build; inspección visual del propietario pendiente); F4 `PENDING`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -63,15 +63,16 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** build de cliente e inspección visual; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F2.md`.
 
-### F3 — Mostrar el conteo autoritativo de Court (`ACTIVE`)
+### F3 — Mostrar el conteo autoritativo de Court (`CLOSED`)
 
 - **Pregunta única:** ¿el valor visible coincide con las cartas que están en Court en cada etapa del flujo?
 - **Entrada:** F2 implementada en este worktree; F1 confirma las rutas de mutación. F2/F3 cuentan con autorización explícita del propietario pese a los solapamientos; no copiar cambios de otras ramas.
 - **Salida:** campo numérico público en `g-updatePlayers` derivado de `this.deck.length` y contador localizado inmediatamente encima del mazo central, compartido por todas las vistas sin exponer cartas.
-- **Criterio de cierre:** parte de 15 menos las cartas repartidas; baja dos mientras Exchange espera elección y vuelve al valor inicial cuando devuelve dos; no cambia por un reemplazo uno-a-uno tras desafío; se reinicia correctamente al jugar otra vez. Controles del protocolo permanecen iguales.
+- **Criterio de cierre:** auditoría estática confirma que parte de 15 menos las cartas repartidas; baja dos mientras Exchange espera elección y vuelve al valor previo al devolver dos; no cambia por reemplazo uno-a-uno tras desafío; se reinicia correctamente al jugar otra vez. Controles del protocolo permanecen iguales. El propietario revisará estos estados en el preview; no se afirma recorrido manual en esta fase.
 - **Artefacto:** código y reporte F3.
 - **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 28 F3 court deck count`.
 - **Validación:** build de cliente y revisión estática del ciclo servidor/cliente; preview local para revisión visual del propietario; no añadir ni ejecutar tests automatizados.
+- **Reporte:** `docs/plans/game-table-ux/report_issue_28_F3.md`.
 
 ### F4 — Revisión final independiente (`PENDING`)
 
