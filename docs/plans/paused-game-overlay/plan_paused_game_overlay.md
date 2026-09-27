@@ -1,7 +1,7 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `READY_TO_MERGE`; F1, F2 y F3 cerradas. La PR #35 está abierta contra `master`, con mergeability `clean`; el usuario autorizó el merge.
+- **Estado:** `COMPLETED`; F1, F2 y F3 cerradas; la PR #35 se integró en `master` mediante merge commit `12115856c71de8b8abb5d13a81cf8458a2cae240` y GitHub cerró el issue #26.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` (cambio de autorización server-side).
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
@@ -92,7 +92,7 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 - **Límites de evidencia:** el recorrido humano no incluyó una pausa no recuperable; ese estado se verificó estáticamente y el reporte no lo presenta como prueba visual. No se agregaron ni ejecutaron tests automatizados según la política de la issue. Los F3 de `6621255`, `46b0805` y `9276e0a` son históricos de sus hashes.
 - **Cobertura restante no manual:** Codex-only, payload falsificado, desconexión durante pausa y rechazo real no formaron parte de los pasos que recibió el usuario; su comportamiento de servidor se revisó estáticamente en el informe independiente previo `report_issue_26_F3_followup.md` (hash histórico `9276e0a`). La autorización posterior del usuario cubre PR y merge; estos casos no se declaran visualmente probados.
 - **Artefactos:** `report_issue_26_F3_copy.md` (Verifier FINAL PASS) junto con `report_issue_26_F3.md`, `report_issue_26_F3_recheck.md` y `report_issue_26_F3_followup.md` como históricos.
-- **Commit:** cierre F3 documentado en `66675d2`; Orquestador actualizará el handoff y bitácora antes de abrir la integración.
+- **Cierre:** F3 documentada inicialmente en `66675d2`; el handoff y bitácora registran después la PR #35 integrada y el estado COMPLETED.
 - **Validación:** build exit 0 con warnings preexistentes, `git diff --check`, paridad i18n 292/292, revisión estática independiente y recorrido humano aprobado. No ejecutar tests automatizados.
 
 ## Riesgos y pregunta de falsificación
@@ -105,4 +105,4 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 
 Antes de crear branch/worktree, el Ejecutor relee la issue #26 en `pronficilio/coup-online`, registra claim visible y confirma que no existe uno incompatible. Después crea un único branch y worktree desde `origin/master` actualizado. El control local de esta unidad está preparado en `docs/plans/`; copiar selectivamente plan, handoff y bitácora a ese worktree, sin copiar ni limpiar otros cambios del checkout raíz. Toda implementación ocurre en ese worktree y termina en una sola PR hacia `master` del fork.
 
-Branch/worktree de #26 son canónicos y están aislados. La PR única es [#35](https://github.com/pronficilio/coup-online/pull/35), hacia `master`; el usuario autorizó su merge después de la revisión de integración. No desplegar.
+Branch/worktree de #26 son canónicos y están aislados. La PR única [#35](https://github.com/pronficilio/coup-online/pull/35) ya está integrada en `master`; GitHub cerró el issue. No desplegar.
