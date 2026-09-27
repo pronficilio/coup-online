@@ -58,6 +58,10 @@ docker compose -p deploy -f docker-compose.yml -f codex-ai.compose.yml ps
 
 El runner usa `@openai/codex@0.157.1`, fijado en `deploy/Dockerfile.codex-runner`. Para actualizarlo, cambia el pin y repite validación de protocolo, build, healthcheck y una llamada real antes de desplegar.
 
+## Estado actual de Hetzner
+
+Al 2026-09-27, el web se sirve desde `coup-web:84b6f96`; API y runner siguen en `4ab5e52` y están saludables. Se reconstruyó y reemplazó solo `coup-web` para ocultar el control de emergencia a invitados sin reiniciar el API ni cerrar salas activas. El host sirve la página y el bundle `main.76e01582.js` con HTTP 200. El `.env` privado se conservó con modo `600`. Un despliegue completo futuro puede mover API y runner a un único release; reiniciar el API cierra las salas actuales.
+
 ## Autorizar Codex
 
 El volumen Docker `coup_codex_state` conserva la autenticación privada (`CODEX_HOME`) y los límites de uso del runner. El contenedor del API no lo monta. No copies `auth.json` al repo, al `.env`, a un ticket o al chat.

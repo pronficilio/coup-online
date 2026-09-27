@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2/F3 implementados; release POC `4ab5e52` activo y saludable en Hetzner; OAuth normal y una decisión real GPT-6 Luna `low` verificados; palanca roja restringida al líder autorizado por el código y rearmada; Draft PR #23 abierto contra `master`; escenarios manuales y revisión final pendientes.
+Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2/F3 implementados; en Hetzner el web `84b6f96` y API/runner `4ab5e52` están saludables; OAuth normal y una decisión real GPT-6 Luna `low` verificados; palanca roja restringida al líder autorizado por el código y rearmada; Draft PR #23 abierto contra `master`; escenarios manuales y revisión final pendientes.
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
