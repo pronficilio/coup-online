@@ -273,6 +273,15 @@
     text-align: center;
 }
 
+.PauseWaitingStatus {
+    margin: 12px auto;
+    padding: 12px 16px;
+    max-width: 42rem;
+    border-radius: 8px;
+    background: #edf2f5;
+    color: #23313a;
+}
+
 .PauseOverlay {
     position: fixed;
     z-index: 2001;

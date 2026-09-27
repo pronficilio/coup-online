@@ -1,5 +1,7 @@
 # Issue #26 — reporte F1: causas de pausa y permisos
 
+> **Histórico / criterio superseded:** este análisis reflejaba la regla inicial de reanudación por líder y ya no es vigente. La aclaración posterior del usuario requiere permiso exclusivo para humanos pendientes de responder; ver [`report_issue_26_F1_recheck.md`](report_issue_26_F1_recheck.md).
+
 - **Pregunta:** ¿cada causa de `g-gamePaused` comunica coherentemente si se puede reanudar y quién está autorizado?
 - **Base inspeccionada:** `origin/master` `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`.
 - **Worktree:** `.worktrees/issue-26-paused-game-overlay`; branch `issue/26-paused-game-overlay`.

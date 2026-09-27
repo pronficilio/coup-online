@@ -1,5 +1,7 @@
 # Issue #26 — reporte F2: overlay de pausa y reanudación
 
+> **Histórico / criterio superseded:** este overlay mostraba el CTA al líder y ya no representa el comportamiento requerido. La implementación fue corregida para autorizar solo asientos humanos pendientes de responder; ver [`report_issue_26_F2_recheck.md`](report_issue_26_F2_recheck.md). El reporte F3 previo corresponde al commit `662125554a76c6724a159a8c572627544a3c19fc` y también es histórico.
+
 - **Fase:** F2 `CLOSED`; F3 `BLOCKED`, unidad `WAITING_ORCHESTRATOR`.
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Base:** F1 `2347fa0`; `origin/master` `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`.

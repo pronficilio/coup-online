@@ -224,7 +224,7 @@ const DECISION_ERROR_KEYS = {
     'This seat is not eligible for this decision.': 'game.decision.error.ineligible',
     'Choice is not available to this seat.': 'game.decision.error.choiceUnavailable',
     'A different choice was already submitted.': 'game.decision.error.alreadySubmitted',
-    'Only the lobby leader can resume a timed-out decision.': 'game.decision.error.leaderOnlyResume',
+    'Only a player who did not answer this decision can resume it.': 'game.decision.error.timeoutOwnerOnlyResume',
     'There is no timed-out decision to resume.': 'game.decision.error.noTimedOutDecision',
     'This pause cannot be resumed; recreate the game.': 'game.decision.error.cannotResume',
     'Every seat must still be connected to resume.': 'game.decision.error.seatsDisconnected',
@@ -248,6 +248,7 @@ export default class Coup extends Component {
             pausedCause: '',
             canResume: false,
             resumePending: false,
+            pauseWaiting: false,
             winner: '',
             canPlayAgain: false,
             logs: [],
@@ -296,18 +297,21 @@ export default class Coup extends Component {
             }))
         })
         socket.on('g-gamePaused', paused => {
-            if (!this.state.pausedCause && typeof document !== 'undefined') {
+            const showOverlay = !paused || paused.showOverlay !== false
+            if (showOverlay && !this.state.pausedCause && typeof document !== 'undefined') {
                 this.pauseReturnFocus = document.activeElement
             }
             this.resumeRequestPending = false
             this.setState({
                 decision: null,
                 submitted: false,
-                pausedCause: paused && paused.cause ? paused.cause : 'Game paused.',
-                canResume: Boolean(paused && paused.canResume),
-                resumePending: false
+                pausedCause: showOverlay ? (paused && paused.cause ? paused.cause : 'Game paused.') : '',
+                canResume: showOverlay && Boolean(paused && paused.canResume),
+                resumePending: false,
+                pauseWaiting: Boolean(paused && paused.waitingForOwner),
+                decisionError: ''
             }, () => {
-                if (this.pauseOverlayRef.current) this.pauseOverlayRef.current.focus({ preventScroll: true })
+                if (showOverlay && this.pauseOverlayRef.current) this.pauseOverlayRef.current.focus({ preventScroll: true })
             })
         })
         socket.on('g-gameResumed', () => {
@@ -316,6 +320,7 @@ export default class Coup extends Component {
                 pausedCause: '',
                 canResume: false,
                 resumePending: false,
+                pauseWaiting: false,
                 decisionError: ''
             }, () => {
                 if (typeof document === 'undefined') return
@@ -355,7 +360,7 @@ export default class Coup extends Component {
     }
 
     resumeGame = () => {
-        if (!this.state.canResume || !this.props.isLeader || this.resumeRequestPending) return
+        if (!this.state.canResume || this.resumeRequestPending) return
         this.resumeRequestPending = true
         this.setState({ resumePending: true, decisionError: '' }, () => {
             this.props.socket.emit('g-resume')
@@ -477,7 +482,8 @@ export default class Coup extends Component {
                     {this.state.submitted && <p>{t('game.decision.sent')}</p>}
                     {this.state.decisionError && <p role="alert">{this.state.decisionError}</p>}
                 </>}
-                {!decision && !this.state.winner && !this.state.pausedCause && <p>{t('game.waiting')}</p>}
+                {this.state.pauseWaiting && <p className="PauseWaitingStatus" role="status">{t('game.pause.waitingForResponsible')}</p>}
+                {!decision && !this.state.winner && !this.state.pausedCause && !this.state.pauseWaiting && <p>{t('game.waiting')}</p>}
                 {this.state.winner && <p><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
                 {playAgain}
             </div>
@@ -496,14 +502,13 @@ export default class Coup extends Component {
                     <h2 id="PauseOverlayTitle">{t('game.pause.title')}</h2>
                     <p id="PauseOverlayCause" className="PauseCause">{pausedMessage(this.state.pausedCause)}</p>
                     {this.state.canResume
-                        ? this.props.isLeader
-                            ? <p>{t('game.pause.leaderCanResume')}</p>
-                            : <p>{t('game.pause.waitingForHost')}</p>
+                        ? <p>{t('game.pause.responsibleCanResume')}</p>
                         : <p>{t('game.pause.notResumable')}</p>}
                     {this.state.canResume && <p className="PauseConnectionHint">{t('game.pause.seatsMustStayConnected')}</p>}
-                    {this.state.canResume && this.props.isLeader && <button
+                    {this.state.canResume && <button
                         type="button"
                         className="PauseResumeButton"
+                        disabled={this.state.resumePending}
                         aria-disabled={this.state.resumePending}
                         onClick={this.resumeGame}
                     >{this.state.resumePending ? t('game.pause.resumePending') : t('game.resume')}</button>}

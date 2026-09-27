@@ -1,8 +1,8 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `BLOCKED`.
-- **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 revalidada `CLOSED`; F2 corregida `CLOSED`; F3 manual `BLOCKED`, Verifier `FINAL` nuevo solicitado.
+- **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` (cambio de autorización server-side).
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
 - **Handoff:** `docs/plans/active/issue_26_paused_game_overlay.md`.
@@ -14,89 +14,92 @@ Cuando vence una decisión por falta de respuesta, cubrir la vista de cada jugad
 
 ## Objetivo y definición de éxito
 
-Todas las personas conectadas reconocen inmediatamente la pausa. En un timeout recuperable, quien creó la sala puede volver a solicitar la misma decisión; el resto sabe quién debe actuar. Las pausas no recuperables no ofrecen una acción que el servidor rechazará.
+Cuando vence una decisión, únicamente los asientos humanos que no respondieron pueden reanudarla. El overlay y su CTA se muestran solo a esos asientos; cada otro jugador ve un aviso de espera no modal y no recibe overlay. El servidor deriva los responsables del estado de la decisión, nunca de datos enviados por el cliente. Las pausas sin responsable humano (incluidas las de Codex) y las demás causas no recuperables muestran guía a todos sin CTA.
 
 ## Hechos, inferencias y desconocidos
 
 ### Hechos confirmados
 
-- `origin/master` fue actualizado para este trabajo y apunta a `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`, merge del PR #22 de #19. El worktree de #26 parte de ese commit; el checkout raíz permanece intacto.
-- En `server/game/coup.js`, el temporizador de una decisión llama `pause(..., { recoverable: true })`. La pausa emite `g-gamePaused` con `canResume` derivado de una decisión recuperable.
-- El mismo servidor acepta `g-resume` solo del socket líder, solo para una pausa recuperable y mientras cada asiento humano siga conectado. Al reanudar, crea una decisión con nueva identidad/versión.
-- En `coup-client/src/components/game/Coup.js`, la pausa se presenta como texto dentro de `DecisionsSection`; `Resume game` solo se renderiza si `canResume && isLeader`. No hay una capa que cubra el tablero.
-- La issue #19 sigue abierta porque falta su recorrido manual y Verifier FINAL. Su PR #22 ya integró `Coup.js` y `translations.json` en `master` mediante `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. En la revalidación posterior al claim, su worktree seguía limpio en `ca16e426`; no se observan cambios de producto pendientes. La dependencia de código quedó liberada. Si #19 reabre cambios en esas superficies, coordinar antes de editarlas.
+- La base original de #26 fue `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. PR #27 de #25 avanzó `origin/master` a `c601410952184c85f552ee5cbb73ef6fe52519ff`; luego `1ff478c308478af3be61131daa1bd88652bdc77f` cerró #25 y sincronizó sus documentos. El branch se rebasó limpiamente sobre ambas actualizaciones; el diff #25 quedó preservado y ya no aparece como cambio local de #26.
+- En la base, el timeout llamaba `pause(..., { recoverable: true })`, y `g-resume` autorizaba al líder. Esa regla ha sido reemplazada para #26 por la aclaración explícita del usuario.
+- `openDecision()` guarda `allowed` y `responses`; los responsables humanos de un timeout se calculan como `allowed - responses`, con las claves resueltas a asientos desde estado servidor. Quien ya respondió nunca recibe permiso.
+- La base no ofrece reconexión/reasignación de asiento después de iniciar: `lobby.js` rechaza nuevas conexiones. Una desconexión invalida la pausa y exige recrear la partida. El propietario se guarda por número de asiento, no por socket ID, de modo que cualquier reasignación confiable futura conservará el asiento autorizado; no se aceptan IDs de asiento/socket del cliente.
+- En la base, la pausa se presentaba en `Coup.js` sin cubrir el tablero. La revisión previa mostró CTA del líder; el nuevo cliente solo muestra overlay/CTA si el payload privado del servidor lo marca responsable.
+- La issue #19 sigue abierta por su propio recorrido/Verifier. PR #27 de #25 (`c601410`) solo añadió cambios de portada/favicon y sus documentos; `translations.json` recibió una modificación menor de #25, preservada en el rebase. La corrección de #26 se inspeccionó sobre esta base actualizada.
 
 ### Diagnóstico e inferencia
 
-Para el timeout normal, el servidor ya dispone de una ruta de reanudación para el líder. La falta de señalización a pantalla completa y la ausencia de CTA para el resto de la sala explican por qué la pausa puede parecer bloqueada. Todavía no está confirmado que la sesión reportada corresponda a ese camino recuperable: F1 debe clasificar todos los emisores de `g-gamePaused`.
+El análisis histórico encontró una ruta de reanudación para el líder; la aclaración actual cambia quién puede usarla y también exige emisiones por receptor. La causa concreta de una sesión reportada puede variar: timeout humano pendiente, timeout solo Codex, desconexión u otro error; el servidor debe distinguirlos sin atribuir culpabilidad por conveniencia.
 
-### Decisión vigente
+### Aclaración vigente del usuario
 
-Conservar el contrato de #14: reanuda solo el líder y solo cuando `canResume` sea verdadero. No ampliar el permiso a cualquier participante ni cambiar reglas/protocolo sin reorquestación explícita.
+Esta regla de issue #26 prevalece sobre la política anterior basada en líder incluida en el body inicial de #26 y en los reportes F1/F2 previos. El servidor calcula los asientos pendientes usando `allowed - responses`, filtra a controladores humanos y guarda `resumeOwnerSeats`. Solo esos asientos pueden reanudar. El líder no recibe excepción. No se envían identidades responsables al cliente ni se confía en una identidad proporcionada por este.
+
+Si queda pendiente únicamente un actor Codex, no existe responsable humano: el servidor no guarda decisión reanudable y muestra la pausa no recuperable a todos. Si se desconecta alguien o surge otra causa no recuperable, no se inventa responsable ni CTA.
 
 ## Alcance
 
 - Auditar las causas de pausa y el permiso vigente antes de implementar.
 - Añadir una capa de pausa de pantalla completa y su presentación accesible/responsiva en el cliente.
 - Incorporar las nuevas cadenas al diccionario bilingüe integrado por #19. Confirmar con el Orquestador que no haya comenzado una corrección concurrente antes de editar `Coup.js`/`translations.json`.
-- Cambiar servidor solo si F1 demuestra que una pausa causada por falta de respuesta queda incorrectamente marcada como no recuperable. Ese hallazgo devuelve el plan al Orquestador para reclasificar riesgo/verificación.
+- Cambiar servidor para derivar dueños por asiento no respondido y autorizar `g-resume` contra el asiento que controla el socket actual. Ninguna identidad del cliente determina ownership.
 
 ## Fuera de alcance
 
-- Permitir a cualquier asiento reanudar, cambiar el liderazgo, ajustar timeouts o automatizar una acción/pase.
+- Permitir a cualquier asiento reanudar; solo los asientos humanos aún pendientes pueden hacerlo.
 - Reanudar pausas que el servidor considera no recuperables.
 - Desplegar el cambio.
 
 ## Fases
 
-### F1 — Clasificar pausa y permisos (`CLOSED`)
+### F1 — Clasificar pausa y permisos (`CLOSED`, revalidada)
 
-- **Pregunta única:** ¿cada causa de `g-gamePaused` comunica de forma coherente si la partida puede reanudarse y quién puede hacerlo?
-- **Entrada:** `origin/master` actualizado; contrato `docs/plans/codex-ai-players/f0_contract.md`; `server/game/coup.js`; `coup-client/src/components/game/Coup.js`; issue #19 y PR #22.
-- **Salida:** matriz de llamadas a `pause()` con causa, `canResume`, identidad autorizada y estado visible actual; confirmación de si el caso reportado corresponde al timeout recuperable.
-- **Criterio de avance:** cada ruta queda clasificada. Si el timeout de una decisión humana se marca no recuperable, detener cambios de interfaz y pedir reorquestación para corregir el contrato del servidor.
+- **Pregunta única:** ¿el timeout identifica solo a los humanos pendientes como responsables y qué ocurre cuando no hay responsable humano?
+- **Entrada:** base vigente `1ff478c308478af3be61131daa1bd88652bdc77f`; código integrado de `server/game/coup.js`; cliente; issue #26 y sus comentarios de aclaración/sincronización.
+- **Salida:** matriz actualizada de emisores, responsables por asiento, estado visible por receptor y comportamiento de pausas no recuperables.
+- **Criterio de avance:** timeout con humanos pendientes conserva la decisión y autoriza exclusivamente a esos asientos; actor Codex pendiente sin humanos no crea responsable; disconnect/error no ofrece reanudación.
 - **Pivote:** una causa no puede traducirse o recuperarse sin cambiar reglas/protocolo; elevar la decisión al Orquestador.
 - **Repetición acotada:** una segunda lectura del caso concreto si quedan rutas de pausa sin clasificar.
 - **Bloqueo/cancelación:** bloquear si la base cambió durante la auditoría o el contrato de #14 no coincide con el código integrado; cancelar solo por decisión del usuario.
-- **Artefactos:** `docs/plans/paused-game-overlay/report_issue_26_F1.md` y actualización de este plan. Resultado: cada emisor está clasificado; el timeout ordinario conserva la decisión y permite reanudar solo al líder mientras todos sigan conectados. No se requiere cambio de servidor.
-- **Commit:** `COMMIT_REQUIRED`; `docs(ui): issue 26 F1 CLOSED advance_f2`.
+- **Artefactos:** `docs/plans/paused-game-overlay/report_issue_26_F1.md` (hallazgo previo histórico) y `report_issue_26_F1_recheck.md` (criterio actual). Los resultados anteriores que autorizaban al líder quedan obsoletos.
+- **Commit:** `COMMIT_REQUIRED`; `docs(game): issue 26 F1 rechecked timeout owners`.
 - **Validación:** inspección estática de todos los emisores y del handler `g-resume`; no ejecutar tests.
 
-### F2 — Mostrar overlay y acción autorizada (`CLOSED`)
+### F2 — Mostrar overlay y acción autorizada (`CLOSED`, corregida)
 
-- **Pregunta única:** ¿todas las personas entienden que el juego está pausado y puede reanudarlo quien tiene permiso?
-- **Entrada:** F1 cerrada; `origin/master` actualizado al menos a `5de95ee`; comprobar que #19 no abrió una corrección concurrente; decisión del Orquestador si F1 encontró un defecto de servidor.
+- **Pregunta única:** ¿solo el responsable recibe overlay/CTA y todos los demás quedan informados sin overlay?
+- **Entrada:** F1 revalidada; `origin/master` actualizado a `1ff478c308478af3be61131daa1bd88652bdc77f`; comprobar que no haya corrección concurrente en Coup.js/estados de pausa.
 - **Salida:** capa fija semitransparente que cubre el área de juego, bloquea controles inferiores y muestra copy accesible en español.
-- **Copy inicial, sujeto al glosario de #19:** encabezado «Partida en pausa»; explicación de timeout «Se agotó el tiempo para responder»; CTA del líder «Reanudar partida»; mensaje para otros «Esperando a que el anfitrión reanude. Todos deben seguir conectados»; para una pausa no recuperable, explicar que no admite reanudación desde ese estado y omitir CTA.
-- **Criterio de avance:** toda ventana recibe la capa; solo el líder con `canResume` ve el botón; el botón evita emisiones duplicadas mientras espera; la capa se cierra con `g-gameResumed`; errores permanecen visibles y no reactivan controles detrás del overlay.
+- **Copy:** responsable: «Tu respuesta quedó pendiente. Puedes volver a abrir la decisión para continuar.»; otros: aviso accesible no modal indicando espera de personas con respuestas pendientes; pausa no recuperable: explicar que no admite reanudación y omitir CTA.
+- **Criterio de avance:** solo responsable obtiene overlay/CTA; resto no recibe overlay y queda en espera accesible; el servidor rechaza líder/responsable no pendiente/spectator y payload con identidad; el CTA evita duplicados; `g-gameResumed` despeja overlay/espera; la pérdida de recuperabilidad muestra overlay sin CTA a todos.
 - **Pivote:** si el servidor rechaza el caso normal de timeout o el copy exige otro contrato, detenerse y reorquestar.
 - **Repetición acotada:** una corrección de estado/foco por defecto reproducible.
 - **Bloqueo/cancelación:** bloquear si #19 inicia correcciones simultáneas en las superficies afectadas; no editar en paralelo. Cancelar solo por decisión del usuario.
-- **Artefactos:** código del overlay, claves bilingües y reporte F2.
-- **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 26 fullscreen pause overlay`.
-- **Validación:** build del cliente, revisión estática de condiciones/estados, claves bilingües y `git diff --check` pasaron. El recorrido manual no estuvo disponible en este entorno y se conserva como requisito de F3; no agregar ni ejecutar tests automatizados.
+- **Artefactos:** corrección de autorización/entrega personalizada de pausa, overlay, aviso de espera, claves bilingües, reporte F2 revalidado y solicitud de Verifier nuevo.
+- **Commit:** `COMMIT_REQUIRED`; `fix(game): resume timed-out decisions by pending seat`.
+- **Validación:** `npm run build` exit 0 con avisos conocidos; revisión estática de ownership/resume; i18n 313/313 claves y placeholders; `git diff --check` exit 0. No se agregaron ni ejecutaron tests automatizados.
 
-### F3 — Revisar pausa y reanudación (`BLOCKED`)
+### F3 — Revisar pausa y reanudación (`BLOCKED` para walkthrough)
 
 - **Pregunta única:** ¿el overlay orienta a cada participante sin sugerir acciones rechazadas ni ocultar un fallo real de reanudación?
-- **Entrada:** F1 y F2 cerradas.
+- **Entrada:** F1 y F2 cerradas; nuevo Verifier FINAL solicitado sobre HEAD actualizado.
 - **Salida:** recorrido manual en escritorio, móvil y teclado, más revisión independiente FINAL.
-- **Criterio de cierre:** revisar timeout recuperable visto por líder y no líder, desconexión durante la pausa, rechazo de `g-resume`, confirmación `g-gameResumed`, foco/lector de pantalla y ausencia de interacción con el tablero bajo el overlay. Registrar build, evidencia y resultado del Verifier.
+- **Criterio de cierre:** validar responsable, líder no responsable, respondedor previo, varios actores pendientes, timeout con Codex solamente, payload falsificado/no vacío, desconexión, `g-gameResumed`, teclado/foco y espera sin overlay. Registrar build, evidencia visual/manual y Verifier FINAL independiente en el commit nuevo.
 - **Pivote:** cualquier CTA no autorizado, decisión antigua aplicada o ventana sin recuperación debe regresar a la fase propietaria.
 - **Repetición acotada:** una ronda de corrección y revisión por hallazgo material.
-- **Bloqueo/cancelación:** bloqueada: no hay navegador local ni herramienta de navegador expuesta; Verifier FINAL independiente sigue pendiente. Orquestador debe proveer/reclamar un entorno navegable y asignar Verifier. Cancelar solo por decisión del usuario.
-- **Artefactos:** `docs/plans/paused-game-overlay/report_issue_26_F3.md` y evidencia visual/manual pertinente.
+- **Bloqueo/cancelación:** no se puede hacer recorrido visual aquí por falta de navegador. El F3 anterior corresponde solo a `6621255` y a criterio líder; es histórico/obsoleto. Verifier FINAL independiente solicitado sobre el nuevo HEAD; no declarar PASS global sin recorrido visual.
+- **Artefactos:** conservar `report_issue_26_F3.md` sin alterarlo como reporte histórico y añadir resultado de la nueva revisión cuando llegue.
 - **Commit:** `COMMIT_REQUIRED`; `docs(game-ui): issue 26 F3 READY_FOR_REVIEW`.
 - **Validación:** build, inspección manual y Verifier independiente. No ejecutar tests automatizados.
 
 ## Riesgos y pregunta de falsificación
 
-- **Riesgo MEDIUM:** la capa cubre controles de juego y el CTA inicia una decisión nueva; el servidor sigue siendo autoridad y conserva su verificación de líder, conectividad y recuperabilidad.
+- **Riesgo HIGH:** el cambio modifica autorización server-side y emisiones personalizadas; el servidor sigue siendo autoridad, deriva `allowed - responses`, guarda asientos responsables y exige socket→asiento verificado en el momento de reanudar.
 - **Dependencia de idioma:** las cadenas pasan por #19 para evitar texto español fuera del diccionario bilingüe.
-- **Pregunta adversarial:** ¿alguna pausa por timeout se anuncia como no recuperable, presenta un CTA que el servidor rechazará o deja actuar los controles del tablero antes de `g-gameResumed`?
+- **Pregunta adversarial:** ¿un líder/respondedor/tercero puede reanudar un timeout, un responsable pierde permiso si cambia la conexión pero conserva asiento confiable, aparece CTA si solo falta Codex o cualquier no responsable recibe el overlay?
 
 ## Reclamo, aislamiento e integración
 
 Antes de crear branch/worktree, el Ejecutor relee la issue #26 en `pronficilio/coup-online`, registra claim visible y confirma que no existe uno incompatible. Después crea un único branch y worktree desde `origin/master` actualizado. El control local de esta unidad está preparado en `docs/plans/`; copiar selectivamente plan, handoff y bitácora a ese worktree, sin copiar ni limpiar otros cambios del checkout raíz. Toda implementación ocurre en ese worktree y termina en una sola PR hacia `master` del fork.
 
-No hay branch/worktree ni PR de #26 todavía. #19 sigue abierta por una validación manual/verificación independiente pendiente, pero PR #22 ya liberó en `master` las superficies requeridas por F2.
+Branch/worktree de #26 son canónicos y están aislados; no hay PR abierta ni despliegue. Orquestador asigna el Verifier FINAL nuevo y consigue navegador para el recorrido manual pendiente.
