@@ -5,10 +5,16 @@
     aspect-ratio: 1;
     margin: 12px auto;
     box-sizing: border-box;
-    transform: translateY(clamp(-180px, calc(108px - 15vh - 13vw), -40px));
+    transform: translateY(clamp(-180px, calc(108px - 15vh - min(14vw, 126px)), -40px));
 }
 
-@media only screen and (max-width: 1023px) {
+@media only screen and (min-width: 521px) and (max-width: 1023px) {
+    .PlayerBoardContainer {
+        transform: translateY(clamp(-240px, calc(100px - 22vh - min(14vw, 126px)), -40px));
+    }
+}
+
+@media only screen and (max-width: 520px) {
     .PlayerBoardContainer {
         transform: translateY(clamp(-240px, calc(80px - 22vh - 14vw), -40px));
     }

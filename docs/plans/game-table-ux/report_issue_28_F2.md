@@ -12,6 +12,7 @@ Commit prescrito: `feat(game-ui): issue 28 F2 influences, lost cards and board p
 - Las cartas que llegan por `revealedInfluences` se presentan como pérdidas permanentes: capa gris translúcida, símbolo `×`, etiqueta accesible localizada y nombre del rol debajo de la carta. La imagen del rol se conserva.
 - Las influencias ocultas activas de otras personas siguen mostrando el reverso y no pasan su identidad a atributos del DOM. El marcado de pérdida usa solo el estado público `revealedInfluences`; una carta temporal probada en desafío no entra en esa lista y no recibe marca.
 - Moví visualmente solo `.PlayerBoardContainer` con `transform`, usando desplazamientos de viewport distintos para desktop y móvil. El transform no cambia el flujo de la página: `.GameHeader`, nombre/monedas, Rules, Cheat Sheet, Event Log, `ReferencePanel` y decisiones mantienen sus reglas actuales de posición y flujo.
+- En el seguimiento de F2, calibré el desplazamiento para que su término de ancho use el ancho real del tablero, limitado a 900 px, y separé tablet (521–1023 px) de móvil (hasta 520 px). Así el cálculo no usa el ancho de viewport completo cuando el tablero ya alcanzó su tope.
 
 ## Evidencia y validación
 
@@ -20,8 +21,9 @@ Commit prescrito: `feat(game-ui): issue 28 F2 influences, lost cards and board p
 - `git diff --check`: correcto.
 - `translations.json`: parsea como JSON.
 - `npm run build` en `coup-client`: correcto. CRA mostró avisos preexistentes de `logo`/`Link` sin uso en `src/App.js`, base `caniuse-lite` antigua y `postcss-calc` no reconoce las unidades `dvh` de `ReferencePanel.css` (líneas 100 y 106). El build terminó y dejó `build/` listo.
+- Después de calibrar el lift responsive, `git diff --check` y un segundo `npm run build` también pasaron con esos mismos avisos preexistentes.
 - No se agregaron ni ejecutaron tests automatizados.
-- La revisión visual del propietario permanece pendiente; F3 añadirá el contador y el preview se iniciará al completar ambas fases.
+- F3 añadió el contador y el preview está activo para la revisión visual del propietario, que permanece pendiente.
 
 ## Archivos de producto
 

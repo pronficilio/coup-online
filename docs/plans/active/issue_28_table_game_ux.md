@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` (implementación/build; revisión visual del propietario pendiente); F3 `CLOSED` (implementación/build; revisión visual del propietario pendiente); F4 `PENDING`.
+- **Estado:** `WAITING_USER`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `PENDING`. Implementación/build terminados; falta revisión visual del propietario.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -38,6 +38,7 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 - Cliente: `http://localhost:3015` — HTTP 200; proceso iniciado desde este worktree, exec session `17958`.
 - Backend: `http://localhost:8015` — escuchando desde este worktree, exec session `84755` (la ruta `/` responde 404 porque no es una ruta de aplicación).
 - No se creó una sala de juego. El servicio existente del puerto 8000 sigue intacto; 3015 y 8015 estaban libres antes del inicio.
+- La fórmula responsive del lift se calibró para el ancho máximo de 900 px del tablero; el cliente activo recibe el CSS por HMR y el build de seguimiento terminó correctamente.
 - La revisión visual queda pendiente del propietario. Mantener ambas sesiones activas hasta que concluya esa revisión.
 
 ## Commits y validación

@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` (implementación/build; inspección visual del propietario pendiente); F3 `CLOSED` (implementación/build; inspección visual del propietario pendiente); F4 `PENDING`.
+- **Estado:** `WAITING_USER`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `PENDING`. Implementación/build terminados; falta revisión visual del propietario.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -60,6 +60,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Criterio de cierre:** build de cliente y revisión estática; mantener controles y Event Log en sus coordenadas declaradas, sin cambiar reglas ni protocolo de decisiones. La revisión visual del propietario queda pendiente explícitamente para el preview después de F3; no afirmar inspección manual propia de estados de juego.
 - **Artefacto:** código y reporte F2.
 - **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 28 F2 influences, lost cards and board position`.
+- **Seguimiento:** commit separado `fix(game-ui): issue 28 calibrate responsive board lift` por el tope real de 900 px del círculo.
 - **Validación:** build de cliente e inspección visual; no añadir ni ejecutar tests automatizados.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F2.md`.
 
