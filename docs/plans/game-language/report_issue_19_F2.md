@@ -1,6 +1,7 @@
 # Reporte F2 — issue #19, avances parciales
 
 **Estado de la fase:** `ACTIVE`; esta tanda aislada queda completa, pero F2 no está cerrada.
+**PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22), `DRAFT`, abierta por solicitud del usuario para validar el avance parcial; no está lista para fusionarse.
 **Base sincronizada:** `origin/master` en `c0119cb70995974f6c5f5e71c19af8bba5f94011`, integrado por el merge `28e1046` (primer padre `56a41a1`).
 **Commits de la tanda:** `4b6b564` (`feat(i18n): issue 19 F2 spanish default and dictionary`), `c9d5442` (`fix(i18n): keep issue 19 locale fallback in Spanish`) y `a63336c` (`feat(i18n): issue 19 F2 localize reference panel`).
 **Fecha:** 2026-09-26.

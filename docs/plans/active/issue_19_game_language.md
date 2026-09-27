@@ -3,7 +3,7 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/19
 - **Plan exacto:** `docs/plans/game-language/plan_game_language.md`
 - **Bitácora exacta:** `docs/plans/log/issue-19.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` en superficies aisladas y pendiente en rutas reservadas; F3 `BLOCKED` por #14; F4 `PENDING`. Issue abierta y asignada a `pronficilio`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` en superficies aisladas y pendiente en rutas reservadas; F3 `BLOCKED` por #14; F4 `PENDING`. Issue abierta y asignada a `pronficilio`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) está `DRAFT` por solicitud del usuario para validar el avance parcial; no está lista para fusionarse.
 - **Modo/riesgo/verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Verifier requerido ahora:** no. Requerido en F4 antes de revisión de integración.
 - **Pregunta de falsificación:** ¿puede una persona en un recorrido normal encontrar texto inglés visible/accesible o activar inglés pese a no existir selector?
@@ -50,6 +50,7 @@
 - **Branch destino:** `issue/19-spanish-default-dictionary`.
 - **Worktree destino:** `.worktrees/issue-19-spanish-default-dictionary`.
 - **Merge target:** `master`; **PR esperada:** una, desde el branch de #19 a `master` en el fork.
+- **PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22), `DRAFT`, abierta el 2026-09-27T04:47:45Z a solicitud explícita del usuario. Es la PR única de esta unidad, para revisión parcial; mantenerla en borrador y no fusionar hasta completar F2/F3/F4 y el veredicto requerido.
 - **Secuencia obligatoria:** registrar claim visible en tracker; releer y confirmar issue; crear/confirmar branch desde `origin/master` actualizado; crear/entrar al único worktree; allí mover `inbox/` a `active/`, registrar `claim` y `worktree_confirmed` y commitear el control antes del trabajo técnico.
 - **Bitácora:** append-only `docs/plans/log/issue-19.jsonl`.
 - **Delegación:** dividir subtareas ordinarias según la política local; si hay Agentes Menores disponibles, asignarles tareas atómicas con este plan y aislamiento; de lo contrario ejecutar la fase desde el Alquimista.

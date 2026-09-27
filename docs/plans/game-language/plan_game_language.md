@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Siguiente dueño:** Orquestador para coordinar la liberación de las rutas compartidas de #14; el Alquimista retomará F2 cuando exista una superficie segura adicional.
-**Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`.
+**Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) se abrió como borrador por solicitud explícita del usuario para validar el avance parcial; es la única PR de esta unidad.
 
 ## Solicitud y definición de éxito
 
@@ -83,7 +83,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Rutas reservadas, no editar en F2 todavía:** #14 conserva `coup-client/src/components/CreateGame.js`, `coup-client/src/components/JoinGame.js`, `coup-client/src/components/game/ActionDecision.js`, `BlockChallengeDecision.js`, `BlockDecision.js`, `ChallengeDecision.js`, `ChooseInfluence.js`, `Coup.js`, `ExchangeInfluences.js`, `PlayerBoard.js` y `RevealDecision.js`; los últimos nueve archivos están bajo `coup-client/src/components/game/`. `ReferencePanel.js`/`.css` ya están liberados por #18 y la tanda actual solo edita `ReferencePanel.js`; no modificar `Coup.js` aunque la integración de #18 ya lo monte desde master. La sincronización con `origin/master` `c0119cb` quedó registrada como `sync_base` en esta tanda. F3 permanece bloqueada hasta que #14 libere `server/index.js` y `server/game/coup.js`.
 
-**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED`, no abrir PR ni entregar integración hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. La integración sigue siendo una única PR de #19.
+**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED` ni tratar la rama como lista para integrar hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. A solicitud explícita del usuario, se permite la PR de borrador #22 para revisar este avance parcial; debe permanecer `DRAFT` y no fusionarse hasta cumplir F2/F3/F4 y el veredicto requerido. Esta revisión temprana no cambia los criterios de aceptación ni crea una integración adicional.
 
 **Avanzar:** recorridos del cliente muestran etiquetas, decisiones y ayudas en español; ambos mapas tienen la misma estructura; solo se importa `es`; no existe selector, detección ni persistencia.
 **Pivotar:** si una etiqueta dinámica no cabe en un string de diccionario sin cambiar el payload, usar marcadores nombrados en presentación.
@@ -143,3 +143,4 @@ Riesgo principal: textos de servidor/protocolo y código de #14 comparten compon
 - 2026-09-27: la inspección de los worktrees #14/#18 precisó los archivos en colisión. F2 avanza en las superficies aisladas enumeradas arriba; los componentes modificados por esas unidades quedan reservados hasta liberar/integrar sus ramas. F3 espera la liberación de #14.
 - 2026-09-27: durante la tanda aislada F2, el Orquestador confirmó que PR #20 de #18 se fusionó como `64a507d` y liberó `ReferencePanel.js`/`.css`; después la issue #18 se cerró (2026-09-27T02:37:50Z). `Coup.js` continúa reservado por #14. El worktree #19 no se sincronizó en esta tanda; la siguiente sincronizará `origin/master` antes de editar las rutas liberadas.
 - 2026-09-26: se verificaron de nuevo issue #19 y worktrees #14/#18; #14 mantiene cambios locales en rutas reservadas y #18 está cerrada. `origin/master` `c0119cb` se integró en #19 con merge `28e1046`; se registra `sync_base`. La integración upstream modifica `Coup.js` para montar `ReferencePanel`, pero #19 conserva esa modificación sin editarla. Se conectó únicamente `ReferencePanel.js` al diccionario y se añadieron 9 claves (190 total); F2 permanece `ACTIVE` y F3 `BLOCKED`.
+- 2026-09-26: por solicitud explícita del usuario de validar los cambios, el Orquestador publicó `issue/19-spanish-default-dictionary` en `origin` y abrió la PR única #22 como `DRAFT` hacia `master`. La PR cubre el avance parcial de F2; no autoriza merge ni cierre de #19. F2 `ACTIVE`, F3 `BLOCKED` por #14.
