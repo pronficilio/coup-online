@@ -3,7 +3,7 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/25
 - **Plan exacto:** `docs/plans/home-coin-favicon/plan_home_coin_favicon.md`
 - **Bitácora exacta:** `docs/plans/log/issue-25.jsonl`
-- **Estado:** `ACTIVE`; F1 `ACTIVE`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `ACTIVE`. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); el Orquestador confirmó el desbloqueo. #25 está asignada a `pronficilio`.
 - **Modo/riesgo/verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Fase sugerida:** F1 — integrar moneda animada y favicon.
@@ -34,6 +34,13 @@
 - Política: `COMMIT_REQUIRED` al cerrar F1; `feat(home): issue 25 animated coin and favicon`.
 - Build: `cd coup-client && npm run build`.
 - Revisión: formato/dimensiones/tamaño del ICO, GIF final, y portada en escritorio/móvil; registrar resultados en plan/handoff y bitácora. No tests automatizados.
+
+## Entrega al Orquestador
+
+- **AC1–AC4:** implementación y revisión del diff conformes. GIF original preservado (256×256, 6 frames, 109,685 bytes; idéntico por SHA-256); favicon ICO válido de 16×16/32×32 (3,596 bytes); manifest coherente; solo la clave bilingüe de alt cambió con paridad de diccionario.
+- **Build:** `npm run build` terminó exit 0 (“Compiled with warnings”). Warnings observados: imports sin uso en `src/App.js` y `postcss-calc`/`dvh` en `game/ReferencePanel.css`; el trabajo de #25 no produjo warnings señalados.
+- **AC5 parcial:** CSS inspeccionado estáticamente: 256×256 en 1440×900, 175.5×175.5 en 390×844 y 160×160 en 360×640. No se pudo realizar recorrido visual de navegador porque el entorno no tiene Chrome/Chromium/Firefox ni herramienta visual integrada; la visibilidad de controles no está confirmada.
+- **Siguiente acción:** revisar la PR draft visualmente en escritorio y móvil (moneda, controles Create/Join y reglas), y registrar el veredicto antes de cerrar F1. Unidad `WAITING_ORCHESTRATOR`; F1 sigue `ACTIVE`.
 
 ## Reclamo y topología
 

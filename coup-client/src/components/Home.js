@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from "react-router-dom";
-import chicken from "../assets/Chicken.svg"
+import coin from "../assets/home-coin.gif"
 import RulesModal from './RulesModal';
 import { t } from '../i18n'
 
@@ -11,7 +11,13 @@ export default class Home extends Component {
             <div className="homeContainer">
                 <h1>{t('home.title')}</h1>
                 <p>{t('home.tagline')}</p>
-                <img src={chicken} alt={t('home.chicken.alt')}/>
+                <img
+                    className="homeCoin"
+                    src={coin}
+                    alt={t('home.coin.alt')}
+                    width="256"
+                    height="256"
+                />
                 <div className="input-group-btn">
                     <Link className="home" to="/create" >{t('home.create')}</Link>
                 </div>
