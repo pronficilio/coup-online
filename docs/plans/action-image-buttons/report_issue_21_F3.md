@@ -65,4 +65,4 @@ Total: 518,836 bytes. La inspección visual de los WebP disponibles muestra los 
 
 ## Dictamen
 
-Contrato, mapeo y formato/dimensiones documentadas pasan la revisión estática; build también pasa. F3 permanece `BLOCKED` porque el recorrido manual exigido no es ejecutable en este entorno sin instalar un navegador, acción que este encargo prohíbe. Con un navegador disponible, repetir el walkthrough de Challenge, Block Foreign Aid, Block Steal, Block Assassination y Pass, además del contexto Claim, en escritorio/móvil y con teclado/reduced motion; después actualizar el veredicto.
+Contrato, mapeo y formato/dimensiones documentadas pasan la revisión estática; build también pasa. F3 permanece `BLOCKED` porque el recorrido manual exigido no es ejecutable en este entorno. No instalé un navegador durante esta revisión. Con un navegador ejecutable disponible, repetir el walkthrough de Challenge, Block Foreign Aid, Block Steal, Block Assassination y Pass, además del contexto Claim, en escritorio/móvil y con teclado/reduced motion; después actualizar el veredicto.
