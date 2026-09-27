@@ -1,6 +1,6 @@
 # Reporte F4 — issue #21: corrección visual de fondos WebP
 
-**Estado:** `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F3 permanece `BLOCKED`.
+**Estado:** `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F3 permanece `BLOCKED` para el walkthrough amplio de AC6.
 **Branch/worktree:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons`.
 **Base revisada:** F3 documental `c88a223`; rama #21 conserva el merge de base `b93a67c` que integra #14 PR #23 (`2d82fa1`).
 **Motivo:** feedback visual del usuario: eliminar el fondo exterior de las imágenes y conservar todos los bordes y resplandores.
@@ -48,6 +48,10 @@ Es una inspección local de previews, no una validación final de la interfaz. E
 - `git diff --check`: **PASS** después de actualizar documentos.
 - No ejecuté tests automatizados. No detuve ni reinicié servidores locales.
 
+## Confirmación visual del usuario
+
+El 2026-09-27, el usuario revisó la instancia corregida en `http://localhost:3001` y confirmó que no ve rectángulos blancos, que la ventana de desafío de Tax muestra solo Pass y Challenge, y que Challenge usa la variante activa actualizada. La URL anterior en el puerto 3000 servía un bundle obsoleto; por eso no reflejaba los cambios. Se comprobó que el bundle del puerto 3001 ya no incluye `DecisionClaimContext` y que los WebP de Pass/Challenge servidos tienen alfa transparente en las esquinas.
+
 ## Estado y límite
 
-F4 cierra la corrección local. F3 continúa `BLOCKED` hasta validación visual del usuario y walkthrough manual en navegador de las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion. No hice push, PR, merge ni cierre de issue.
+F4 cierra la corrección local y los tres defectos visuales reportados quedan validados por el usuario. F3 continúa `BLOCKED` hasta completar el walkthrough manual de AC6: las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion. No hice push, PR, merge ni cierre de issue.

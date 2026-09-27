@@ -3,14 +3,14 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/21
 - **Plan exacto:** `docs/plans/action-image-buttons/plan_action_image_buttons.md`
 - **Bitácora exacta:** `docs/plans/log/issue-21.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; F3 `BLOCKED` hasta que el usuario valide visualmente los assets y se complete walkthrough con navegador.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; el usuario confirmó los arreglos visuales de F4; F3 `BLOCKED` hasta completar el walkthrough amplio de AC6.
 - **Reporte F1:** `docs/plans/action-image-buttons/report_issue_21_F1.md`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Reporte F3:** `docs/plans/action-image-buttons/report_issue_21_F3.md` (`BLOCKED`).
 - **Reporte F4:** `docs/plans/action-image-buttons/report_issue_21_F4.md` (`CLOSED`).
-- **Verifier requerido ahora:** falta validación visual del usuario y walkthrough en navegador para desbloquear F3.
+- **Verifier requerido ahora:** el usuario ya confirmó transparencia, ausencia de Claim en la ventana de Tax y Challenge activo actualizado. Falta walkthrough de las demás respuestas y revisión en escritorio/móvil con teclado, foco y reduced motion para desbloquear F3.
 - **Falsificación:** ¿hay un par con escala, formato o contenido incorrectos; una acción que se puede disparar por jugador no elegible; un payload/handler cambiado; un control sin acceso por teclado; un layout shift o transición que retrasa el envío?
-- **Estado de fase:** F1, F2 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. F3 sigue bloqueada hasta validación visual del usuario y walkthrough de las cinco respuestas con navegador en escritorio y móvil.
+- **Estado de fase:** F1, F2 y F4 cerradas. F2 adaptó los cinco botones al renderer genérico en la base sincronizada tras #14 PR #23 (`2d82fa1`, merge canónico #21 `b93a67c`) y añadió el par Claim al inventario. F4 regeneró los doce WebP con alfa y quitó Claim decorativo del renderer. El usuario validó que desaparecieron los fondos blancos, que en Tax solo aparecen Pass/Challenge y que Challenge muestra el arte activo actualizado. F3 sigue bloqueada por el walkthrough restante de AC6 en escritorio/móvil, teclado/foco y reduced motion.
 - **Documentos fuente:** issue #21; plan exacto arriba; `docs/plans/turn-actions-panel/plan_turn_actions_panel.md`; `docs/plans/game-language/plan_game_language.md`; componentes en `coup-client/src/components/game/`.
 
 ## Subtareas listas
@@ -29,7 +29,7 @@
 
 Cumplir AC1–AC7 del plan. Build del cliente, inspección de los diez WebP y recorrido manual registrados en los reportes; no añadir ni ejecutar tests automatizados. Fuera de alcance: acciones principales, reglas, servidor, Socket.IO, nueva dependencia de animación.
 
-**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. No hay navegador ejecutable desde esta sesión WSL: Chrome del host (`/mnt/c/Program Files/Google/Chrome/Application/chrome.exe`) falla antes de iniciar con `UtilBindVsockAnyPort:307`; no se instalaron navegadores. El usuario debe validar visualmente los assets y hace falta walkthrough de las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
+**Riesgo/bloqueos:** fuentes ignoradas RGB sin modificaciones; F4 elimina solo el fondo exterior y mantiene bordes/halos según preview. El usuario ya validó la corrección visual de F4 en navegador; esta sesión WSL no puede ejecutar Chrome (`UtilBindVsockAnyPort:307`). Sigue pendiente walkthrough de las cinco respuestas en escritorio/móvil, teclado/foco y reduced motion para cambiar F3 de `BLOCKED`. Las copias actuales ignoradas de `c.png`/`c-active.png` miden 1024×342 RGB y F4 las usó para salidas de 512×171; no sustituyen las fuentes históricas de 1400×468 documentadas por F1.
 
 ## Commits por fase
 

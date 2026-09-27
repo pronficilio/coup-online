@@ -1,18 +1,18 @@
 # Botones gráficos de respuesta de partida — issue #21
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; F3 `BLOCKED` hasta validación visual del usuario y walkthrough en navegador.
+**Estado:** `WAITING_ORCHESTRATOR`; F1/F2/F4 `CLOSED`; el usuario confirmó la corrección visual de F4. F3 `BLOCKED` hasta completar el walkthrough amplio de AC6 en navegador.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/21
 **Handoff:** `docs/plans/active/issue_21_action_image_buttons.md`
 **Bitácora:** `docs/plans/log/issue-21.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Branch/worktree/PR:** `issue/21-action-image-buttons` / `.worktrees/issue-21-action-image-buttons` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Orquestador; F3 requiere validación visual del usuario y un entorno con navegador para completar el recorrido manual.
+**Siguiente dueño:** Orquestador; F3 requiere el recorrido manual restante de AC6 en navegador.
 
 ## Solicitud y éxito
 
 Preparar los pares gráficos `ba`, `bfa`, `bs`, `pass`, `c`, `claim` y sus variantes `-active`, reducir cada fuente al 50 % de su tamaño actual manteniendo proporción, exportar WebP y colocarlos en el cliente React. Reemplazar los botones de respuesta correspondientes y animar el cambio visual de estado. F4 removió el fondo exterior de los WebP y quitó Claim decorativo del renderer; la descripción textual conserva ese contexto.
 
-Éxito significa que las cinco acciones usan su ilustración correcta en las ventanas de respuesta, los doce archivos son WebP con alfa a la mitad de sus dimensiones de origen actual, los halos y bordes permanecen visibles, las variantes activas se perciben con una transición breve y las reglas, elegibilidad, opciones y payloads permanecen intactos. La interacción conserva acceso por teclado, foco visible y movimiento reducido. F3 sigue `BLOCKED` hasta que el usuario valide visualmente los recursos corregidos y se realice walkthrough en navegador.
+Éxito significa que las cinco acciones usan su ilustración correcta en las ventanas de respuesta, los doce archivos son WebP con alfa a la mitad de sus dimensiones de origen actual, los halos y bordes permanecen visibles, las variantes activas se perciben con una transición breve y las reglas, elegibilidad, opciones y payloads permanecen intactos. La interacción conserva acceso por teclado, foco visible y movimiento reducido. El usuario ya confirmó visualmente que F4 quitó los rectángulos blancos y Claim de la ventana de Tax, y que Challenge usa el arte activo actualizado. F3 sigue `BLOCKED` hasta completar el walkthrough más amplio de AC6.
 
 ## Hechos, supuesto y dependencias
 
@@ -93,7 +93,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 **Entrada:** feedback visual del usuario y fuentes PNG actuales en `/mnt/e/dev/coup/fotos/`.
 **Tareas:** regenerar las doce salidas WebP en RGBA al 50 % de las fuentes actuales, revisar previews compuestos sobre fondo slate y retirar el Claim decorativo de la ventana challenge.
 **Avanzar:** formato/modo/dimensiones verificados; los previews conservan el arte y halos y no muestran matte rectangular; build del cliente y `git diff --check` pasan.
-**Resultado:** F4 cierra la corrección local tras revisión visual/build. El par Claim permanece en el inventario pero no se muestra; no es una opción. F3 sigue bloqueada hasta validación visual del usuario y walkthrough manual en navegador.
+**Resultado:** F4 cierra la corrección local tras revisión visual/build. El par Claim permanece en el inventario pero no se muestra; no es una opción. El usuario confirmó en navegador transparencia, ausencia de Claim en la ventana de Tax y el arte activo actualizado de Challenge. F3 sigue bloqueada hasta completar el walkthrough manual de AC6.
 **Reporte:** `docs/plans/action-image-buttons/report_issue_21_F4.md`.
 
 ## Decisiones e historial
@@ -106,6 +106,7 @@ Fuera de alcance: acciones principales del turno (`Income`, `Foreign Aid`, `Tax`
 - 2026-09-27: F2 completada en `feat(action-images): issue 21 F2 image response controls and transition`. `npm run build` compiló; no había navegador para recorrido visual, lo cual queda anotado en el reporte. La unidad espera Orquestador/Verifier para F3.
 - 2026-09-27: Verifier independiente F3: build y revisión estática PASS; formato/dimensiones/modo de doce WebP coinciden con el inventario F1/F2. F3 `BLOCKED`: no hay navegador para el walkthrough obligatorio; además, las copias ignoradas actuales de `c.png`/`c-active.png` son posteriores a F1 y no permiten confirmar la fuente histórica. Sin tests.
 - 2026-09-27: F4 correctiva por feedback visual: regenerados los doce WebP con alfa desde los PNG actuales (sin modificarlos), incluyendo `c`/`c-active` actuales 1024×342 → 512×171. Revisión de doce previews sin pérdida visible de halos/bordes ni matte rectangular; se retiró Claim decorativo del renderer. F3 continúa `BLOCKED` hasta validación visual del usuario y walkthrough; ver `report_issue_21_F4.md`.
+- 2026-09-27: el usuario validó en `http://localhost:3001` que los rectángulos blancos desaparecieron, que durante Tax solo aparecen Pass y Challenge, y que Challenge muestra el arte activo actualizado. El puerto 3000 servía un bundle viejo. F3 queda `BLOCKED` solo por el walkthrough restante de AC6 (otras respuestas, móvil, teclado/foco y movimiento reducido).
 
 - 2026-09-27 04:42 UTC: Alquimista reclamó #21 mediante comentario, la releyó OPEN y confirmó que no había claim incompatible ni PR candidata; F1 activa en branch/worktree canónicos.
 
