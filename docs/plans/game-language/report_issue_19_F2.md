@@ -2,7 +2,7 @@
 
 **Estado final de F2:** `CLOSED`, integrado en PR #33 (`45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`). El Verifier FINAL dio `PASS` sobre el árbol integrado. `translations.json` contiene 292 claves `es` y 292 `en`, con paridad confirmada. El build asociado al producto terminó exit 0; no se ejecutaron tests.
 **Estado final de F3:** `CLOSED`, con los mensajes localizados en origen y el protocolo preservado; ver el reporte F3 y el veredicto final de F4.
-**Issue/tracker:** PR #33 está `MERGED`; #19 permanece `OPEN` hasta integrar la PR documental de cierre y que Orquestación cierre la unidad. Unidad `WAITING_ORCHESTRATOR`.
+**Issue/tracker:** PR #33 está `MERGED`; la PR documental de cierre [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión. #19 permanece `OPEN` hasta integrarla y que Orquestación cierre la unidad. Unidad `WAITING_ORCHESTRATOR`.
 
 ## Historial de tandas previas a la integración de PR #33
 

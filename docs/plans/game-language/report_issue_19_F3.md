@@ -2,7 +2,7 @@
 
 **Estado final:** `CLOSED`, integrado en PR #33 mediante el merge `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. El Verifier FINAL dio `PASS` para AC1–AC7 sobre ese árbol integrado. Las ocho plantillas `g-addLog` actuales están localizadas y el payload continúa siendo `string`; no se modificaron eventos, decisiones ni valores internos.
 **Diccionario integrado:** 292 claves `es` y 292 `en`, con paridad confirmada por el Verifier. El branch previo al merge registraba 307/307; se conservan ambos conteos según sus árboles, sin inferir causa de la diferencia.
-**Tracker:** PR #33 `MERGED`; issue #19 `OPEN` hasta que se integre la PR documental de cierre y Orquestación cierre la unidad. No se ejecutaron tests; el build ya registrado terminó exit 0.
+**Tracker:** PR #33 `MERGED`; la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión. Issue #19 sigue `OPEN` hasta integrarla y que Orquestación cierre la unidad. No se ejecutaron tests; el build ya registrado terminó exit 0.
 
 ## Historial de implementación y validación previo a la integración de PR #33
 

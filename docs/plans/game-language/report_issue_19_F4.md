@@ -1,7 +1,7 @@
 # Reporte F4 — cobertura final y revisión independiente
 
 **Estado final de fase:** `CLOSED`. Verifier FINAL `PASS` sobre el merge integrado de PR #33, `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`; AC1–AC7 `PASS`. El usuario, tras completar el checklist, respondió exactamente «he probado y todo luce en orden, sugiero comenzar con el cierre del issue 19». El Verifier acepta este informe para AC7. No se infieren navegador, dispositivo ni anchos exactos, que no fueron indicados.
-**Estado de unidad:** F1–F4 `CLOSED`; `WAITING_ORCHESTRATOR`. PR #33 está `MERGED`. Issue #19 permanece `OPEN` hasta integrar la PR documental de cierre y que Orquestación cierre la unidad.
+**Estado de unidad:** F1–F4 `CLOSED`; `WAITING_ORCHESTRATOR`. PR #33 está `MERGED`; la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión. Issue #19 permanece `OPEN` hasta integrarla y que Orquestación cierre la unidad.
 **Árbol integrado:** `translations.json` contiene 292 claves `es` y 292 `en`; el Verifier confirmó paridad. La rama anterior al merge (`1b65425`) tenía 307/307; se preservan ambos conteos vinculados a sus árboles, sin inferir por qué difieren. El build del producto ya registrado terminó con exit 0. No se ejecutaron tests.
 **Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29 y llega después del merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico avanzó mediante fast-forward a `3313d42` y merge `318c119` desde `ca16e42`.
 **Estado de fases en el checkpoint inicial de este reporte (histórico):** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED`. Ese estado fue reemplazado por el cierre final documentado arriba.
@@ -103,4 +103,4 @@ PR #33 se integró en `master` mediante `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdb
 
 El árbol integrado presenta 292/292 claves `es`/`en` con paridad confirmada. La rama previa al merge (`1b65425`) registraba 307/307; no se infiere la causa de la diferencia. El build registrado previamente dio exit 0; no se ejecutaron tests.
 
-**Cierre:** F4 `CLOSED`; junto con ella F1–F3 `CLOSED`. Unidad `WAITING_ORCHESTRATOR`. La PR documental debe integrarse antes de que Orquestación cierre la issue; #19 se mantiene `OPEN` hasta entonces.
+**Cierre:** F4 `CLOSED`; junto con ella F1–F3 `CLOSED`. Unidad `WAITING_ORCHESTRATOR`. La PR documental #38 debe integrarse antes de que Orquestación cierre la issue; #19 se mantiene `OPEN` hasta entonces.

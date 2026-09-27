@@ -4,7 +4,7 @@
 - **Plan:** `docs/plans/game-language/plan_game_language.md`
 - **Bitácora append-only:** `docs/plans/log/issue-19.jsonl`
 - **Unidad:** `WAITING_ORCHESTRATOR`; F1, F2, F3 y F4 `CLOSED`.
-- **Issue:** #19 permanece `OPEN` hasta integrar la PR documental de cierre y que Orquestación cierre la unidad.
+- **Issue:** #19 permanece `OPEN` hasta integrar la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) y que Orquestación cierre la unidad.
 - **PR de producto:** [#33](https://github.com/pronficilio/coup-online/pull/33), `MERGED` en `master` mediante `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`.
 
 ## Veredicto final
@@ -15,7 +15,7 @@ El árbol integrado tiene 292 claves en `es` y 292 en `en`, con paridad confirma
 
 ## Siguiente acción
 
-Orquestación revisa e integra la PR documental de cierre. Después verifica el tracker y cierra #19. Hasta entonces, la issue permanece `OPEN` y esta unidad `WAITING_ORCHESTRATOR`.
+Orquestación revisa e integra la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38). Después verifica el tracker y cierra #19. Hasta entonces, la issue permanece `OPEN` y esta unidad `WAITING_ORCHESTRATOR`.
 
 ## Referencias
 

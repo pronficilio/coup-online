@@ -5,8 +5,8 @@
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Orquestación: revisar e integrar la PR documental de cierre en preparación, actualizar el tracker y cerrar #19. La issue permanece `OPEN` hasta que los documentos finales estén en `master`; el Alquimista deja las cuatro fases `CLOSED` y la unidad `WAITING_ORCHESTRATOR`.
-**Integración:** PR #22 se fusionó parcialmente con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; la continuación #33 se fusionó en `master` con `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Esa integración contiene el producto #19. Se prepara una PR documental de seguimiento en la misma rama/worktree para publicar el PASS final, las fases cerradas y el conteo integrado 292/292; no se modifica producto.
+**Siguiente dueño:** Orquestación: revisar e integrar la [PR documental #38](https://github.com/pronficilio/coup-online/pull/38), actualizar el tracker y cerrar #19. La issue permanece `OPEN` hasta integrar los documentos finales; el Alquimista deja las cuatro fases `CLOSED` y la unidad `WAITING_ORCHESTRATOR`.
+**Integración:** PR #22 se fusionó parcialmente con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; la continuación #33 se fusionó en `master` con `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Esa integración contiene el producto #19. La PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión desde la misma rama/worktree; publica el PASS final, las fases cerradas y el conteo integrado 292/292, sin modificar producto.
 
 ## Solicitud y definición de éxito
 
