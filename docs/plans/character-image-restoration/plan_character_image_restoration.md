@@ -7,6 +7,7 @@
 **Modo / riesgo / verificación:** LIGHT / LOW / NONE.
 **Branch / worktree / merge target:** issue/36-character-image-restoration / .worktrees/issue-36-character-image-restoration / master.
 **Base:** origin/master en 5fffacfd; originales de personajes tomados de be93e975, primer padre del merge de PR #34.
+**PR:** https://github.com/pronficilio/coup-online/pull/37, abierta hacia `master`.
 **Siguiente dueño:** Orquestador para integrar la PR.
 
 ## Solicitud

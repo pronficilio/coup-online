@@ -11,6 +11,7 @@
 - **No tocar:** los otros trece WebP optimizados, código, CSS, imágenes de referencias y assets sin uso.
 - **Branch / worktree:** `issue/36-character-image-restoration` / `.worktrees/issue-36-character-image-restoration`.
 - **Merge target:** `master`.
+- **PR:** https://github.com/pronficilio/coup-online/pull/37.
 - **Criterio:** seis WebP idénticos a la fuente previa al PR #34; ningún otro asset modificado.
 - **Validación:** comparar hashes y revisar paths del diff. Sin tests ni build.
 - **Commit:** `fix(assets): restore original character image sizes (#36)`.
