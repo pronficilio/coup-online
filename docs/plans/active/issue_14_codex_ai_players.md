@@ -2,7 +2,7 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0/F1 CLOSED (PHASE PASS); F2 App Server y runner aislado implementados, handshake local PASS; F3 IA/lobby/kill switch implementados. La release POC `5a13376` sigue activa en Hetzner; API y runner healthy, la web responde HTTP 200 y el runner permanece en una red separada sin puertos publicados. La corrección `466a3b5` instala y valida el bundle CA del sistema en la imagen del runner; su release aislado y su imagen ya están preparados. El usuario no ve el ajuste device-code, por lo que se usa OAuth normal con túnel SSH. El primer callback llegó al CLI pero falló el canje OAuth; el segundo login sigue esperando autorización. No hay sesión verificada ni llamada al modelo.
+Estado: ACTIVE; F0/F1 CLOSED (PHASE PASS); F2 App Server y runner aislado implementados; F3 IA/lobby/kill switch implementados. El release `466a3b5` está activo en Hetzner: API y runner `healthy`, la web responde HTTP 200 y el runner sigue aislado en su propia red sin puertos publicados. OAuth normal se completó por túnel SSH y `codex login status` confirmó la sesión en el volumen privado. Una decisión real de GPT-6 Luna con esfuerzo `low` pasó por API → runner y devolvió una opción legal (`steal:1`).
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -11,7 +11,7 @@ Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 PR: todavía no existe; el usuario pidió una prueba temporal y no publicar cambios al fork.
-Siguiente paso: completar el OAuth que está abierto con la imagen `coup-codex-runner:466a3b5`. Si tiene éxito, comprobar `codex login status`, activar el release nuevo conservando `5a13376` y `55be894` para rollback, y probar una decisión Luna antes de entregar el código de acceso de IA o invitar amigos. El login temporal no monta código ni sockets y escribe directamente en el volumen privado. No publicar PR ni branch.
+Siguiente paso: prueba manual del lobby en `https://coup.ejele.net`: persona contra dos IA y luego IA contra IA con el creador como espectador; verificar desafíos/bloqueos y la palanca roja. El código compartido se lee desde el `.env` privado por SSH y se introduce en el campo del lobby; no va en la URL. Si se activa la palanca roja, el rearme es manual desde el servidor. Mantener la rama sin publicar y no abrir PR.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -33,7 +33,7 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 
 ## Contrato global para las siguientes fases
 
-- Codex App Server mediante login ChatGPT del propietario, GPT-6 Luna y esfuerzo low/medium/high por asiento; medium inicial. La disponibilidad se confirmará con una llamada real.
+- Codex App Server mediante login ChatGPT del propietario, GPT-6 Luna y esfuerzo low/medium/high por asiento; medium inicial. La disponibilidad quedó confirmada el 2026-09-26 con una llamada real `low` que devolvió una elección legal.
 - Sin API key, facturación API ni fallback a otro modelo. Si Codex/Plus falla o llega a un límite, pausar con mensaje.
 - La guía oficial ofrece App Server para integrar Codex dentro de productos, pero clasifica el protocolo como experimental/no soportado en producción; el uso aquí es una prueba temporal. El runner no monta el repo ni recibe texto libre, y el API web no ve la sesión. Si Luna no aparece en la cuenta, pausar sin cambiar de modelo ni usar API.
 - Privacidad por asiento y autoridad del servidor se implementan antes de conectar el jugador Codex.
@@ -44,4 +44,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - El usuario autorizó desplegar esta prueba en Hetzner desde un release separado y reversible; no se tocará DNS/Nginx ni el release anterior. El branch no se publicará al fork.
 - F0 y F1 cerraron con PHASE `PASS`. La guía operativa POC está en `docs/plans/codex-ai-players/poc-runbook.md`.
 
-Secuencia actual: Issue #14 y branch/worktree conservados; F0 `b189cc0`; F1 `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. La rama integra la base activa de Hetzner `55be894`. El commit `5a13376` continúa activo; `466a3b5` añade `ca-certificates` y un check de build, y ya se archivó como release separado y se construyó su imagen en Hetzner. Compose validó antes de la corrección; API/runner siguen healthy, la web devuelve HTTP 200 y el runner actual solo está en `coup_codex_egress`. La release `55be894` sigue disponible para rollback. La suite del servidor pasó 36/36, `node --check` y build pasan (dos warnings previos de imports sin uso); socket `0660` con GID 10002, conexión API-runner y palanca persistente se validaron localmente. El login device-code no pudo usarse porque el ajuste no aparece. El primer OAuth de navegador llegó al callback y falló en el canje; el segundo intenta completar con la imagen corregida. Todavía no hay sesión verificada ni llamada real a Luna. No publicar PR ni branch.
+Secuencia actual: Issue #14 y branch/worktree conservados; F0 `b189cc0`; F1 `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`. La rama integra la base de Hetzner `55be894`. El release `466a3b5` está activo y conserva `5a13376` y `55be894` para rollback. La imagen del runner instala `ca-certificates`; Compose valida y los servicios API, runner y web están saludables. La sesión OAuth normal persiste en `coup_codex_state`; el runner permanece en `coup_codex_egress`, sin puertos publicados. Smoke real API→runner→GPT-6 Luna `low` PASS con opción legal `steal:1`. El código de acceso no se registró ni publicó. Faltan las comprobaciones manuales del lobby (humano vs. dos IA, IA vs. IA, desafío/bloqueo y palanca roja). No publicar PR ni branch.
