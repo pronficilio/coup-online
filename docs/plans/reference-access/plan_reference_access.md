@@ -1,9 +1,9 @@
 # Plan: acceso a referencias desde la partida
 
-**Estado:** `WAITING_ORCHESTRATOR` — F1 `CLOSED`; build, diff-check y revisión manual de escritorio/móvil pasan. [PR draft #20](https://github.com/pronficilio/coup-online/pull/20).
+**Estado:** `COMPLETED` — F1 `CLOSED`, integración verificada. [PR #20](https://github.com/pronficilio/coup-online/pull/20) se fusionó en `master` mediante `64a507dcefa3ffea2ecf60653755342930c49f09`; issue #18 cerrada.
 **Issue:** https://github.com/pronficilio/coup-online/issues/18
 **Origen:** continuación acotada del acceso pendiente de la issue #8; activos y componente aislado integrados por [PR #12](https://github.com/pronficilio/coup-online/pull/12).
-**Handoff:** `docs/plans/active/issue_18_reference_access.md`
+**Handoff completado:** `docs/plans/active/issue_18_reference_access.md`
 **Bitácora:** `docs/plans/log/issue-18.jsonl`
 
 ## Perfil operativo
@@ -21,7 +21,7 @@ Montar dos accesos compactos, en la esquina inferior derecha de la pantalla de p
 
 Se conservan los modales e imágenes españolas, reglas del juego, controles actuales, servidor y protocolo. Los dos accesos deben funcionar para los jugadores sin depender de que sea su turno. El PNG de `fotos/mini.png` es una referencia local ignorada y no se versiona.
 
-## Fase F1 — montar los accesos (`CLOSED — listo para revisión final`)
+## Fase F1 — montar los accesos (`CLOSED`)
 
 **Resultado:** código montado en `TurnTableShell`; build y `git diff --check` pasan. Chromium headless confirmó la composición de escritorio/móvil, apertura y carga individual de las imágenes, cierre por Escape/fondo/botón, retorno de foco, decisión sin cambios, toque emulado, movimiento reducido y ausencia de errores. La evidencia está en el reporte F1.
 
@@ -44,4 +44,4 @@ Riesgo `LOW`: cambio visual localizado y reversible en cliente. Verificación in
 
 ## Integración
 
-El ejecutor entregó una sola rama y el [PR draft #20](https://github.com/pronficilio/coup-online/pull/20), vinculado a #18, en `WAITING_ORCHESTRATOR`. El Orquestador revisa diff, build, recorrido/evidencia y topología; solo él integra y cierra después de verificar. La revisión visual ya se completó; el PR y la issue continúan abiertos.
+El ejecutor entregó una sola rama y el [PR #20](https://github.com/pronficilio/coup-online/pull/20), vinculado a #18. El Orquestador revisó diff, build, recorrido/evidencia y topología; el PR quedó integrado y la issue cerrada después de verificar.

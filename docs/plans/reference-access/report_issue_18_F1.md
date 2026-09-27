@@ -33,4 +33,4 @@ Ejecutado en Chromium headless sobre una partida local real de dos jugadores, co
 
 ## Siguiente paso
 
-F1 está lista para revisión final del Orquestador en el único PR #20. El PR sigue draft y la issue #18 sigue abierta; no se ha integrado ni cerrado.
+F1 quedó integrada mediante PR #20 en `master` (`64a507dcefa3ffea2ecf60653755342930c49f09`). La issue #18 se cerró después de verificar la integración.

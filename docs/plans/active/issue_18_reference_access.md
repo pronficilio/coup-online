@@ -3,13 +3,13 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/18
 - **Plan exacto:** `docs/plans/reference-access/plan_reference_access.md`
 - **Bitácora exacta:** `docs/plans/log/issue-18.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; issue #18 permanece `OPEN` y asignada a `pronficilio`; claim registrado en comentario #5851364890. Worktree confirmado desde `origin/master` en `55be894a608822f1e22b09c5338e04b658d1477d`.
+- **Estado:** `COMPLETED`; issue #18 cerrada después de integrar y verificar el PR #20. Claim registrado en comentario #5851364890; la implementación se aisló desde `origin/master` en `55be894a608822f1e22b09c5338e04b658d1477d`.
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no; revisión final del Orquestador.
 - **Branch de toda la unidad:** `issue/18-reference-access`.
 - **Worktree de toda la unidad:** `.worktrees/issue-18-reference-access`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR canónico:** [draft #20](https://github.com/pronficilio/coup-online/pull/20), desde esta rama a `master`, vinculado a #18. Revisión visual completada; espera revisión final del Orquestador.
+- **PR canónico:** [#20](https://github.com/pronficilio/coup-online/pull/20), integrado en `master` mediante merge commit `64a507dcefa3ffea2ecf60653755342930c49f09`.
 
 ## Solicitud y objetivo
 
@@ -23,7 +23,7 @@ Antes de crear el branch/worktree, relee #18 en `pronficilio/coup-online`, recla
 
 Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica solo a `origin`. No escribas en `Cheneth/coup-online` ni en `upstream`.
 
-## Fase F1 — Accesos a referencias en la partida (`CLOSED — listo para revisión final`)
+## Fase F1 — Accesos a referencias en la partida (`CLOSED`)
 
 **Pregunta:** ¿puede cada jugador abrir la tarjeta o la tabla desde los controles inferiores derechos sin interferir con el juego?
 
@@ -48,11 +48,11 @@ Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica s
 ### Evidencia, validación y cierre
 
 - Resultado actual en `docs/plans/reference-access/report_issue_18_F1.md`: build y diff-check pasan; Chromium headless confirmó escritorio y viewport móvil, apertura/cierre de ambas referencias, retorno de foco, estado de decisión sin cambios, carga individual de imágenes, movimiento reducido y toque emulado.
-- F1 está `CLOSED`. La única limitación es que el toque se simuló en Chromium, no en un dispositivo físico. No añadir ni ejecutar tests automatizados.
+- F1 está `CLOSED`. La única limitación es que el toque se simuló en Chromium, no en un dispositivo físico. No se añadieron ni ejecutaron tests automatizados.
 - Intentar refutar el éxito: comprobar si un botón tapa una decisión en viewport estrecho, si el cierre altera una decisión/turno, si se descarga una imagen no solicitada o si el foco no vuelve al control de apertura.
 - `COMMIT_REQUIRED`: registrar la evidencia final en el reporte, actualizar plan/bitácora y confirmar que el commit de fase de implementación existe. Para el cierre de fase usa `docs(reference-panel): issue 18 F1 CLOSED ready_review`.
-- Al terminar, actualiza el plan, bitácora e issue; conserva el único PR canónico (#20) en `WAITING_ORCHESTRATOR`. No abras un segundo PR, no integres y no cierres la issue.
+- Cierre: el Orquestador verificó el PR canónico #20, lo integró tras la autorización del usuario y cerró la issue #18. La bitácora registra revisión, merge y cierre.
 
 ## Delegación y condición de parada
 
-Delega subtareas ordinarias según la política de agentes/modelos del proyecto; si no hay una jerarquía aplicable, puedes ejecutar la fase directamente. F1 ya tiene evidencia manual. El Orquestador realiza la revisión final del diff y la topología en PR #20; no integrar ni cerrar la issue durante esta entrega.
+La unidad está completada. Se conserva este handoff en `active/` según la organización documental existente del repositorio; la fuente de estado del tracker indica issue cerrada.
