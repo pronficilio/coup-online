@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, influencias y contador del mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `ACTIVE`; F2/F3 `BLOCKED` por solapamiento de superficies; F4 `PENDING`.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2/F3 `BLOCKED` por solapamiento de superficies; F4 `PENDING`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -40,7 +40,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 
 ## Fases
 
-### F1 — Confirmar reglas, mutaciones y contrato visual (`ACTIVE`)
+### F1 — Confirmar reglas, mutaciones y contrato visual (`CLOSED`)
 
 - **Pregunta única:** ¿qué tamaño de Court y qué transiciones debe exponer la interfaz sin cambiar las reglas?
 - **Entrada:** issue #28; `docs/coup_transcription.md`, `docs/coup_llm_summary.md`; base `origin/master` actualizada; `server/game/utils.js`, `server/game/coup.js`, `Coup.js`, `PlayerBoard.js` y estilos.
@@ -49,6 +49,7 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Artefacto:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 - **Commit:** `COMMIT_REQUIRED`; `docs(ui): issue 28 F1 CLOSED advance_f2`.
 - **Validación:** inspección estática/documental; no ejecutar tests.
+- **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
 ### F2 — Integrar influencias y ajustar el círculo (`BLOCKED`)
 

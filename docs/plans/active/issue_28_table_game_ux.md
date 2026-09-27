@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1 `ACTIVE`; F2/F3 `BLOCKED` hasta liberar superficies compartidas.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2/F3 `BLOCKED` hasta liberar superficies compartidas.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
