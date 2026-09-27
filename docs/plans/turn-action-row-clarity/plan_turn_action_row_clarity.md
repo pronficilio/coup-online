@@ -1,12 +1,12 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. El Alquimista reclamó #24 y confirmó el aislamiento canónico para ejecutar F2.
+**Estado:** `BLOCKED`; F1 `CLOSED / PASS`; F2 `BLOCKED`. La implementación y el build de F2 están listos; falta el recorrido manual obligatorio en un navegador funcional.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
-**Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
+**Handoff bloqueado:** `docs/plans/blocked/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Alquimista para F2; Verifier independiente para F3.
+**Siguiente dueño:** Orquestador, para proporcionar o coordinar un navegador funcional y reanudar el recorrido manual de F2. F3 no está listo.
 
 ## Solicitud y definición de éxito
 
@@ -61,7 +61,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Commit:** `COMMIT_REQUIRED`; `docs(action-rows): issue 24 F1 generic renderer confirmed`.
 **Validación:** releer issues/PRs, inspeccionar código integrado y `git diff --check`.
 
-### F2 — Implementar y documentar la fila interactiva (`ACTIVE`)
+### F2 — Implementar y documentar la fila interactiva (`BLOCKED`)
 
 **Pregunta:** ¿el renderer final comunica de forma inequívoca dónde activar una acción y por qué una acción no está disponible?
 
@@ -75,8 +75,10 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Pivotar:** si el renderer no soporta controles de fila o hint accesible sin cambio de arquitectura, regresar al Orquestador con evidencia.
 **Repetir:** una corrección localizada por criterio con fallo reproducible.
 **Bloquear/cancelar:** vuelve a reservarse un archivo compartido o aparece una necesidad de cambiar reglas/protocolo.
-**Commit:** `COMMIT_REQUIRED`; `feat(action-rows): issue 24 F2 accessible action states`.
-**Validación:** build de `coup-client`, recorrido manual de mouse/teclado/tacto y saldos 2, 3, 6, 7, 9 y 10; objetivo/cancelación con IDs originales, revisión de `es`/`en` y `git diff --check`. No añadir tests.
+**Commit:** `COMMIT_REQUIRED`; `feat(action-rows): issue 24 F2 BLOCKED manual review`.
+**Implementación y revisión estática:** adaptación de `Coup.js`, estilos y claves `es`/`en` revisadas; `git diff --check` pasa. `npm run build` termina con exit 0, con warnings en `App.js`, `ReferencePanel.css` y `caniuse-lite`. No se ejecutaron tests automatizados.
+**Bloqueo y evidencia pendiente:** no se pudo realizar ningún recorrido manual ni captura de escritorio/móvil. Playwright, Puppeteer y Chromium no están disponibles; invocar Chrome de Windows desde WSL termina con `WSL (2 - ) ERROR: UtilBindVsockAnyPort:307: socket failed 1`. Falta verificar visualmente los tres estados y el hint, los límites 2/3, 6/7, 9/10, mouse/teclado/tacto, objetivos/cancelación y envío único de IDs originales, foco/lector de pantalla, recorte, reduced motion y conservación del renderer de otros tipos de decisión. Ver `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
+**Siguiente paso:** el Orquestador coordina un entorno de navegador funcional; luego se completa F2 y se solicita F3 a un Verifier independiente. No se abre PR ni se cierra la issue.
 
 ### F3 — Verificación independiente y entrega (`PENDING`)
 
@@ -97,7 +99,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 ## Trazabilidad y topología
 
-Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama fue rebaseada sobre `origin/master@5de95ee`; su único delta es el plan, handoff, referencias y reportes de esta unidad.
+Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama se rebaseó sobre `origin/master@5de95ee` antes de F2 y ahora contiene el plan, la evidencia F1, el checkpoint de reclamo y el cambio F2 bloqueado con su reporte.
 
 ## Decisiones
 
@@ -106,3 +108,4 @@ Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad 
 - 2026-09-27: adaptar F2 al renderer genérico y agrupar `choiceId` por acción/destino. La interfaz no amplía las opciones legales del servidor.
 - 2026-09-27: clasificar `FULL / MEDIUM / FINAL` por la adaptación investigada al renderer nuevo, el selector de destino y la revisión independiente de elegibilidad.
 - 2026-09-27: el Alquimista reclamó la issue en el fork y confirmó branch/worktree limpios; F2 comienza sobre `Coup.js`.
+- 2026-09-27: la implementación F2 y el build pasan, pero F2 queda `BLOCKED` porque no hay navegador funcional para completar el recorrido manual obligatorio. El Orquestador coordina el entorno; F3 sigue pendiente.

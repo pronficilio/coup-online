@@ -90,6 +90,18 @@ const ACTION_KEYS = {
     steal: 'steal'
 }
 
+const ACTION_ROWS = [
+    { action: 'income', blockers: [], reward: 1 },
+    { action: 'foreign_aid', blockers: ['duke'], reward: 2 },
+    { action: 'coup', blockers: [], cost: 7, target: true },
+    { action: 'tax', declaredRole: 'duke', blockers: [], reward: 3 },
+    { action: 'assassinate', declaredRole: 'assassin', blockers: ['contessa'], cost: 3, target: true },
+    { action: 'exchange', declaredRole: 'ambassador', blockers: [], free: true },
+    { action: 'steal', declaredRole: 'captain', blockers: ['ambassador', 'captain'], amount: 2, target: true }
+]
+
+const ACTION_ROW_KEYS = new Set(ACTION_ROWS.map(({ action }) => action))
+
 const ROLE_KEYS = {
     duke: 'duke',
     captain: 'captain',
@@ -163,6 +175,39 @@ function actionOptionLabel(action) {
     return key ? t(`game.decision.action.option.${key}`) : t('game.decision.option.unknown')
 }
 
+function actionOptionGroups(options) {
+    const groups = new Map(ACTION_ROWS.map(({ action }) => [action, []]))
+    options.forEach(option => {
+        const action = String(option.choiceId || '').split(':')[0]
+        if (ACTION_ROW_KEYS.has(action)) groups.get(action).push(option)
+    })
+    return groups
+}
+
+function unavailableActionReason(action, options, money) {
+    if (options.length > 0) return ''
+    if (money >= 10 && action !== 'coup') return t('game.actions.error.coupRequired')
+
+    const cost = action === 'coup' ? 7 : action === 'assassinate' ? 3 : null
+    if (cost !== null && money < cost) {
+        return t('game.actions.error.insufficientFundsAction', { cost, actionLabel: actionName(action) })
+    }
+
+    return t('game.actions.error.unavailable')
+}
+
+function actionPrice(actionRow) {
+    if (actionRow.free) return t('game.actions.price.free')
+    if (actionRow.cost !== undefined) return t('game.actions.price.cost', { cost: actionRow.cost })
+    if (actionRow.reward !== undefined) {
+        return actionRow.reward === 1
+            ? t('game.actions.price.reward.single')
+            : t('game.actions.price.reward.plural', { amount: actionRow.reward })
+    }
+    if (actionRow.amount !== undefined) return t('game.actions.price.amount', { amount: actionRow.amount })
+    return ''
+}
+
 function localizeOptionLabel(option, decision) {
     const choiceId = String(option.choiceId || '')
     if (choiceId === 'pass') return t('game.common.pass')
@@ -190,6 +235,13 @@ function localizeOptionLabel(option, decision) {
         return t('game.decision.option.keep', { roles: roles.join(' y ') })
     }
     return t('game.decision.option.unknown')
+}
+
+function targetName(option, action) {
+    const actionEnglish = ({ coup: 'Coup', steal: 'Steal', assassinate: 'Assassinate' })[action]
+    const label = String(option.label || '')
+    const prefix = `${actionEnglish} — `
+    return actionEnglish && label.startsWith(prefix) ? label.slice(prefix.length) : label
 }
 
 const DECISION_ERROR_KEYS = {
@@ -220,6 +272,7 @@ export default class Coup extends Component {
             courtCount: null,
             currentPlayer: '',
             decision: null,
+            actionTarget: null,
             submitted: false,
             decisionError: '',
             gamePaused: false,
@@ -236,6 +289,9 @@ export default class Coup extends Component {
         this.decisionSectionRef = createRef()
         this.resumeRequestPending = false
         this.pauseReturnFocus = null
+        this.actionSubmissionLock = false
+        this.actionRowRefs = Object.fromEntries(ACTION_ROWS.map(({ action }) => [action, React.createRef()]))
+        this.firstActionTargetRef = React.createRef()
 
         const socket = this.props.socket
         socket.on('disconnect', () => this.setState({ disconnected: true }))
@@ -250,14 +306,19 @@ export default class Coup extends Component {
         })
         socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
         socket.on('g-addLog', message => this.setState(state => ({ logs: state.logs.concat(String(message)) })))
-        socket.on('g-decision', decision => this.setState(state => ({
-            decision,
-            submitted: false,
-            decisionError: state.gamePaused ? state.decisionError : ''
-        })))
+        socket.on('g-decision', decision => {
+            this.actionSubmissionLock = false
+            this.setState(state => ({
+                decision,
+                actionTarget: null,
+                submitted: false,
+                decisionError: state.gamePaused ? state.decisionError : ''
+            }))
+        })
         socket.on('g-decisionClosed', closed => {
             if (this.state.decision && closed.decisionId === this.state.decision.decisionId) {
-                this.setState({ decision: null, submitted: false })
+                this.actionSubmissionLock = false
+                this.setState({ decision: null, actionTarget: null, submitted: false })
             }
         })
         socket.on('g-decisionAccepted', accepted => {
@@ -266,6 +327,7 @@ export default class Coup extends Component {
             }
         })
         socket.on('g-decisionRejected', rejection => {
+            this.actionSubmissionLock = false
             const rejectedResume = this.state.gamePaused
             if (rejectedResume) this.resumeRequestPending = false
             this.setState(state => ({
@@ -275,6 +337,7 @@ export default class Coup extends Component {
             }))
         })
         socket.on('g-gamePaused', paused => {
+            this.actionSubmissionLock = false
             const showOverlay = !paused || paused.showOverlay !== false
             if (showOverlay && !this.state.gamePaused && typeof document !== 'undefined') {
                 this.pauseReturnFocus = document.activeElement
@@ -282,6 +345,7 @@ export default class Coup extends Component {
             this.resumeRequestPending = false
             this.setState({
                 decision: null,
+                actionTarget: null,
                 submitted: false,
                 gamePaused: showOverlay,
                 canResume: showOverlay && Boolean(paused && paused.canResume),
@@ -328,6 +392,123 @@ export default class Coup extends Component {
             choiceId: option.choiceId
         })
         this.setState({ submitted: true, decisionError: '' })
+    }
+
+    submitActionChoice = option => {
+        const { decision, submitted } = this.state
+        if (this.actionSubmissionLock || !decision || decision.type !== 'action' || submitted) return
+        if (!Array.isArray(decision.options) || !decision.options.includes(option)) return
+        this.actionSubmissionLock = true
+        this.submitChoice(option)
+    }
+
+    openActionTargets = action => {
+        const decision = this.state.decision
+        if (!decision || decision.type !== 'action' || this.state.submitted || this.actionSubmissionLock) return
+        const options = actionOptionGroups(Array.isArray(decision.options) ? decision.options : []).get(action) || []
+        if (options.length === 0) return
+        this.setState({ actionTarget: action, decisionError: '' }, () => {
+            if (this.firstActionTargetRef.current) this.firstActionTargetRef.current.focus()
+        })
+    }
+
+    cancelActionTargets = () => {
+        const action = this.state.actionTarget
+        if (!action || this.state.submitted) return
+        this.setState({ actionTarget: null }, () => {
+            const actionRow = this.actionRowRefs[action]
+            if (actionRow && actionRow.current) actionRow.current.focus()
+        })
+    }
+
+    handleActionDecisionKeyDown = event => {
+        if (event.key === 'Escape' && this.state.actionTarget && !this.state.submitted) {
+            event.preventDefault()
+            this.cancelActionTargets()
+        }
+    }
+
+    renderActionDecision(decision, money) {
+        const optionsByAction = actionOptionGroups(Array.isArray(decision.options) ? decision.options : [])
+        const targetAction = this.state.actionTarget
+        const submitted = this.state.submitted || this.state.gamePaused
+        const selectedTargets = targetAction ? (optionsByAction.get(targetAction) || []) : []
+        const selectedActionRow = ACTION_ROWS.find(({ action }) => action === targetAction)
+
+        return <section className="ActionDecision DecisionActionPanel" onKeyDown={this.handleActionDecisionKeyDown} aria-labelledby="action-decision-title">
+            <h2 id="action-decision-title" className="ActionDecisionTitle">
+                {targetAction ? t('game.actions.chooseTarget') : t('game.actions.turnTitle')}
+            </h2>
+            {targetAction
+                ? <p className="DecisionActionPrompt">{selectedActionRow ? t(`game.actions.${ACTION_KEYS[targetAction]}.description`) : ''}</p>
+                : <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>}
+
+            {targetAction ? <>
+                <div className="DecisionActionTargets" role="group" aria-label={t('game.actions.chooseTarget')}>
+                    {selectedTargets.map((option, index) => <button
+                        className="DecisionActionTarget"
+                        key={option.choiceId}
+                        type="button"
+                        ref={index === 0 ? this.firstActionTargetRef : null}
+                        disabled={submitted}
+                        aria-label={localizeOptionLabel(option, decision)}
+                        onClick={() => this.submitActionChoice(option)}
+                    >{targetName(option, targetAction)}</button>)}
+                </div>
+                <button
+                    className="DecisionActionCancel"
+                    type="button"
+                    disabled={submitted}
+                    onClick={this.cancelActionTargets}
+                >{t('game.actions.cancel')}</button>
+            </> : <div className="DecisionActionRows" role="group" aria-label={t('game.actions.turnTitle')}>
+                {ACTION_ROWS.map(actionRow => {
+                    const { action, blockers, declaredRole } = actionRow
+                    const options = optionsByAction.get(action) || []
+                    const available = options.length > 0
+                    const unavailableReason = unavailableActionReason(action, options, money)
+                    const actionId = `decision-action-${action}`
+                    const actionPriceLabel = actionPrice(actionRow)
+                    const isTargetAction = Boolean(actionRow.target)
+                    const content = <>
+                        <span className="DecisionActionContent">
+                            <span className="DecisionActionHeading">
+                                <span id={`${actionId}-label`} className="DecisionActionLabel">{actionName(action)}</span>
+                                {declaredRole && <span className={`ActionRoleChip ActionRoleChip--declared ActionRoleChip--${declaredRole}`}>{roleName(declaredRole)}</span>}
+                            </span>
+                            <span id={`${actionId}-description`} className="DecisionActionDescription">{t(`game.actions.${ACTION_KEYS[action]}.description`)}</span>
+                            {blockers.length > 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta">
+                                <span className="ActionMetaLabel">{t('game.actions.blockedBy')}</span>
+                                {blockers.map(role => <span className={`ActionRoleChip ActionRoleChip--blocker ActionRoleChip--${role}`} key={role}>{roleName(role)}</span>)}
+                            </span>}
+                            {declaredRole && blockers.length === 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta DecisionActionMeta--unblockable">{t('game.actions.unblockable')}</span>}
+                            {!available && <span id={`${actionId}-hint`} className="DecisionActionHint" role="note">{unavailableReason}</span>}
+                        </span>
+                        <span id={`${actionId}-price`} className={`ActionPrice${actionRow.free ? ' ActionPrice--free' : ''}`} aria-label={actionPriceLabel}>
+                            {actionRow.free
+                                ? actionPriceLabel
+                                : <span className="ActionPriceAmount">{actionRow.cost !== undefined ? actionRow.cost : actionRow.reward !== undefined ? `+${actionRow.reward}` : actionRow.amount}<span className="ActionCoin" aria-hidden="true">⚜</span></span>}
+                        </span>
+                    </>
+
+                    return <button
+                        className={`DecisionActionRow${available ? '' : ' DecisionActionRow--disabled'}`}
+                        key={action}
+                        type="button"
+                        ref={this.actionRowRefs[action]}
+                        aria-labelledby={`${actionId}-label`}
+                        aria-describedby={`${actionId}-description ${actionId}-price${declaredRole || blockers.length ? ` ${actionId}-roles` : ''}${available ? '' : ` ${actionId}-hint`}`}
+                        aria-disabled={available ? undefined : 'true'}
+                        disabled={available && submitted}
+                        onClick={available ? (isTargetAction
+                            ? () => this.openActionTargets(action)
+                            : () => this.submitActionChoice(options[0])) : undefined}
+                    >{content}</button>
+                })}
+            </div>}
+            {this.state.submitted && <p>{t('game.decision.sent')}</p>}
+            {this.state.decisionError && <p className="ActionError" role="alert">{this.state.decisionError}</p>}
+        </section>
     }
 
     playAgain = () => {
@@ -430,7 +611,8 @@ export default class Coup extends Component {
                     disabled={this.state.codexDisabled}
                     style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
                 >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
-                {decision && <>
+                {decision && decision.type === 'action' && this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
+                {decision && decision.type !== 'action' && <>
                     <p className="DecisionTitle">{t(DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic', {
                         count: ownInfluences.length,
                         influenceLabel: ownInfluences.length === 1 ? t('game.influence.singular') : t('game.influence.plural')
