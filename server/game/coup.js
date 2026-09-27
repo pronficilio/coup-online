@@ -262,6 +262,7 @@ class CoupGame {
             title: decision.title,
             description: decision.description,
             allowed: decision.allowed,
+            responses: new Map(decision.responses),
             priorityFrom: decision.priorityFrom,
             resumeOwnerSeats,
             resolve: decision.resolve
@@ -373,11 +374,12 @@ class CoupGame {
             title: template.title,
             description: template.description,
             allowed: template.allowed,
-            responses: new Map(),
+            responses: template.responses instanceof Map ? new Map(template.responses) : new Map(),
             priorityFrom: template.priorityFrom,
             resolve: template.resolve
         }
         template.allowed.forEach((choices, actorKey) => {
+            if (this.activeDecision.responses.has(actorKey)) return
             const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
             if (!player) return
             if (player.controller === 'human') this.socketEmit(player.socketID, 'g-decision', {
@@ -397,6 +399,7 @@ class CoupGame {
         }, this.decisionTimeoutMs)
         if (this.decisionTimer && typeof this.decisionTimer.unref === 'function') this.decisionTimer.unref()
         template.allowed.forEach((_, actorKey) => {
+            if (this.activeDecision.responses.has(actorKey)) return
             const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
             if (player && player.controller === 'codex') this.requestCodexDecision(player, this.activeDecision)
         })

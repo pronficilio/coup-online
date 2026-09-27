@@ -1,7 +1,7 @@
 # Plan: pausa visible y reanudación clara
 
 - **Issue:** [#26 — Hacer visible la pausa de partida y guiar la reanudación](https://github.com/pronficilio/coup-online/issues/26)
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 revalidada `CLOSED`; F2 corregida `CLOSED`; F3 manual `BLOCKED`, Verifier `FINAL` nuevo solicitado.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 revalidada `CLOSED`; F2 follow-up `CLOSED`; F3 manual `BLOCKED`, nuevo Verifier FINAL requerido tras commit.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` (cambio de autorización server-side).
 - **Branch / worktree:** `issue/26-paused-game-overlay` / `.worktrees/issue-26-paused-game-overlay`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR al cerrar la unidad.
@@ -14,7 +14,7 @@ Cuando vence una decisión por falta de respuesta, cubrir la vista de cada jugad
 
 ## Objetivo y definición de éxito
 
-Cuando vence una decisión, únicamente los asientos humanos que no respondieron pueden reanudarla. El overlay y su CTA se muestran solo a esos asientos; cada otro jugador ve un aviso de espera no modal y no recibe overlay. El servidor deriva los responsables del estado de la decisión, nunca de datos enviados por el cliente. Las pausas sin responsable humano (incluidas las de Codex) y las demás causas no recuperables muestran guía a todos sin CTA.
+Cuando vence una decisión, únicamente los asientos humanos que no respondieron pueden reanudarla. El overlay y su CTA se muestran solo a esos asientos; cada otro jugador ve un aviso de espera no modal y no recibe overlay. El servidor deriva los responsables del estado de la decisión, nunca de datos enviados por el cliente. Las respuestas ya aceptadas por el servidor se conservan durante la pausa y no vuelven a solicitarse al reanudar con ID/versión nuevos. Las pausas sin responsable humano (incluidas las de Codex) y las demás causas no recuperables muestran guía a todos sin CTA.
 
 ## Hechos, inferencias y desconocidos
 
@@ -65,30 +65,30 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 - **Commit:** `COMMIT_REQUIRED`; `docs(game): issue 26 F1 rechecked timeout owners`.
 - **Validación:** inspección estática de todos los emisores y del handler `g-resume`; no ejecutar tests.
 
-### F2 — Mostrar overlay y acción autorizada (`CLOSED`, corregida)
+### F2 — Mostrar overlay y acción autorizada (`CLOSED`, preservar respuestas)
 
 - **Pregunta única:** ¿solo el responsable recibe overlay/CTA y todos los demás quedan informados sin overlay?
 - **Entrada:** F1 revalidada; `origin/master` actualizado a `1ff478c308478af3be61131daa1bd88652bdc77f`; comprobar que no haya corrección concurrente en Coup.js/estados de pausa.
 - **Salida:** capa fija semitransparente que cubre el área de juego, bloquea controles inferiores y muestra copy accesible en español.
 - **Copy:** responsable: «Tu respuesta quedó pendiente. Puedes volver a abrir la decisión para continuar.»; otros: aviso accesible no modal indicando espera de personas con respuestas pendientes; pausa no recuperable: explicar que no admite reanudación y omitir CTA.
-- **Criterio de avance:** solo responsable obtiene overlay/CTA; resto no recibe overlay y queda en espera accesible; el servidor rechaza líder/responsable no pendiente/spectator y payload con identidad; el CTA evita duplicados; `g-gameResumed` despeja overlay/espera; la pérdida de recuperabilidad muestra overlay sin CTA a todos.
+- **Criterio de avance:** solo responsable obtiene overlay/CTA; resto no recibe overlay y queda en espera accesible; el servidor rechaza líder/responsable no pendiente/spectator y payload con identidad; el CTA evita duplicados; `g-gameResumed` despeja overlay/espera; la pérdida de recuperabilidad muestra overlay sin CTA a todos. Al pausar, copiar respuestas server-side aceptadas; al reanudar, preservar esas respuestas, generar identidad/versión nuevas y pedir respuesta solo a actores aún pendientes.
 - **Pivote:** si el servidor rechaza el caso normal de timeout o el copy exige otro contrato, detenerse y reorquestar.
 - **Repetición acotada:** una corrección de estado/foco por defecto reproducible.
 - **Bloqueo/cancelación:** bloquear si #19 inicia correcciones simultáneas en las superficies afectadas; no editar en paralelo. Cancelar solo por decisión del usuario.
 - **Artefactos:** corrección de autorización/entrega personalizada de pausa, overlay, aviso de espera, claves bilingües, reporte F2 revalidado y solicitud de Verifier nuevo.
 - **Commit:** `COMMIT_REQUIRED`; `fix(game): resume timed-out decisions by pending seat`.
-- **Validación:** `npm run build` exit 0 con avisos conocidos; revisión estática de ownership/resume; i18n 313/313 claves y placeholders; `git diff --check` exit 0. No se agregaron ni ejecutaron tests automatizados.
+- **Validación:** build del follow-up exit 0 con warnings preexistentes; revisión estática de ownership y conservación de `responses`; i18n 313/313; `git diff --check` exit 0. No agregar ni ejecutar tests automatizados. El commit `46b0805` y su reporte F3 quedan históricos.
 
 ### F3 — Revisar pausa y reanudación (`BLOCKED` para walkthrough)
 
 - **Pregunta única:** ¿el overlay orienta a cada participante sin sugerir acciones rechazadas ni ocultar un fallo real de reanudación?
 - **Entrada:** F1 y F2 cerradas; nuevo Verifier FINAL solicitado sobre HEAD actualizado.
 - **Salida:** recorrido manual en escritorio, móvil y teclado, más revisión independiente FINAL.
-- **Criterio de cierre:** validar responsable, líder no responsable, respondedor previo, varios actores pendientes, timeout con Codex solamente, payload falsificado/no vacío, desconexión, `g-gameResumed`, teclado/foco y espera sin overlay. Registrar build, evidencia visual/manual y Verifier FINAL independiente en el commit nuevo.
+- **Criterio de cierre:** validar responsable, líder no responsable, respondedor previo (no recibe una segunda decisión), varios actores pendientes, timeout con Codex solamente, payload falsificado/no vacío, desconexión, respuestas aceptadas preservadas bajo ID/versión nueva, `g-gameResumed`, teclado/foco y espera sin overlay. Registrar build, evidencia visual/manual y Verifier FINAL independiente en el commit nuevo.
 - **Pivote:** cualquier CTA no autorizado, decisión antigua aplicada o ventana sin recuperación debe regresar a la fase propietaria.
 - **Repetición acotada:** una ronda de corrección y revisión por hallazgo material.
 - **Bloqueo/cancelación:** no se puede hacer recorrido visual aquí por falta de navegador. El F3 anterior corresponde solo a `6621255` y a criterio líder; es histórico/obsoleto. Verifier FINAL independiente solicitado sobre el nuevo HEAD; no declarar PASS global sin recorrido visual.
-- **Artefactos:** conservar `report_issue_26_F3.md` sin alterarlo como reporte histórico y añadir resultado de la nueva revisión cuando llegue.
+- **Artefactos:** conservar `report_issue_26_F3.md` como histórico de `6621255` y `report_issue_26_F3_recheck.md` como histórico de `46b0805`; pedir un nuevo veredicto para el hash que conserva respuestas previas.
 - **Commit:** `COMMIT_REQUIRED`; `docs(game-ui): issue 26 F3 READY_FOR_REVIEW`.
 - **Validación:** build, inspección manual y Verifier independiente. No ejecutar tests automatizados.
 
@@ -96,7 +96,7 @@ Si queda pendiente únicamente un actor Codex, no existe responsable humano: el 
 
 - **Riesgo HIGH:** el cambio modifica autorización server-side y emisiones personalizadas; el servidor sigue siendo autoridad, deriva `allowed - responses`, guarda asientos responsables y exige socket→asiento verificado en el momento de reanudar.
 - **Dependencia de idioma:** las cadenas pasan por #19 para evitar texto español fuera del diccionario bilingüe.
-- **Pregunta adversarial:** ¿un líder/respondedor/tercero puede reanudar un timeout, un responsable pierde permiso si cambia la conexión pero conserva asiento confiable, aparece CTA si solo falta Codex o cualquier no responsable recibe el overlay?
+- **Pregunta adversarial:** ¿un líder/respondedor/tercero puede reanudar un timeout, un responsable pierde permiso si cambia la conexión pero conserva asiento confiable, aparece CTA si solo falta Codex, cualquier no responsable recibe el overlay, o se pierde/repite una respuesta aceptada al pausar y reanudar?
 
 ## Reclamo, aislamiento e integración
 
