@@ -1,12 +1,12 @@
 # Idioma español predeterminado y diccionario bilingüe — issue #19
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `BLOCKED` por falta de entorno de navegador para recorrido manual.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `ACTIVE`; F3 `ACTIVE`; F4 `ACTIVE`, con corrección de un hallazgo del Verifier y nueva revisión FINAL pendiente.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Orquestación debe habilitar un entorno local con navegador; después Alquimista completa el recorrido manual y Orquestación delega Verifier FINAL independiente.
-**Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) se abrió como borrador por solicitud explícita del usuario para validar el avance parcial; es la única PR de esta unidad. El usuario autorizó después integrar este avance parcial en `master` para revisión incremental aunque F4 siga bloqueada. Orquestación ejecutará la transición/merge; la aprobación no cierra #19 ni acepta F4.
+**Siguiente dueño:** Orquestación debe delegar Verifier FINAL independiente sobre los reportes, inventario, diff y el informe de recorrido proporcionado por el usuario. El Alquimista no emite PASS.
+**Integración:** PR #22 se fusionó en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Luego PR #30 de #21 añadió cinco familias de botones ilustrados con texto inglés; la rama #19 se sincronizó con `origin/master@3313d42` para corregirlas. La continuación fue reorquestada expresamente porque #22 ya está fusionada; no se abre otra PR en esta tanda. La aprobación de integración parcial no cierra #19 ni acepta F4.
 
 ## Solicitud y definición de éxito
 
@@ -69,7 +69,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Entrada:** inventario F1, glosario aceptado y `origin/master` sincronizado. PR #23 publica la liberación de las rutas previamente compartidas; los cambios de F2 se hacen en el worktree de #19.
 
-**Salida/evidencia:** `translations.json` con claves paralelas `es`/`en`; texto visible del cliente y `CheatSheet.svg` en español; documento con `lang="es"`; metadatos `public/manifest.json` en español; carga por defecto de las cinco ilustraciones de personaje ya traducidas (`duque.webp`, `asesino.webp`, `capitan.webp`, `embajador.webp`, `condesa.webp`). Los valores internos que el cliente envía siguen en inglés; solo las etiquetas renderizadas pasan por el diccionario.
+**Salida/evidencia:** `translations.json` con claves paralelas `es`/`en`; texto visible del cliente y `CheatSheet.svg` en español; documento con `lang="es"`; metadatos `public/manifest.json` en español; carga por defecto de las cinco ilustraciones de personaje ya traducidas (`duque.webp`, `asesino.webp`, `capitan.webp`, `embajador.webp`, `condesa.webp`); etiquetas españolas superpuestas a los cinco rótulos incrustados de botones de respuesta de `action-buttons/`. Los valores internos que el cliente envía siguen en inglés; solo las etiquetas renderizadas pasan por el diccionario.
 
 **Áreas principales:** `coup-client/src/i18n/`, `coup-client/public/index.html`, `coup-client/public/manifest.json`, `CreateGame.js`, `JoinGame.js`, `game/Coup.js`, `game/PlayerBoard.js`, los componentes F1 ya traducidos y `coup-client/src/assets/`. Las rutas liberadas se localizaron en #19 tras integrar `origin/master@2d82fa1`.
 
@@ -85,7 +85,9 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Tanda actual posterior a PR #23:** lobby/decisiones/tablero están en español mediante el mapa `es`; PlayerBoard carga las cinco imágenes de personaje españolas. `translations.json` contiene 307 claves espejo `es`/`en`, con placeholders concordantes. Se añadió el helper de lobby para presentar códigos internos como mensajes localizados y se tradujeron las decisiones a partir de `decision.type`/`choiceId` sin cambiar protocolo.
 
-**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED` ni tratar la rama como lista para aceptación hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. Reorquestación aprobada explícitamente por el usuario (2026-09-27): autoriza integrar PR #22 parcialmente en `master` para revisión incremental mientras F4 permanece `BLOCKED`. Esta excepción permite solo la integración parcial; no satisface criterios, no cierra F2/F3/F4 ni issue #19, y no reemplaza recorrido manual ni Verifier FINAL. Orquestación hará cualquier transición desde DRAFT y el merge. La PR sigue DRAFT hasta esa acción.
+**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED` ni tratar la rama como aceptada hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. Reorquestación aprobada explícitamente por el usuario (2026-09-27) permitió integrar PR #22 parcialmente en `master` para revisión incremental mientras F4 estaba bloqueada; PR #22 se fusionó con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. El merge no satisface criterios, no cierra F2/F3/F4 ni issue #19, y no reemplaza el Verifier FINAL.
+
+**Hallazgo tardío de assets y corrección en curso (2026-09-27):** al revisar `origin/master@3313d42` tras la fusión de #22 se encontraron cinco familias usadas por `Coup.js` cuyo arte normal y activo muestra `BLOCK ASSASSINATION`, `BLOCK FOREIGN AID`, `BLOCK STEAL`, `CHALLENGE` y `PASS`. El Verifier reportó `FAIL` para AC1/AC2/AC4/AC7 por esos rótulos; AC3/AC5/AC6 pasaron. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no tienen importaciones ni referencias en `coup-client/src` y no se usan en la UI actual; se registran como dormidos. F2 agrega el hallazgo al inventario y conecta las cinco etiquetas a las claves `es`/`en` ya existentes. `ResponseImageButton` cubre el texto incrustado con una etiqueta española, preservando marco/icono y estados activo/inactivo. La lógica, los IDs y el protocolo permanecen intactos. Esta tanda requiere build y revisión visual/Verifier; F2 y F4 siguen `ACTIVE`, sin declaración de aceptación.
 
 **Avanzar:** recorridos del cliente muestran etiquetas, decisiones y ayudas en español; ambos mapas tienen la misma estructura; solo se importa `es`; no existe selector, detección ni persistencia.
 **Pivotar:** si una etiqueta dinámica no cabe en un string de diccionario sin cambiar el payload, usar marcadores nombrados en presentación.
@@ -111,15 +113,17 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Commit:** `COMMIT_REQUIRED`; `feat(i18n): issue 19 F3 spanish game log messages`.
 **Validación:** inspección de los emisores y reproducción manual de mensajes disponibles sin modificar las decisiones; `git diff --check`; no añadir ni ejecutar tests.
 
-### F4 — Cerrar cobertura y revisión independiente (`BLOCKED`)
+### F4 — Cerrar cobertura y revisión independiente (`ACTIVE`)
 
 **Pregunta:** ¿la implementación satisface los criterios y no dejó texto en inglés visible ni una forma de seleccionar inglés?
 
-**Entrada:** F1–F3 cerradas, diff consolidado y build/recorridos documentados.
+**Entrada:** inventario F1, reportes/diff F2-F3, build y recorrido manual documentados para revisión independiente.
 
 **Salida/evidencia:** reporte final con correspondencia inventario→diccionario/interfaz, comparación de claves y marcadores, build de producción y recorrido manual de portada, lobby y partida; revisión FINAL independiente con `PASS`, `FAIL` o `BLOCKED`.
 
 **Falsificación para Verifier:** buscar por rutas normales cualquier inglés visible o accesible; intentar hallar una preferencia/selector/detección que active `en`; confirmar que las claves, marcadores y nombres/payloads de juego no cambiaron.
+
+**Revisión independiente anterior:** el Verifier informó `FAIL` en AC1/AC2/AC4/AC7 al encontrar texto inglés incrustado en las cinco familias de botones usadas; informó `PASS` en AC3/AC5/AC6. La corrección puntual está en curso y exige nueva revisión visual independiente. El reporte previo del usuario (recorrido de portada, lobby y partida completa, todo en orden) se conserva como cita de su experiencia, sin inferir dispositivo/navegador/pasos ni convertirlo en veredicto.
 
 **Avanzar:** criterios AC1–AC7 sustentados y Verifier `PASS`; dejar la unidad `WAITING_ORCHESTRATOR` para revisión de la única PR.
 **Pivotar:** devolver a F2/F3 solo el criterio refutado con reproducción concreta.
@@ -128,11 +132,11 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Commit:** `COMMIT_REQUIRED`; `docs(i18n): issue 19 F4 CLOSED ready_for_review`.
 **Validación:** verificación independiente FINAL; no añadir ni ejecutar tests automatizados.
 
-**Bloqueo observado (2026-09-27):** en el worktree #19 no se encontraron `chromium`, `chromium-browser`, `google-chrome`, `google-chrome-stable`, `chrome` ni `firefox` en `PATH`. `coup-client/package.json` declara `start`, `build`, `test` y `eject`, sin Playwright, Puppeteer ni WebDriver. No hay medio local disponible para observar portada, lobby, decisiones, partida y registro; no se inició ni se inventó un recorrido. No instalar dependencias para simular un navegador. El build de cliente ya documentado no sustituye el recorrido. F4 queda `BLOCKED`; el Verifier FINAL independiente no se ha asignado ni emitió veredicto. Orquestación debe asignarlo después de disponer de entorno manual.
+**Comprobación de entorno anterior (2026-09-27):** en el worktree #19 no se encontraron `chromium`, `chromium-browser`, `google-chrome`, `google-chrome-stable`, `chrome` ni `firefox` en `PATH`; `coup-client/package.json` no declara Playwright/Puppeteer/WebDriver. En ese entorno no se inició recorrido ni se instaló nada; F4 quedó `BLOCKED`. Después el usuario informó haber recorrido portada, lobby y una partida completa, y dijo que todo se veía en orden. No informó navegador, dispositivo, pasos específicos ni capturas; no se infieren. F4 está ahora `ACTIVE`, pendiente del Verifier FINAL independiente, sin veredicto todavía.
 
 ## Topología, riesgos y decisiones
 
-El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. La rama canónica `issue/19-spanish-default-dictionary` y worktree `.worktrees/issue-19-spanish-default-dictionary` conservan la ejecución aislada; la única PR es #22 y actualmente sigue DRAFT. El usuario autorizó la integración parcial para revisión incremental aunque F4 esté bloqueada; Orquestación ejecutará la transición/merge sin marcar F4 aceptada ni cerrar la issue.
+El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. PR #22 se fusionó a `master` mediante `5de95ee`; el worktree canónico #19 se sincronizó por fast-forward desde `ca16e42` hasta `origin/master@3313d42`. El usuario autorizó la integración parcial para revisión incremental; no equivale a aceptación F4 ni al cierre de la issue.
 
 Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas y evitar exponer IDs ingleses. La base publicada de PR #23 ya está integrada; no se copian cambios locales de otros worktrees. No cambiar reglas, enums o payloads para traducir etiquetas. Aplicar el glosario y referencias españolas existentes.
 
@@ -152,5 +156,6 @@ Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas 
 - 2026-09-27: commit `9f97acb` publicó la tanda actual F2/F3 en el branch de #19. Después se reemplazaron y releyeron los cuerpos de issue #19 y PR #22; #19 sigue `OPEN` y asignada a `pronficilio`, PR #22 sigue `OPEN`/`DRAFT`. La tanda de tracker está registrada en `issue-19.jsonl`; no hubo cierre de fase ni merge.
 - 2026-09-27: al iniciar F4 se comprobó que no hay navegador instalado/en `PATH` ni dependencia Playwright/Puppeteer/WebDriver en `coup-client`. No se hizo el recorrido manual; F4 `BLOCKED` hasta disponer de navegador/entorno seguro y después obtener Verifier FINAL independiente. Issue #19 permanece `OPEN`; PR #22 `DRAFT`; F2/F3 `ACTIVE`.
 - 2026-09-27: se reemplazaron y releyeron los cuerpos de #19 y PR #22 para registrar el bloqueo F4 observado. La API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`; ambos describen F4 `BLOCKED` y declaran que no hubo recorrido manual. Evento append-only en `issue-19.jsonl`.
-- 2026-09-27: reorquestación autorizada explícitamente por el usuario: permitir que Orquestación integre PR #22 parcialmente en `master` para revisión incremental aunque F4 siga `BLOCKED`. No equivale a aceptación/veredicto F4 ni cierre de #19. La rama sigue sin merge al registrar este evento; Orquestación ejecuta la transición/merge. Issue permanece `OPEN`.
-- 2026-09-27: los cuerpos de issue #19 y PR #22 se actualizaron y releyeron tras la reorquestación. API a las 18:06:46Z: #19 `OPEN`/asignada a `pronficilio`; PR #22 `OPEN`/`DRAFT`. Ambos registran integración parcial autorizada, F4 `BLOCKED`, y ausencia de cierre/aceptación. El Alquimista no hizo transición ni merge.
+- 2026-09-27 (histórico, antes del merge): el usuario autorizó explícitamente integrar PR #22 parcialmente para revisión incremental aunque F4 estuviera `BLOCKED`; no equivalía a aceptación/veredicto ni cierre de #19.
+- 2026-09-27: #22 fue fusionada con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; issue #19 sigue `OPEN`. `origin/master` avanzó a `3313d42`; el branch #19 se sincronizó por fast-forward limpio desde `ca16e42`.
+- 2026-09-27: el usuario informó exactamente que recorrió portada, lobby y partida completa y que ve todo en orden. Sin detalles de navegador/dispositivo/pasos. F4 `ACTIVE`, pendiente del Verifier independiente; F2/F3 siguen `ACTIVE`, sin cierre ni PASS.

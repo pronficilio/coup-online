@@ -1,8 +1,9 @@
 # Reporte F3 — mensajes `g-addLog` de issue #19
 
-**Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. El recorrido manual del registro está bloqueado por falta de navegador local (ver `report_issue_19_F4.md`).
-**Base:** `origin/master@2d82fa1`, integrada en #19 por `74432a6`.
-**PR:** [#22](https://github.com/pronficilio/coup-online/pull/22) sigue `DRAFT`; el usuario autorizó la integración parcial en `master` para revisión incremental con F4 `BLOCKED`. Orquestación ejecuta transición/merge; no supone aceptación F4 ni cierre de issue #19, que permanece `OPEN`.
+**Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. El usuario informó haber recorrido una partida completa y que todo se ve en orden, pero no indicó detalles específicos de los mensajes del registro (ver `report_issue_19_F4.md`). F3 sigue `ACTIVE`, pendiente de revisión independiente.
+**Base del trabajo F3:** `origin/master@2d82fa1`, integrada en #19 por `74432a6`.
+**Base actual:** `origin/master@3313d42`, que contiene el merge de PR #22 (`5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`) y PR #30/#21. Esta reauditoría de assets no cambia el alcance ni el protocolo de F3.
+**PR:** [#22](https://github.com/pronficilio/coup-online/pull/22) está `MERGED`; issue #19 permanece `OPEN`. El merge parcial no constituye aceptación F4 ni cierre de la issue.
 **Commit publicado:** `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`); la sincronización de los cuerpos de tracker se registró después en un commit documental.
 
 ## Cambios
@@ -20,5 +21,5 @@
 - Diccionario JSON parseable; 307 claves en cada mapa y mismos marcadores dinámicos.
 - `npm run build` del cliente: exit 0; warnings por imports sin uso preexistentes en `App.js`, `caniuse-lite` desactualizado y `postcss-calc` con unidades `dvh` en `ReferencePanel.css:100/106`.
 - `git diff --check`: limpio.
-- No se añadieron ni ejecutaron tests. No se hizo una partida manual; falta confirmar visualmente los mensajes del registro.
-- Tras publicar `9f97acb`, se actualizaron y releyeron los cuerpos de #19 y #22. #19 sigue `OPEN`/asignada a `pronficilio`; #22 sigue `OPEN`/`DRAFT`.
+- No se añadieron ni ejecutaron tests. El Alquimista no observó los mensajes en una partida local; el usuario informó haber completado una partida, sin detallar registro ni mensajes concretos. La validación independiente de cobertura visible sigue pendiente.
+- Históricamente, tras publicar `9f97acb`, #19 estaba `OPEN`/asignada a `pronficilio` y #22 `OPEN`/`DRAFT`; luego #22 se fusionó en `5de95ee`.

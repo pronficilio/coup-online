@@ -1,26 +1,32 @@
 # Reporte F4 — cobertura final y revisión independiente
 
-**Estado:** `BLOCKED`; no se completó el recorrido manual requerido. Este documento no es un veredicto de aceptación.
-**Base y evidencia:** producto en `9f97acb`; la comprobación local se inició desde HEAD `1e28666`, y este reporte F4 quedó versionado en `e9be456` sobre el branch canónico `issue/19-spanish-default-dictionary`.
-**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED`. Issue #19 permanece `OPEN`; PR #22 sigue `DRAFT` mientras Orquestación prepara la integración parcial autorizada por el usuario.
+**Estado:** `ACTIVE`; el Verifier independiente reportó `FAIL` en AC1/AC2/AC4/AC7 y `PASS` en AC3/AC5/AC6 por texto inglés incrustado en cinco familias de botones. La corrección está en curso y requiere revisión FINAL nueva. Este documento no emite PASS general ni aceptación.
+**Base sincronizada:** `origin/master@3313d42`, que contiene el merge de PR #22 `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c` y PR #30/#21. El worktree canónico se actualizó por fast-forward desde `ca16e42`.
+**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `ACTIVE`, pendiente del Verifier FINAL. Issue #19 permanece `OPEN`; PR #22 está `MERGED`.
 
 ## Alcance requerido
 
-F4 debe revisar la correspondencia inventario→diccionario/interfaz, confirmar claves y marcadores, el build, y observar manualmente portada, lobby y partida (decisiones y registro incluidos). Después debe emitir un Verifier FINAL independiente con `PASS`, `FAIL` o `BLOCKED`. No se cierra F4 sin recorrido y veredicto independiente.
+F4 debe revisar la correspondencia inventario→diccionario/interfaz, confirmar claves y marcadores, el build y el alcance que llegó después de PR #22. El usuario informó que recorrió portada, lobby y una partida completa y que todo se ve en orden; esa es una declaración del usuario, no una observación del Alquimista. Después de la corrección de las etiquetas incrustadas se requiere Verifier FINAL independiente con `PASS`, `FAIL` o `BLOCKED`. No se cierra F4 sin cobertura, recorrido y veredicto independiente.
 
-## Comprobación del entorno y bloqueo
+## Comprobación anterior del entorno
 
 - Se comprobó `PATH` para `chromium`, `chromium-browser`, `google-chrome`, `google-chrome-stable`, `chrome` y `firefox`; ninguno resolvió a un ejecutable.
 - `coup-client/package.json` contiene scripts `start`, `start-pc`, `build`, `test` y `eject`; no declara Playwright, Puppeteer ni WebDriver en dependencias.
 - No se encontró navegador disponible por otra herramienta local de esta sesión. No se inició el juego ni se observó/renderizó ninguna pantalla, decisión o mensaje de registro.
 - No se instalaron dependencias para simular el entorno. No se añadieron ni ejecutaron tests.
 
-Por estas razones, no hay evidencia visual/manual para portada, lobby, decisiones, tablero ni mensajes `g-addLog`; tampoco se puede afirmar que no haya texto inglés visible/accesible en un recorrido normal. El build previo de F2/F3 y las comprobaciones estáticas no sustituyen esta observación.
+En esa comprobación el Alquimista no pudo hacer su propio recorrido ni producir evidencia visual. El usuario posteriormente informó que sí completó la revisión manual indicada a continuación. El informe del usuario no incluye evidencias visuales ni datos del navegador/dispositivo; el Verifier independiente debe evaluar si basta para los criterios.
+
+## Recorrido informado por el usuario (2026-09-27)
+
+El usuario informó que recorrió portada, lobby y una partida completa y que ve todo en orden. Ese es el único detalle reportado. No se añadieron navegador, dispositivo, pasos específicos, capturas ni hallazgos que el usuario no haya mencionado. Se registra como informe del usuario, no como observación propia o independiente.
 
 ## Resultado y siguiente acción
 
-F4 queda `BLOCKED` hasta habilitar un navegador y entorno local seguro para la partida manual. Una vez exista, recorrer portada, creación/unión de lobby, decisiones, tablero y registro; guardar pasos y resultados reproducibles. Luego Orquestación debe asignar un Verifier FINAL independiente con `translation_inventory.md`, el plan y criterios AC1–AC7, reportes F2/F3, este reporte y el diff consolidado. El Verifier debe inspeccionar inglés visible/accesible, ausencia de selector/ruta a `en`, paridad de claves/marcadores y preservación de valores/protocolos. El Alquimista no reclama ni emite ese veredicto por sí mismo.
+El Verifier independiente informó que cinco familias de botones visibles aún mostraban palabras inglesas: `ba` (BLOCK ASSASSINATION), `bfa` (BLOCK FOREIGN AID), `bs` (BLOCK STEAL), `c` (CHALLENGE) y `pass` (PASS), incluidas variantes normales y activas. Resultado recibido: AC1/AC2/AC4/AC7 `FAIL`; AC3/AC5/AC6 `PASS`. La tanda actual cubre los rótulos con etiquetas españolas conectadas al diccionario y el build terminó exit 0; falta una revisión visual/independiente posterior. `claim.webp` y `claim-active.webp` contienen `CLAIM`, pero no están importadas ni referenciadas por la aplicación y no se usan en esta UI.
 
-El usuario autorizó ahora la integración parcial de PR #22 en `master` para revisión incremental aunque F4 siga bloqueada. Esa autorización no es aceptación del resultado: no marca F4 cerrada, no equivale al veredicto FINAL y no cierra #19. Orquestación ejecutará la transición desde DRAFT y el merge; al registrar esta actualización, la issue sigue `OPEN` y PR #22 sigue `DRAFT`.
+F4 queda `ACTIVE` y la issue #19 `OPEN`. Entregar al siguiente Verifier `translation_inventory.md`, el plan y criterios AC1–AC7, reportes F2/F3, este reporte, el diff consolidado y el informe de recorrido del usuario sin añadir detalles no comunicados. El Verifier debe inspeccionar inglés visible/accesible, ausencia de selector/ruta a `en`, paridad de claves/marcadores y preservación de valores/protocolos; puede pedir pasos/evidencia adicionales si el informe breve no basta. El Alquimista no reclama ni emite PASS por sí mismo.
 
-Los cuerpos de issue #19 y PR #22 se actualizaron y releyeron el 2026-09-27 tras la reorquestación. La API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`; ambos reflejan la autorización de integración parcial sin cambiar F4 `BLOCKED` y declaran que no hubo recorrido manual. El Alquimista no hizo transición de DRAFT ni merge.
+El usuario autorizó la integración parcial; PR #22 se fusionó en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Ese merge no acepta el resultado, no marca F4 cerrada, no equivale al veredicto FINAL y no cierra #19. La issue sigue `OPEN`.
+
+La API confirmó después del merge que issue #19 sigue `OPEN`/asignada a `pronficilio`, y PR #22 está `MERGED`/cerrada en `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. F4 sigue `ACTIVE`; el último resultado independiente es `FAIL` en AC1/AC2/AC4/AC7 y no hay PASS general.
