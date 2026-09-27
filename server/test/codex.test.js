@@ -291,6 +291,8 @@ test('app client and isolated runner exchange one versioned choice over a Unix s
     })
     try {
         await runner.listen()
+        const socketStat = await fs.stat(socketPath)
+        assert.equal(socketStat.mode & 0o777, 0o660)
         const client = new CodexRunnerClient({ socketPath, timeoutMs: 1000 })
         const result = await client.choose({
             decisionId: 'game-1-decision-2',

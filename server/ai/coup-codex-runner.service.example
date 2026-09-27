@@ -7,7 +7,8 @@ Wants=network-online.target
 Type=simple
 User=coup-codex
 Group=coup-game
-UMask=0007
+# Keep Codex-created socket directories private; the worker sets its IPC socket to 0660 explicitly.
+UMask=0077
 
 # Replace /srv/coup-online with the canonical application checkout path chosen in Issue #13.
 Environment=CODEX_APP_ROOT=/srv/coup-online
