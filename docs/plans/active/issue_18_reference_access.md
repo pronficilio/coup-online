@@ -9,7 +9,7 @@
 - **Branch de toda la unidad:** `issue/18-reference-access`.
 - **Worktree de toda la unidad:** `.worktrees/issue-18-reference-access`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR canónico:** [draft #20](https://github.com/pronficilio/coup-online/pull/20), desde esta rama a `master`, vinculado a #18. Permanece draft mientras la revisión visual esté pendiente.
+- **PR canónico:** [draft #20](https://github.com/pronficilio/coup-online/pull/20), desde esta rama a `master`, vinculado a #18. Revisión visual completada; espera revisión final del Orquestador.
 
 ## Solicitud y objetivo
 
@@ -23,7 +23,7 @@ Antes de crear el branch/worktree, relee #18 en `pronficilio/coup-online`, recla
 
 Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica solo a `origin`. No escribas en `Cheneth/coup-online` ni en `upstream`.
 
-## Fase F1 — Accesos a referencias en la partida (`BLOCKED — revisión visual pendiente`)
+## Fase F1 — Accesos a referencias en la partida (`CLOSED — listo para revisión final`)
 
 **Pregunta:** ¿puede cada jugador abrir la tarjeta o la tabla desde los controles inferiores derechos sin interferir con el juego?
 
@@ -47,12 +47,12 @@ Toda mutación `gh` debe especificar `--repo pronficilio/coup-online`; publica s
 
 ### Evidencia, validación y cierre
 
-- Resultado actual en `docs/plans/reference-access/report_issue_18_F1.md`: el montaje y los accesos están implementados; build y diff-check pasan. La revisión manual de escritorio/móvil no se ejecutó porque el entorno no tiene navegador.
-- F1 permanece `BLOCKED`; no declarar cumplimiento visual, de interacción ni de carga por red sin el recorrido manual. No añadir ni ejecutar tests automatizados.
+- Resultado actual en `docs/plans/reference-access/report_issue_18_F1.md`: build y diff-check pasan; Chromium headless confirmó escritorio y viewport móvil, apertura/cierre de ambas referencias, retorno de foco, estado de decisión sin cambios, carga individual de imágenes, movimiento reducido y toque emulado.
+- F1 está `CLOSED`. La única limitación es que el toque se simuló en Chromium, no en un dispositivo físico. No añadir ni ejecutar tests automatizados.
 - Intentar refutar el éxito: comprobar si un botón tapa una decisión en viewport estrecho, si el cierre altera una decisión/turno, si se descarga una imagen no solicitada o si el foco no vuelve al control de apertura.
-- `COMMIT_REQUIRED`: incluir código, reporte y evento `phase_verdict` en un solo commit de fase. Para el resultado actual usa `feat(reference-panel): issue 18 F1 BLOCKED manual_review_pending`; usa el mensaje `feat(reference-panel): issue 18 F1 CLOSED ready_review` únicamente después de reunir la evidencia visual exigida.
+- `COMMIT_REQUIRED`: registrar la evidencia final en el reporte, actualizar plan/bitácora y confirmar que el commit de fase de implementación existe. Para el cierre de fase usa `docs(reference-panel): issue 18 F1 CLOSED ready_review`.
 - Al terminar, actualiza el plan, bitácora e issue; conserva el único PR canónico (#20) en `WAITING_ORCHESTRATOR`. No abras un segundo PR, no integres y no cierres la issue.
 
 ## Delegación y condición de parada
 
-Delega subtareas ordinarias según la política de agentes/modelos del proyecto; si no hay una jerarquía aplicable, puedes ejecutar la fase directamente. La siguiente acción es habilitar un navegador para revisar manualmente escritorio/móvil y registrar la evidencia. Detente y devuelve a `WAITING_ORCHESTRATOR` si el dock de la captura no corresponde a la composición actual, si el montaje requiere alterar reglas/servidor, o si no hay espacio seguro para los accesos en móvil.
+Delega subtareas ordinarias según la política de agentes/modelos del proyecto; si no hay una jerarquía aplicable, puedes ejecutar la fase directamente. F1 ya tiene evidencia manual. El Orquestador realiza la revisión final del diff y la topología en PR #20; no integrar ni cerrar la issue durante esta entrega.

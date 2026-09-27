@@ -1,6 +1,6 @@
 # Plan: acceso a referencias desde la partida
 
-**Estado:** `WAITING_ORCHESTRATOR` — F1 `BLOCKED`; build y diff-check pasan, revisión visual pendiente por falta de navegador. [PR draft #20](https://github.com/pronficilio/coup-online/pull/20).
+**Estado:** `WAITING_ORCHESTRATOR` — F1 `CLOSED`; build, diff-check y revisión manual de escritorio/móvil pasan. [PR draft #20](https://github.com/pronficilio/coup-online/pull/20).
 **Issue:** https://github.com/pronficilio/coup-online/issues/18
 **Origen:** continuación acotada del acceso pendiente de la issue #8; activos y componente aislado integrados por [PR #12](https://github.com/pronficilio/coup-online/pull/12).
 **Handoff:** `docs/plans/active/issue_18_reference_access.md`
@@ -21,9 +21,9 @@ Montar dos accesos compactos, en la esquina inferior derecha de la pantalla de p
 
 Se conservan los modales e imágenes españolas, reglas del juego, controles actuales, servidor y protocolo. Los dos accesos deben funcionar para los jugadores sin depender de que sea su turno. El PNG de `fotos/mini.png` es una referencia local ignorada y no se versiona.
 
-## Fase F1 — montar los accesos (`BLOCKED — revisión visual pendiente`)
+## Fase F1 — montar los accesos (`CLOSED — listo para revisión final`)
 
-**Resultado actual:** código montado en `TurnTableShell`; build y `git diff --check` pasan. No se observó apertura/cierre, solapamiento, foco o solicitudes de red en un navegador, por lo que F1 no se cierra. El reporte registra qué quedó sin verificar y el siguiente paso: disponer de navegador para un recorrido manual en escritorio y móvil.
+**Resultado:** código montado en `TurnTableShell`; build y `git diff --check` pasan. Chromium headless confirmó la composición de escritorio/móvil, apertura y carga individual de las imágenes, cierre por Escape/fondo/botón, retorno de foco, decisión sin cambios, toque emulado, movimiento reducido y ausencia de errores. La evidencia está en el reporte F1.
 
 **Pregunta única:** ¿puede cualquier jugador consultar ambas referencias desde el dock inferior derecho en escritorio y móvil sin cambiar el estado del juego?
 
@@ -31,7 +31,7 @@ Se conservan los modales e imágenes españolas, reglas del juego, controles act
 - **Trabajo:** montar el componente; ubicar botones cuadrados con iconos accesibles en el inferior derecho; preservar modal separado, foco, teclado/tacto y cierre por botón/Escape/fondo; evitar tapar controles de decisiones en móviles.
 - **Fuera de alcance:** cambiar arte/contenido, reglas, decisiones, Rules, servidor, Socket.IO, añadir dependencias o versionar PNG.
 - **Salida/evidencia:** `docs/plans/reference-access/report_issue_18_F1.md`, build y resultados del recorrido manual.
-- **Avanzar:** seis criterios en handoff cumplidos con evidencia, build y diff limpios.
+- **Avanzar:** seis criterios en handoff cumplidos con evidencia, build y diff limpios. `CLOSED`.
 - **Pivotar:** ajustar el anclaje/composición del dock si el viewport o panel de decisión lo requieren, manteniendo su esquina inferior derecha.
 - **Repetir:** una corrección localizada de posición, foco o control.
 - **Bloquear:** solo si no hay espacio móvil seguro sin rediseñar otra superficie o cambiar lógica de juego; devolver el hallazgo y una alternativa al Orquestador.
@@ -44,4 +44,4 @@ Riesgo `LOW`: cambio visual localizado y reversible en cliente. Verificación in
 
 ## Integración
 
-El ejecutor entregó una sola rama y el [PR draft #20](https://github.com/pronficilio/coup-online/pull/20), vinculado a #18, en `WAITING_ORCHESTRATOR`. El Orquestador revisa diff, build, recorrido/evidencia y topología; solo él integra y cierra después de verificar.
+El ejecutor entregó una sola rama y el [PR draft #20](https://github.com/pronficilio/coup-online/pull/20), vinculado a #18, en `WAITING_ORCHESTRATOR`. El Orquestador revisa diff, build, recorrido/evidencia y topología; solo él integra y cierra después de verificar. La revisión visual ya se completó; el PR y la issue continúan abiertos.
