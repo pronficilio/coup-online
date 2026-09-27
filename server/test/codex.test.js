@@ -222,7 +222,9 @@ test('Codex runner rejects credentials located inside the model workspace or tem
             tempRoot: fixture.tempRoot
         }), { code: 'runner_not_configured' })
 
-        await fs.writeFile(path.join(fixture.env.CODEX_HOME, 'auth.json'), 'fake token', { mode: 0o644 })
+        const authPath = path.join(fixture.env.CODEX_HOME, 'auth.json')
+        await fs.writeFile(authPath, 'fake token', { mode: 0o600 })
+        await fs.chmod(authPath, 0o644)
         await assert.rejects(runCodexDecision(request(), {
             env: fixture.env,
             spawn: fake.spawn,
