@@ -2,7 +2,7 @@
 
 Issue: #14 — https://github.com/pronficilio/coup-online/issues/14
 Plan: docs/plans/codex-ai-players/plan_codex_ai_players.md
-Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); dos PHASE F2 BLOCKED; el perfil candidato con cambios locales pasó un probe sin auth y espera nuevo PHASE
+Estado: ACTIVE; F0 CLOSED (PHASE PASS); F1 CLOSED (PHASE PASS tras correcciones); tres PHASE F2 BLOCKED; el último probe no reprodujo el éxito local y falló antes del comando por el directorio de socket interno
 Modo / riesgo / verificación: FULL / HIGH / PHASE (F0, F1, F2, F3 y cierre final)
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -11,7 +11,7 @@ Evidencia F1: docs/plans/active/issue_14_F1_evidence.md
 Contrato/evidencia F2: docs/plans/codex-ai-players/f2_codex_runner.md
 Implementación inicial revisada: 608089d4c839f367b9b0b0e92009d3daf536ce5c; las dos correcciones pasaron PHASE en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 PR: todavía no existe; debe haber una sola integración a master para esta issue.
-Siguiente dueño: Verifier F2 tras el commit del perfil candidato. El recheck identificó que declarar `:slash_tmp` explícitamente impedía el preflight; el probe pasó al omitirlo y separar los dos directorios privados. Revisar el diff y repetir lectura/escritura con CLI/runtime Linux equivalente a Hetzner, sin auth real. También faltan resolver la advertencia oficial sobre auth Plus en un proyecto público y la disponibilidad de Luna para la cuenta. F2 no habilita asientos IA desde el lobby ni autoriza login o llamadas reales.
+Siguiente dueño: Ejecutor F2. El recheck independiente del checkpoint `d74e71c` no reprodujo el probe anterior: el preflight falló antes del comando con `app-server socket directory must be a user-owned directory with mode 0700`. Con UMask 0007 observó un directorio temporal 0770; el mismo fallo continuó con UMask 0077 y modo 0700, así que cambiar solo la umask no es una solución demostrada. Diagnosticar la ruta/propiedad efectiva del socket y repetir el aislamiento antes de solicitar otra PHASE. También siguen abiertos la advertencia oficial sobre auth Plus en proyecto público y la disponibilidad de Luna. F2 no habilita asientos IA ni autoriza login o llamadas reales.
 
 ## Contrato F0 y decisiones de producto definidos
 
@@ -44,4 +44,4 @@ El usuario eligió orden fijo de asientos en sentido horario desde quien declara
 - Issue #13 sigue siendo la unidad canónica para el despliegue en Hetzner, después de integrar esta funcionalidad.
 - F0 y F1 ya cerraron tras PHASE `PASS`; F2 puede iniciar en este branch sin PR por fase. La revisión F1 no invocó Codex.
 
-Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; F0 cerró con PHASE `PASS` en `b189cc0`. F1 cerró con PHASE `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` tras corregir el desafío perdido contra Asesinato y Exchange con una influencia. F2 runner implementado; los dos primeros PHASE reportaron `BLOCKED`. El probe local posterior pasó sin auth al omitir la regla explícita `:slash_tmp` y separar `TMPDIR` de `XDG_RUNTIME_DIR`: leyó el workspace, no el señuelo auth, no escribió workspace y sí escribió en el TMPDIR privado. El runner aún debe reflejar ese cambio y pasar un nuevo PHASE. `npm test` pasó 26/26. Uso de Plus para proyecto público y Luna en esa cuenta siguen sin confirmar. No crear PR todavía.
+Secuencia: issue #14 reclamada; branch/worktree confirmados; contrato y reglas versionadas; F0 cerró con PHASE `PASS` en `b189cc0`. F1 cerró con PHASE `PASS` en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee` tras corregir el desafío perdido contra Asesinato y Exchange con una influencia. El runner F2 está implementado, pero los tres PHASE independientes reportaron `BLOCKED`. Un probe local posterior informó aislamiento correcto al omitir `:slash_tmp`; el recheck `d74e71c` no reprodujo el arranque y volvió a fallar antes del comando por el socket interno. Con UMask `0007` se creó un path `0770`, pero cambiar a `0077`/`0700` no resolvió el error. No declarar controles efectivos hasta un probe reproducible. `npm test` pasó 26/26. Auth Plus para repo público y Luna en esa cuenta siguen sin confirmar. No crear PR todavía.
