@@ -4,11 +4,12 @@
 - **PR:** https://github.com/pronficilio/coup-online/pull/27
 - **Plan exacto:** `docs/plans/home-coin-favicon/plan_home_coin_favicon.md`
 - **Bitácora exacta:** `docs/plans/log/issue-25.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED` tras la validación visual del usuario. La PR #22 de #19 ya integró los cambios de idioma a `master` (commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`); #25 está asignada a `pronficilio`.
+- **Estado:** `COMPLETED`; issue #25 cerrada después de integrar la PR #27 en `master`.
 - **Modo/riesgo/verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
-- **Siguiente acción:** revisión final e integración de la PR #27 a `master`.
-- **Por qué sigue:** la implementación y la validación terminaron; el Orquestador integra la PR #27.
+- **Integración:** [PR #27](https://github.com/pronficilio/coup-online/pull/27), merge commit `c601410952184c85f552ee5cbb73ef6fe52519ff`.
+- **Siguiente acción:** ninguna; unidad completada.
+- **Por qué sigue:** registro histórico del trabajo; no quedan acciones pendientes.
 - **Documentos fuente:** issue #25, el plan citado y `coup-client/src/components/Home.js`, `coup-client/src/index.css`, `coup-client/public/favicon.ico`, `coup-client/public/manifest.json`.
 - **Fuentes locales:** `/mnt/e/dev/coup/fotos/gif.gif` (256×256, 109,685 bytes) y `/mnt/e/dev/coup/fotos/coin.png` (480×460, 408,320 bytes). Están ignoradas por Git; copiarlas selectivamente al worktree solo después del claim. No versionar los originales.
 
@@ -41,7 +42,7 @@
 - **AC1–AC4:** implementación y revisión del diff conformes. GIF original preservado (256×256, 6 frames, 109,685 bytes; idéntico por SHA-256); favicon ICO válido de 16×16/32×32 (3,596 bytes); manifest coherente; solo la clave bilingüe de alt cambió con paridad de diccionario.
 - **Build:** `npm run build` terminó exit 0 (“Compiled with warnings”). Warnings observados: imports sin uso en `src/App.js` y `postcss-calc`/`dvh` en `game/ReferencePanel.css`; el trabajo de #25 no produjo warnings señalados.
 - **AC5:** el usuario revisó la portada desde el navegador conectado al servidor de desarrollo del worktree en el puerto 3003 y aprobó el resultado (“está super bonito”), sin reportar defectos. La revisión visual queda aceptada para F1.
-- **Veredicto F1:** `CLOSED`; AC1–AC5 y build completados. Unidad `WAITING_ORCHESTRATOR` para revisión final e integración de la PR #27.
+- **Veredicto F1:** `CLOSED`; AC1–AC5 y build completados. El Orquestador revisó la implementación; PR #27 integrada e issue #25 cerrada.
 
 ## Reclamo y topología
 
@@ -52,4 +53,4 @@
 - **Decisión de alcance:** el Orquestador actualizó #25 y autorizó cambiar exclusivamente el `alt` a `home.coin.alt`, localizado como “Moneda giratoria” (`es`) y “Spinning coin” (`en`). No modificar ningún otro texto.
 - **Bitácora append-only:** `docs/plans/log/issue-25.jsonl`.
 - **Delegación:** aplicar solo las reglas de delegación existentes si las subtareas llegan a ser separables; esta fase localizada puede ejecutarse de forma secuencial.
-- El Ejecutor terminó; el Orquestador revisa e integra la PR #27. No abrir una segunda integración.
+- Unidad completada; mantener la PR #27 como única integración canónica.

@@ -1,12 +1,12 @@
 # Moneda animada en la portada y favicon optimizado — issue #25
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
+**Estado:** `COMPLETED`; F1 `CLOSED`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/25
 **Handoff:** `docs/plans/active/issue_25_home_coin_favicon.md`
 **Bitácora:** `docs/plans/log/issue-25.jsonl`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
-**Siguiente dueño:** Agente Orquestador; revisión aprobada, integración en curso.
-**Integración esperada:** `issue/25-home-coin-favicon` en `.worktrees/issue-25-home-coin-favicon`, una PR a `master`.
+**Siguiente dueño:** ninguno; unidad completada.
+**Integración:** [PR #27](https://github.com/pronficilio/coup-online/pull/27) integrada a `master` en `c601410952184c85f552ee5cbb73ef6fe52519ff`.
 
 ## Solicitud y definición de éxito
 
@@ -47,7 +47,7 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 
 **Salida/evidencia:** cambio de portada y estilos responsivos; clave `home.coin.alt` localizada solo para la moneda; ICO de 16×16/32×32 y manifest consistente; tamaños de recursos documentados aquí o en el handoff; paridad del diccionario, build y comprobación visual manual registrados.
 
-**Avanzar:** criterios AC1–AC5 satisfechos; dejar #25 `WAITING_ORCHESTRATOR` para revisar la única PR.
+**Avanzar:** criterios AC1–AC5 satisfechos; F1 cerrada e issue #25 completada tras integrar la única PR.
 **Pivotar:** si el GIF no cabe junto al contenido móvil, ajustar su límite responsivo preservando el área disponible para Create/Join.
 **Repetir:** una corrección localizada si el build, el favicon a 16 px o el layout móvil falla.
 **Bloquear/cancelar:** reaparece un conflicto material en `Home.js`, las fuentes no están disponibles en el checkout del Ejecutor o hace falta alterar el alcance del producto.
@@ -63,12 +63,12 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 - **Build:** `npm run build` en `coup-client` terminó con exit 0 (“Compiled with warnings”). Los warnings observados son imports `logo` y `Link` sin uso en `src/App.js` y `postcss-calc` con `dvh` en `game/ReferencePanel.css:100,106`.
 - **Tamaño responsive estático:** CSS calcula 256×256 en 1440×900; 175.5×175.5 en 390×844; 160×160 en 360×640. `height: auto` preserva la relación cuadrada.
 - **AC5:** el servidor de desarrollo se levantó desde el worktree en `http://localhost:3003`; el usuario revisó la portada en su navegador y aprobó el resultado (“está super bonito”), sin reportar defectos. `npm run build` pasó. No se agregaron ni ejecutaron tests automatizados.
-- **PR:** [#27](https://github.com/pronficilio/coup-online/pull/27) hacia `master`, lista para integración.
-- **Veredicto:** F1 `CLOSED` tras la validación manual del usuario y la revisión del Orquestador; la unidad sigue `WAITING_ORCHESTRATOR` solo para integrar la PR #27.
+- **PR:** [#27](https://github.com/pronficilio/coup-online/pull/27), integrada a `master` mediante `c601410952184c85f552ee5cbb73ef6fe52519ff`.
+- **Veredicto:** F1 `CLOSED` tras la validación manual del usuario y la revisión del Orquestador; issue #25 `COMPLETED` y cerrada.
 
 ## Topología y coordinación
 
-La unidad está desbloqueada tras integrar PR #22 y la confirmación del Orquestador. El Ejecutor debe releer #25, reclamarla en el fork y confirmar el estado; después crear o confirmar `issue/25-home-coin-favicon` desde `origin/master` actualizado y `.worktrees/issue-25-home-coin-favicon`. Copiar selectivamente las fuentes locales ignoradas al worktree; versionar solo el GIF usado por el cliente y el favicon derivado. Registrar `claim` y `worktree_confirmed` en la bitácora dentro del branch antes de la implementación. Toda la unidad culmina en una única PR a `master`.
+La unidad se ejecutó en `issue/25-home-coin-favicon` y `.worktrees/issue-25-home-coin-favicon`. La única PR (#27) se integró a `master` en `c601410952184c85f552ee5cbb73ef6fe52519ff`; la issue se cerró después de verificar el merge. No se abrió una segunda integración.
 
 ## Pregunta de falsificación
 
@@ -80,5 +80,6 @@ La unidad está desbloqueada tras integrar PR #22 y la confirmación del Orquest
 - 2026-09-27: usar un ICO derivado en tamaños habituales 16×16 y 32×32, no redimensionar el favicon a ~100 px.
 - 2026-09-27: desbloquear F1 después de integrar la PR #22 de #19; conservar la localización ya integrada en `Home.js`.
 - 2026-09-27: incluir solo el `alt` bilingüe de la moneda (`home.coin.alt`) para satisfacer el criterio de accesibilidad sin traducir otros textos.
+- 2026-09-27: el usuario aprobó la revisión visual manual; F1 cerrada, PR #27 integrada y issue #25 completada.
 
 **Aclaración de alcance del Orquestador (2026-09-27):** autoriza únicamente localizar el `alt` de la moneda con `home.coin.alt` (“Moneda giratoria” / “Spinning coin”) y conservar paridad `es`/`en`; no se modifica ningún otro texto. Confirmada en la issue #25 actualizada.
