@@ -20,15 +20,38 @@ El runner solo tiene salida de red para login y servicio Codex; no comparte la r
 
 ## Autorizar la cuenta y probar
 
-Antes del flujo remoto, habilitar el inicio con código de dispositivo en ChatGPT > Settings > Security (cuenta personal) o en los permisos del workspace. OpenAI documenta que este ajuste es requisito para `codex login --device-auth` en máquinas headless: [autenticación de Codex](https://learn.chatgpt.com/docs/auth). Si el ajuste no está disponible, no copies `auth.json` por el chat; pausa aquí y elige el siguiente método de login con el propietario.
+Antes del flujo remoto, habilitar el inicio con código de dispositivo en ChatGPT > Settings > Security (cuenta personal) o en los permisos del workspace. OpenAI documenta que este ajuste es requisito para `codex login --device-auth` en máquinas headless: [autenticación de Codex](https://learn.chatgpt.com/docs/auth). Si el ajuste no está disponible, usa el flujo OAuth normal del navegador que sigue; no copies `auth.json` por el chat.
 
-Iniciar el flujo de dispositivo dentro del runner:
+Si el ajuste aparece, iniciar el flujo de dispositivo dentro del runner:
 
 ```sh
 docker compose -p deploy -f docker-compose.yml -f codex-ai.compose.yml exec -it coup-codex-runner codex login --device-auth
 ```
 
-Abrir la URL que imprime el CLI, iniciar sesión con la cuenta elegida y completar el código que muestra. No copiar `auth.json` fuera del volumen del runner. Comprobar después el healthcheck del runner, crear una sala, habilitar IA con el código compartido y jugar una mano corta. El primer uso real confirma si la cuenta ofrece `gpt-6-luna` mediante App Server; si el modelo o el login no están disponibles, el turno se pausa y no hay fallback ni API.
+Si el ajuste no aparece, usar el flujo OAuth normal del navegador, con un túnel SSH temporal y un contenedor de login de un solo uso. En el equipo donde se abrirá el navegador, mantener este túnel activo:
+
+```sh
+ssh -N -L 1455:localhost:1455 sqf-hetzner
+```
+
+En el servidor, ejecutar Codex desde la imagen del runner con acceso directo solo al volumen privado de autenticación. No publicar puertos ni copiar el archivo de sesión:
+
+```sh
+docker run --rm -it --network host --read-only \
+  --security-opt no-new-privileges --cap-drop ALL --pids-limit 128 \
+  --memory 512m --cpus 1 \
+  --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m \
+  --volume coup_codex_state:/var/lib/coup-codex:rw \
+  --env CODEX_HOME=/var/lib/coup-codex/auth --env HOME=/tmp \
+  --user 10001:10002 --entrypoint /usr/local/bin/codex \
+  coup-codex-runner:RELEASE_HASH login
+```
+
+`RELEASE_HASH` es el valor de `COUP_REVISION` del `.env` privado.
+
+Abrir en el navegador del mismo equipo la URL OAuth que imprime el CLI y completar la autorización. El callback vuelve por el túnel a `localhost:1455`; al terminar, cerrar el túnel. El contenedor de login no monta el código ni los sockets del juego. La imagen del runner debe incluir `ca-certificates` para que Codex pueda completar las solicitudes HTTPS; el Dockerfile comprueba durante el build que el bundle exista.
+
+No copiar `auth.json` fuera del volumen del runner. Comprobar después `codex login status` y el healthcheck del runner, crear una sala, habilitar IA con el código compartido y jugar una mano corta. El primer uso real confirma si la cuenta ofrece `gpt-6-luna` mediante App Server; si el modelo o el login no están disponibles, el turno se pausa y no hay fallback ni API.
 
 Probar en este orden: persona contra una IA, persona contra dos IA, IA contra IA con el creador como espectador, desafío/blocaje, apagado durante un turno y reinicio del servidor. El botón rojo está disponible a cualquier jugador conectado y detiene los procesos activos; no requiere el código compartido.
 

@@ -1,5 +1,10 @@
 FROM node:24-bookworm-slim
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && test -s /etc/ssl/certs/ca-certificates.crt
+
 RUN groupadd --gid 10001 coup-codex \
     && groupadd --gid 10002 coup-codex-ipc \
     && useradd --uid 10001 --gid 10001 --groups 10002 --no-create-home --shell /usr/sbin/nologin coup-codex \
