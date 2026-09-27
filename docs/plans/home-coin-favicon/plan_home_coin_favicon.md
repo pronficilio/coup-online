@@ -39,7 +39,7 @@ Fuentes de verdad: issue #25, este plan, el código de la portada y la configura
 
 ## Fase única
 
-### F1 — Integrar moneda de portada y favicon (`READY`)
+### F1 — Integrar moneda de portada y favicon (`BLOCKED` — revisión visual pendiente)
 
 **Pregunta:** ¿la portada puede mostrar la moneda animada y usar un favicon derivado pequeño sin saturar la vista móvil ni aumentar innecesariamente los recursos?
 
