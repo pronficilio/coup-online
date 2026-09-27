@@ -153,12 +153,12 @@ export default class Coup extends Component {
             />
 
             <div className="DecisionsSection" aria-live="polite">
-                <button
+                {this.props.isCodexAuthorized && <button
                     type="button"
                     onClick={this.emergencyStopCodex}
                     disabled={this.state.codexDisabled}
                     style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
-                >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>
+                >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>}
                 {this.state.pausedCause && <p role="alert">Game paused: {this.state.pausedCause}</p>}
                 {this.state.canResume && this.props.isLeader && <button onClick={this.resumeGame}>Resume game</button>}
                 {decision && <>

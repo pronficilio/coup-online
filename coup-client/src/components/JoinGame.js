@@ -141,10 +141,6 @@ export default class JoinGame extends Component {
         })
     }
 
-    emergencyStopCodex = () => {
-        if (this.state.socket) this.state.socket.emit('emergencyStopCodex')
-    }
-
     render() {
         if(this.state.isGameStarted) {
             return (<Coup
@@ -235,12 +231,6 @@ export default class JoinGame extends Component {
                             })
                         }
                 </div>
-                {this.state.isInRoom && <button
-                    type="button"
-                    onClick={this.emergencyStopCodex}
-                    disabled={this.state.codexDisabled}
-                    style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginTop: 12 }}
-                >{this.state.codexDisabled ? 'CODEX APAGADO' : 'APAGAR CODEX · EMERGENCIA'}</button>}
             </div>
         )
     }

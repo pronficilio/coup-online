@@ -166,6 +166,7 @@ export default class CreateGame extends Component {
                 socket={this.state.socket}
                 isLeader={this.state.isLeader}
                 isSpectator={this.state.isSpectating}
+                isCodexAuthorized={this.state.isAIAuthorized}
                 codexDisabled={this.state.codexDisabled}
             />)
         }
