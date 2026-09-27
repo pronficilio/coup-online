@@ -2,7 +2,7 @@
 
 **Estado:** `BLOCKED`; no se completó el recorrido manual requerido. Este documento no es un veredicto de aceptación.
 **Base y evidencia:** producto en `9f97acb`; la comprobación local se inició desde HEAD `1e28666`, y este reporte F4 quedó versionado en `e9be456` sobre el branch canónico `issue/19-spanish-default-dictionary`.
-**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED`. Issue #19 permanece `OPEN`; PR #22 permanece `DRAFT`.
+**Estado de fases:** F1 `CLOSED`; F2/F3 `ACTIVE`; F4 `BLOCKED`. Issue #19 permanece `OPEN`; PR #22 sigue `DRAFT` mientras Orquestación prepara la integración parcial autorizada por el usuario.
 
 ## Alcance requerido
 
@@ -21,6 +21,6 @@ Por estas razones, no hay evidencia visual/manual para portada, lobby, decisione
 
 F4 queda `BLOCKED` hasta habilitar un navegador y entorno local seguro para la partida manual. Una vez exista, recorrer portada, creación/unión de lobby, decisiones, tablero y registro; guardar pasos y resultados reproducibles. Luego Orquestación debe asignar un Verifier FINAL independiente con `translation_inventory.md`, el plan y criterios AC1–AC7, reportes F2/F3, este reporte y el diff consolidado. El Verifier debe inspeccionar inglés visible/accesible, ausencia de selector/ruta a `en`, paridad de claves/marcadores y preservación de valores/protocolos. El Alquimista no reclama ni emite ese veredicto por sí mismo.
 
-No cambiar estado de issue/PR, no marcar F4 cerrada, no retirar el borrador ni fusionar. Issue #19 sigue `OPEN`; PR #22 sigue `DRAFT`.
+El usuario autorizó ahora la integración parcial de PR #22 en `master` para revisión incremental aunque F4 siga bloqueada. Esa autorización no es aceptación del resultado: no marca F4 cerrada, no equivale al veredicto FINAL y no cierra #19. Orquestación ejecutará la transición desde DRAFT y el merge; al registrar esta actualización, la issue sigue `OPEN` y PR #22 sigue `DRAFT`.
 
-Los cuerpos de issue #19 y PR #22 se actualizaron y releyeron el 2026-09-27; la API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`. Ambos reflejan el bloqueo observado y la ausencia del recorrido.
+Los cuerpos de issue #19 y PR #22 se actualizaron y releyeron el 2026-09-27 tras la reorquestación. La API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`; ambos reflejan la autorización de integración parcial sin cambiar F4 `BLOCKED` y declaran que no hubo recorrido manual. El Alquimista no hizo transición de DRAFT ni merge.

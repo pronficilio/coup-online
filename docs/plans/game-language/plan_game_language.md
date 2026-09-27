@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Siguiente dueño:** Orquestación debe habilitar un entorno local con navegador; después Alquimista completa el recorrido manual y Orquestación delega Verifier FINAL independiente.
-**Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) se abrió como borrador por solicitud explícita del usuario para validar el avance parcial; es la única PR de esta unidad.
+**Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`. La [PR #22](https://github.com/pronficilio/coup-online/pull/22) se abrió como borrador por solicitud explícita del usuario para validar el avance parcial; es la única PR de esta unidad. El usuario autorizó después integrar este avance parcial en `master` para revisión incremental aunque F4 siga bloqueada. Orquestación ejecutará la transición/merge; la aprobación no cierra #19 ni acepta F4.
 
 ## Solicitud y definición de éxito
 
@@ -85,7 +85,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Tanda actual posterior a PR #23:** lobby/decisiones/tablero están en español mediante el mapa `es`; PlayerBoard carga las cinco imágenes de personaje españolas. `translations.json` contiene 307 claves espejo `es`/`en`, con placeholders concordantes. Se añadió el helper de lobby para presentar códigos internos como mensajes localizados y se tradujeron las decisiones a partir de `decision.type`/`choiceId` sin cambiar protocolo.
 
-**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED` ni tratar la rama como lista para integrar hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. A solicitud explícita del usuario, se permite la PR de borrador #22 para revisar este avance parcial; debe permanecer `DRAFT` y no fusionarse hasta cumplir F2/F3/F4 y el veredicto requerido. Esta revisión temprana no cambia los criterios de aceptación ni crea una integración adicional.
+**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED` ni tratar la rama como lista para aceptación hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. Reorquestación aprobada explícitamente por el usuario (2026-09-27): autoriza integrar PR #22 parcialmente en `master` para revisión incremental mientras F4 permanece `BLOCKED`. Esta excepción permite solo la integración parcial; no satisface criterios, no cierra F2/F3/F4 ni issue #19, y no reemplaza recorrido manual ni Verifier FINAL. Orquestación hará cualquier transición desde DRAFT y el merge. La PR sigue DRAFT hasta esa acción.
 
 **Avanzar:** recorridos del cliente muestran etiquetas, decisiones y ayudas en español; ambos mapas tienen la misma estructura; solo se importa `es`; no existe selector, detección ni persistencia.
 **Pivotar:** si una etiqueta dinámica no cabe en un string de diccionario sin cambiar el payload, usar marcadores nombrados en presentación.
@@ -132,7 +132,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 ## Topología, riesgos y decisiones
 
-El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. La rama canónica `issue/19-spanish-default-dictionary` y worktree `.worktrees/issue-19-spanish-default-dictionary` conservan la ejecución aislada; la única PR es #22 y debe seguir DRAFT.
+El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. La rama canónica `issue/19-spanish-default-dictionary` y worktree `.worktrees/issue-19-spanish-default-dictionary` conservan la ejecución aislada; la única PR es #22 y actualmente sigue DRAFT. El usuario autorizó la integración parcial para revisión incremental aunque F4 esté bloqueada; Orquestación ejecutará la transición/merge sin marcar F4 aceptada ni cerrar la issue.
 
 Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas y evitar exponer IDs ingleses. La base publicada de PR #23 ya está integrada; no se copian cambios locales de otros worktrees. No cambiar reglas, enums o payloads para traducir etiquetas. Aplicar el glosario y referencias españolas existentes.
 
@@ -152,3 +152,5 @@ Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas 
 - 2026-09-27: commit `9f97acb` publicó la tanda actual F2/F3 en el branch de #19. Después se reemplazaron y releyeron los cuerpos de issue #19 y PR #22; #19 sigue `OPEN` y asignada a `pronficilio`, PR #22 sigue `OPEN`/`DRAFT`. La tanda de tracker está registrada en `issue-19.jsonl`; no hubo cierre de fase ni merge.
 - 2026-09-27: al iniciar F4 se comprobó que no hay navegador instalado/en `PATH` ni dependencia Playwright/Puppeteer/WebDriver en `coup-client`. No se hizo el recorrido manual; F4 `BLOCKED` hasta disponer de navegador/entorno seguro y después obtener Verifier FINAL independiente. Issue #19 permanece `OPEN`; PR #22 `DRAFT`; F2/F3 `ACTIVE`.
 - 2026-09-27: se reemplazaron y releyeron los cuerpos de #19 y PR #22 para registrar el bloqueo F4 observado. La API confirmó #19 `OPEN`/asignada a `pronficilio` y PR #22 `OPEN`/`DRAFT`; ambos describen F4 `BLOCKED` y declaran que no hubo recorrido manual. Evento append-only en `issue-19.jsonl`.
+- 2026-09-27: reorquestación autorizada explícitamente por el usuario: permitir que Orquestación integre PR #22 parcialmente en `master` para revisión incremental aunque F4 siga `BLOCKED`. No equivale a aceptación/veredicto F4 ni cierre de #19. La rama sigue sin merge al registrar este evento; Orquestación ejecuta la transición/merge. Issue permanece `OPEN`.
+- 2026-09-27: los cuerpos de issue #19 y PR #22 se actualizaron y releyeron tras la reorquestación. API a las 18:06:46Z: #19 `OPEN`/asignada a `pronficilio`; PR #22 `OPEN`/`DRAFT`. Ambos registran integración parcial autorizada, F4 `BLOCKED`, y ausencia de cierre/aceptación. El Alquimista no hizo transición ni merge.
