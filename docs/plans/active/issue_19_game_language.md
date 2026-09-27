@@ -3,11 +3,12 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/19
 - **Plan exacto:** `docs/plans/game-language/plan_game_language.md`
 - **Bitácora exacta:** `docs/plans/log/issue-19.jsonl`
-- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por coordinación con #14/#18; F3 `BLOCKED` por coordinación con #14; F4 `PENDING`. Issue abierta y asignada a `pronficilio`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` en superficies aisladas y pendiente en rutas reservadas; F3 `BLOCKED` por #14; F4 `PENDING`. Issue abierta y asignada a `pronficilio`.
 - **Modo/riesgo/verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Verifier requerido ahora:** no. Requerido en F4 antes de revisión de integración.
 - **Pregunta de falsificación:** ¿puede una persona en un recorrido normal encontrar texto inglés visible/accesible o activar inglés pese a no existir selector?
-- **F1 cerrada:** `docs/plans/game-language/translation_inventory.md` inventaría texto visible/accesible, errores, decisiones, reglas, HTML/PWA, assets y mensajes `g-addLog`; no hubo cambios de producto. Siguiente acción: Orquestador coordina la liberación de las superficies #14/#18 antes de F2 y #14 antes de F3.
+- **F1 cerrada:** `docs/plans/game-language/translation_inventory.md` inventaría texto visible/accesible, errores, decisiones, reglas, HTML/PWA, assets y mensajes `g-addLog`; no hubo cambios de producto.
+- **F2 en curso:** empezar con `src/i18n/**`, `Home.js`, `RulesModal.js`, `CheatSheetModal.js`, `EventLog.js`, `public/index.html`, `public/manifest.json` y `assets/CheatSheet.svg`. Mantener sin cambios los archivos reservados de #14/#18 que se enumeran abajo; F2 no cierra hasta integrar/liberar esas rutas, sincronizar la base y completar su localización.
 - **Documentos fuente:** issue #19; plan indicado arriba; reglas `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md`; recursos de referencia descritos en el plan.
 
 ## Subtareas auditadas en F1
@@ -21,14 +22,17 @@
 
 ## Alcance de ejecución restante
 
-- F2: traducir la interfaz y preparar `coup-client/src/i18n/translations.json` con claves paralelas `es`/`en`; cliente fijo a `es`; declarar `lang="es"`; traducir texto de `CheatSheet.svg` y actualizar `public/manifest.json`; cargar las cinco variantes españolas existentes de las ilustraciones de personaje. No rediseñar controles a partir de las brechas de accesibilidad registradas sin reorquestación.
+- F2: traducir la interfaz y preparar `coup-client/src/i18n/translations.json` con claves paralelas `es`/`en`; cliente fijo a `es`; declarar `lang="es"`; traducir texto de `CheatSheet.svg` y actualizar `public/manifest.json`; cargar las cinco variantes españolas existentes de las ilustraciones de personaje. El primer commit puede cubrir solo las superficies aisladas autorizadas por el plan; no rediseñar controles a partir de brechas de accesibilidad sin reorquestación.
 - F3: traducir únicamente mensajes visibles `g-addLog` y reflejar sus plantillas en el diccionario; conservar payload string, eventos, acciones, cartas, reglas y nombres internos.
 - F4: compilar cliente, recorrer portada/lobby/partida manualmente, revisar cobertura y solicitar Verifier FINAL independiente.
 - No implementar selector, detección, preferencia persistente ni otra ruta para elegir idioma; no añadir ni ejecutar tests automatizados.
 
 ## Dependencias y límites
 
-- **Colisiones activas:** #14 sigue abierta y tiene trabajo pendiente en `CreateGame.js`, `JoinGame.js`, `Coup.js`, `server/game/coup.js` y `server/index.js`. #18 está abierta y asignada a `pronficilio`; monta `ReferencePanel` dentro de `Coup.js`. F1 está cerrada. Antes de F2, el Orquestador debe confirmar integración/liberación o coordinación explícita de #14 y #18; antes de F3, lo mismo con #14. No resolver conflictos por inferencia.
+- **Reserva de archivos confirmada por el Orquestador (2026-09-27):** #19 puede tocar ahora `coup-client/src/i18n/**`, `coup-client/src/components/Home.js`, `RulesModal.js`, `CheatSheetModal.js`, `EventLog.js`, `coup-client/public/index.html`, `coup-client/public/manifest.json` y `coup-client/src/assets/CheatSheet.svg`. Los demás paths de componentes indicados comparten diffs vivos con #14/#18 y quedan temporalmente reservados.
+- **Rutas reservadas a #14 durante F2:** `coup-client/src/components/CreateGame.js`, `coup-client/src/components/JoinGame.js`, `coup-client/src/components/game/ActionDecision.js`, `BlockChallengeDecision.js`, `BlockDecision.js`, `ChallengeDecision.js`, `ChooseInfluence.js`, `Coup.js`, `ExchangeInfluences.js`, `PlayerBoard.js` y `RevealDecision.js`. **Rutas reservadas a #18:** `coup-client/src/components/game/Coup.js`, `ReferencePanel.js` y `ReferencePanel.css`. No editar ni resolver cambios ajenos por inferencia. Después de integrar/liberar ambas unidades, registrar `sync_base`, actualizar el inventario por texto nuevo y completar F2.
+- **F3 sigue bloqueada:** #14 tiene cambios activos en `server/game/coup.js` y `server/index.js`. Traducir solo los emisores `g-addLog` después de que #14 libere/integren esos archivos; mantener el string de payload y el resto del protocolo.
+- #14 permanece `OPEN` con F2 bloqueada por sus gates de preflight/auth; #18 permanece `OPEN`, PR draft #20 y F1 bloqueada por la revisión visual manual. Estas fases no se cancelan ni se relajan; el trabajo aislado de F2 avanza en paralelo.
 - #13 es una unidad de despliegue fuera de alcance; no desplegar este cambio desde esta issue.
 - No cambies lógica, reglas, shape de Socket.IO ni parámetros de juego para facilitar traducción. Los textos que se envían como datos de juego conservan sus valores en inglés y reciben etiqueta española al renderizarse.
 

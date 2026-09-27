@@ -1,11 +1,11 @@
 # Idioma español predeterminado y diccionario bilingüe — issue #19
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por coordinación con #14/#18; F3 `BLOCKED` por coordinación con #14; F4 `PENDING`.
+**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE` para superficies sin colisión y pendiente en rutas compartidas; F3 `BLOCKED` por #14; F4 `PENDING`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Orquestador para coordinar F2/F3; F1 está cerrada con inventario revisado.
+**Siguiente dueño:** Alquimista para avanzar F2 en el alcance aislado confirmado; el Orquestador coordinará después las rutas compartidas.
 **Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`.
 
 ## Solicitud y definición de éxito
@@ -63,17 +63,21 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 **Commit:** `COMMIT_REQUIRED`; `docs(i18n): issue 19 F1 CLOSED advance_f2`.
 **Validación:** búsqueda estática de literales/texto en atributos y assets más lectura manual de cada contexto encontrado; sin añadir ni ejecutar tests.
 
-### F2 — Traducir la interfaz y preparar el diccionario fijo en español (`BLOCKED` hasta liberar los archivos compartidos)
+### F2 — Traducir la interfaz y preparar el diccionario fijo en español (`ACTIVE` en superficies aisladas; rutas compartidas reservadas)
 
 **Pregunta:** ¿puede el cliente mostrar español desde un diccionario bilingüe con `es` como fuente fija y sin ruta para elegir otro idioma?
 
-**Entrada:** inventario F1, glosario aceptado y una base sincronizada con `origin/master`; coordinación explícita con #14/#18 antes de modificar superficies compartidas.
+**Entrada:** inventario F1, glosario aceptado y la base de #19. El trabajo empieza en archivos sin cambios en #14/#18; se sincroniza la base y se obtiene liberación de rutas compartidas antes de editarlas.
 
 **Salida/evidencia:** `translations.json` con claves paralelas `es`/`en`; texto visible del cliente y `CheatSheet.svg` en español; documento con `lang="es"`; metadatos `public/manifest.json` en español; carga por defecto de las cinco ilustraciones de personaje ya traducidas (`duque.webp`, `asesino.webp`, `capitan.webp`, `embajador.webp`, `condesa.webp`). Los valores internos que el cliente envía siguen en inglés; solo las etiquetas renderizadas pasan por el diccionario.
 
 **Áreas principales:** `coup-client/src/i18n/`, `coup-client/public/index.html`, `coup-client/public/manifest.json`, `coup-client/src/components/`, `coup-client/src/assets/CheatSheet.svg`, `coup-client/src/assets/characters/` y el reporte F2. Cargar las variantes españolas existentes en `PlayerBoard.js`; coordinar primero cualquier edición de superficies compartidas.
 
-**Dependencia:** #14 tiene trabajo abierto en `CreateGame.js`, `JoinGame.js`, `Coup.js` y rutas servidor relacionadas; #18 monta `ReferencePanel` en `Coup.js`. Antes de editar superficies compartidas, el Orquestador debe confirmar integración/liberación de #14 y #18 o registrar coordinación explícita; no mezclar cambios ni resolver conflictos por inferencia.
+**Coordinación y archivos autorizados ahora (2026-09-27):** la inspección de worktrees confirma que #14 tiene cambios comprometidos y locales en componentes de lobby/decisión y en rutas de servidor; #18 conserva el PR draft #20 con cambios en `Coup.js` y `ReferencePanel`. Para avanzar sin tocar cambios ajenos, F2 puede modificar `coup-client/src/i18n/**`, `coup-client/src/components/Home.js`, `RulesModal.js`, `CheatSheetModal.js`, `EventLog.js`, `coup-client/public/index.html`, `coup-client/public/manifest.json`, `coup-client/src/assets/CheatSheet.svg` y el reporte F2. Puede preparar las entradas F1 del cliente en `translations.json`; F2 seguirá abierta para actualizar los componentes reservados y auditar textos nuevos que entren con #14.
+
+**Rutas reservadas, no editar en F2 todavía:** #14 conserva `coup-client/src/components/CreateGame.js`, `coup-client/src/components/JoinGame.js`, `coup-client/src/components/game/ActionDecision.js`, `BlockChallengeDecision.js`, `BlockDecision.js`, `ChallengeDecision.js`, `ChooseInfluence.js`, `Coup.js`, `ExchangeInfluences.js`, `PlayerBoard.js` y `RevealDecision.js`; los últimos nueve archivos están bajo `coup-client/src/components/game/`. #18 conserva `coup-client/src/components/game/Coup.js`, `ReferencePanel.js` y `ReferencePanel.css`. No editar esos archivos ni resolver sus diffs por inferencia. Tras integrar/liberar #14 y #18, sincronizar #19 con `origin/master`, registrar `sync_base` y completar la localización allí. F3 permanece bloqueada hasta que #14 libere `server/index.js` y `server/game/coup.js`.
+
+**Criterio de parcialidad:** los commits incrementales de F2 pueden contener solo las superficies autorizadas. No declarar F2 `CLOSED`, no abrir PR ni entregar integración hasta completar las rutas reservadas, actualizar el inventario/diccionario por cualquier texto nuevo y satisfacer la validación de F2. La integración sigue siendo una única PR de #19.
 
 **Avanzar:** recorridos del cliente muestran etiquetas, decisiones y ayudas en español; ambos mapas tienen la misma estructura; solo se importa `es`; no existe selector, detección ni persistencia.
 **Pivotar:** si una etiqueta dinámica no cabe en un string de diccionario sin cambiar el payload, usar marcadores nombrados en presentación.
@@ -129,4 +133,5 @@ Riesgo principal: textos de servidor/protocolo y código de #14/#18 comparten ar
 - 2026-09-26: F1 queda independiente de #14; F2/F3 requieren coordinación por solapamiento de archivos.
 - 2026-09-26: la issue #18 también requiere coordinación para F2 porque monta `ReferencePanel` dentro de `Coup.js`.
 
-- 2026-09-26: F1 confirmó texto inglés en `CheatSheet.svg`, cinco ilustraciones de personaje usadas por `PlayerBoard.js`, metadatos de `public/index.html` y nombres de instalación en `public/manifest.json`; F2 incluye las variantes gráficas españolas existentes y el manifest. F1 queda cerrada; F2/F3 esperan coordinación con #14/#18.
+- 2026-09-26: F1 confirmó texto inglés en `CheatSheet.svg`, cinco ilustraciones de personaje usadas por `PlayerBoard.js`, metadatos de `public/index.html` y nombres de instalación en `public/manifest.json`; F2 incluye las variantes gráficas españolas existentes y el manifest. F1 queda cerrada.
+- 2026-09-27: la inspección de los worktrees #14/#18 precisó los archivos en colisión. F2 avanza en las superficies aisladas enumeradas arriba; los componentes modificados por esas unidades quedan reservados hasta liberar/integrar sus ramas. F3 espera la liberación de #14.
