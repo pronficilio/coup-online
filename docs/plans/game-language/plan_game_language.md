@@ -1,11 +1,11 @@
 # Idioma español predeterminado y diccionario bilingüe — issue #19
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`; F2 `BLOCKED` por colisiones con #14/#18; F3 `BLOCKED` por colisión con #14; F4 `PENDING`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por coordinación con #14/#18; F3 `BLOCKED` por coordinación con #14; F4 `PENDING`.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Alquimista; #19 está reclamada y F1 está en curso.
+**Siguiente dueño:** Orquestador para coordinar F2/F3; F1 está cerrada con inventario revisado.
 **Integración única esperada:** `issue/19-spanish-default-dictionary` en `.worktrees/issue-19-spanish-default-dictionary`, una PR a `master`.
 
 ## Solicitud y definición de éxito
@@ -18,8 +18,8 @@ La solicitud es identificar las palabras en inglés del código, establecer el e
 
 - El repositorio `coup-online` usa `master` como base, `origin` apunta al fork `pronficilio/coup-online`, GitHub es el tracker y el aislamiento local es un worktree por issue.
 - El cliente es React 16/Create React App en `coup-client/`; el servidor Socket.IO/Node está en `server/`.
-- El escaneo inicial encontró cadenas visibles en inglés en `Home.js`, `CreateGame.js`, `JoinGame.js`, `RulesModal.js`, `CheatSheetModal.js`, `ActionDecision.js`, `BlockDecision.js`, `ChallengeDecision.js`, `RevealDecision.js`, `ExchangeInfluences.js`, `Coup.js` y `EventLog.js`. `CheatSheet.svg` contiene texto inglés y `coup-client/public/index.html` declara `lang="en"`.
-- `server/index.js` y `server/game/coup.js` envían mensajes ingleses mediante `g-addLog`; el cliente los muestra en el registro. `PlayerBoard.js` y `ReferencePanel.js` ya tienen etiquetas accesibles en español. La referencia se muestra con los recursos `card-es.webp` y `table-es.webp`; existen también sus variantes `en`, que no deben confundirse con la interfaz predeterminada.
+- La auditoría F1 confirmó cadenas visibles en `Home.js`, `CreateGame.js`, `JoinGame.js`, `RulesModal.js`, `CheatSheetModal.js`, componentes de decisión, `Coup.js` y `EventLog.js`; `CheatSheet.svg` y las cinco ilustraciones de personaje cargadas en `PlayerBoard.js` tienen texto inglés. `coup-client/public/index.html` declara `lang="en"` y `public/manifest.json` incluye nombre y descripción ingleses.
+- `server/index.js` y `server/game/coup.js` envían mensajes ingleses mediante `g-addLog`; el cliente los muestra en el registro. `PlayerBoard.js` y `ReferencePanel.js` tienen etiquetas accesibles en español, pero el tablero carga cinco ilustraciones inglesas aunque existen variantes españolas. La referencia de juego muestra `card-es.webp` y `table-es.webp`; las variantes `en` no están cargadas.
 - La issue #14 está abierta y su plan documenta cambios pendientes del lobby y de `server/game/coup.js`/`server/index.js`. Esas superficies se solapan con la traducción. La issue #18 también está abierta, asignada a `pronficilio`, y monta `ReferencePanel` en `Coup.js`; F2 toca ese mismo shell. #13 trata de despliegue y queda fuera de esta unidad.
 - Supuesto: usar español neutral de Latinoamérica, clave `es`, y conservar el texto inglés de origen bajo `en`. Los nombres propios de jugadores y los valores internos de cartas/acciones se conservan en los mensajes; solo cambia su presentación.
 - Glosario inicial: usar los nombres que ya aparecen en la referencia española del juego —Duque, Asesino, Embajador, Capitán y Condesa— y las acciones Ingreso, Ayuda extranjera, Golpe, Impuesto, Robar, Intercambiar y Asesinar. F1 confirma la forma final contra las referencias vigentes del juego.
@@ -39,22 +39,24 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 1. El inventario registra cada texto de jugador en inglés con archivo/origen, contexto, clave propuesta, valor inglés, traducción española y parámetros dinámicos; clasifica el texto ya español, assets bilingües y cadenas internas excluidas.
 2. El flujo visible de portada, creación/ingreso al lobby, reglas, acciones, decisiones, estados de partida y registro de eventos queda en español.
 3. El diccionario `translations.json` conserva los textos fuente en `en`, ofrece traducciones en `es` y tiene el mismo conjunto de claves y marcadores en ambos mapas.
-4. Los textos visibles de accesibilidad y recursos gráficos quedan en español; los recursos de referencia inglesa solo permanecen donde se identifican explícitamente como material bilingüe.
+4. Los textos visibles de accesibilidad, recursos gráficos y nombres instalables de la PWA quedan en español; los recursos de referencia inglesa solo permanecen donde se identifican explícitamente como material bilingüe.
 5. `public/index.html` declara `lang="es"`; la interfaz usa español fijo y no ofrece selector, detección o persistencia de idioma.
 6. Se preservan nombres de evento, forma y contenido de payloads, valores internos de juego, reglas y comportamiento de partida.
 7. La auditoría final no encuentra texto inglés visible o accesible en los recorridos incluidos; build y recorrido manual quedan documentados y un Verifier independiente intenta refutar ese claim.
 
 ## Fases
 
-### F1 — Inventariar cadenas y cerrar el contrato del diccionario (`READY`)
+### F1 — Inventariar cadenas y cerrar el contrato del diccionario (`CLOSED`)
 
 **Pregunta:** ¿qué textos ingleses aparecen en la experiencia jugable y cómo se representan con claves y parámetros sin traducir datos del protocolo?
 
 **Entrada:** archivos React del cliente, recursos SVG/HTML, mensajes `g-addLog` del servidor, referencias vigentes del juego y este plan.
 
-**Salida/evidencia:** `docs/plans/game-language/translation_inventory.md`, con tabla de origen, contexto, clave propuesta, inglés, español propuesto, parámetros y decisión de inclusión; glosario español y propuesta de esquema `es`/`en`. Distinguir texto visible, accesibilidad, contenido gráfico, texto ya español y cadenas internas excluidas. No modificar código de producto en esta fase.
+**Salida/evidencia:** `docs/plans/game-language/translation_inventory.md`, con tabla de origen, contexto, clave propuesta, inglés, español propuesto, parámetros y decisión de inclusión; glosario español y propuesta de esquema `es`/`en`. Distinguir texto visible, accesibilidad, contenido gráfico, texto ya español y cadenas internas excluidas. Se inventariaron además `public/manifest.json` y las cinco ilustraciones de personaje que se muestran en inglés. No modificar código de producto en esta fase.
 
-**Avanzar:** una revisión de las rutas renderizadas, attributes accesibles, recursos gráficos y mensajes visibles deja cada hallazgo clasificado; las claves preservan variables y los términos coinciden con las referencias españolas.
+**Veredicto F1:** `CLOSED`. La lectura manual y el barrido de JSX, atributos, HTML/PWA, SVG/WebP y emisores/receptor `g-addLog` cubren las superficies encontradas; los parámetros están nombrados, los IDs de protocolo quedan excluidos y el glosario coincide con los recursos españoles existentes. El inventario registra por separado huecos de accesibilidad que no autorizan rediseñar controles.
+
+**Avanzar:** una revisión de las rutas renderizadas, atributos accesibles, recursos gráficos y mensajes visibles deja cada hallazgo clasificado; las claves preservan variables y los términos coinciden con las referencias españolas.
 **Pivotar:** si la auditoría descubre texto expuesto fuera del cliente/servidor contemplado, actualizar alcance e issue antes de incorporarlo.
 **Repetir:** una pasada dirigida solo a rutas o recursos identificados como omitidos.
 **Bloquear/cancelar:** si aparece una decisión de producto sobre terminología o alcance regional que no puede resolverse con las referencias vigentes, registrar la pregunta para el Orquestador/usuario.
@@ -65,11 +67,11 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Pregunta:** ¿puede el cliente mostrar español desde un diccionario bilingüe con `es` como fuente fija y sin ruta para elegir otro idioma?
 
-**Entrada:** inventario F1, glosario aceptado y una base sincronizada con `origin/master`.
+**Entrada:** inventario F1, glosario aceptado y una base sincronizada con `origin/master`; coordinación explícita con #14/#18 antes de modificar superficies compartidas.
 
-**Salida/evidencia:** `translations.json` con claves paralelas `es`/`en`; texto visible del cliente y `CheatSheet.svg` en español; documento con `lang="es"`; accesibilidad actualizada. Los valores internos que el cliente envía siguen en inglés; solo las etiquetas renderizadas pasan por el diccionario.
+**Salida/evidencia:** `translations.json` con claves paralelas `es`/`en`; texto visible del cliente y `CheatSheet.svg` en español; documento con `lang="es"`; metadatos `public/manifest.json` en español; carga por defecto de las cinco ilustraciones de personaje ya traducidas (`duque.webp`, `asesino.webp`, `capitan.webp`, `embajador.webp`, `condesa.webp`). Los valores internos que el cliente envía siguen en inglés; solo las etiquetas renderizadas pasan por el diccionario.
 
-**Áreas principales:** `coup-client/src/i18n/`, `coup-client/public/index.html`, `coup-client/src/components/`, `coup-client/src/assets/CheatSheet.svg` y el reporte F2. El inventario decide si hay otros assets con texto.
+**Áreas principales:** `coup-client/src/i18n/`, `coup-client/public/index.html`, `coup-client/public/manifest.json`, `coup-client/src/components/`, `coup-client/src/assets/CheatSheet.svg`, `coup-client/src/assets/characters/` y el reporte F2. Cargar las variantes españolas existentes en `PlayerBoard.js`; coordinar primero cualquier edición de superficies compartidas.
 
 **Dependencia:** #14 tiene trabajo abierto en `CreateGame.js`, `JoinGame.js`, `Coup.js` y rutas servidor relacionadas; #18 monta `ReferencePanel` en `Coup.js`. Antes de editar superficies compartidas, el Orquestador debe confirmar integración/liberación de #14 y #18 o registrar coordinación explícita; no mezclar cambios ni resolver conflictos por inferencia.
 
@@ -126,3 +128,5 @@ Riesgo principal: textos de servidor/protocolo y código de #14/#18 comparten ar
 - 2026-09-26: usar `es` fijo y conservar `en` en diccionario; no implementar selección, detección o persistencia.
 - 2026-09-26: F1 queda independiente de #14; F2/F3 requieren coordinación por solapamiento de archivos.
 - 2026-09-26: la issue #18 también requiere coordinación para F2 porque monta `ReferencePanel` dentro de `Coup.js`.
+
+- 2026-09-26: F1 confirmó texto inglés en `CheatSheet.svg`, cinco ilustraciones de personaje usadas por `PlayerBoard.js`, metadatos de `public/index.html` y nombres de instalación en `public/manifest.json`; F2 incluye las variantes gráficas españolas existentes y el manifest. F1 queda cerrada; F2/F3 esperan coordinación con #14/#18.

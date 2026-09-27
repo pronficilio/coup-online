@@ -1,0 +1,208 @@
+# Inventario de traducción — issue #19 (F1)
+
+**Estado al iniciar la auditoría:** F1 `ACTIVE`; inventario preparado para el veredicto de cierre.
+**Branch/worktree observado:** `issue/19-spanish-default-dictionary` / `.worktrees/issue-19-spanish-default-dictionary`.
+**Base inspeccionada:** `origin/master` en `55be894`; control de unidad `856e9ac`.
+**Alcance:** textos renderizados por el cliente, atributos accesibles, errores recibidos del servidor, metadatos HTML/PWA, assets con texto visibles y todas las emisiones `g-addLog` que llegan a `EventLog`. Esta fase fue de solo lectura; no se modificó código del juego.
+
+## Convenciones y glosario
+
+Las claves propuestas usan espacios de nombres estables (`home.*`, `lobby.*`, `rules.*`, `game.*`, `help.*`, `meta.*`). Los valores de `en` conservan exactamente el texto actual, incluidos errores tipográficos cuando corresponda; cada traducción `es` usa español neutral latinoamericano. Los marcadores son nombres descriptivos y deben ser idénticos en ambas lenguas.
+
+Marcadores frecuentes: `{playerName}`, `{targetName}`, `{challengerName}`, `{challengeeName}`, `{blockerName}`, `{blockeeName}`, `{actionLabel}`, `{roleLabel}`, `{coins}`, `{amount}`, `{cost}`, `{maxLength}`, `{roomCode}`. Los nombres escritos por jugadores, códigos de sala y valores internos se conservan como datos; solo se localiza la etiqueta o representación que se muestra.
+
+El glosario sigue los recursos españoles existentes `card-es.webp`, `table-es.webp` y las variantes españolas de las cartas: **Duque, Asesino, Embajador, Capitán, Condesa**; **Ingreso, Ayuda Extranjera, Golpe, Impuesto, Robar, Intercambiar, Asesinar**; **influencia**, **moneda** y **Mazo de la Corte**. `Coup` se conserva como nombre del juego. Las reglas inglesas de `docs/coup_transcription.md`, `docs/coup_play_reference.md` y `docs/coup_summary_card.md` sirven para verificar significado; los recursos `es` fijan la terminología visible.
+
+`g-addLog` sigue siendo un payload de texto plano. Los códigos de acción/carta, nombres de eventos y otros enums no se traducen en el protocolo: cualquier etiqueta dinámica debe localizarse únicamente al presentarla.
+
+## Portada, lobby y texto de sitio
+
+| Origen / contexto | Clave propuesta | Inglés original (`en`) | Español propuesto (`es`) | Parámetros | Clasificación / decisión |
+|---|---|---|---|---|---|
+| `Home.js`, encabezado de portada | `home.title` | `Welcome to Coup` | `Te damos la bienvenida a Coup` | — | Texto visible; traducible |
+| `Home.js`, subtítulo | `home.tagline` | `A game of deduction and deception` | `Un juego de deducción y engaño` | — | Texto visible; traducible |
+| `Home.js`, enlaces | `home.create`, `home.join` | `Create Game`; `Join Game` | `Crear partida`; `Unirse a una partida` | — | Texto visible; traducible |
+| `RulesModal.js`, acceso en portada y partida | `common.rules` | `Rules` | `Reglas` | — | Texto visible; aparece en dos contextos |
+| `Home.js`, imagen decorativa con alt | `home.chicken.alt` | `chicken-leg` | `Pierna de pollo` | — | Accesibilidad; el `Chicken.svg` no tiene texto incrustado |
+| `Home.js`, crédito | `home.credit` | `Made by {authorName}` | `Creado por {authorName}` | `authorName` = nombre propio Ethan Chen | Texto visible; no traducir el nombre propio |
+| `Home.js`, distintivo de versión | `home.version` | `Beta v0.9` | `Versión beta 0.9` | versión fija actual | Texto visible; traducción propuesta, conservar número |
+| `public/index.html`, idioma del documento | `meta.documentLanguage` | `lang="en"` | `lang="es"` | — | Metadato de accesibilidad/localización; no es una frase del diccionario |
+| `public/index.html`, título de pestaña | `meta.documentTitle` | `Coup Online` | `Coup en línea` | — | Texto visible del navegador; mantener `Coup` como nombre del juego |
+| `public/index.html`, descripción social | `meta.ogDescription` | `Play Coup Online uwu` | `Juega Coup en línea uwu` | — | Metadato que se muestra al compartir; conservar el emoticono textual `uwu` |
+| `public/index.html`, descripción del sitio | `meta.description` | `Play Coup online with your friends! Create or join a game with a 6-digit code` | `Juega Coup en línea con tus amistades. Crea una partida o únete a una con un código de 6 dígitos.` | — | Metadato de búsqueda/compartir, de cara a quien visita |
+| `public/index.html`, palabras clave | `meta.keywords` | `Coup Online, Coup Game, Coup Boardgame, Games with friends` | `Coup en línea, juego Coup, juego de mesa Coup, juegos con amistades` | — | Metadato; traducible aunque no se renderice dentro de la página |
+| `public/index.html`, estado sin JavaScript | `meta.noScript` | `You need to enable JavaScript to run this app.` | `Debes habilitar JavaScript para usar esta aplicación.` | — | Texto visible cuando JavaScript está deshabilitado |
+| `public/manifest.json`, nombre corto instalable | `meta.pwa.shortName` | `Coup Online` | `Coup en línea` | — | Candidato visible en el lanzador del dispositivo; ampliación menor incluida en F1 |
+| `public/manifest.json`, nombre instalable | `meta.pwa.name` | `An online port of Coup` | `Una versión de Coup para jugar en línea` | — | Candidato visible en la instalación de la aplicación; ampliación menor incluida en F1 |
+| `CreateGame.js`, botón y estado de carga | `lobby.create.submit`, `lobby.create.loading` | `Create`; `Creating...` | `Crear`; `Creando...` | — | Texto visible; traducible |
+| `CreateGame.js` y `JoinGame.js`, validación | `lobby.name.required` | `Please enter a name` | `Escribe tu nombre` | — | Texto visible; misma cadena en ambas rutas |
+| `CreateGame.js`, validación del nombre | `lobby.create.nameMaxLength` | `Name must be less than 11 characters` | `El nombre debe tener menos de 11 caracteres` | — (11 es literal actual) | Texto visible; traducible |
+| `CreateGame.js`, error de creación de sala | `lobby.create.serverUnavailable` | `Error creating room, server is unreachable` | `No se pudo crear la sala: el servidor no responde` | — | Texto visible; traducible |
+| `CreateGame.js`, ayuda para ordenar | `lobby.create.reorderHint` | `You can drag to re-arrange the players in a specific turn order!` | `Puedes arrastrar a los jugadores para cambiar el orden de los turnos.` | nombres de jugadores, mostrados aparte, no se traducen | Texto visible; traducible |
+| `CreateGame.js`, rótulo de código | `lobby.roomCode.label` | `ROOM CODE:` | `CÓDIGO DE SALA:` | — | Texto visible; traducible |
+| `CreateGame.js`, confirmación de copiado | `lobby.roomCode.copied` | `Copied to clipboard` | `Código copiado al portapapeles` | — | Texto visible; traducible |
+| `CreateGame.js`, disponibilidad | `lobby.player.ready`, `lobby.player.notReady` | `Ready!`; `Not Ready` | `¡Listo!`; `No está listo` | nombre del jugador se mantiene aparte | Texto visible; dos estados de lista |
+| `CreateGame.js`, inicio de partida | `lobby.start` | `Start Game` | `Iniciar partida` | — | Texto visible; traducible |
+| `JoinGame.js`, campos y acciones | `lobby.name.label`, `lobby.roomCode.label`, `lobby.join.submit`, `lobby.join.loading` | `Your Name`; `Room Code`; `Join`; `Joining...` | `Tu nombre`; `Código de sala`; `Unirse`; `Uniéndose...` | — | Texto visible; traducible |
+| `JoinGame.js`, validación del nombre | `lobby.join.nameMaxLength` | `Name must be less than 9 characters` | `El nombre debe tener menos de 9 caracteres` | — (9 es literal actual) | Texto visible; traducible |
+| `JoinGame.js`, validación del código | `lobby.roomCode.required` | `Please enter a room code` | `Escribe el código de sala` | — | Texto visible; traducible |
+| `JoinGame.js`, estados de disponibilidad | `lobby.ready.button`, `lobby.ready.confirmed` | `Ready`; `You are ready!` | `Listo`; `¡Ya estás listo!` | — | Texto visible; traducible |
+| `JoinGame.js`, código de sala inexistente | `lobby.join.invalidRoomCode` | `Invalid Party Code` | `El código de sala no es válido` | — | Texto visible; traducible |
+| `JoinGame.js`, error HTTP/conexión | `lobby.join.serverError` | `Server error` | `Error del servidor` | — | Texto visible; traducible |
+| `server/index.js` → `JoinGame.js`, error de sala iniciada | `lobby.join.gameAlreadyStarted` | `game_already_started` | `La partida ya comenzó` | código de servidor sin traducir en payload | Código de protocolo que el cliente muestra literalmente hoy; mapear a texto español en la presentación |
+| `server/index.js` → `JoinGame.js`, sala llena | `lobby.join.partyFull` | `party_full` | `La sala está llena` | código de servidor sin traducir en payload | Código de protocolo que el cliente muestra literalmente hoy; mapear en la presentación |
+| `server/index.js` → `JoinGame.js`, nombre ocupado | `lobby.join.nameTaken` | `name_taken` | `Ese nombre ya está en uso` | código de servidor sin traducir en payload | Código de protocolo que el cliente muestra literalmente hoy; mapear en la presentación |
+| `CreateGame.js` / `JoinGame.js`, lista del lobby | `lobby.player.position` (si se decide almacenar la plantilla) | `{index}. {playerName}` | `{index}. {playerName}` | índice y nombre de jugador | Datos dinámicos, no texto inglés; no traducir valores |
+
+**Nota de flujo de errores:** `JoinGame.js` renderiza directamente el valor recibido en `joinFailed`, por lo que hoy pueden verse los enums `game_already_started`, `party_full` y `name_taken`. `CreateGame.js` recibe el mismo evento, pero solo lo registra en `console.log` y apaga el estado de carga; no presenta esos códigos en pantalla. Los códigos del payload deben permanecer intactos.
+
+**Observaciones de accesibilidad, fuera del inventario de cadenas:** los campos de nombre/código no están asociados a `<label>`, `aria-label` ni `placeholder`; el código copiable es un `<b onClick>` sin semántica ni nombre de botón accesible. Esto no autoriza rediseñar esos controles durante F2; si se quiere corregir esa accesibilidad, requiere coordinación/reorquestación explícita.
+
+## Reglas y ayuda
+
+| Origen / contexto | Clave propuesta | Inglés original (`en`) | Español propuesto (`es`) | Parámetros | Clasificación / decisión |
+|---|---|---|---|---|---|
+| `RulesModal.js`, título del diálogo | `rules.modal.title` | `Rules` | `Reglas` | — | Texto visible; comparte término con `common.rules` |
+| `RulesModal.js`, etiqueta accesible del diálogo | `rules.modal.a11yLabel` | `Minimal Modal Example` | `Reglas de Coup` | — | Accesibilidad; no se muestra como texto visual |
+| `RulesModal.js`, tamaño de partida | `rules.playerCount` | `2-6 players` | `De 2 a 6 jugadores` | — | Texto visible; traducible |
+| `RulesModal.js`, introducción | `rules.turn.intro` | `On your turn, you may choose an action to play. The action you choose may or may not correspond to the influences that you possess. For the action that you choose, other players may potentially block or challenge it.` | `En tu turno, puedes elegir una acción. La acción puede corresponder o no a las influencias que tienes. Los demás jugadores pueden bloquearla o desafiarla.` | — | Texto visible; traducible |
+| `RulesModal.js`, explicación del desafío | `rules.challenge` | `Challenge: When a player declares an action they are declaring to the rest of the players that they have a certain influence, and any other player can challenge it. When a player is challenged, the challenged player must reveal the correct influence associated with their action. If they reveal the correct influence, the challenger player will lose an influence. However, if they fail to reveal the correct influence the challenged player will lose their incorrectly revealed influence.` | `Desafío: Al declarar una acción, un jugador afirma ante los demás que tiene una influencia determinada, y cualquier otro jugador puede desafiar esa afirmación. Si alguien lo desafía, debe revelar la influencia requerida por su acción. Si revela la correcta, quien lo desafió pierde una influencia; si no, el jugador desafiado pierde una influencia.` | — | Texto visible; traducible |
+| `RulesModal.js`, explicación del bloqueo | `rules.block` | `Block: When the any of the actions "Foreign Aid", "Steal", and "Assasinate" are used, they can be blocked. Once again, any player can claim to have the correct influence to block. However, blocks can also be challenged by any player. If a block fails, the original action will take place.` | `Bloqueo: Las acciones «Ayuda extranjera», «Robar» y «Asesinar» se pueden bloquear. Cualquier jugador puede afirmar que tiene la influencia necesaria para bloquear. También se puede desafiar un bloqueo. Si el bloqueo falla, se resuelve la acción original.` | — | Texto visible; el original dice `Assasinate` (error tipográfico), normalizar en español |
+| `RulesModal.js`, eliminación | `rules.elimination` | `If a player loses all their influences, they are out of the game. The last player standing wins!` | `Si un jugador pierde todas sus influencias, queda fuera de la partida. ¡Gana quien siga en juego!` | — | Texto visible; traducible |
+| `RulesModal.js`, desconexión | `rules.disconnect` | `At this time, if a player disconnects, the game must be recreated.` | `Si un jugador se desconecta, hay que crear la partida de nuevo.` | — | Texto visible; traducible |
+| `RulesModal.js`, encabezados de sección | `rules.influences.title`, `rules.otherActions.title` | `Influences`; `Other Actions` | `Influencias`; `Otras acciones` | — | Texto visible; traducible |
+| `RulesModal.js`, Capitán | `rules.cards.captain` | `Captain`; `STEAL: Steal 2 coins from a target. Blockable by Captain or Ambassador. Can block STEAL` | `Capitán`; `ROBAR: Toma 2 monedas de otro jugador. Puede bloquearlo el Capitán o el Embajador. También puede bloquear la acción Robar.` | — | Texto visible; traducible según referencia española |
+| `RulesModal.js`, Asesino | `rules.cards.assassin` | `Assassin`; `ASSASSINATE: Pay 3 coins to choose a target to assassinate (target loses an influence). Blockable by Contessa.` | `Asesino`; `ASESINAR: Paga 3 monedas y elige a un jugador para que pierda una influencia. Puede bloquearlo la Condesa.` | — | Texto visible; traducible |
+| `RulesModal.js`, Duque | `rules.cards.duke` | `Duke`; `TAX: Collect 3 coins from the treasury. Not blockable. Can block Foreign Aid.` | `Duque`; `IMPUESTO: Toma 3 monedas del Tesoro. No puede bloquearse. Puede bloquear la Ayuda Extranjera.` | — | Texto visible; traducible |
+| `RulesModal.js`, Embajador | `rules.cards.ambassador` | `Ambassador`; `EXCHANGE: Draw 2 influences into your hand and pick any 2 influences to put back. Not blockable. Can block STEAL` | `Embajador`; `INTERCAMBIAR: Toma 2 cartas y devuelve 2 cartas al Mazo de la Corte. No puede bloquearse. Puede bloquear la acción Robar.` | — | Texto visible; traducible |
+| `RulesModal.js`, Condesa | `rules.cards.contessa` | `Contessa`; `BLOCK ASSASSINATION: Can block assassinations. Not blockable.` | `Condesa`; `BLOQUEAR ASESINATOS: Puede bloquear los asesinatos. No puede bloquearse.` | — | Texto visible; traducible |
+| `RulesModal.js`, acción Ingreso | `rules.actions.income` | `INCOME: Collect 1 coins from the treasury.` | `INGRESO: Toma 1 moneda del Tesoro.` | — | Texto visible; traducible; corregir plural inglés defectuoso solo en es |
+| `RulesModal.js`, acción Ayuda extranjera | `rules.actions.foreignAid` | `FOREIGN AID: Collect 2 coins from the treasury. Blockable by Duke.` | `AYUDA EXTRANJERA: Toma 2 monedas del Tesoro. Puede bloquearla el Duque.` | — | Texto visible; traducible |
+| `RulesModal.js`, acción Golpe | `rules.actions.coup` | `COUP: Pay 7 coins and choose a target to lose an influence. If a player starts their turn with 10 or more coins, they must Coup. Not Blockable.` | `GOLPE: Paga 7 monedas y elige a un jugador para que pierda una influencia. Si empieza su turno con 10 monedas o más, debe dar un golpe. No se puede bloquear.` | — | Texto visible; traducible |
+| `CheatSheetModal.js`, acceso a la ayuda | `help.open` | `Cheat Sheet` | `Resumen de reglas` | — | Texto visible; traducible |
+| `CheatSheetModal.js`, etiqueta accesible del diálogo | `help.modal.a11yLabel` | `Minimal Modal Example` | `Ayuda de Coup` | — | Accesibilidad; etiqueta genérica actual |
+| `CheatSheetModal.js`, imagen SVG | `help.cheatSheet.alt` | `Cheat-Sheet` | `Resumen de acciones y contraacciones de Coup` | — | Accesibilidad; describir el contenido y no el tipo de archivo |
+
+### Texto dentro de `coup-client/src/assets/CheatSheet.svg`
+
+El SVG se muestra desde `CheatSheetModal.js`. Las filas de texto indicadas a continuación son visibles como parte de la imagen; los guiones son separadores gráficos y no requieren traducción.
+
+| Contexto / clave propuesta | Inglés original (`en`) | Español propuesto (`es`) | Parámetros / clasificación |
+|---|---|---|---|
+| Encabezados `help.cheatSheet.headers.*` | `Influences`; `Action`; `Effect`; `Counteraction` | `Personaje`; `Acción`; `Efecto`; `Contraacción` | —; texto gráfico traducible |
+| Ingreso `help.cheatSheet.income.*` | `Income`; `Collect 1 coin` | `Ingreso`; `Toma 1 moneda` | —; texto gráfico traducible |
+| Ayuda extranjera `help.cheatSheet.foreignAid.*` | `Foreign Aid`; `Collect 2 coins` | `Ayuda Extranjera`; `Toma 2 monedas` | —; texto gráfico traducible |
+| Golpe `help.cheatSheet.coup.*` | `Coup`; `Pay 7 coins`; `Make any player lose influence` | `Golpe`; `Paga 7 monedas`; `Elige a un jugador para que pierda 1 influencia` | —; texto gráfico traducible |
+| Duque `help.cheatSheet.duke.*` | `DUKE`; `TAX`; `Collect 3 coins`; `Block Foreign Aid` | `DUQUE`; `IMPUESTO`; `Toma 3 monedas`; `Bloquea Ayuda Extranjera` | —; texto gráfico traducible |
+| Asesino `help.cheatSheet.assassin.*` | `ASSASSIN`; `ASSASSINATE`; `Pay 3 coins`; `Make any player lose influence` | `ASESINO`; `ASESINAR`; `Paga 3 monedas`; `Elige a un jugador para que pierda 1 influencia` | La misma frase de efecto aparece en el SVG del Golpe; puede reutilizarse la clave de efecto apropiada |
+| Embajador `help.cheatSheet.ambassador.*` | `AMBASSADOR`; `EXCHANGE`; `Block Stealing`; `Draw 2 influences`; `and put 2 back` | `EMBAJADOR`; `INTERCAMBIAR`; `Bloquea robos`; `Toma 2 cartas`; `y devuelve 2` | Las dos últimas líneas forman la frase `Toma 2 cartas y devuelve 2`; texto gráfico traducible |
+| Capitán `help.cheatSheet.captain.*` | `CAPTAIN`; `STEAL`; `Block Stealing`; `Draw 2 coins from`; `another player` | `CAPITÁN`; `ROBAR`; `Bloquea robos`; `Toma 2 monedas de`; `otro jugador` | Las dos últimas líneas forman una oración; texto gráfico traducible |
+| Condesa `help.cheatSheet.contessa.*` | `CONTESSA`; `Block Assassination` | `CONDESA`; `Bloquea asesinatos` | —; texto gráfico traducible |
+| Separadores visuales | `—————` | `—————` | Elementos no lingüísticos; conservar |
+
+## Decisiones, estado de partida y registro del cliente
+
+| Origen / contexto | Clave propuesta | Inglés original (`en`) | Español propuesto (`es`) | Parámetros | Clasificación / decisión |
+|---|---|---|---|---|---|
+| `ActionDecision.js`, nombres de acción | `game.actions.income.label`, `.foreignAid.label`, `.coup.label`, `.tax.label`, `.steal.label`, `.exchange.label`, `.assassinate.label` | `Income`; `Foreign Aid`; `Coup`; `Tax`; `Steal`; `Exchange`; `Assassinate` | `Ingreso`; `Ayuda extranjera`; `Golpe`; `Impuesto`; `Robar`; `Intercambiar`; `Asesinar` | — | Texto visible; el campo interno `action` no cambia |
+| `ActionDecision.js`, descripciones | `game.actions.*.description` | `Take 1 coin.`; `Take 2 coins.`; `Pay 7 coins. Choose a player to lose an influence card.`; `Take 3 coins.`; `Take up to 2 coins from another player.`; `Swap 2 cards with the deck.`; `Pay 3 coins. Choose a player to lose an influence card.` | `Toma 1 moneda.`; `Toma 2 monedas.`; `Paga 7 monedas. Elige a un jugador para que pierda una carta de influencia.`; `Toma 3 monedas.`; `Toma hasta 2 monedas de otro jugador.`; `Intercambia 2 cartas con el mazo.`; `Paga 3 monedas. Elige a un jugador para que pierda una carta de influencia.` | — | Texto visible; cada frase corresponde al orden de acciones de la fila anterior |
+| `ActionDecision.js`, afirmación y bloqueadores | `game.roles.*`, `game.actions.blockedBy`, `game.actions.unblockable` | `Duke`; `Captain`; `Ambassador`; `Contessa`; `Can be blocked by`; `Cannot be blocked.` | `Duque`; `Capitán`; `Embajador`; `Condesa`; `Puede bloquearlo`; `No se puede bloquear.` | roles dinámicos se renderizan como `{roleLabel}` | Texto visible; traducir la representación del enum, no el valor enviado |
+| `ActionDecision.js`, costes/precios accesibles | `game.actions.price.free`, `.cost`, `.amount` | `Free`; `Costs {cost} coins`; `Up to {amount} coins` | `Gratis`; `Cuesta {cost} monedas`; `Hasta {amount} monedas` | `{cost}`, `{amount}` | Texto visible y `aria-label`; traducible |
+| `ActionDecision.js`, advertencias de coste | `game.actions.error.insufficientFunds`, `.coupRequired` | `Requires {cost} coins`; `Requires {cost} coins to {action}.`; `Coup required with 10+ coins` | `Necesitas {cost} monedas`; `Necesitas {cost} monedas para {actionLabel}.`; `Debes dar un golpe si tienes 10 monedas o más` | `{cost}`, `{actionLabel}` (no usar el enum crudo `action`) | Texto visible; traducible |
+| `ActionDecision.js`, objetivo y confirmación | `game.actions.chooseTarget`, `.confirmTitle`, `.turnTitle`, `.confirmPrompt`, `.confirmButton`, `.cancel` | `Choose a target`; `Confirm your action`; `Actions on your turn`; `Confirm {label} against {target}?`; `Confirm {label}`; `Cancel` | `Elige un objetivo`; `Confirma tu acción`; `Acciones de tu turno`; `¿Confirmas {actionLabel} contra {targetName}?`; `Confirmar {actionLabel}`; `Cancelar` | `{actionLabel}`, `{targetName}` | Texto visible; nombres/targets son datos dinámicos |
+| `ActionDecision.js`, validación del objetivo | `game.actions.error.chooseTarget`, `.targetInvalid` | `Choose a target before confirming.`; `That player is no longer a valid target.` | `Elige un objetivo antes de confirmar.`; `Ese jugador ya no es un objetivo válido.` | — | Texto visible; traducible |
+| `BlockDecision.js`, Ayuda extranjera | `game.block.foreignAid.prompt`, `.button` | `{playerName} is trying to use Foreign Aid`; `Block Foreign Aid` | `{playerName} intenta recibir Ayuda extranjera`; `Bloquear Ayuda extranjera` | `{playerName}` | Texto visible; traducible |
+| `BlockDecision.js`, otras opciones de bloqueo | `game.block.steal.button`, `.assassination.button`, `.steal.chooseRole` | `Block Steal`; `Block Assassination`; `To block steal, do you claim Ambassador or Captain?` | `Bloquear robo`; `Bloquear asesinato`; `Para bloquear el robo, ¿afirmas tener al Embajador o al Capitán?` | — | Texto visible; traducible |
+| `ChallengeDecision.js`, desafío a Robar | `game.challenge.steal` | `{source} is trying to Steal from {target}` | `{playerName} intenta robarle a {targetName}` | `{playerName}`, `{targetName}` | Texto visible; acción y nombres deben renderizarse localizados/datos originales |
+| `ChallengeDecision.js`, desafío a Impuesto | `game.challenge.tax` | `{source} is trying to collect Tax (3 coins)` | `{playerName} intenta cobrar el Impuesto (3 monedas)` | `{playerName}` | Texto visible; traducible |
+| `ChallengeDecision.js`, desafío a Asesinar | `game.challenge.assassinate` | `{source} is trying to Assassinate {target}` | `{playerName} intenta asesinar a {targetName}` | `{playerName}`, `{targetName}` | Texto visible; traducible |
+| `ChallengeDecision.js`, desafío a Intercambiar | `game.challenge.exchange` | `{source} is trying to Exchange their influences` | `{playerName} intenta intercambiar sus influencias` | `{playerName}` | Texto visible; traducible |
+| `ChallengeDecision.js` / `BlockChallengeDecision.js`, botón | `game.challenge.button` | `Challenge` | `Desafiar` | — | Texto visible; se repite en ambos diálogos |
+| `BlockChallengeDecision.js`, afirmación de bloqueo | `game.blockChallenge.prompt` | `{blocker} is trying to block {action} from {actor} as {claim}` | `{blockerName} intenta bloquear la acción {actionLabel} de {actorName} afirmando tener la influencia {roleLabel}` | `{blockerName}`, `{actionLabel}`, `{actorName}`, `{roleLabel}` | Texto visible; `prevAction.action` y `counterAction.claim` son IDs internos y requieren etiquetas para presentación |
+| `ChooseInfluence.js`, decisión de perder | `game.influence.chooseToLose` | `Choose an influence to lose` | `Elige una influencia para perder` | roles ofrecidos renderizados como `{roleLabel}` | Texto visible; valores de cartas (`duke`, etc.) siguen intactos |
+| `ExchangeInfluences.js`, decisión de conservar | `game.influence.chooseToKeep` | `Choose which influence(s) to keep` | `Elige qué influencias conservar` | roles ofrecidos renderizados como `{roleLabel}` | Texto visible; traducible |
+| `RevealDecision.js`, desafío y revelación | `game.reveal.challengePrompt` | `Your {act} has been challenged! If you don't reveal {roles} you'll lose influence!` | `¡Han desafiado tu acción {actionLabel}! Si no muestras {requiredInfluences}, perderás una influencia.` | `{actionLabel}`, `{requiredInfluences}` | Texto visible; `act` y `actionMap` usan IDs ingleses de acciones/cartas |
+| `Coup.js`, turno actual | `game.turn.current` | `It is {playerName}'s turn` | `Turno de {playerName}` | `{playerName}` | Texto visible y `aria-live`; nombre propio sin traducir |
+| `Coup.js`, botón de pasar | `game.common.pass` | `Pass` | `Pasar` | — | Texto visible; disponible durante votaciones |
+| `Coup.js`, identidad | `game.player.identity` | `You are: {playerName}` | `Tú eres: {playerName}` | `{playerName}` | Texto visible; nombre ingresado por jugador |
+| `Coup.js`, mano del jugador | `game.player.influences` | `Your Influences` | `Tus influencias` | — | Texto visible; los nombres de cartas que siguen requieren `game.cards.*` |
+| `Coup.js`, monedas | `game.player.coins` | `Coins: {coins}` | `Monedas: {coins}` | `{coins}` | Texto visible; cantidad dinámica |
+| `Coup.js`, espera | `game.waiting` | `Waiting for other players...` | `Esperando a los demás jugadores...` | — | Texto visible; traducible |
+| `Coup.js`, desconexión | `game.disconnect.notice` | `You have been disconnected :c` | `Te has desconectado :c` | — | Texto visible; conservar el emoticono |
+| `Coup.js`, recuperación tras desconexión | `game.disconnect.recreate` | `Please recreate the game.` | `Crea la partida de nuevo.` | — | Texto visible; misma intención que el mensaje de reglas |
+| `Coup.js`, disculpa tras desconexión | `game.disconnect.apology` | `Sorry for the inconvenience (シ_ _)シ` | `Disculpa las molestias (シ_ _)シ` | — | Texto visible; la frase se traduce y el kaomoji se conserva |
+| `Coup.js`, volver a jugar | `game.playAgain` | `Play Again` | `Jugar de nuevo` | — | Texto visible; traducible |
+| `Coup.js`, ganador | `game.result.winner` | `{winner} Wins!` | `¡Gana {playerName}!` | `{playerName}` | Texto visible; nombre propio dinámico |
+| `EventLog.js`, encabezado | `game.eventLog.title` | `Event Log` | `Registro de eventos` | — | Texto visible; los mensajes del registro vienen del servidor |
+
+## Mensajes de partida enviados por `g-addLog`
+
+Se siguió cada emisor en `server/index.js` y `server/game/coup.js` hasta `Coup.js` y `EventLog.js`. Todos los siguientes textos se agregan al registro de partida; `EventLog.js` colorea nombres según el cliente. El payload de Socket.IO sigue siendo `string`.
+
+| Origen / contexto | Clave propuesta | Inglés original (`en`) | Español propuesto (`es`) | Parámetros | Clasificación / decisión |
+|---|---|---|---|---|---|
+| `server/game/coup.js`, reto a una acción | `game.log.challengeStarted` | `{challenger} challenged {challengee}` | `{challengerName} desafió a {challengeeName}` | `{challengerName}`, `{challengeeName}` | Mensaje de partida; sin punto final junto al nombre para no romper el resaltado actual por tokens |
+| `server/game/coup.js`, reto a un bloqueo | `game.log.blockChallengeStarted` | `{challenger} challenged {challengee}'s block` | `{challengerName} desafió el bloqueo de {challengeeName}` | `{challengerName}`, `{challengeeName}` | Mensaje de partida; nombres dinámicos |
+| `server/game/coup.js`, bloqueo declarado | `game.log.blockDeclared` | `{blocker} blocked {blockee}` | `{blockerName} bloqueó a {blockeeName}` | `{blockerName}`, `{blockeeName}` | Mensaje de partida; nombres dinámicos |
+| `server/game/coup.js`, reto fallido contra un bloqueo | `game.log.blockChallengeFailed` | `{challenger}'s challenge on {challengee}'s block failed` | `El desafío de {challengerName} al bloqueo de {challengeeName} falló` | `{challengerName}`, `{challengeeName}` | Mensaje de partida; traducible |
+| `server/game/coup.js`, reto exitoso contra un bloqueo | `game.log.blockChallengeSucceeded` | `{challenger}'s challenge on {challengee}'s block succeeded` | `El desafío de {challengerName} al bloqueo de {challengeeName} tuvo éxito` | `{challengerName}`, `{challengeeName}` | Mensaje de partida; traducible |
+| `server/game/coup.js`, carta perdida tras reto a bloqueo (línea 154) | `game.log.influenceLost` | `{challengee} lost their {revealedCard}` | `{playerName} perdió una influencia: {roleLabel}` | `{playerName}`, `{roleLabel}` | Mensaje de partida; localizar solo la representación del ID de carta |
+| `server/game/coup.js`, reto fallido contra una acción | `game.log.challengeFailed` | `{challenger}'s challenge on {challengee} failed` | `El desafío de {challengerName} a {challengeeName} falló` | `{challengerName}`, `{challengeeName}` | Mensaje de partida; traducible |
+| `server/game/coup.js`, reto exitoso contra una acción | `game.log.challengeSucceeded` | `{challenger}'s challenge on {challengee} succeeded` | `El desafío de {challengerName} a {challengeeName} tuvo éxito` | `{challengerName}`, `{challengeeName}` | Mensaje de partida; traducible |
+| `server/game/coup.js`, carta perdida tras reto a acción (línea 192) | `game.log.influenceLost` | `{challengee} lost their {revealedCard}` | `{playerName} perdió una influencia: {roleLabel}` | `{playerName}`, `{roleLabel}` | Misma plantilla que en la línea 154 |
+| `server/game/coup.js`, influencia elegida al perderla (línea 211) | `game.log.influenceLost` | `{playerName} lost their {influence}` | `{playerName} perdió una influencia: {roleLabel}` | `{playerName}`, `{roleLabel}` | Misma clave; origen usa otros nombres de variables |
+| `server/game/coup.js`, acción aplicada | `game.log.actionUsed` | `{source} used {action}{logTarget}`; con objetivo: ` on {target}` | `{playerName} usó {actionLabel}`; con objetivo: `{playerName} usó {actionLabel} contra {targetName}` | `{playerName}`, `{actionLabel}`, `{targetName}` opcional | Mensaje de partida; `actionLabel` se deriva del enum visible; no traducir el valor interno |
+| `server/game/coup.js`, eliminación | `game.log.playerEliminated` | `{name} is out!` | `{playerName} quedó fuera de la partida` | `{playerName}` | Mensaje de partida; traducible |
+| `server/index.js`, desconexión | `game.log.playerDisconnected` | `${JSON.stringify(players[index].player)} has disconnected` | `{playerName} se desconectó` | `{playerName}`; la fuente actual serializa el nombre con `JSON.stringify` y agrega comillas | Mensaje de partida; ver advertencia de formato debajo |
+| `server/index.js`, recuperación tras desconexión | `game.log.recreateGame` | `Please recreate the game.` | `Hay que crear la partida de nuevo` | — | Mensaje de partida; traducible |
+| `server/index.js`, disculpa tras desconexión | `game.log.disconnectionApology` | `Sorry for the inconvenience (シ_ _)シ` | `Disculpen las molestias (シ_ _)シ` | — | Mensaje de partida; conservar kaomoji |
+
+**Restricción de formato para F3:** `Coup.js` divide cada texto recibido por espacios y compara cada token completo contra los nombres para aplicar color. El emisor de desconexión usa `JSON.stringify(nombre)`, que agrega comillas; nombres con espacios o signos de puntuación junto al marcador también dejan de coincidir con esa búsqueda. Las plantillas españolas no deben suponerse compatibles con ese resaltado sin verificarlo. Mantener `g-addLog` como string y coordinar con #14 cualquier ajuste de la superficie compartida; no cambiar nombres de eventos, enums ni forma de payload. Si se conserva el tokenizador actual, evitar puntuación pegada a parámetros de nombre.
+
+## Texto gráfico, assets localizados y superficies sin traducción
+
+### Cartas de personaje actualmente mostradas en inglés
+
+`PlayerBoard.js` importa imágenes con texto incrustado desde `coup-client/src/assets/characters/`. En la vista del jugador propio se muestran las caras, así que el inglés aparece en un recorrido normal. El mismo directorio contiene variantes españolas disponibles, pero el cliente no las carga. Para cada carta, la propuesta es usar la variante `es` existente; el texto fuente y destino se registra aquí para no omitirlo aunque no viva en un string del diccionario.
+
+| Origen cargado / clave propuesta | Inglés original incrustado (`en`) | Español propuesto (`es`) | Parámetros | Clasificación / destino sugerido |
+|---|---|---|---|---|
+| `characters/duke.webp` → `characters/duque.webp`; `game.assets.cards.duke` | `Duke`; `Take 3 coins from Treasury.`; `Blocks Foreign Aid.` | `Duque`; `Toma 3 monedas del Tesoro.`; `Bloquea la Ayuda Extranjera.` | — | Asset visible; seleccionar variante española existente en F2 |
+| `characters/assassin.webp` → `characters/asesino.webp`; `game.assets.cards.assassin` | `Assassin`; `Pay 3 coins to assassinate another player.` | `Asesino`; `Paga 3 monedas para asesinar a otro jugador.` | — | Asset visible; seleccionar variante española existente en F2 |
+| `characters/captain.webp` → `characters/capitan.webp`; `game.assets.cards.captain` | `Captain`; `Steal 2 coins from another player.`; `Blocks stealing.` | `Capitán`; `Roba 2 monedas a otro jugador.`; `Bloquea robos.` | — | Asset visible; seleccionar variante española existente en F2 |
+| `characters/ambassador.webp` → `characters/embajador.webp`; `game.assets.cards.ambassador` | `Ambassador`; `Exchange cards with Court Deck.`; `Blocks stealing.` | `Embajador`; `Intercambia cartas con el Mazo de la Corte.`; `Bloquea robos.` | — | Asset visible; seleccionar variante española existente en F2 |
+| `characters/contessa.webp` → `characters/condesa.webp`; `game.assets.cards.contessa` | `Contessa`; `Blocks assassination.` | `Condesa`; `Bloquea asesinatos.` | — | Asset visible; seleccionar variante española existente en F2 |
+
+### Assets gráficos y textos ya localizados
+
+| Origen / contexto | Hallazgo | Clasificación / decisión |
+|---|---|---|
+| `coup-client/src/assets/references/card-es.webp`, `table-es.webp` usados por `ReferencePanel.js` | Contienen texto en español y son los recursos cargados: términos Ingreso, Ayuda Extranjera, Golpe, Impuesto, Robar, Intercambiar, Asesinar y nombres de roles del glosario | Ya español; no requieren traducción |
+| `references/card-en.webp`, `table-en.webp` | Hay variantes inglesas en el directorio, pero `ReferencePanel.js` solo importa las imágenes `-es` | Recurso bilingüe no visible en el recorrido actual; excluir de F1 traducible y conservar como referencia futura |
+| Variantes `characters/*` en español | `duque.webp`, `asesino.webp`, `capitan.webp`, `embajador.webp`, `condesa.webp` contienen las versiones españolas registradas arriba | Ya traducidas; candidatas para cargar por defecto en F2 |
+| `PlayerBoard.js`, atributos del tablero | `Influencia oculta`; `Tablero de jugadores`; `Mazo central de la Corte`; `{coins} monedas` | Ya español; mantener |
+| `PlayerBoard.js`, `role="img"` | `Influencia: {influence}` tiene etiqueta española, pero `influence` es un ID inglés (`duke`, `assassin`, `captain`, `ambassador`, `contessa`) | Mixto; mostrar `Influencia: {roleLabel}` y conservar el ID solo como dato |
+| `ReferencePanel.js`, controles/modales | `Referencias de juego`; `Tarjeta`; `Tabla`; `Tarjeta de referencia en español`; `Tabla de referencia en español`; `Cerrar {referenceName}` y sus `alt` | Ya español; mantener |
+| `ReferencePanel.js`, imágenes | `card-es.webp` y `table-es.webp` tienen `alt` descriptivos en español | Ya español y accesible |
+| `PlayerBoard.js`, imágenes de rol | El `<img>` interior tiene `alt=""` y está oculto a tecnología asistiva, pero su imagen contiene texto inglés; el contenedor `role="img"` es el nombre accesible y actualmente usa el enum en inglés | Hallazgo cubierto por assets de arriba y por `game.playerBoard.influenceVisible`; usar además la etiqueta de rol española |
+| `Chicken.svg`, `deck.webp`, `reverso.webp`, `player.webp`, `coin.webp`, `logo.svg` | No tienen texto visible incrustado; `Chicken.svg` sí tiene alt aparte. `logo.svg` es el logo React importado sin texto visible | Gráficos sin texto; excluir del diccionario |
+
+## Cadenas internas excluidas y hallazgos de accesibilidad
+
+- Los IDs/eventos Socket.IO (`setName`, `joinFailed`, `g-addLog`, `g-actionDecision`, `g-chooseInfluence`, `leaderDisconnect`, entre otros) no son etiquetas y se mantienen intactos. La cadena `leader_disconnected` no se presenta en ningún componente; excluirla.
+- Las acciones enviadas por el cliente (`income`, `foreign_aid`, `coup`, `tax`, `steal`, `exchange`, `assassinate`), contraacciones (`block_foreign_aid`, `block_steal`, `block_assassinate`) y cartas (`duke`, `assassin`, `captain`, `ambassador`, `contessa`) son datos de protocolo. Algunas hoy se interpolan sin traducir en decisiones, influencias y el registro; añadir una etiqueta de pantalla sin modificar el valor enviado.
+- Nombres de jugadores, autor, código de sala, monedas/cantidades, ids CSS/HTML, clases, mensajes `console.log`/`console.error`, comentarios y texto explicativo del template HTML no son cadenas de interfaz del juego; excluirlos del diccionario. Si un literal también alimenta `errorMsg`, se inventaría por su aparición renderizada, no por el `console.log`.
+- `public/index.html` tiene cierres y comentarios técnicos en inglés no visibles. `ReactModal` usa `Minimal Modal Example` como etiqueta accesible y sí se inventaría en la tabla de arriba.
+- Los botones SVG de cierre de `RulesModal.js` y `CheatSheetModal.js` muestran `x` sin un nombre accesible significativo. Propuesta de nombres a añadir: `Cerrar reglas` y `Cerrar ayuda`. Es una brecha detectada; F2 no debe rediseñar controles sin reorquestación.
+- Los controles de portada `Rules` y `Cheat Sheet` están montados en `<div onClick>`; el código copiable del lobby usa `<b onClick>`. Son observaciones de semántica/accesibilidad, no cadenas traducibles ni una autorización para ampliar F2.
+- CSS inspeccionado no agrega texto mediante `content`; no se encontró otra superficie de texto generada en estilos.
+
+## Cobertura y decisiones para el avance
+
+El inventario cubre portada, creación/unión de lobby, reglas, acciones, desafíos/bloqueos/revelaciones/intercambio, tablero, estado/desconexión, etiquetas accesibles, HTML/PWA, assets con texto y todos los emisores `g-addLog` seguidos hasta `EventLog`. Las referencias españolas existentes fijan el glosario. Los enums y payloads no se localizan; se localiza la representación mostrada.
+
+Se amplía la lista concreta de superficies F2 para incluir `coup-client/public/manifest.json` (`name`, `short_name`) y seleccionar las cinco ilustraciones `characters/*` españolas existentes en lugar de las inglesas que actualmente carga `PlayerBoard.js`. `manifest.json` es una ampliación menor del inventario de metadatos: contiene el nombre de la aplicación instalada y afecta el criterio general de texto visible, aunque no figuraba por nombre en la lista inicial de archivos. El handoff/plan debe reflejar esa superficie antes de F2.
+
+**Hallazgo de falsificación:** sí se puede encontrar inglés visible o accesible en recorridos normales: hay texto en portada/lobby/reglas/decisiones, `CheatSheet.svg`, las cinco cartas de personaje que se cargan con rótulos y descripciones inglesas, el nombre/descripcion del sitio y el nombre PWA; además, códigos de error y de rol llegan a la pantalla sin traducirse. El panel de referencias ya carga solo sus dos recursos españoles.
+
+**Bloqueos:** F1 no edita código de producto. F2 sigue bloqueada por coordinación con #14 y #18 en superficies compartidas; F3 sigue bloqueada por coordinación con #14 en emisores de `g-addLog`. El formato plano del registro y el resaltado por tokens deben revisarse al planear F3, sin alterar el protocolo.

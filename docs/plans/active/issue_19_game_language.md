@@ -3,14 +3,14 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/19
 - **Plan exacto:** `docs/plans/game-language/plan_game_language.md`
 - **Bitácora exacta:** `docs/plans/log/issue-19.jsonl`
-- **Estado:** `ACTIVE`; F1 `ACTIVE`; issue abierta y reclamada mediante asignación visible a `pronficilio`. Relectura posterior confirmó que no había reclamo incompatible.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `BLOCKED` por coordinación con #14/#18; F3 `BLOCKED` por coordinación con #14; F4 `PENDING`. Issue abierta y asignada a `pronficilio`.
 - **Modo/riesgo/verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Verifier requerido ahora:** no. Requerido en F4 antes de revisión de integración.
 - **Pregunta de falsificación:** ¿puede una persona en un recorrido normal encontrar texto inglés visible/accesible o activar inglés pese a no existir selector?
-- **Fase sugerida:** F1 — inventario de cadenas y contrato del diccionario. Es una auditoría de solo lectura que prepara traducciones y no interfiere con #14.
+- **F1 cerrada:** `docs/plans/game-language/translation_inventory.md` inventaría texto visible/accesible, errores, decisiones, reglas, HTML/PWA, assets y mensajes `g-addLog`; no hubo cambios de producto. Siguiente acción: Orquestador coordina la liberación de las superficies #14/#18 antes de F2 y #14 antes de F3.
 - **Documentos fuente:** issue #19; plan indicado arriba; reglas `docs/coup_transcription.md`, `docs/coup_play_reference.md`, `docs/coup_summary_card.md`; recursos de referencia descritos en el plan.
 
-## Subtareas listas
+## Subtareas auditadas en F1
 
 1. Auditar textos renderizados por React y atributos accesibles; incluir literales, valores dinámicos presentados al usuario, título/alt, `public/index.html` y `CheatSheet.svg`.
 2. Seguir `g-addLog` desde `server/index.js` y `server/game/coup.js` hasta `EventLog.js`; registrar cada mensaje que ve quien juega.
@@ -21,14 +21,14 @@
 
 ## Alcance de ejecución restante
 
-- F2: traducir la interfaz y preparar `coup-client/src/i18n/translations.json` con claves paralelas `es`/`en`; cliente fijo a `es`; declarar `lang="es"`; traducir texto de `CheatSheet.svg` y actualizar accesibilidad.
+- F2: traducir la interfaz y preparar `coup-client/src/i18n/translations.json` con claves paralelas `es`/`en`; cliente fijo a `es`; declarar `lang="es"`; traducir texto de `CheatSheet.svg` y actualizar `public/manifest.json`; cargar las cinco variantes españolas existentes de las ilustraciones de personaje. No rediseñar controles a partir de las brechas de accesibilidad registradas sin reorquestación.
 - F3: traducir únicamente mensajes visibles `g-addLog` y reflejar sus plantillas en el diccionario; conservar payload string, eventos, acciones, cartas, reglas y nombres internos.
 - F4: compilar cliente, recorrer portada/lobby/partida manualmente, revisar cobertura y solicitar Verifier FINAL independiente.
 - No implementar selector, detección, preferencia persistente ni otra ruta para elegir idioma; no añadir ni ejecutar tests automatizados.
 
 ## Dependencias y límites
 
-- **Colisiones activas:** #14 sigue abierta y tiene trabajo pendiente en `CreateGame.js`, `JoinGame.js`, `Coup.js`, `server/game/coup.js` y `server/index.js`. #18 está abierta y asignada a `pronficilio`; monta `ReferencePanel` dentro de `Coup.js`. Haz F1 primero. Antes de escribir en superficies compartidas, pide coordinación al Orquestador y confirma integración/liberación de #14 y #18; no resolver conflictos por inferencia. F3 solo solapa con #14.
+- **Colisiones activas:** #14 sigue abierta y tiene trabajo pendiente en `CreateGame.js`, `JoinGame.js`, `Coup.js`, `server/game/coup.js` y `server/index.js`. #18 está abierta y asignada a `pronficilio`; monta `ReferencePanel` dentro de `Coup.js`. F1 está cerrada. Antes de F2, el Orquestador debe confirmar integración/liberación o coordinación explícita de #14 y #18; antes de F3, lo mismo con #14. No resolver conflictos por inferencia.
 - #13 es una unidad de despliegue fuera de alcance; no desplegar este cambio desde esta issue.
 - No cambies lógica, reglas, shape de Socket.IO ni parámetros de juego para facilitar traducción. Los textos que se envían como datos de juego conservan sus valores en inglés y reciben etiqueta española al renderizarse.
 
