@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `PENDING`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` (implementación/build; revisión visual del propietario pendiente); F3 `ACTIVE`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -31,7 +31,7 @@ Entrega `docs/plans/game-table-ux/report_issue_28_F1.md` con fuentes, observacio
 - Mostrar el conteo localizado de Court inmediatamente encima de la imagen del mazo, derivado del tamaño real `this.deck.length` que proyecta el servidor. En un Exchange pendiente hay dos cartas menos; al devolver las dos, el conteo final no cambia. Un reemplazo por desafío devuelve y roba una; tampoco cambia el total. Reinicio vuelve a inicializarlo.
 - Conservar 15 cartas, cinco roles, 2–6 jugadores, identidades privadas y protocolo existentes.
 
-El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas.
+El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F2 cerró su implementación y build; el propietario hará la revisión visual después de que F3 deje el preview completo.
 
 ## Commits y validación
 

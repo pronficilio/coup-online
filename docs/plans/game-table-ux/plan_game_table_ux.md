@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `ACTIVE`; F3 `PENDING`; F4 `PENDING`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` (implementación/build; inspección visual del propietario pendiente); F3 `ACTIVE`; F4 `PENDING`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -52,17 +52,18 @@ En la inspección inicial del checkout local (que está atrasado respecto de `or
 - **Validación:** inspección estática/documental; no ejecutar tests.
 - **Reporte:** `docs/plans/game-table-ux/report_issue_28_F1.md`.
 
-### F2 — Integrar influencias perdidas y ajustar el círculo (`ACTIVE`)
+### F2 — Integrar influencias perdidas y ajustar el círculo (`CLOSED`)
 
 - **Pregunta única:** ¿la mano propia y el círculo pueden ocupar la posición solicitada sin desplazar ni cubrir el resto del HUD?
 - **Entrada:** F1 cerrada; el propietario autorizó explícitamente continuar en este worktree aislado y hará la revisión visual del preview. Registrar y sincronizar la rama desde `origin/master` vigente antes del código; no tocar ni copiar cambios de worktrees/branches #24 o #26.
 - **Salida:** nombres de roles traducidos bajo las cartas propias, sin sección/título/bolitas globales; influencias perdidas permanentemente grises con símbolo/etiqueta accesible y rol legible; círculo algo más arriba con unos 50 px hasta el primer encabezado superior.
-- **Criterio de cierre:** build de cliente, revisión estática y preview listo; mantener controles y Event Log en sus coordenadas, sin cambiar reglas ni protocolo de decisiones. La revisión visual del propietario queda pendiente explícitamente; no afirmar inspección manual propia de estados de juego.
+- **Criterio de cierre:** build de cliente y revisión estática; mantener controles y Event Log en sus coordenadas declaradas, sin cambiar reglas ni protocolo de decisiones. La revisión visual del propietario queda pendiente explícitamente para el preview después de F3; no afirmar inspección manual propia de estados de juego.
 - **Artefacto:** código y reporte F2.
 - **Commit:** `COMMIT_REQUIRED`; `feat(game-ui): issue 28 F2 influences, lost cards and board position`.
 - **Validación:** build de cliente e inspección visual; no añadir ni ejecutar tests automatizados.
+- **Reporte:** `docs/plans/game-table-ux/report_issue_28_F2.md`.
 
-### F3 — Mostrar el conteo autoritativo de Court (`PENDING`)
+### F3 — Mostrar el conteo autoritativo de Court (`ACTIVE`)
 
 - **Pregunta única:** ¿el valor visible coincide con las cartas que están en Court en cada etapa del flujo?
 - **Entrada:** F2 implementada en este worktree; F1 confirma las rutas de mutación. F2/F3 cuentan con autorización explícita del propietario pese a los solapamientos; no copiar cambios de otras ramas.

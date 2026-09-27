@@ -19,14 +19,6 @@ import challengeActiveImage from '../../assets/action-buttons/c-active.webp'
 import passImage from '../../assets/action-buttons/pass.webp'
 import passActiveImage from '../../assets/action-buttons/pass-active.webp'
 
-const INFLUENCE_COLORS = {
-    duke: '#D55DC7',
-    captain: '#80C6E5',
-    assassin: '#2B2B2B',
-    contessa: '#E35646',
-    ambassador: '#B4CA1F'
-}
-
 const RESPONSE_WINDOW_TYPES = new Set(['challenge', 'block', 'block_challenge'])
 
 function responseButtonFor(decision, option, localizedLabel) {
@@ -357,15 +349,6 @@ export default class Coup extends Component {
                 <CheatSheetModal />
                 <EventLog logs={this.state.logs} />
             </div>
-
-            {ownInfluences.length > 0 && <div className="InfluenceSection">
-                <p>{t('game.player.influences')}</p>
-                {ownInfluences.map((influence, index) => <div key={`${influence}-${index}`} className="InfluenceUnitContainer">
-                    <span className="circle" style={{ backgroundColor: INFLUENCE_COLORS[influence] }} />
-                    <br />
-                    <h3>{roleName(influence)}</h3>
-                </div>)}
-            </div>}
 
             <PlayerBoard
                 players={this.state.players}

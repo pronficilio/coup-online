@@ -43,48 +43,59 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
     const own = isObserver && Array.isArray(observerInfluences) ? observerInfluences : []
     const knownCards = isObserver ? revealed.concat(own) : revealed
     const isActive = slotIndex < (revealed.length + (isObserver ? own.length : (player.influenceCount || 0)))
+    const isLost = slotIndex < revealed.length
+    const isOwnActive = isObserver && slotIndex >= revealed.length && slotIndex < revealed.length + own.length
 
     if (!isActive) {
-        return <span
-            className="PlayerInfluenceSlot PlayerInfluenceSlot--inactive"
-            aria-hidden="true"
-            key={slotIndex}
-        />
+        return <div className="PlayerInfluenceEntry" key={slotIndex}>
+            <span
+                className="PlayerInfluenceSlot PlayerInfluenceSlot--inactive"
+                aria-hidden="true"
+            />
+        </div>
     }
 
     if (knownCards[slotIndex]) {
         const influence = knownCards[slotIndex]
-        return <span
-            className="PlayerInfluenceSlot PlayerInfluenceSlot--face"
+        return <div className="PlayerInfluenceEntry" key={slotIndex}>
+            <span
+                className={`PlayerInfluenceSlot PlayerInfluenceSlot--face${isLost ? ' PlayerInfluenceSlot--lost' : ''}`}
+                role="img"
+                aria-label={isLost
+                    ? t('game.playerBoard.influenceLost', { roleLabel: roleLabel(influence) })
+                    : t('game.playerBoard.influenceVisible', { roleLabel: roleLabel(influence) })}
+            >
+                <img
+                    className="PlayerInfluenceImage"
+                    src={getInfluenceImage(influence)}
+                    alt=""
+                    aria-hidden="true"
+                    draggable="false"
+                />
+                {isLost && <span className="PlayerInfluenceLostOverlay" aria-hidden="true">
+                    <span className="PlayerInfluenceLostMarker">×</span>
+                </span>}
+            </span>
+            {(isOwnActive || isLost) && <span className="PlayerInfluenceRoleLabel">{roleLabel(influence)}</span>}
+        </div>
+    }
+
+    // Do not pass the rival's influence value to any DOM attribute or child.
+    return <div className="PlayerInfluenceEntry" key={slotIndex}>
+        <span
+            className="PlayerInfluenceSlot PlayerInfluenceSlot--back"
             role="img"
-            aria-label={t('game.playerBoard.influenceVisible', { roleLabel: roleLabel(influence) })}
-            key={slotIndex}
+            aria-label={t('game.playerBoard.influenceHidden')}
         >
             <img
                 className="PlayerInfluenceImage"
-                src={getInfluenceImage(influence)}
+                src={cardBackImage}
                 alt=""
                 aria-hidden="true"
                 draggable="false"
             />
         </span>
-    }
-
-    // Do not pass the rival's influence value to any DOM attribute or child.
-    return <span
-        className="PlayerInfluenceSlot PlayerInfluenceSlot--back"
-        role="img"
-        aria-label={t('game.playerBoard.influenceHidden')}
-        key={slotIndex}
-    >
-        <img
-            className="PlayerInfluenceImage"
-            src={cardBackImage}
-            alt=""
-            aria-hidden="true"
-            draggable="false"
-        />
-    </span>
+    </div>
 }
 
 export default function PlayerBoard(props) {

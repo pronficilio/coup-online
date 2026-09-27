@@ -5,6 +5,13 @@
     aspect-ratio: 1;
     margin: 12px auto;
     box-sizing: border-box;
+    transform: translateY(clamp(-180px, calc(108px - 15vh - 13vw), -40px));
+}
+
+@media only screen and (max-width: 1023px) {
+    .PlayerBoardContainer {
+        transform: translateY(clamp(-240px, calc(80px - 22vh - 14vw), -40px));
+    }
 }
 
 .GameContainer {
@@ -155,6 +162,25 @@
     gap: 5px;
 }
 
+.PlayerInfluenceEntry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: clamp(76px, 10.4vw, 134px);
+}
+
+.PlayerInfluenceRoleLabel {
+    width: 100%;
+    box-sizing: border-box;
+    color: #28231e;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
 .PlayerBoardSeat--current .PlayerBoardSeatInfluences {
     gap: 5px;
 }
@@ -204,6 +230,10 @@
     border-width: 1px;
 }
 
+.PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceEntry {
+    width: clamp(48px, 5.2vw, 70px);
+}
+
 .PlayerInfluenceSlot--face {
     padding: 0;
     background: #fff;
@@ -234,6 +264,35 @@
     border-style: dashed;
     border-color: #c8c8c8;
     background: #f4f4f4;
+}
+
+.PlayerInfluenceSlot--lost .PlayerInfluenceLostOverlay {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 3px;
+    border-radius: 5px;
+    background: rgba(120, 120, 120, 0.43);
+    box-sizing: border-box;
+}
+
+.PlayerInfluenceLostMarker {
+    display: inline-flex;
+    width: 1.35em;
+    height: 1.35em;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    background: rgba(40, 40, 40, 0.82);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+    text-shadow: 0 1px 2px #000;
 }
 
 .PlayerBoardSeat--current .PlayerInfluenceSlot:not(.PlayerInfluenceSlot--inactive) {
@@ -278,6 +337,10 @@
         width: clamp(58px, 15.5vw, 82px);
     }
 
+    .PlayerBoardSeat--observer .PlayerInfluenceEntry {
+        width: clamp(58px, 15.5vw, 82px);
+    }
+
     .PlayerBoardSeatName {
         gap: 3px;
         padding: 1px 4px;
@@ -308,6 +371,14 @@
         width: clamp(29px, 9vw, 42px);
         height: auto;
         aspect-ratio: 0.68;
+    }
+
+    .PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceEntry {
+        width: clamp(29px, 9vw, 42px);
+    }
+
+    .PlayerInfluenceRoleLabel {
+        font-size: 0.58rem;
     }
 
     .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardSeatHeader {

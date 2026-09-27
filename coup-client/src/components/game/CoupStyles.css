@@ -155,31 +155,6 @@
   stroke: none;
 }
 
-.InfluenceSection {
-    background-color: #F2F2F2;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    /* width: 300px; */
-    display: inline-block;
-}
-
-.InfluenceSection p{
-    text-align: center;
-}
-
-.InfluenceSection h3{
-    text-align: center;
-}
-
-.InfluenceUnitContainer {
-    width: 110px;
-    text-align: center;
-    margin-left: 15px;
-    margin-right: 15px;
-    line-height: 30%;
-    display: inline-block;
-}
-
 .CurrentPlayer {
     text-align: right;
     position: absolute;
@@ -272,13 +247,6 @@
     text-align: center;
 }
 
-.circle {
-    height: 30px;
-    width: 30px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-  }
 .DecisionsSection button {
     min-width: 100px;
     height: 30px;
