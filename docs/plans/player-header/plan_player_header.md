@@ -1,6 +1,6 @@
 # Plan: encabezado del jugador con saldo y neón de turno — issue #16
 
-**Estado:** `ACTIVE`; F1 inicial `FAILED`; F2 `READY_FOR_USER_REVIEW` tras reorquestación.
+**Estado:** `COMPLETED`; F1 inicial `FAILED`; F2 `PASSED` e integrada tras aprobación del usuario.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/16
 **Handoff:** `docs/plans/active/issue_16_player_header.md`
 **Bitácora:** `docs/plans/log/issue-16.jsonl`
@@ -42,14 +42,14 @@ Rediseñar la identificación visual de cada jugador según `fotos/jugador.png`:
 **Avanzar:** pasan los seis criterios anteriores y se entrega evidencia visual más compilación del cliente. **Pivotar:** solo ajustes CSS localizados dentro del encabezado. **Repetir:** una corrección visual acotada por viewport. **Bloquear/reorquestar:** si resolver una colisión requiere cambiar geometría de asientos, cartas u otras áreas fuera de alcance.
 **Falsificación:** con seis jugadores y nombres largos a 320 px, ¿se oculta el saldo, se recorta el neón o se superpone el encabezado con otro jugador, las cartas o controles?
 **Validación:** revisión manual en escritorio y móvil, incluidas vista de 320 px, 2–6 jugadores, nombres largos, saldos 0/2/10, turnos activo/inactivo y jugadores eliminados; compilación de coup-client y `git diff --check`. No añadir ni ejecutar tests automatizados.
-**Publicación:** F1 inicial falló el criterio 5; el usuario reorquestó el trabajo y F2 incorpora sus ajustes. La rama está en el [PR draft #17](https://github.com/pronficilio/coup-online/pull/17) para revisar las capturas actualizadas. Mantener la issue abierta y no fusionar ni cerrar.
+**Publicación:** F1 inicial falló el criterio 5; el usuario reorquestó el trabajo y aprobó F2 tras revisar sus capturas. El [PR #17](https://github.com/pronficilio/coup-online/pull/17) se integró en `master` mediante `ffcca7b8cd3006d86c68f9830fa7fb615b2cc6ca`; la issue #16 quedó cerrada.
 
-## F2 — Ajuste visual tras feedback del usuario (`READY_FOR_USER_REVIEW`)
+## F2 — Ajuste visual tras feedback del usuario (`CLOSED — APPROVED`)
 
 **Decisión autorizada:** reducir bastante el tamaño de letra del nombre, eliminar el truncado con `…` y dejar que el texto completo determine el ancho de la barra; bajar la altura de la barra móvil; reducir proporcionalmente el ancho y alto de las cartas rivales, respetando su aspecto original. Las cartas del observador conservan su tamaño.
 **Implementación:** centrar la fila sobre el asiento para que un nombre largo no se corte en los bordes; barra móvil de 18 CSS px, letra de 0.52 rem y sin elipsis; cartas rivales con `aspect-ratio: 0.68`, ancho de 29–42 CSS px en móvil y 48–70 CSS px fuera de móvil. Su altura se deriva de esa proporción. El layout y los puntos de asiento no cambian.
 **Evidencia:** capturas CDP actuales de 2–6 jugadores a 320×900 y 1280×1000 en `docs/plans/player-header/evidence/`; inspección visual de matriz, build y `git diff --check` pasan.
-**Avanzar:** dejar el PR draft para revisión del usuario. No fusionar ni cerrar #16.
+**Veredicto final:** `PASSED`; usuario aprobó la integración. PR #17 integrada a `master`; issue #16 cerrada. El build y `git diff --check` pasan; no se ejecutaron tests automatizados conforme al handoff.
 
 ## Topología, riesgos y revisión
 

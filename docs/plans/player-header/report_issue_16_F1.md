@@ -3,9 +3,9 @@
 **Unidad:** https://github.com/pronficilio/coup-online/issues/16
 **Worktree / rama:** `.worktrees/issue-16-player-header` / `issue/16-player-header`
 **F1 inicial:** `FAILED`; las capturas originales mostraron cruces entre encabezados y cartas rivales.
-**F2 reorquestada:** pasa la revisión visual de capturas en 2–6 jugadores, el build del cliente y `git diff --check`; build con advertencias preexistentes.
-**PR de revisión (draft):** https://github.com/pronficilio/coup-online/pull/17
-**Issue:** permanece abierta. Mantener el PR draft para revisión; no integrar hasta la aprobación del usuario.
+**F2 reorquestada:** aprobada por el usuario; pasa la revisión visual de capturas en 2–6 jugadores, el build del cliente y `git diff --check`; build con advertencias preexistentes.
+**PR integrada:** https://github.com/pronficilio/coup-online/pull/17 — merge commit `ffcca7b8cd3006d86c68f9830fa7fb615b2cc6ca` en `master`.
+**Issue:** cerrada el 2026-09-26 (UTC−06:00) después de la integración.
 
 ## Cambios revisados
 
@@ -73,6 +73,6 @@ La primera iteración limitó el ancho del encabezado. El saldo permanecía ente
 - No se añadieron ni ejecutaron tests automatizados.
 - Las primeras capturas CLI que pedían ventana física de 320 px no fijaban un viewport CSS de 320 px; se descartaron y se retiraron. Este reporte solo enlaza el set CDP validado.
 
-## Siguiente paso
+## Cierre
 
-F1 inicial queda `FAILED`. F2 recoge el feedback del usuario y pasa la inspección visual de capturas, build y `git diff --check`. Mantener la issue abierta y el PR draft para revisión del usuario; no integrar ni cerrar la issue.
+F1 inicial queda `FAILED`; F2 resuelve los problemas visuales dentro del alcance. Tras la aprobación del usuario, la implementación se integró a `master` y la issue #16 se cerró. La inspección visual, el build y `git diff --check` pasan. No se ejecutaron tests automatizados conforme al handoff.

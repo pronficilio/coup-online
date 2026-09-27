@@ -3,13 +3,13 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/16
 **Plan exacto:** `docs/plans/player-header/plan_player_header.md`
 **Bitácora exacta:** `docs/plans/log/issue-16.jsonl`
-**Estado:** `ACTIVE`; F1 inicial `FAILED`; F2 `READY_FOR_USER_REVIEW` tras reorquestación solicitada por el usuario.
+**Estado:** `COMPLETED`; F1 inicial `FAILED`; F2 `PASSED` e integrada tras la aprobación del usuario.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Verifier requerido ahora:** no; revisión final del Orquestador.
 **Branch destino de toda la issue:** `issue/16-player-header`.
 **Worktree destino de toda la issue:** `.worktrees/issue-16-player-header`.
 **Merge target:** `master` de `pronficilio/coup-online`.
-**PR esperada:** una PR desde la rama indicada a `master`, asociada a #16.
+**Integración:** [PR #17](https://github.com/pronficilio/coup-online/pull/17), merge commit `ffcca7b8cd3006d86c68f9830fa7fb615b2cc6ca` en `master`.
 
 ## Reclamo y aislamiento
 
@@ -33,9 +33,9 @@ Reduce bastante la letra de los nombres; elimina `…` y permite que el texto co
 
 **Validaciones:** inspección visual/manual, `npm run build` desde `coup-client` y `git diff --check`. No añadir ni ejecutar tests automatizados. Registrar comandos y resultados reales, sin anticiparlos.
 
-**Resultado F1 inicial (2026-09-26):** FAILED; en 5p/6p móvil se cruzaban barras y cartas laterales. El usuario autorizó reducir la altura de cartas rivales y compactar la tipografía/barra; F2 implementa esa reorquestación. Las capturas nuevas y resultados actuales están en `docs/plans/player-header/report_issue_16_F1.md`. La issue permanece abierta y el [PR #17](https://github.com/pronficilio/coup-online/pull/17) sigue en draft.
+**Resultado F1 inicial (2026-09-26):** FAILED; en 5p/6p móvil se cruzaban barras y cartas laterales. El usuario autorizó reducir la altura de cartas rivales y compactar la tipografía/barra; F2 implementó esa reorquestación. Las capturas y resultados finales están en `docs/plans/player-header/report_issue_16_F1.md`.
 
-**Cierre:** compilar y revisar manualmente F2; mantener el PR draft para revisión del usuario, sin fusionar ni cerrar #16. Registrar el resultado y las capturas nuevas en `docs/plans/log/issue-16.jsonl`.
+**Cierre:** el usuario aprobó la integración. La revisión final confirmó capturas CDP de 2–6 jugadores en 320×900 y 1280×1000, build con código 0 y `git diff --check` aprobado. PR #17 integrada en `master`; issue #16 cerrada el 2026-09-26 (UTC−06:00). No quedan acciones pendientes.
 
 ## Pregunta de falsificación
 
