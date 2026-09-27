@@ -5,8 +5,8 @@
 **Handoff:** `docs/plans/active/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Orquestación debe delegar Verifier FINAL independiente sobre los reportes, inventario, diff y el informe de recorrido proporcionado por el usuario. El Alquimista no emite PASS.
-**Integración:** PR #22 se fusionó parcialmente en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Luego PR #30 de #21 añadió cinco familias de botones ilustrados con texto inglés; la rama #19 se sincronizó con `origin/master@3313d42` y corrigió las cinco. Antes de abrir la continuación, también integró `origin/master@be93e97` (PR #31/#29) mediante merge `318c119`. Reorquestación documentada: Orquestación abrirá una PR de continuación desde el mismo branch/worktree porque #22 ya está fusionada y el alcance reveló este hallazgo posterior. Esta excepción mantiene una sola rama/worktree activa; la continuación queda pendiente de revisión FINAL y aprobación del usuario antes de merge. No cierra #19 ni acepta F4.
+**Siguiente dueño:** Verifier FINAL independiente está preparando el recorrido local para que el usuario inspeccione la corrección; luego reportará su veredicto. El Alquimista no emite PASS.
+**Integración:** PR #22 se fusionó parcialmente en `master` con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Luego PR #30 de #21 añadió cinco familias de botones ilustrados con texto inglés; la rama #19 se sincronizó con `origin/master@3313d42` y corrigió las cinco. Antes de abrir la continuación, también integró `origin/master@be93e97` (PR #31/#29) mediante merge `318c119`. Reorquestación documentada: PR de continuación [#33](https://github.com/pronficilio/coup-online/pull/33) está `DRAFT` desde el mismo branch/worktree porque #22 ya está fusionada y el alcance reveló este hallazgo posterior. Esta excepción mantiene una sola rama/worktree activa; la continuación queda pendiente de revisión FINAL y aprobación del usuario antes de merge. No cierra #19 ni acepta F4.
 
 ## Solicitud y definición de éxito
 
@@ -125,7 +125,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 **Revisión independiente anterior:** el Verifier informó `FAIL` en AC1/AC2/AC4/AC7 al encontrar texto inglés incrustado en las cinco familias de botones usadas; informó `PASS` en AC3/AC5/AC6. La corrección puntual está en curso y exige nueva revisión visual independiente. El reporte previo del usuario (recorrido de portada, lobby y partida completa, todo en orden) se conserva como cita de su experiencia, sin inferir dispositivo/navegador/pasos ni convertirlo en veredicto.
 
-**Avanzar:** criterios AC1–AC7 sustentados y Verifier `PASS`; dejar la unidad `WAITING_ORCHESTRATOR` para revisión de la PR de continuación documentada.
+**Avanzar:** criterios AC1–AC7 sustentados y Verifier `PASS`; dejar la unidad `WAITING_ORCHESTRATOR` para revisión de PR #33.
 **Pivotar:** devolver a F2/F3 solo el criterio refutado con reproducción concreta.
 **Repetir:** una ronda focalizada tras una corrección y repetir el chequeo del criterio afectado.
 **Bloquear/cancelar:** falta entorno de recorrido/build o permanece una dependencia de #14/#18 sin liberar.
