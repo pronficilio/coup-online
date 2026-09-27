@@ -2,7 +2,11 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    position: fixed;
+    z-index: 30;
+    right: 22px;
+    bottom: 20px;
 }
 
 .reference-panel__trigger,
@@ -19,14 +23,42 @@
 }
 
 .reference-panel__trigger {
-    min-height: 40px;
-    padding: 8px 12px;
+    display: inline-flex;
+    width: 52px;
+    height: 52px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(38, 31, 23, 0.2);
+}
+
+.reference-panel__trigger:hover {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(38, 31, 23, 0.27);
+}
+
+.reference-panel__icon {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.65;
 }
 
 .reference-panel__trigger:focus-visible,
 .reference-panel__close:focus-visible {
     outline: 3px solid #1976d2;
     outline-offset: 2px;
+}
+
+@media (max-width: 1199px) {
+    .reference-panel__triggers {
+        position: static;
+        width: max-content;
+        margin: 8px 12px 12px auto;
+    }
 }
 
 .reference-panel__overlay {

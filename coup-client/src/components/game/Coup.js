@@ -4,6 +4,7 @@ import './CoupStyles.css'
 import EventLog from './EventLog'
 import CheatSheetModal from '../CheatSheetModal'
 import RulesModal from '../RulesModal'
+import ReferencePanel from './ReferencePanel'
 
 const INFLUENCE_COLORS = {
     duke: '#D55DC7',
@@ -151,6 +152,7 @@ export default class Coup extends Component {
                 observerInfluences={ownInfluences}
                 currentPlayer={this.state.currentPlayer}
             />
+            <ReferencePanel />
 
             <div className="DecisionsSection" aria-live="polite">
                 {this.props.isCodexAuthorized && <button

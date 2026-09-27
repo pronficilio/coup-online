@@ -1,11 +1,13 @@
 # Issue #8: referencias visuales para la partida
 
-**Estado:** `ACTIVE`
+**Estado:** `CLOSED` en el tracker tras fusionar PR #12; el montaje del panel no quedó realizado y se continúa en [issue #18](https://github.com/pronficilio/coup-online/issues/18).
 **Issue:** https://github.com/pronficilio/coup-online/issues/8
-**Handoff:** `docs/plans/inbox/issue_8_game_reference_materials.md`
+**Handoff histórico:** `docs/plans/active/issue_8_game_reference_materials.md`
 **Bitácora:** `docs/plans/log/issue-8.jsonl`
 
 ## Objetivo
+
+> **Registro histórico:** PR #12 integró los activos y el componente de consulta aislado, pero no montó `ReferencePanel` en la partida. El resto de este plan conserva el contrato original; no lo uses como handoff ejecutable. El montaje pendiente se planifica en #18.
 
 Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referencia mediante dos consultas separadas, cada una en su propio modal. Mantener el contenido en español hasta que exista configuración de idioma. Optimizar las cuatro imágenes fuente como WebP de 1024 px de ancho y calidad 85; versionar solo esos WebP entre los recursos gráficos de esta función.
 
@@ -13,11 +15,11 @@ Dar acceso dentro de la partida a la tarjeta de acciones y a la tabla de referen
 
 - Proyecto: `coup-online`; tracker GitHub en `pronficilio/coup-online`.
 - Rama base y merge target: `master`, según `docs/plans/PROJECT_ORCHESTRATION.yaml` y los remotos del checkout.
-- Issue canónica: #8, abierta.
+- Issue canónica: #8, cerrada tras integrar PR #12.
 - Rama/worktree de la unidad: `issue/8-game-reference-assets` / `.worktrees/issue-8-game-reference-assets`.
 - Aislamiento creado desde `origin/master` actualizado, commit base `febec397d3dcd9c2472a61910c8441800c939326`.
 - Claim: la issue #8 está asignada a `pronficilio` por el Orquestador; antes de asignar se verificó que estaba abierta y sin reclamo previo.
-- Integración: un único PR de la rama de issue a `master`, asociado a #8.
+- Integración: [PR #12](https://github.com/pronficilio/coup-online/pull/12) quedó fusionado en `master` el 2026-09-26. Integró F1 y el componente aislado de F2.
 - Ejecutor: Agente Alquimista.
 - Modo: `LIGHT`; riesgo: `LOW`; verificación independiente: `NONE`.
 - Validación funcional y visual: manual, con build del cliente en cierre; no agregar pruebas automatizadas para esta función.
