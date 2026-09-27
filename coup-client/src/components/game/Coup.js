@@ -466,10 +466,11 @@ export default class Coup extends Component {
                 {ACTION_ROWS.map((actionRow, index) => {
                     const { action, blockers, declaredRole } = actionRow
                     const options = optionsByAction.get(action) || []
-                    const nextActionRow = ACTION_ROWS[index + 1]
-                    const nextOptions = nextActionRow ? (optionsByAction.get(nextActionRow.action) || []) : []
                     const available = options.length > 0
-                    const showDivider = available && nextOptions.length > 0
+                    const hasNextAvailableAction = ACTION_ROWS.slice(index + 1).some(({ action: nextAction }) =>
+                        (optionsByAction.get(nextAction) || []).length > 0
+                    )
+                    const showDivider = available && hasNextAvailableAction
                     const unavailableReason = unavailableActionReason(action, options, money)
                     const actionId = `decision-action-${action}`
                     const actionPriceLabel = actionPrice(actionRow)
