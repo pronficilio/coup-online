@@ -9,9 +9,9 @@ import ChooseInfluence from './ChooseInfluence';
 import ExchangeInfluences from './ExchangeInfluences';
 import './CoupStyles.css';
 import EventLog from './EventLog';
-import ReactModal from 'react-modal';
 import CheatSheetModal from '../CheatSheetModal';
 import RulesModal from '../RulesModal';
+import ReferencePanel from './ReferencePanel';
 
 export default class Coup extends Component {
 
@@ -343,6 +343,7 @@ export default class Coup extends Component {
                         observerName={this.props.name}
                         currentPlayer={this.state.currentPlayer}
                     />
+                    <ReferencePanel />
                     <aside
                         className={`TurnActionPanel ${canChooseAction ? 'TurnActionPanel--active' : 'TurnActionPanel--inactive'}`}
                         aria-label="Your turn actions"
