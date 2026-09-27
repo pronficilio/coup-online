@@ -51,5 +51,5 @@ La nueva inspección visual y el recorrido restante siguen pendientes; esta rean
 
 - `npm run build` desde `coup-client`: **exit 0**, compilado con los mismos warnings del checkpoint previo (imports sin uso en `App.js`, parser `postcss-calc` para `dvh` en `ReferencePanel.css`, `caniuse-lite` desactualizado). Ninguno señala archivos de este cambio.
 - `git diff --check`: **pasa**.
-- `curl -I http://localhost:3006`: **200 OK**. El bundle base servido todavía contiene la compilación previa porque el watcher HMR no detectó las ediciones en `/mnt/e`; el Orquestador confirmó el proceso CRA de este worktree y reiniciará solo esa sesión para que la usuaria pueda ver el checkpoint.
+- `curl -I http://localhost:3006`: **200 OK** antes del reinicio. El watcher HMR no detectó las ediciones en `/mnt/e`; el Orquestador reinició solo la sesión CRA del worktree, confirmó compilación exitosa del nuevo HEAD y volvió a verificar HTTP 200. La usuaria ya puede inspeccionar el checkpoint.
 - No se ejecutaron tests automatizados. El resultado visual de esta corrección aún no fue revisado por la usuaria.

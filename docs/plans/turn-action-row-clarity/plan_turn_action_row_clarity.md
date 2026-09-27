@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Orquestador reinicia CRA para refrescar HMR; la usuaria hace la siguiente inspección visual; Alquimista continúa el recorrido F2. F3 no está listo.
+**Siguiente dueño:** la usuaria hace la siguiente inspección visual; Alquimista continúa el recorrido F2 con el feedback. F3 no está listo.
 
 ## Solicitud y definición de éxito
 
@@ -79,7 +79,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Implementación y revisión estática previa:** adaptación de `Coup.js`, estilos y claves `es`/`en` revisadas; el primer `npm run build` terminó con exit 0 y warnings en `App.js`, `ReferencePanel.css` y `caniuse-lite`. No se ejecutaron tests automatizados. El reporte del checkpoint anterior está en `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
 **Reanudación:** 2026-09-27, la usuaria inspeccionó la aplicación en `http://localhost:3006` con backend en `:18000` y reportó: (1) los divisores de filas parecen los extremos curvos del borde de hover; (2) el panel de acciones aparece debajo del tablero y debe situarse a la derecha, por debajo de la altura de “Resumen de reglas”, como overlay del tablero y las cartas.
 **Trabajo activo:** separar el divider de la superficie/contorno de cada fila, evitando colisión con filas deshabilitadas y conservándolo al hover; posicionar únicamente el panel de `action` a la derecha en overlay con límites responsive, sin cambiar la posición del control de reglas ni el flujo de otras decisiones.
-**Validación del checkpoint:** `git diff --check` pasa; `npm run build` exit 0 con warnings en archivos no modificados. El CRA de `localhost:3006` respondió 200, pero HMR no detectó estas ediciones en `/mnt/e`; el Orquestador reiniciará esa sesión. No se ejecutaron tests.
+**Validación del checkpoint:** `git diff --check` pasa; `npm run build` exit 0 con warnings en archivos no modificados. HMR no detectó estas ediciones en `/mnt/e`; el Orquestador reinició CRA desde este worktree, confirmó compilación exitosa y HTTP 200 en `localhost:3006`. No se ejecutaron tests.
 **Validación pendiente:** inspección de la usuaria después del reinicio y luego recorrido visual/interactivo de AC1–AC9 (estados, saldos, mouse/teclado/tacto, destinos/cancelación, hints, recorte, reduced motion y otros tipos de decisión). No añadir tests. No se abre PR ni se cierra la issue.
 
 ### F3 — Verificación independiente y entrega (`PENDING`)
