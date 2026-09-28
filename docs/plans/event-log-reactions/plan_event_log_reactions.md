@@ -1,0 +1,105 @@
+# Plan — Registro de eventos y reacciones (#40)
+
+**Estado:** `PLANNED`; F1 `READY`; issue `OPEN`, asignada a `pronficilio`.  
+**Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
+**Handoff:** `docs/plans/inbox/issue_40_event_log_reactions.md`  
+**Bitácora:** `docs/plans/log/issue-40.jsonl`  
+**Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.  
+**Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.  
+**Base / destino:** `origin/master` (`a3d23f3c5f262fc02fe15ffbb554472b3d829aec`) / `master` de `pronficilio/coup-online`.  
+**Integración:** una PR para el issue completo; aún no existe.
+
+## Solicitud y resultado esperado
+
+Rediseñar el registro de partida para conservar cada tipo de evento actual, comunicar resultados reales y omitir horas. Añadir reacciones contextuales con conteos, una reacción como máximo por participante y evento, y globos de presencia efímeros al lado del nombre de quien reaccionó. El usuario aprobó la dirección detallada en el issue #40.
+
+El issue #40 es la fuente canónica de los doce criterios de aceptación, catálogo de reacciones, categorías de eventos, reglas de privacidad y comportamiento visual. No se debe recortar ni reinterpretar su alcance para facilitar la implementación.
+
+## Estado observado
+
+- `server/game/coup.js` emite mensajes de texto por `g-addLog`; el cliente los guarda como strings en `Coup.js` y los presenta en `EventLog.js`.
+- Las traducciones actuales están en `coup-client/src/i18n/translations.json`; el tablero expone nombre, monedas y asiento en `PlayerBoard.js`.
+- Los PNG de `fotos/` son referencias locales excluidas de Git y pueden faltar en este worktree. No importarlos ni agregarlos al PR sin validar disponibilidad y optimizar los derivados.
+- La issue #24 está abierta y asignada a `pronficilio`, con un worktree activo que toca el shell/estilos de la UI del turno. No cambiar en paralelo las mismas zonas de `coup-client/src/components/game/Coup.js` o estilos compartidos. Consultar su estado/diff antes de editar esas superficies y sincronizar `master` antes de integrar. La lógica de servidor F1 es independiente.
+- El Orquestador creó este branch/worktree a petición explícita del usuario, antes del reclamo del Alquimista. El Alquimista debe volver a leer issue/PR/branch, confirmar que no hay reclamo incompatible y registrar su propio `claim` remoto antes de cambios de producto.
+
+## Decisiones aprobadas
+
+- No renderizar hora, timestamp ni hueco reservado para hora; usar separación discreta por turno.
+- Conservar acciones, desafíos, bloqueos, afirmaciones probadas/fallidas, pérdidas de influencia y eliminaciones; agregar resultados de ingreso, ayuda extranjera, impuesto, robo y resolución de intercambio con valores reales.
+- No revelar cartas privadas de intercambio ni publicar el vínculo permanente participante→reacción. Los conteos públicos contienen solo totales; la selección propia se confirma al cliente de ese asiento.
+- El servidor deriva la identidad desde el socket, valida evento y catálogo contextual, y conserva un resultado canónico frente a emisiones simultáneas.
+- Selección propia: reemplazar al escoger otra reacción; quitar al pulsar la propia; clic en grupo existente para sumarse directamente. Conteos y selecciones viven en memoria durante la partida y se limpian al rematch.
+- El globo se difunde como presencia efímera. Máximo uno por asiento; una acción siguiente lo reemplaza y reinicia la expiración (~3,5 s). Globos de distintos asientos pueden coexistir.
+- Sin reacciones automáticas de IA y sin emisión de reacciones por espectadores. Sin avatares ni listas de participantes por grupo.
+- Movimiento breve y reducido cuando corresponda, accesibilidad de teclado/touch, soporte móvil y sin saltos de layout ni scroll forzado por reacciones.
+
+## Fases
+
+### F1 — Contrato público y autoridad del servidor
+
+**Pregunta única:** ¿Puede el servidor identificar eventos públicos y mantener reacciones válidas, únicas por asiento/evento y libres de datos privados?
+
+- **Entrada:** issue #40, mensajes `addLog`, flujo de resolución de acciones, sockets y modelos de juego.
+- **Áreas:** `server/game/coup.js`, `server/test/coup.test.js` y otros tests server estrictamente necesarios, `server/i18n.js` si hace falta el contrato localizado, este plan/handoff/bitácora. No tocar UI todavía.
+- **Trabajo:** definir envelope tipado con ID único por partida, tipo/turno y campos públicos mínimos; registrar resultados reales sin duplicar bloqueos/pérdidas; conservar privacidad de Exchange; mantener historial/estado de reacción en memoria; validar seat/evento/reacción del lado servidor; emitir totales, selección propia y presencia efímera según issue.
+- **Salida/evidencia:** contrato y código revisables, verificaciones aplicables y nota breve de privacidad/concurrencia.
+- **Avance:** el servidor rechaza emisor, evento o reacción inválidos; repetir/reordenar emisiones mantiene una sola selección por asiento/evento y conteos exactos; rematch limpia el estado; payloads públicos no incluyen datos ocultos.
+- **Pivotar:** si el protocolo actual no permite identidad inequívoca por socket o el modelo no puede arbitrar selección de forma segura, detenerse y devolver una propuesta de contrato al Orquestador.
+- **Repetir:** solo ante fallo determinista de validación/concurrencia, una corrección acotada y repetición del mismo escenario.
+- **Bloquear/cancelar:** bloquear si no puede probarse la identidad autoritativa o evitar filtraciones; cancelar solo si el usuario retira la función.
+- **Commit:** `feat(event-reactions): issue 40 F1 CLOSED advance_f2` (`COMMIT_REQUIRED`).
+- **Verifier:** no en esta fase; resultado independiente `FINAL` obligatorio antes de integrar.
+
+### F2 — Registro y controles de reacción
+
+**Pregunta única:** ¿Puede leerse cada evento y seleccionarse la reacción contextual sin horas ni pérdida de contexto?
+
+- **Entrada:** envelope F1 integrado en el mismo branch y contrato de payload cerrado.
+- **Áreas:** `coup-client/src/components/game/EventLog.js`, estilos de juego, `Coup.js`, traducciones es/en y assets optimizados si se justifican. Inspeccionar issue #24 antes de tocar archivos cliente compartidos.
+- **Trabajo:** renderizar todos los tipos/resultados, participantes con colores, iconos y grupos por turno; bandeja contextual; conteo/selección propia y click para agregar/reemplazar/quitar; conservar scroll; panel escritorio/móvil.
+- **Salida/evidencia:** recorrido de todas las categorías, variantes bloqueadas y robo de 0/1/2 monedas; capturas representativas de escritorio/móvil.
+- **Avance:** cobertura completa, ausencia total de horas, opciones por contexto correctas y estado del cliente consistente con servidor.
+- **Pivotar:** recolocar/reducir el panel si cubre asientos o controles; no retirar categorías ni reacciones aprobadas.
+- **Repetir:** una repetición por defecto ante un defecto visual reproducible, después de una corrección acotada.
+- **Bloquear/cancelar:** bloquear si issue #24 mantiene una edición incompatible en la misma superficie; coordinar secuencia con Orquestador.
+- **Commit:** `feat(event-log): issue 40 F2 CLOSED advance_f3` (`COMMIT_REQUIRED`).
+
+### F3 — Globos efímeros y acabado accesible
+
+**Pregunta única:** ¿Puede verse quién acaba de reaccionar, por poco tiempo, sin enlazar permanentemente a esa persona con una reacción del log?
+
+- **Entrada:** emisión de presencia F1 y asientos/render F2.
+- **Áreas:** encabezados/asientos de `PlayerBoard`, estilos y componente de globo; traducciones/atributos accesibles necesarios.
+- **Trabajo:** un globo por asiento junto al nombre y opuesto a monedas; orientar hacia interior en bordes; reemplazar/reiniciar timer del mismo asiento; coexistencia entre asientos; movimiento reducido y navegación accesible.
+- **Salida/evidencia:** escenarios de reacciones sucesivas en un asiento, concurrencia entre asientos, expiración, retiro y bordes con 2–6 jugadores; capturas compactas.
+- **Avance:** globo transitorio correcto, conteo sin atribución individual persistente, sin recorte, timers limpios y layouts estables.
+- **Pivotar:** cambiar orientación/anclaje si tapa el nombre, saldo o viewport; no mostrar relación con una fila concreta.
+- **Repetir:** repetir una vez tras corregir un fallo visual o de temporizador reproducible.
+- **Bloquear/cancelar:** bloquear si hace falta identificar globalmente el evento en el globo o alterar privacidad aprobada.
+- **Commit:** `feat(reaction-bubbles): issue 40 F3 CLOSED advance_f4` (`COMMIT_REQUIRED`).
+
+### F4 — Falsificación y entrega
+
+**Pregunta única:** ¿Puede una ruta cliente o secuencia concurrente refutar unicidad, conteos, privacidad, caducidad o presentación sin horas?
+
+- **Entrada:** F1–F3 cerradas en el mismo branch.
+- **Trabajo/evidencia:** build y verificaciones pertinentes, revisión visual/funcional de escritorio y móvil, resultados de escenarios críticos y evidencia para AC1–AC12.
+- **Verifier:** revisión independiente `FINAL`, sin modificar la implementación. Debe intentar refutar unicidad bajo concurrencia, exactitud de agregados, privacidad, borde/temporizador y ausencia de horas.
+- **Avance:** evidencia cubre todos los criterios y Verifier da `PASS`; dejar PR única lista para revisión del Orquestador.
+- **Repetir:** si hay un defecto, regresar a la fase dueña del criterio, corregir en el mismo branch y repetir solo la evidencia afectada más el checkpoint Verifier.
+- **Bloquear/cancelar:** no integrar ante `FAIL`/`BLOCKED` no resuelto ni relajar criterios; cancelar solo por decisión explícita del propietario.
+- **Commit:** `docs(event-reactions): issue 40 F4 CLOSED ready_review` (`COMMIT_REQUIRED`).
+
+## Contrato de integración y control
+
+- Mantener un único branch, worktree y PR hacia `master`; no crear aislamiento por fase.
+- Commit de control inicial: `chore(event-reactions): issue 40 setup control`, con plan, handoff, log y actualización del índice.
+- Cada fase con artefactos persistentes termina en commit que contiene reporte/actualización de fase y evento JSONL de veredicto.
+- El Alquimista debe seguir `docs/agentes/ALQUIMISTA.md`, reclamar/releer issue #40 y verificar este worktree antes de trabajo técnico. No tocar `master` ni el checkout raíz.
+- No declarar la unidad completa ni integrar/cerrar: entregar al Orquestador para revisión independiente de la integración.
+
+## Historial de decisiones
+
+- 2026-09-27/28: el propietario aprobó en conversación el diseño del registro sin horas, resultados explícitos de acciones, reacciones contextuales, conteos Telegram y globos de identidad transitorios.
+- 2026-09-28: el propietario pidió crear el branch/worktree e invocar Alquimista. El worktree se creó desde el `origin/master` remoto verificado, después de confirmar issue abierta/asignada y ausencia de branch/PR duplicados.
