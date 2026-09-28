@@ -2,7 +2,7 @@
 
 **Estado:** `COMPLETED`; F1, F2, F3 y F4 `CLOSED`. Verifier FINAL `PASS` sobre el merge integrado `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe` y aceptación de AC7 tras la respuesta del usuario.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
-**Handoff:** `docs/plans/active/issue_19_game_language.md`
+**Handoff final:** `docs/plans/completed/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Siguiente dueño:** ninguno; la issue #19 está `CLOSED` y la unidad `COMPLETED`.
