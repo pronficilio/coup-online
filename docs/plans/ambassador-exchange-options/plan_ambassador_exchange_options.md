@@ -1,19 +1,19 @@
 # Plan — opciones visuales para el intercambio del Embajador (#47)
 
-**Estado:** `BLOCKED`; F1 `BLOCKED`; issue `OPEN` asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1 `ACTIVE` tras rediseño solicitado por el usuario; issue `OPEN` asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/47
 **Handoff:** `docs/plans/active/issue_47_ambassador_exchange_options.md`
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `FINAL` independiente.
 **Branch / worktree:** `issue/47-ambassador-exchange-options` / `.worktrees/issue-47-ambassador-exchange-options`.
-**Base inicial / actual / destino:** `origin/master@f900c094` al reclamar; branch rebasada sobre `origin/master@0a467c1` / `master` de `pronficilio/coup-online`.
+**Base inicial / actual / destino:** `origin/master@f900c094` al reclamar; branch rebasada sobre `origin/master@0a467c1`; debe sincronizarse con la base vigente antes de continuar / `master` de `pronficilio/coup-online`.
 **Integración:** una PR asociada únicamente a #47; aún no existe.
 
 ## Solicitud y definición de éxito
 
-Al ejecutar Exchange (Embajador), algunas combinaciones visualmente equivalentes aparecen repetidas. Optimizar las opciones considerando roles repetidos y orden irrelevante, y mostrar cada pareja elegible como elección dentro del panel/tablero de acciones, con las cartas ilustradas y la etiqueta localizada debajo.
+Al ejecutar Exchange (Embajador), algunas combinaciones visualmente equivalentes aparecen repetidas y una galería de parejas dibuja demasiadas cartas. Deduplicar los resultados válidos y reemplazar la galería por las cartas disponibles una sola vez, dejando que el jugador cambie iterativamente cuáles conserva.
 
-Éxito significa que cada pareja de roles que represente un resultado distinto aparece una sola vez; opciones como `duke + captain` y `captain + duke`, o copias físicas de roles repetidos que produzcan la misma pareja, colapsan en una única elección. El jugador ve las imágenes de las cartas y su texto en el idioma actual y puede seleccionar una opción, mientras el servidor conserva autoridad sobre la opción permitida y resuelve el intercambio correctamente.
+Éxito significa que cada pareja de roles que represente un resultado distinto aparece una sola vez en las opciones autorizadas; la UI muestra cada carta física del pool una sola vez. Con dos influencias originales, las cuatro cartas aparecen juntas: las dos originales empiezan iluminadas en rojo neón y las dos robadas sin iluminar. Un clic en una carta no seleccionada la intercambia por una de las seleccionadas; las posiciones a sustituir alternan empezando por B, luego A y siguen alternando, de forma que cualquier pareja puede alcanzarse desde cualquier selección. Siempre hay exactamente dos cartas iluminadas. El rótulo inferior se actualiza con la pareja actual y, según la confirmación del usuario, también funciona como botón para enviar. Con una influencia original se conserva la regla vigente: mostrar las tres cartas disponibles y mantener una iluminada. El servidor mantiene autoridad sobre la combinación permitida y su resolución.
 
 ## Hechos confirmados
 
@@ -24,37 +24,39 @@ Al ejecutar Exchange (Embajador), algunas combinaciones visualmente equivalentes
 
 ## Alcance y límites
 
-Incluye deduplicar por combinación no ordenada de roles conservados, publicar los datos de presentación estrictamente necesarios al jugador elegible, renderizar opciones Exchange como parejas de cartas dentro del panel de acciones, texto accesible/localizado debajo, y conservar estado enviado/deshabilitado y submission envelope actual.
+Incluye deduplicar por multiconjunto de roles, publicar al jugador elegible las cartas disponibles con identidad de slot y marca de mano original, renderizar esas cartas una sola vez en el panel de acciones, estado seleccionado con el resplandor rojo neón existente del turno, sustitución alternante de slots, rótulo localizado dinámico y confirmación. Preservar accesibilidad, estado enviado/deshabilitado y el envelope actual.
 
 No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo de envío (`decisionId`, `stateVersion`, `choiceId`), ids de opciones permitidas, resolución de cartas devueltas ni UX de otros tipos de decisión. No revelar las opciones a otros asientos/Codex por una proyección pública más amplia.
 
-## F1 — Deduplicar resultados y renderizar parejas Exchange (`BLOCKED`)
+## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`ACTIVE`)
 
-**Pregunta única:** ¿puede una clave canónica de roles conservados eliminar duplicados sin fusionar resultados distintos, y puede el panel existente alojar esas elecciones ilustradas sin exponer datos privados ni cambiar el envío?
+**Pregunta única:** ¿puede el jugador formar cualquier combinación válida intercambiando iterativamente cartas iluminadas dentro del panel de acciones, con el server manteniendo autoridad y privacidad?
 
-- Enumerar combinaciones como ahora, derivar para cada una los roles conservados y deduplicar mediante una firma estable que trate el orden como irrelevante y preserve multiplicidad (`duke + duke` distinto de `duke + captain`). Conservar índices de una combinación representante para la resolución actual.
-- Dar a cada resultado único un `choiceId` estable y único dentro de la decisión. Entregar al cliente solo la pareja de roles de cada opción al jugador autorizado, sin serializar `value`, `keptIndices` ni mano completa.
-- Presentar el tipo `exchange` dentro del `ActionDecisionPanel` del `ActionDecisionRail`, como opciones seleccionables con una imagen por carta y una etiqueta localizada bajo la pareja. Reusar assets/localización de roles existentes cuando sea razonable; mantener etiquetas accesibles y feedback de envío/deshabilitado.
-- Retirar las opciones exchange duplicadas de `.DecisionsSection` para evitar dos renderers y confirmar que se siguen limpiando en cambio de fase, espera, pausa, error y respuesta enviada.
-- Releer y coordinar #43/#44/#45 antes de editar los archivos compartidos; integrar sobre base fresca y trabajar en un branch/worktree canónicos.
-- **Salida:** cambio acotado, reporte `docs/plans/ambassador-exchange-options/report_issue_47_F1.md` con matriz de pools (roles distintos, repetidos, orden espejo, una influencia y dos influencias) y evidencia de privacidad/protocolo.
-- **Avanzar:** cada firma semántica aparece una vez, ninguna firma distinta desaparece, la imagen/texto identifica cada pareja y el server sigue aceptando solo su `choiceId`.
-- **Pivotar:** si el cliente no puede ubicar el panel como se pide sin competir con #44, documentar la alternativa de integración más cercana en el mismo panel antes de implementarla.
+- Conservar la deduplicación server por firma canónica multiconjunto y su primera combinación física representante.
+- Proyectar solo al asiento elegible una lista ordenada de slots del pool con rol e indicador original/draw; no enviar índices de resolución ni `choice.value`. Preservar esta metadata en pausas/reanudaciones si la decisión puede recuperarse.
+- Mostrar cada carta física del pool una sola vez (4 si el jugador conserva dos influencias; 3 con una influencia), diferenciando original/draw por posición y nombre accesible, sin depender del rol para identificar copias iguales.
+- Estado inicial: slots de la mano original iluminados; cartas robadas no iluminadas. Para dos originales, reemplazar el slot 1 (B) en el primer clic, slot 0 (A) en el segundo y alternar después. Un clic en seleccionada no cambia selección ni cursor. Para una original, reemplazar la única seleccionada en cada clic.
+- Mantener exactamente `keepCount` cartas iluminadas. Calcular su multiconjunto de roles y asociarlo al `choiceId` permitido existente. No enviar hasta confirmar el rótulo inferior dinámico `Conservar X y Y`, que también será el botón de envío según aclaración del usuario.
+- Usar el rojo neón y contorno blanco del estado de turno existente (`PlayerBoardStyles.css`) para resaltar cartas seleccionadas; preservar foco visible, teclado, estado enviado/pausa/error y eliminar el segundo renderer de `.DecisionsSection`.
+- Sincronizar branch sobre `origin/master` vigente antes de tocar producto; coordinar #43/#44/#45 por las superficies compartidas.
+- **Salida:** reporte `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md` con matriz de estados/clics, una/dos influencias, roles repetidos, privacidad/protocolo, build y walkthrough visual.
+- **Avanzar:** todo par legal es alcanzable, cada clic conserva exactamente `keepCount`, color/caption reflejan la selección y confirmar envía el `choiceId` correspondiente; walkthrough desktop/móvil PASS.
+- **Pivotar:** si la rotación alternante impide llegar a una pareja o confunde el estado con roles repetidos, documentar una secuencia reproducible y proponer la variación mínima sin cambiar el diseño de cartas individuales.
 - **Repetir:** una iteración acotada por defecto visual o de accesibilidad reproducible.
-- **Bloquear:** conflicto no resuelto con #44/#45, duplicación de la emisión privada o fallo de opción/resolución.
-- **Commit:** `COMMIT_REQUIRED`; `feat(exchange): issue 47 F1 unique visual keep choices`.
-- **Validación:** inspección estática del algoritmo y proyección Socket.IO; build cliente/servidor si el entorno lo permite; walkthrough manual de parejas repetidas y distintas en móvil/escritorio; `git diff --check`. No agregar ni ejecutar pruebas automatizadas.
+- **Bloquear:** conflicto no resuelto con #43/#44/#45, filtración de cartas, selección distinta de lo enviado o ausencia de navegador para el walkthrough final.
+- **Commit:** `COMMIT_REQUIRED`; `feat(exchange): issue 47 F1 select from four visible cards`.
+- **Validación:** inspección estática del algoritmo de slots y proyección Socket.IO; build cliente si está disponible; walkthrough manual desktop/móvil de inicialización, clics alternados, roles repetidos y confirmación; `git diff --check`. No agregar ni ejecutar pruebas automatizadas.
 
 ## F2 — Verificación independiente final (`PENDING`)
 
-**Pregunta única:** ¿existe un pool válido donde se omita una pareja distinta, se conserve una duplicada, se filtren roles a otro jugador o la opción visual no corresponda a la que el servidor resuelve?
+**Pregunta única:** ¿hay una secuencia de clics/estado donde sea inalcanzable una pareja legal, el número de cartas iluminadas sea incorrecto, se filtren roles privados o el botón inferior envíe una pareja distinta a la mostrada?
 
-- Verifier independiente revisa el commit final, compara la firma canónica, opciones proyectadas al asiento elegible y `keptIndices` representante, e intenta falsificar esos cuatro criterios.
+- Verifier independiente revisa el commit final e intenta falsificar reachability de las parejas, alternancia B/A, conteo de selección (dos cartas o una en el caso de una influencia), mapping caption→choiceId y proyección privada al asiento elegible.
 - **Salida:** `docs/plans/ambassador-exchange-options/report_issue_47_F2_verifier.md` y verdict `PASS`/`FAIL`/`BLOCKED`.
 - **Avanzar:** `PASS` documentado y unidad `WAITING_ORCHESTRATOR` para revisión de PR.
 - **Pivotar:** corregir el caso exacto señalado, conservar evidencia y solicitar re-verificación focalizada.
 - **Repetir:** una verificación sobre el commit corregido.
-- **Bloquear:** riesgo de filtración o selección que no pueda resolverse sin cambiar protocolo/reglas; reorquestar antes de ampliar alcance.
+- **Bloquear:** riesgo de filtración, combinación legal inalcanzable o selección que no pueda resolverse sin cambiar protocolo/reglas; reorquestar antes de ampliar alcance.
 - **Commit:** `COMMIT_REQUIRED`; `docs(exchange): issue 47 F2 CLOSED verifier pass`.
 - **Validación:** revisión independiente del diff y evidencia; no ejecutar tests automatizados.
 
@@ -62,6 +64,6 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 
 Una unidad #47 → `issue/47-ambassador-exchange-options` → `.worktrees/issue-47-ambassador-exchange-options` → una PR a `master` de `pronficilio/coup-online`. Antes de reclamar, leer issue y comprobar branch/worktree/PR candidato; registrar claim en el fork, releer y usar aislamiento desde `origin/master` actualizado. No usar `upstream`.
 
-**Siguiente dueño:** Orquestador/usuario, proporcionar navegador accesible o evidencia visual verificable de las parejas duplicadas/distintas en móvil y escritorio. Después el Alquimista reanuda F1 y, al cerrarla, invoca al Verifier independiente en F2. El Orquestador revisa la integración y evidencia final.
+**Siguiente dueño:** Alquimista, reemplazar la galería de opciones F1 por la interacción de cartas descrita arriba. El navegador está disponible en `http://localhost:3103` con backend en `3104` para el walkthrough. Verifier independiente en F2 después del cierre F1.
 
 **Falsificación:** ¿hay un pool alcanzable de cartas donde la interfaz ofrece dos opciones con la misma pareja de roles, omite una pareja distinta, muestra una carta diferente a la incluida en el `choiceId`, o envía opciones/datos privados a un asiento no elegible?

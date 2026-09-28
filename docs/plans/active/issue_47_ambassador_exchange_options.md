@@ -2,21 +2,23 @@
 
 **Issue/Ticket:** [#47 — Optimizar y visualizar las opciones de intercambio del Embajador](https://github.com/pronficilio/coup-online/issues/47), `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
-**Estado del plan:** `BLOCKED`; F1 `BLOCKED` por walkthrough visual pendiente.
+**Estado del plan:** `ACTIVE`; F1 reabierta con el nuevo diseño solicitado por el usuario.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `MEDIUM` (decisión de juego y render privado por asiento).
 **Política de verificación:** `FINAL` independiente.
 **Verifier requerido ahora:** no; F1 corresponde al Ejecutor, Verifier requerido en F2.
-**Pregunta de falsificación:** ¿un pool válido pierde una pareja distinta, conserva una pareja duplicada, expone roles a otro jugador o permite que lo mostrado no corresponda al resultado resuelto?
-**Fase sugerida:** F1 — deduplicación semántica y opciones visuales en el panel de acciones.
-**Por qué esta fase sigue:** la implementación de F1 y el build ya están listos; falta un walkthrough visual verificable en móvil y escritorio, con parejas duplicadas y distintas. No iniciar F2 hasta cerrar esta validación.
+**Pregunta de falsificación:** ¿una selección alternante deja menos/más cartas iluminadas que las permitidas, hace inalcanzable una pareja legal, proyecta roles a otro asiento o envía un `choiceId` distinto del caption?
+**Fase sugerida:** F1 — cuatro cartas en pantalla con selección alternante y confirmación dinámica.
+**Por qué esta fase sigue:** el usuario sustituyó la galería de parejas por selección continua de cartas; se conserva la deduplicación del server y se reemplaza el renderer antes del walkthrough.
 
 ## Fuentes, contrato y alcance
 
 - Plan canónico: `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
 - Fuentes de código: `server/game/coup.js::openExchange`, `activateDecision`; `coup-client/src/components/game/Coup.js`, `CoupStyles.css`, `PlayerBoard.js`; `coup-client/src/i18n/translations.json`.
-- Generar los subconjuntos legales como ahora, deduplicar su resultado por multiconjunto de roles (orden indiferente, multiplicidad conservada) y mantener una combinación de índices representante para resolver.
-- Mostrar cada opción Exchange dentro del `ActionDecisionPanel`/`ActionDecisionRail`: imágenes de ambas cartas y etiqueta localizada debajo. Reusar imágenes y traducciones de rol existentes.
+- Generar los subconjuntos legales como ahora y deduplicar por multiconjunto de roles; mantener una combinación representante autorizada para resolver.
+- Mostrar cada carta física del pool una sola vez dentro del `ActionDecisionPanel`/`ActionDecisionRail`: cuatro con dos influencias originales, tres con una. Iluminar originales con el rojo neón del turno, draws sin iluminación; alternar slots a reemplazar empezando por B, luego A; caption localizado dinámico abajo y botón de confirmación con ese texto.
+- Un clic en una carta ya seleccionada no cambia selección ni cursor; un clic en otra carta reemplaza el slot seleccionado correspondiente al turno alternante. Mantener exactamente `keepCount` iluminadas y permitir llegar a cualquier pareja.
+- Preservar las reglas con una influencia y la identidad física de copias con roles repetidos. Solo el jugador elegible recibe el pool privado.
 - Proyectar solo los roles necesarios al cliente elegible. Nunca transmitir `value`, `keptIndices`, la mano completa ni datos de opciones a otros asientos. Mantener el envelope y validación del servidor basados en `decisionId`, `stateVersion`, `choiceId`.
 - Retirar el renderer textual de exchange en `DecisionsSection`; preservar estados enviados, pausados, inválidos y cerrados.
 - No cambiar reglas, elegibilidad, protocolo, timeout o resolución de otras acciones.
@@ -29,24 +31,25 @@
 
 ## Criterios de aceptación
 
-1. Para un mismo multiconjunto de roles conservados existe exactamente una opción, sin importar orden ni qué copia física se conserve; multiconjuntos distintos siguen siendo opciones distintas.
-2. `choiceId` es único por decisión y está respaldado por una combinación representativa válida para el estado actual; el motor mantiene la autoridad y resuelve la pareja mostrada.
-3. La elección del Embajador aparece dentro del panel/tablero de acciones; cada opción muestra ambas ilustraciones y una etiqueta localizada/accessibile debajo.
+1. La pantalla dibuja cada slot del pool una vez; con dos influencias hay cuatro cartas y dos iluminadas inicialmente; con una influencia hay tres cartas y una iluminada.
+2. Los clics en cartas no seleccionadas alternan el reemplazo B/A; siempre se conserva el número legal, cualquier pareja es alcanzable y slots repetidos por rol siguen siendo independientes.
+3. El caption localizado refleja exactamente la pareja iluminada; pulsarlo confirma y envía el `choiceId` permitido correspondiente al multiconjunto.
 4. Las cartas/opciones solo se proyectan al jugador elegible; ningún otro asiento o espectador recibe roles privados.
 5. Elegir bloquea/acepta/envía con el envelope actual; pausa, rechazo, cierre de decisión y nuevas decisiones no dejan controles viejos ni duplicados.
-6. #44/#45 no tienen conflictos no resueltos ni cambios ajenos incluidos en #47.
+6. El panel es accesible y funciona en escritorio/móvil; no quedan controles duplicados u obsoletos.
+7. #43/#44/#45 no tienen conflictos no resueltos ni cambios ajenos incluidos en #47.
 
 ## Subtareas, evidencia y validación
 
-1. Confirmar issue/branch/worktree/PR de #47, #43, #44 y #45; reclamar #47 en el fork y releerlo antes de crear/usar worktree.
-2. Derivar tabla pequeña de pools representativos (A,A,B,B; A,B,C,D; una influencia; dos iguales) con firmas y conteo esperado de opciones.
-3. Implementar proyección privada de roles y deduplicación por multiconjunto; no incluir datos privados no necesarios en evento cliente ni en observaciones de Codex.
-4. Extender renderer del panel de acciones para parejas de carta y texto localizado; verificar teclado, foco, aria, estados disabled/submitted y responsive; coordinar #44/#45.
-5. Revisar el diff para comprobar que cada choiceId conserva resolución válida y que no cambian los eventos/protocolo.
-6. Guardar `docs/plans/ambassador-exchange-options/report_issue_47_F1.md` con tabla de pools, privacidad, archivos/rutas, resultado del build si está disponible y walkthrough manual. No declarar verificaciones no realizadas.
-7. Verifier independiente en F2 revisa el commit exacto e intenta falsificar AC1–AC5. El ejecutor corrige cualquier FAIL y solicita re-verificación.
+1. Releer issue #47 y comprobar las ramas/worktrees de #43/#44/#45; el claim y el worktree #47 ya existen.
+2. Sincronizar branch con `origin/master` vigente sin perder los commits actuales.
+3. Implementar metadata privada de slots original/draw, persistencia en timeout/resume y deduplicación por multiconjunto.
+4. Reemplazar galería por cartas individuales, selección inicial, cursor alternante, caption y confirmación; no modificar `ResponseImageButton.js`.
+5. Revisar estados, build y hacer walkthrough usando `http://localhost:3103` (backend `3104`) en escritorio/móvil: selección inicial, clics alternados, caption/confirmación y respuesta posterior. No declarar verificaciones no realizadas.
+6. Guardar `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md`; conservar el reporte F1 previo como evidencia de la presentación supersedida.
+7. Verifier independiente en F2 revisa el commit exacto e intenta falsificar AC1–AC6.
 
-No agregar ni ejecutar tests automatizados. Validación esperada: revisión estática, `git diff --check`, build del cliente/servidor cuando el entorno lo permita y recorrido manual móvil/escritorio con parejas duplicadas/distintas.
+No agregar ni ejecutar tests automatizados. Validación esperada: revisión estática, `git diff --check`, build y recorrido manual móvil/escritorio de selección, alternancia, caption y confirmación.
 
 ## Topología y operación
 
@@ -55,7 +58,7 @@ No agregar ni ejecutar tests automatizados. Validación esperada: revisión est�
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **Bitácora:** `docs/plans/log/issue-47.jsonl`.
 - **PR/MR esperado:** una PR a `master`, asociada solo a #47.
-- **Secuencia de reclamo:** leer issue y comprobar candidatos; reclamar en issue del fork y releer; crear/confirmar worktree canónico desde `origin/master`; mover handoff `inbox/` → `active/` tras el reclamo; registrar `claim` y `worktree_confirmed`.
+- **Estado del reclamo:** issue asignada y claim visible; handoff ya está en `active`; el Alquimista debe sincronizar el branch actual con `origin/master` vigente antes de editar producto.
 - **Commits:** `COMMIT_REQUIRED` por fase; mensajes en el plan.
 - **Qué actualizar:** issue, plan, bitácora, handoff y reportes F1/F2.
 - **Delegación:** delegar subtareas ordinarias según jerarquía/política existente; no inventar roles.
