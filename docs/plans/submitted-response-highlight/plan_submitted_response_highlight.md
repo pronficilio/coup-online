@@ -1,6 +1,6 @@
 # Plan — Mantener resaltada la respuesta elegida mientras esperan los demás (#45)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `BLOCKED` solo por walkthrough manual pendiente; issue `OPEN`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `BLOCKED` solo por walkthrough manual pendiente tras un reintento autorizado; issue `OPEN`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/45
 **Handoff:** `docs/plans/active/issue_45_submitted_response_highlight.md`
 **Bitácora:** `docs/plans/log/issue-45.jsonl` (append-only).
@@ -21,7 +21,7 @@ Fuera de alcance: reglas o protocolo del juego, assets gráficos, rail de accion
 
 ## F1 — Persistencia visual de la opción enviada (`BLOCKED`)
 
-**Estado actual:** implementación localizada en `ResponseImageButton.js`; queda bloqueada únicamente la validación manual de una partida con otro participante. El worktree propio parte del `origin/master` vigente (`f900c09`). No se pudo verificar el diff anunciado por #43 (su branch/worktree aún no aparecen), así que el cambio se restringió al componente que posee las imágenes y al contrato `disabled` ya provisto por el padre; no se tocaron `Coup.js`, `PlayerBoard.js` ni estilos compartidos. La inspección estática confirmó que `disabled` pasa a `true` al enviar, vuelve a `false` en rechazo o nueva decisión, y el componente se desmonta al cerrar la decisión/pausar. El bloqueo de topología anterior queda supersedido para esta edición estrictamente localizada; sigue siendo necesario evitar ampliar el alcance sin revisar #43.
+**Estado actual:** implementación localizada en `ResponseImageButton.js`; queda bloqueada únicamente la validación manual de una partida con otro participante. El worktree propio parte del `origin/master` vigente (`f900c09`). No se pudo verificar el diff anunciado por #43 (su branch/worktree aún no aparecen), así que el cambio se restringió al componente que posee las imágenes y al contrato `disabled` ya provisto por el padre; no se tocaron `Coup.js`, `PlayerBoard.js` ni estilos compartidos. La inspección estática confirmó que `disabled` pasa a `true` al enviar, vuelve a `false` en rechazo o nueva decisión, y el componente se desmonta al cerrar la decisión/pausar. El bloqueo de topología anterior queda supersedido para esta edición estrictamente localizada; sigue siendo necesario evitar ampliar el alcance sin revisar #43. Tras la autorización del Orquestador para reintentar el walkthrough local, el sandbox no pudo conectar por loopback y no encontró navegador; la inspección externa del Orquestador vio `127.0.0.1:8000` en escucha, sin PID visible. No hubo evidencia dinámica y F1 continúa `BLOCKED`; no se modifican criterios.
 
 **Pregunta única:** ¿el cliente puede conservar el resaltado de la respuesta enviada sin activar otras opciones ni retener selección obsoleta?
 
