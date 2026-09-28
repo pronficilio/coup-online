@@ -2,14 +2,14 @@
 
 **Issue/Ticket:** [#46 — Disolver la partida si se desconecta un jugador activo durante una pausa](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
 **Plan:** `docs/plans/paused-disconnect/plan_paused_disconnect.md`.
-**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`, F2 `ACTIVE`.
+**Estado del plan:** `ACTIVE`; F1–F2 `CLOSED (PASS)`, F3 `ACTIVE`.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH` (transición concurrente de estado de partida y desconexión).
 **Política de verificación:** `FINAL` independiente; Verifier requerido en F3.
-**Verifier requerido ahora:** no; F1/F2 pertenecen al Ejecutor.
+**Verifier requerido ahora:** sí; revisión FINAL independiente de F3 antes de entregar al Orquestador.
 **Pregunta de falsificación:** ¿alguna intercalación disconnect/timeout/resume/respuesta tardía deja un overlay eterno, bloquea continuar tras desconexión de eliminado o reactiva una partida disuelta?
-**Fase sugerida:** F2 — implementar terminación visible y continuidad de eliminados.
-**Por qué esta fase sigue:** F1 confirmó que la namespace sigue viva mientras queden sockets conectados y fijó el orden de transición terminal, invalidación y broadcast.
+**Fase sugerida:** F3 — revisión FINAL independiente.
+**Por qué esta fase sigue:** implementación F2 cerrada con revisión estática; el nivel HIGH exige refutar carreras/eventos obsoletos antes de entregar integración.
 
 ## Fuentes y alcance
 
@@ -26,11 +26,13 @@ Aplicar y evidenciar los criterios 1–8 del plan. La pantalla/estado terminal d
 
 La matriz de fases y asientos, rutas de eventos, ciclo de vida de namespace y contrato de terminación quedan documentados en `docs/plans/paused-disconnect/report_issue_46_F1.md` y en la sección F1 del plan canónico.
 
+## F2 cerrada
+
+La terminación visible y la continuidad de asientos eliminados están implementadas y revisadas estáticamente. Evidencia: `docs/plans/paused-disconnect/report_issue_46_F2.md`. F3 requiere Verifier independiente.
+
 ## Subtareas listas
 
-1. F2: implementar estado/evento terminal con guardia contra doble terminación; limpiar decisiones, timeout y solicitudes Codex; emitir antes de cualquier limpieza que corte sockets; actualizar UI/copy terminal y asegurar que estado/controles de pausa se limpien.
-2. F2: filtrar desconexiones y chequeo de `resume()` por `isDead`, conservando la pausa y el owner válido cuando se desconecta un eliminado.
-3. F3: Verifier independiente revisa diff e intenta falsificar la pregunta del plan con intercalaciones y eventos obsoletos.
+1. F3: Verifier independiente revisa diff e intenta falsificar la pregunta del plan con intercalaciones y eventos obsoletos.
 
 ## Riesgos, evidencia y validación
 

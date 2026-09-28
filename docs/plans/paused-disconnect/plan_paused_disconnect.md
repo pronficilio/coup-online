@@ -3,7 +3,7 @@
 ## Estado vigente
 
 - Issue: [#46](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
-- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`, F2 `ACTIVE`.
+- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`, F2 `CLOSED (PASS)`, F3 `ACTIVE`.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Branch / worktree únicos: `issue/46-paused-disconnect` / `.worktrees/issue-46-paused-disconnect`.
 - Destino: `master` de `pronficilio/coup-online`; una PR asociada a #46.
@@ -81,7 +81,7 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 
 ### F2 — implementar terminación visible y continuidad de eliminados
 
-- Estado: `ACTIVE`.
+- Estado: `CLOSED (PASS)`.
 - Pregunta: ¿el estado terminal disuelve partidas con jugador vivo desconectado y deja continuar partidas si se desconecta un eliminado?
 - Entrada: contrato aprobado en F1.
 - Salida: manejador server-side terminal, proyección/evento cliente localizado y limpieza coordinada; reporte F2.
@@ -93,8 +93,11 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 - Política: `COMMIT_REQUIRED`; `fix(paused-disconnect): issue 46 F2 CLOSED advance_f3`.
 - Validación: inspección estática/diff; no añadir ni ejecutar tests automatizados.
 
+**Veredicto F2:** `PASS` estático. `onDisconnect()` ignora asientos eliminados y disuelve con jugador vivo; `dissolve()` pone fase terminal antes de invalidar trabajos y difundir `g-gameDissolved`; `resume()` solo bloquea por jugadores vivos desconectados; el cliente terminal limpia overlay/decisiones y muestra copy ES/EN también al espectador, que comparte `Coup`. Evidencia: `docs/plans/paused-disconnect/report_issue_46_F2.md`. No se ejecutaron pruebas ni recorrido dinámico.
+
 ### F3 — revisión independiente final
 
+- Estado: `ACTIVE`; pendiente de Verifier independiente.
 - Pregunta: ¿puede una desconexión de jugador muerto bloquear o una carrera tardía resucitar la partida, y quedan todos informados al disolver?
 - Entrada: commit F2 y diff completo de #46.
 - Salida: reporte FINAL independiente que intenta refutar los criterios 1–8.

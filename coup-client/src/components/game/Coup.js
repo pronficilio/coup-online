@@ -284,6 +284,8 @@ export default class Coup extends Component {
             resumePending: false,
             pauseWaiting: false,
             winner: '',
+            dissolved: false,
+            disconnectedPlayer: '',
             canPlayAgain: false,
             logs: [],
             disconnected: false,
@@ -321,6 +323,7 @@ export default class Coup extends Component {
         socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
         socket.on('g-addLog', message => this.setState(state => ({ logs: state.logs.concat(String(message)) })))
         socket.on('g-decision', decision => {
+            if (this.state.dissolved || this.state.winner) return
             this.actionSubmissionLock = false
             this.clearActionPanelTimers()
             const actionDecision = decision && decision.type === 'action'
@@ -368,6 +371,7 @@ export default class Coup extends Component {
             }))
         })
         socket.on('g-gamePaused', paused => {
+            if (this.state.dissolved || this.state.winner) return
             this.actionSubmissionLock = false
             const showOverlay = !paused || paused.showOverlay !== false
             if (showOverlay && !this.state.gamePaused && typeof document !== 'undefined') {
@@ -394,6 +398,7 @@ export default class Coup extends Component {
             })
         })
         socket.on('g-gameResumed', () => {
+            if (this.state.dissolved || this.state.winner) return
             this.resumeRequestPending = false
             this.setState({
                 gamePaused: false,
@@ -413,10 +418,39 @@ export default class Coup extends Component {
             })
         })
         socket.on('g-gameOver', winner => {
+            if (this.state.dissolved) return
             this.clearActionPanelTimers()
             this.setState({
                 winner: String(winner || ''),
                 decision: null,
+                gamePaused: false,
+                canResume: false,
+                resumePending: false,
+                pauseWaiting: false,
+                actionRailPosition: null,
+                actionPanelCompact: false,
+                actionPanelHasEntered: false,
+                actionPanelShowDetails: true,
+                actionPanelDetailsExpanded: true
+            })
+        })
+        socket.on('g-gameDissolved', result => {
+            if (this.state.dissolved || this.state.winner) return
+            this.actionSubmissionLock = false
+            this.resumeRequestPending = false
+            this.clearActionPanelTimers()
+            this.setState({
+                dissolved: true,
+                disconnectedPlayer: String(result && result.playerName || ''),
+                decision: null,
+                actionTarget: null,
+                submitted: false,
+                decisionError: '',
+                gamePaused: false,
+                canResume: false,
+                resumePending: false,
+                pauseWaiting: false,
+                canPlayAgain: false,
                 actionRailPosition: null,
                 actionPanelCompact: false,
                 actionPanelHasEntered: false,
@@ -786,6 +820,13 @@ export default class Coup extends Component {
             return <div className="GameContainer">
                 <div className="GameHeader"><p>{t('game.player.identity', { playerName: this.props.name })}</p></div>
                 <p>{t('game.disconnect.notice')} {t('game.disconnect.recreate')}</p>
+            </div>
+        }
+
+        if (this.state.dissolved) {
+            return <div className="GameContainer" role="status" aria-live="polite">
+                <h1>{t('game.dissolved.title')}</h1>
+                <p>{t('game.dissolved.message', { playerName: this.state.disconnectedPlayer })}</p>
             </div>
         }
 
