@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1–F3 CLOSED; F2 cerrado en 4b1dc92 tras build y comprobaciones estáticas. F4 ACTIVE / WAITING_USER hasta que el propietario revise 5p/390 px y abrir/enviar/cerrar una respuesta en el preview; no repetir FINAL antes de esa confirmación.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE para los hallazgos nuevos del criterio 2; F4 RETURNED por FAIL medio independiente sobre `bae24fc`. El usuario revisó 2 jugadores en móvil; aún falta revisar el candidato corregido y los demás tamaños/transiciones.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -13,7 +13,7 @@
 
 El issue se asignó a `pronficilio` y se releyó en estado `OPEN`, con título y cuerpo coincidentes y sin otros assignees. La actualización visible enlaza este handoff activo en [el comentario de reclamo](https://github.com/pronficilio/coup-online/issues/28#issuecomment-5859072354). La rama `issue/28-table-game-ux` y el worktree `.worktrees/issue-28-table-game-ux` se crearon desde `origin/master` actualizado (`5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`). Se copiaron selectivamente este handoff, el plan y la bitácora; no se copiaron ni limpiaron cambios del checkout raíz.
 
-El propietario reorientó explícitamente el trabajo el 2026-09-27: autorizó implementar F2 y F3 en este único worktree pese a los solapamientos previos, pidió un preview local y reservó para sí la revisión visual. Aprobó un preview anterior de dos jugadores; esa revisión no cubre el ajuste actual de cinco jugadores ni el halo de respuesta. Los puertos 3015 y 8015 permanecen activos. Se mantienen las restricciones: no tocar worktrees/branches hermanos ni hacer cherry-pick; no hacer push ni abrir PR hasta el PASS del Verifier independiente. La rama permanece en `issue/28-table-game-ux`.
+El propietario autorizó F2/F3 en este worktree. La revisión visual reportada cubrió solo dos jugadores en móvil y no confirma `bae24fc` por SHA ni el rango devuelto por F4. F4 devolvió ese producto por colisiones del Event Log fuera de 5p móvil y lift tablet saturado. La corrección de seguimiento compila; revisar el nuevo preview y luego repetir F4. No tocar worktrees hermanos ni hacer push/PR antes del PASS independiente.
 
 ## F4 activa: sincronización con master
 
@@ -23,11 +23,11 @@ El Verifier independiente informó `FAIL` medio para F4 el 2026-09-27: con cinco
 
 El seguimiento F4 sincronizó después `origin/master@094a61e4a45b08ffb6aba68098bb424d21b9b7d2` (#37/#36, recuperación de recursos de cartas) en `caa39f1ec82eca193ce00f8b0e0f3707db142cf9`, sin conflictos. Sobre este HEAD pasan `git diff origin/master...HEAD --check`, `node --check server/game/coup.js`, parseo JSON de traducciones y bitácora JSONL; el build de cliente termina con código 0 y conserva solo los avisos conocidos. El cliente continúa respondiendo HTTP 200 en `localhost:3015`; no se ejecutaron tests automatizados. La issue #28 fue actualizada y conserva los criterios 1–6.
 
-El 2026-09-27 se confirmó `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`; era 13 commits por delante del último sync documentado. El merge en este worktree quedó en `488405097e94dd591903a5107589e75cdee781f1`, sin conflictos. No se copiaron branches/worktrees #24 o #26. El preview `http://localhost:3015` permanece activo.
+El 2026-09-27 se confirmó `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`; era 13 commits por delante del último sync documentado. El merge en este worktree quedó en `488405097e94dd591903a5107589e75cdee781f1`, sin conflictos. No se copiaron branches/worktrees #24 o #26. El preview previo de `http://localhost:3015` ya no responde; reiniciarlo desde este worktree.
 
 La repetición de F4 sobre `a9cbeb2` confirmó el margen superior pero devolvió F4 por un posible solapamiento en móvil. El siguiente pase, sobre `cbc0892`, confirmó que el `z-index: 4` pone el Event Log delante, pero texto y cartas todavía se cruzan a 390 px. También detectó que el lift truncado en −180 px deja márgenes de ~68 px a 1200 px de alto y ~104 px a 1440 px. Los criterios 1, 3–6 pasaron estáticamente. F2 y F4 vuelven a `ACTIVE` para corregir la geometría e incorporar el halo de respuesta pedido por el propietario.
 
-La declaración de F2 `CLOSED` registrada para `cbc0892` fue prematura: el `z-index` priorizaba el log sin separar las superficies. Se conserva la fila append-only original y se registra su devolución correctiva. El candidato quita ese `z-index`, mantiene el anclaje vigente del Event Log (`top:10vh; right:10vw` hasta 1199 px; `top:60px; right:15px` a partir de 1200 px), 9vh de scroll y wrap de texto. En cinco jugadores y hasta 520 px limita el ancho del log y desplaza/compacta los asientos superiores para separar las cajas. El lift responsive usa `clamp(-240px, calc(...), -40px)` y evita saturarse en pantallas altas. El halo local deriva de opciones de `g-decision`, se apaga en submit (incluido Pass) y al cerrar; el indicador `--current` se suspende durante la ventana respondible local. El build final terminó con código 0; diff-check y sintaxis pasan. La revisión visual de 5p/390 px y de abrir/enviar/cerrar respuesta sigue pendiente; después el mismo Verifier puede repetir F4. Preview activo en `http://localhost:3015`.
+La declaración de F2 `CLOSED` registrada para `cbc0892` fue prematura: el `z-index` priorizaba el log sin separar las superficies. Se conserva la fila append-only original y se registra su devolución correctiva. El candidato quita ese `z-index`; el anclaje del Event Log es `top:60px; right:15px` hasta 1023 px y `top:10vh; right:10vw` desde 1024 px. Conserva 9vh de scroll y wrap de texto. En cinco jugadores y hasta 520 px limita el ancho del log y desplaza/compacta los asientos superiores. El lift responsive usa `clamp(-240px, calc(...), -40px)` y evita saturarse en pantallas altas. El halo local deriva de opciones de `g-decision`, se apaga en submit (incluido Pass) y al cerrar; el indicador `--current` se suspende durante la ventana respondible local. El build de aquel candidato terminó con código 0; diff-check y sintaxis pasan. La revisión visual de 5p/390 px y de abrir/enviar/cerrar respuesta sigue pendiente; después el mismo Verifier puede repetir F4. El preview necesita reiniciarse en 3015.
 
 El cuerpo actualizado de #28 también pide que las influencias perdidas permanentemente permanezcan visibles con tratamiento gris y símbolo/etiqueta accesible que no dependa solo del color; el rol debe seguir legible. No marcar cartas probadas temporalmente durante un desafío, ya que vuelven a Court, y no revelar las influencias ocultas activas de rivales.
 
@@ -49,15 +49,15 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 
 ## Preview local para revisión visual
 
-- Cliente: `http://localhost:3015` — HTTP 200; proceso iniciado desde este worktree, exec session `17958`.
-- Backend: `http://localhost:8015` — escuchando desde este worktree, exec session `84755` (la ruta `/` responde 404 porque no es una ruta de aplicación).
-- No se creó una sala de juego. El servicio existente del puerto 8000 sigue intacto; 3015 y 8015 estaban libres antes del inicio.
-- La fórmula responsive del lift se calibró para el ancho máximo de 900 px del tablero; el cliente activo recibe el CSS por HMR y el build de seguimiento terminó correctamente.
-- El propietario aprobó visualmente un preview anterior de dos jugadores el 2026-09-27. La revisión de este ajuste de cinco jugadores y del halo sigue pendiente; mantener ambas sesiones activas para esa comprobación.
+- Cliente: `http://localhost:3015` — volver a iniciar desde este worktree; el proceso previo ya no responde.
+- Backend: `http://localhost:8015` — comprobar el endpoint Socket.IO antes de usarlo; la ruta `/` no es una ruta de aplicación.
+- No crear una sala de juego ni tocar el servicio del puerto 8000.
+- El lift usa el ancho máximo de 900 px del tablero; esta variante amplía el límite del Event Log y calibra las mesas centradas, 5p y 6p en móvil/tablet.
+- El usuario reportó una revisión satisfactoria solo con dos jugadores en móvil. La revisión de esta variante en otros conteos, escritorio y estados del halo sigue pendiente.
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en el único branch. F2 cerró en 4b1dc92 tras build, diff-check, sintaxis y parseo JSON. La revisión visual de este candidato en 5p/390 px y de encendido/apagado/cierre del halo sigue pendiente del propietario; no iniciar F4 hasta su confirmación. No agregues ni ejecutes tests automatizados. Deja issue y unidad abiertas; no integres. No hagas push ni abras PR hasta PASS independiente.
+Cada fase con artefactos requiere commit en este branch. F2 se reabrió para corregir las colisiones del Event Log en varias cuentas y el lift de tabletas altas. Build, diff-check, sintaxis y JSON pasan; el usuario debe revisar visualmente esta nueva variante en 3015. Después, el mismo Verifier repetirá F4. No tests, push ni PR antes del PASS.
 
 ## Criterio visual añadido por el propietario — incorporar en F2/F4
 
@@ -65,4 +65,4 @@ Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment
 
 Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
 
-Alquimista: F2 cerró en 4b1dc92. Cuando el propietario confirme visualmente el layout 5p/390 px y los estados de la respuesta, el mismo Verifier podrá repetir F4 para comprobar encendido, apagado tras envío y cierre del halo, además de los criterios existentes. No push/PR hasta PASS.
+Alquimista: el candidato actualizado está compilado en 3015; solicita revisión visual del propietario y luego pide al mismo Verifier repetir F4 sobre el SHA exacto.

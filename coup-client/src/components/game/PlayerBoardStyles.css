@@ -5,7 +5,7 @@
     aspect-ratio: 1;
     margin: 12px auto;
     box-sizing: border-box;
-    transform: translateY(clamp(-240px, calc(108px - 15vh - min(14vw, 126px)), -40px));
+    transform: translateY(min(-40px, calc(108px - 15vh - min(14vw, 126px))));
 }
 
 /* A five-seat ring tops out at 20.88% instead of the 14% used by the other layouts. */
@@ -15,13 +15,142 @@
 
 @media only screen and (min-width: 521px) and (max-width: 1023px) {
     .PlayerBoardContainer {
-        transform: translateY(clamp(-240px, calc(100px - 22vh - min(14vw, 126px)), -40px));
+        transform: translateY(min(-40px, calc(100px - 22vh - min(14vw, 126px))));
+    }
+}
+
+@media only screen and (min-width: 521px) and (max-width: 1199px) {
+    .PlayerBoardSeat[data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(124px - 14.8vw), 47px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"],
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] {
+        width: clamp(96px, 20vw, 116px);
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatHeader,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatNameText,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatName,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatName {
+        gap: 3px;
+        padding: 2px 4px;
+        font-size: 0.58rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardCoinIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardCoinIcon {
+        flex-basis: 12px;
+        width: 12px;
+        height: 12px;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatCoins,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatCoins {
+        gap: 2px;
+        min-height: 22px;
+        padding: 2px 4px;
+        font-size: 0.58rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerInfluenceEntry,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: clamp(38px, 4.5vw, 44px);
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(102px - 4.8vw), 77px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"]:not([data-seat-upper-right="true"]) {
+        translate: -3vw 0;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) {
+        width: 140px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] {
+        width: 100px;
+        translate: -30px 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerInfluenceEntry {
+        width: 46px;
+    }
+}
+
+@media only screen and (min-width: 521px) and (max-width: 1023px) {
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] {
+        width: 78px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(102px - 4.8vw), 77px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: clamp(34px, 4.3vw, 38px);
+    }
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1199px) {
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(438px - 40vw), 28px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] {
+        width: 78px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(510px - 40vw), 100px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: 36px;
     }
 }
 
 @media only screen and (max-width: 520px) {
     .PlayerBoardContainer {
-        transform: translateY(clamp(-240px, calc(80px - 22vh - 14vw), -40px));
+        transform: translateY(min(-40px, calc(80px - 22vh - 14vw)));
     }
 }
 
@@ -458,6 +587,113 @@
 
     .PlayerBoardSeat[data-seat-upper-side="true"] {
         translate: 0 -24px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) {
+        width: clamp(86px, 25vw, 100px);
+        translate: -5vw 0;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatName {
+        font-size: 0.58rem;
+        gap: 3px;
+        padding: 2px 4px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardCoinIcon {
+        flex-basis: 11px;
+        width: 11px;
+        height: 11px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatCoins {
+        gap: 1px;
+        min-height: 16px;
+        padding: 1px 3px;
+        font-size: 0.5rem;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        width: clamp(58px, 18vw, 70px);
+        translate: calc(-40vw + 45px) 12px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"]:not([data-seat-upper-right="true"]) {
+        width: clamp(58px, 18vw, 70px);
+        translate: calc(-17vw + 39px) 12px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] {
+        width: clamp(64px, calc(17vw + 10px), 76px);
+        translate: calc(-37.9vw + 77px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: clamp(26px, 8.2vw, 32px);
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatName {
+        gap: 2px;
+        padding: 1px 2px;
+        font-size: 0.48rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardCoinIcon {
+        flex-basis: 10px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatCoins {
+        gap: 1px;
+        min-height: 16px;
+        padding: 1px 2px;
+        font-size: 0.48rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatName {
+        gap: 1px;
+        padding: 1px;
+        font-size: 0.45rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardCoinIcon {
+        flex-basis: 9px;
+        width: 9px;
+        height: 9px;
     }
 
     /* Reserve the fixed upper-right Event Log area on a five-seat mobile table. */

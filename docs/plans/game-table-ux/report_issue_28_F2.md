@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-`CLOSED` en `4b1dc92`, tras build y comprobaciones estáticas. La aprobación visual anterior del propietario cubrió un preview de dos jugadores; sigue pendiente su revisión de este candidato en 5p/390 px y de los estados del halo. No repetir F4 hasta esa confirmación. Este reporte no afirma haber inspeccionado visualmente una partida actual ni validado dispositivos reales.
+`ACTIVE` tras devolución de F4 sobre bae24fc (criterio 2, severidad media). La nueva variante aplica el wrap/ancho del Event Log en todos los conteos, separa los asientos afectados en tabletas y 6p móvil, y elimina el piso del lift. Build y checks estáticos pasan; queda revisión visual del propietario para esta variante antes del siguiente F4.
 
 Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost cards and board position`. Commit de cierre de seguimiento: `fix(game-ui): issue 28 F2 responsive geometry and response highlight`.
 
@@ -47,7 +47,7 @@ Verificación del seguimiento: `git diff --check` pasó, `node --check server/ga
 
 El Verifier repitió F4 sobre `cbc0892` y confirmó que `z-index: 4` priorizaba el Event Log sin eliminar la intersección. También midió que el piso de −180 px del `clamp()` deja márgenes de ~68–104 px en escritorios de 1200–1440 px de alto. La declaración `CLOSED` de ese commit fue prematura y se conserva como evento histórico; la bitácora posterior devuelve F2. Se quitó el `z-index` añadido al `.GameHeader`.
 
-El anclaje real del Event Log en viewports de hasta 1199 px sigue siendo `right: 10vw; top: 10vh` por una media query existente; el anclaje base de 60 px/15 px rige fuera de ella. En cinco jugadores y hasta 520 px, solo se limita su ancho a 100–130 px y se ajusta el wrap; el área desplazable conserva 9vh. La geometría estática resultante: a 390×844, el log ocupa x≈221–351, el asiento superior izquierdo x≈47–122 y el derecho x≈134–203; gaps estimados ≈12 px entre asientos y ≈18 px hasta el log. A 320×844, el log ocupa x≈188–288, el izquierdo x≈29–95 y el derecho x≈106–163; gaps ≈11 px y ≈25 px. Son cajas calculadas desde CSS/layout, no medidas de una captura. El halo de nombre e influencias activas se reduce únicamente en cinco jugadores/móvil; su blur sigue necesitando revisión visual del propietario.
+El anclaje real del Event Log hasta 1023 px es `right:15px; top:60px`; desde 1024 px una media query establece `right:10vw; top:10vh`. En cinco jugadores y hasta 520 px, solo se limita su ancho a 100–130 px y se ajusta el wrap; el área desplazable conserva 9vh. La geometría estática resultante: a 390×844, el log ocupa x≈245–375, el asiento superior izquierdo x≈47–122 y el derecho x≈134–203; gaps estimados ≈12 px entre asientos y ≈42 px hasta el log. A 320×844, el log ocupa x≈205–305, el izquierdo x≈29–95 y el derecho x≈106–163; gaps ≈11 px y ≈42 px. Son cajas calculadas desde CSS/layout, no medidas de una captura. El halo de nombre e influencias activas se reduce únicamente en cinco jugadores/móvil; su blur sigue necesitando revisión visual del propietario.
 
 Los `clamp()` de las tres escalas se conservan. En desktop el piso cambia de −180 a −240 px; con tablero limitado a 900 px, la fórmula da lift ≈−198 px a 1440×1200 y ≈−234 px a 1440×1440, en vez de saturar a −180 px. La estimación del margen superior queda cerca de 50 px en esos casos; el clamp mantiene un límite para alturas extremas. HUD y anclaje del Event Log no cambian.
 

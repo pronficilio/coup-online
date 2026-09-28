@@ -148,6 +148,8 @@ export default function PlayerBoard(props) {
                     data-seat-upper-side={
                         seats.length === 6 && top <= 40 && Math.abs(left - 50) >= 5 ? 'true' : undefined
                     }
+                    data-seat-upper-center={top <= 40 && Math.abs(left - 50) < 5 ? 'true' : undefined}
+                    data-seat-upper-right={top <= 40 && left >= 60 ? 'true' : undefined}
                     data-current-player={isCurrentPlayer ? 'true' : 'false'}
                     data-respondable={isRespondable ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
