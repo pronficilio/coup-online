@@ -211,34 +211,65 @@ class CoupGame {
         if (this.phase === 'paused') {
             this.pausedDecision = null
             this.bumpVersion()
-            this.publicEmit('g-gamePaused', { cause, canResume: false, stateVersion: this.stateVersion })
+            this.emitGamePaused(cause)
             this.updatePlayers()
             return
         }
         this.pause(cause)
     }
 
+    unansweredHumanSeats(decision) {
+        if (!decision || !(decision.allowed instanceof Map) || !(decision.responses instanceof Map)) return []
+        const seats = []
+        decision.allowed.forEach((_, actorKey) => {
+            if (decision.responses.has(actorKey)) return
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (player && player.controller === 'human') seats.push(player.seat)
+        })
+        return seats
+    }
+
+    emitGamePaused(cause) {
+        const ownerSeats = new Set(this.pausedDecision ? this.pausedDecision.resumeOwnerSeats : [])
+        const recoverable = ownerSeats.size > 0
+        const base = { cause, stateVersion: this.stateVersion }
+        this.players.filter(player => player.controller === 'human').forEach(player => {
+            const isOwner = ownerSeats.has(player.seat)
+            this.socketEmit(player.socketID, 'g-gamePaused', {
+                ...base,
+                showOverlay: !recoverable || isOwner,
+                canResume: recoverable && isOwner,
+                waitingForOwner: recoverable && !isOwner
+            })
+        })
+        this.spectatorSocketIDs.forEach(socketID => this.socketEmit(socketID, 'g-gamePaused', {
+            ...base,
+            showOverlay: !recoverable,
+            canResume: false,
+            waitingForOwner: recoverable
+        }))
+    }
+
     pause(cause, { recoverable = false } = {}) {
         if (this.phase === 'paused' || this.phase === 'gameover') return
         const decision = this.activeDecision
+        const resumeOwnerSeats = recoverable ? this.unansweredHumanSeats(decision) : []
         this.cancelCodexRequests('cancelled')
         this.clearDecisionTimer()
         this.activeDecision = null
-        this.pausedDecision = recoverable && decision ? {
+        this.pausedDecision = recoverable && decision && resumeOwnerSeats.length ? {
             type: decision.type,
             title: decision.title,
             description: decision.description,
             allowed: decision.allowed,
+            responses: new Map(decision.responses),
             priorityFrom: decision.priorityFrom,
+            resumeOwnerSeats,
             resolve: decision.resolve
         } : null
         this.bumpVersion()
         this.phase = 'paused'
-        this.publicEmit('g-gamePaused', {
-            cause,
-            canResume: Boolean(this.pausedDecision),
-            stateVersion: this.stateVersion
-        })
+        this.emitGamePaused(cause)
         this.updatePlayers()
     }
 
@@ -343,11 +374,12 @@ class CoupGame {
             title: template.title,
             description: template.description,
             allowed: template.allowed,
-            responses: new Map(),
+            responses: template.responses instanceof Map ? new Map(template.responses) : new Map(),
             priorityFrom: template.priorityFrom,
             resolve: template.resolve
         }
         template.allowed.forEach((choices, actorKey) => {
+            if (this.activeDecision.responses.has(actorKey)) return
             const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
             if (!player) return
             if (player.controller === 'human') this.socketEmit(player.socketID, 'g-decision', {
@@ -367,6 +399,7 @@ class CoupGame {
         }, this.decisionTimeoutMs)
         if (this.decisionTimer && typeof this.decisionTimer.unref === 'function') this.decisionTimer.unref()
         template.allowed.forEach((_, actorKey) => {
+            if (this.activeDecision.responses.has(actorKey)) return
             const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
             if (player && player.controller === 'codex') this.requestCodexDecision(player, this.activeDecision)
         })
@@ -472,10 +505,6 @@ class CoupGame {
     }
 
     resume(socketID, payload) {
-        if (socketID !== this.leaderSocketID) {
-            this.rejectDecision(socketID, 'Only the lobby leader can resume a timed-out decision.')
-            return false
-        }
         if (this.phase !== 'paused' || payload !== undefined) {
             this.rejectDecision(socketID, 'There is no timed-out decision to resume.')
             return false
@@ -484,17 +513,18 @@ class CoupGame {
             this.rejectDecision(socketID, 'This pause cannot be resumed; recreate the game.')
             return false
         }
+        const requesterSeat = this.seatForSocket(socketID)
+        if (requesterSeat < 0 || !this.pausedDecision.resumeOwnerSeats.includes(requesterSeat)) {
+            this.rejectDecision(socketID, 'Only a player who did not answer this decision can resume it.')
+            return false
+        }
         const disconnected = this.players.find(player => player.controller === 'human'
             && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
         if (disconnected) {
             this.pausedDecision = null
             this.bumpVersion()
             this.rejectDecision(socketID, 'Every seat must still be connected to resume.')
-            this.publicEmit('g-gamePaused', {
-                cause: `${disconnected.name} disconnected; recreate the game to continue.`,
-                canResume: false,
-                stateVersion: this.stateVersion
-            })
+            this.emitGamePaused(`${disconnected.name} disconnected; recreate the game to continue.`)
             this.updatePlayers()
             return false
         }

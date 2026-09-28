@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, createRef } from 'react'
 import PlayerBoard from './PlayerBoard'
 import './CoupStyles.css'
 import EventLog from './EventLog'
@@ -36,7 +36,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: passImage,
             activeImage: passActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.common.pass'),
+            imageLabelStyle: 'pass'
         }
     }
 
@@ -44,7 +46,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: challengeImage,
             activeImage: challengeActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.challenge.button'),
+            imageLabelStyle: 'challenge'
         }
     }
 
@@ -54,7 +58,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: blockForeignAidImage,
             activeImage: blockForeignAidActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.block.foreignAid.button'),
+            imageLabelStyle: 'blockForeignAid'
         }
     }
 
@@ -62,7 +68,9 @@ function responseButtonFor(decision, option, localizedLabel) {
         return {
             normalImage: blockAssassinationImage,
             activeImage: blockAssassinationActiveImage,
-            accessibleLabel: localizedLabel
+            accessibleLabel: localizedLabel,
+            imageLabel: t('game.block.assassination.button'),
+            imageLabelStyle: 'blockAssassination'
         }
     }
 
@@ -71,7 +79,9 @@ function responseButtonFor(decision, option, localizedLabel) {
             normalImage: blockStealImage,
             activeImage: blockStealActiveImage,
             accessibleLabel: localizedLabel,
-            supplementalLabel: localizedLabel
+            supplementalLabel: localizedLabel,
+            imageLabel: t('game.block.steal.button'),
+            imageLabelStyle: 'blockSteal'
         }
     }
 
@@ -190,32 +200,6 @@ function localizeOptionLabel(option, decision) {
     return t('game.decision.option.unknown')
 }
 
-function pausedMessage(cause) {
-    const message = String(cause || '')
-    let match = message.match(/^(.+) disconnected before the game started\.$/)
-    if (match) return t('game.pause.disconnectedBeforeStart', { playerName: match[1] })
-    match = message.match(/^(.+) disconnected; recreate the game to continue\.$/)
-    if (match) return t('game.pause.disconnected', { playerName: match[1] })
-    match = message.match(/^(.+) decision timed out\.$/)
-    if (match) return t('game.pause.decisionTimeout', { decisionType: t(`game.decision.type.${match[1]}`) })
-    const known = {
-        'Game paused.': 'game.pause.generic',
-        'Codex is disabled or unavailable. Re-enable it from the server before resuming or recreating the game.': 'game.pause.codexUnavailable',
-        'Codex returned a stale or invalid decision.': 'game.pause.codexStale',
-        'Codex returned an unavailable choice.': 'game.pause.codexChoiceUnavailable',
-        'Codex could not complete this decision. Check its login, usage limit, and runner, then resume or recreate the game.': 'game.pause.codexFailed',
-        'Codex was disabled by a player. The owner must re-enable it on the server before starting a new AI decision.': 'game.pause.codexDisabled',
-        'Codex was disabled by a player.': 'game.pause.codexDisabledShort',
-        'The active player did not choose an action.': 'game.pause.actionMissing',
-        'Claimant did not resolve the challenge.': 'game.pause.challengeMissing',
-        'Influence loss was not resolved.': 'game.pause.influenceMissing',
-        'Influence changed during a loss decision.': 'game.pause.influenceChanged',
-        'Exchange was not resolved.': 'game.pause.exchangeMissing',
-        'No active player remains.': 'game.pause.noActivePlayer'
-    }
-    return t(known[message] || 'game.pause.generic')
-}
-
 const DECISION_ERROR_KEYS = {
     'This socket does not control a player seat.': 'game.decision.error.notPlayer',
     'Expected decisionId, stateVersion, and choiceId only.': 'game.decision.error.invalidEnvelope',
@@ -224,7 +208,7 @@ const DECISION_ERROR_KEYS = {
     'This seat is not eligible for this decision.': 'game.decision.error.ineligible',
     'Choice is not available to this seat.': 'game.decision.error.choiceUnavailable',
     'A different choice was already submitted.': 'game.decision.error.alreadySubmitted',
-    'Only the lobby leader can resume a timed-out decision.': 'game.decision.error.leaderOnlyResume',
+    'Only a player who did not answer this decision can resume it.': 'game.decision.error.timeoutOwnerOnlyResume',
     'There is no timed-out decision to resume.': 'game.decision.error.noTimedOutDecision',
     'This pause cannot be resumed; recreate the game.': 'game.decision.error.cannotResume',
     'Every seat must still be connected to resume.': 'game.decision.error.seatsDisconnected',
@@ -245,14 +229,20 @@ export default class Coup extends Component {
             decision: null,
             submitted: false,
             decisionError: '',
-            pausedCause: '',
+            gamePaused: false,
             canResume: false,
+            resumePending: false,
+            pauseWaiting: false,
             winner: '',
             canPlayAgain: false,
             logs: [],
             disconnected: false,
             codexDisabled: Boolean(props.codexDisabled)
         }
+        this.pauseOverlayRef = createRef()
+        this.decisionSectionRef = createRef()
+        this.resumeRequestPending = false
+        this.pauseReturnFocus = null
 
         const socket = this.props.socket
         socket.on('disconnect', () => this.setState({ disconnected: true }))
@@ -266,13 +256,11 @@ export default class Coup extends Component {
         })
         socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
         socket.on('g-addLog', message => this.setState(state => ({ logs: state.logs.concat(String(message)) })))
-        socket.on('g-decision', decision => this.setState({
+        socket.on('g-decision', decision => this.setState(state => ({
             decision,
             submitted: false,
-            decisionError: '',
-            pausedCause: '',
-            canResume: false
-        }))
+            decisionError: state.gamePaused ? state.decisionError : ''
+        })))
         socket.on('g-decisionClosed', closed => {
             if (this.state.decision && closed.decisionId === this.state.decision.decisionId) {
                 this.setState({ decision: null, submitted: false })
@@ -283,17 +271,52 @@ export default class Coup extends Component {
                 this.setState({ submitted: true, decisionError: '' })
             }
         })
-        socket.on('g-decisionRejected', rejection => this.setState({
-            submitted: false,
-            decisionError: decisionError(rejection && rejection.reason ? rejection.reason : '')
-        }))
-        socket.on('g-gamePaused', paused => this.setState({
-            decision: null,
-            submitted: false,
-            pausedCause: paused && paused.cause ? paused.cause : 'Game paused.',
-            canResume: Boolean(paused && paused.canResume)
-        }))
-        socket.on('g-gameResumed', () => this.setState({ pausedCause: '', canResume: false }))
+        socket.on('g-decisionRejected', rejection => {
+            const rejectedResume = this.state.gamePaused
+            if (rejectedResume) this.resumeRequestPending = false
+            this.setState(state => ({
+                submitted: false,
+                decisionError: decisionError(rejection && rejection.reason ? rejection.reason : ''),
+                resumePending: rejectedResume ? false : state.resumePending
+            }))
+        })
+        socket.on('g-gamePaused', paused => {
+            const showOverlay = !paused || paused.showOverlay !== false
+            if (showOverlay && !this.state.gamePaused && typeof document !== 'undefined') {
+                this.pauseReturnFocus = document.activeElement
+            }
+            this.resumeRequestPending = false
+            this.setState({
+                decision: null,
+                submitted: false,
+                gamePaused: showOverlay,
+                canResume: showOverlay && Boolean(paused && paused.canResume),
+                resumePending: false,
+                pauseWaiting: Boolean(paused && paused.waitingForOwner),
+                decisionError: ''
+            }, () => {
+                if (showOverlay && this.pauseOverlayRef.current) this.pauseOverlayRef.current.focus({ preventScroll: true })
+            })
+        })
+        socket.on('g-gameResumed', () => {
+            this.resumeRequestPending = false
+            this.setState({
+                gamePaused: false,
+                canResume: false,
+                resumePending: false,
+                pauseWaiting: false,
+                decisionError: ''
+            }, () => {
+                if (typeof document === 'undefined') return
+                const returnFocus = this.pauseReturnFocus
+                this.pauseReturnFocus = null
+                if (returnFocus && returnFocus !== document.body && document.contains(returnFocus)) {
+                    returnFocus.focus({ preventScroll: true })
+                } else if (this.decisionSectionRef.current) {
+                    this.decisionSectionRef.current.focus({ preventScroll: true })
+                }
+            })
+        })
         socket.on('g-gameOver', winner => this.setState({ winner: String(winner || ''), decision: null }))
         socket.on('g-canPlayAgain', () => this.setState({ canPlayAgain: true }))
         socket.on('startRejected', reason => this.setState({ decisionError: t('lobby.error.startRejected', { reason: lobbyError(reason) }) }))
@@ -321,7 +344,35 @@ export default class Coup extends Component {
     }
 
     resumeGame = () => {
-        if (this.state.canResume && this.props.isLeader) this.props.socket.emit('g-resume')
+        if (!this.state.canResume || this.resumeRequestPending) return
+        this.resumeRequestPending = true
+        this.setState({ resumePending: true, decisionError: '' }, () => {
+            this.props.socket.emit('g-resume')
+        })
+    }
+
+    trapPauseFocus = event => {
+        if (event.key !== 'Tab') return
+        const dialog = event.currentTarget
+        const focusable = Array.from(dialog.querySelectorAll(
+            'button:not(:disabled):not([aria-disabled="true"]), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
+        ))
+        if (!focusable.length) {
+            event.preventDefault()
+            dialog.focus()
+            return
+        }
+
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        const active = document.activeElement
+        if (event.shiftKey && (active === first || active === dialog)) {
+            event.preventDefault()
+            last.focus()
+        } else if (!event.shiftKey && (active === last || active === dialog)) {
+            event.preventDefault()
+            first.focus()
+        }
     }
 
     emergencyStopCodex = () => {
@@ -375,15 +426,13 @@ export default class Coup extends Component {
             />
             <ReferencePanel />
 
-            <div className="DecisionsSection" aria-live="polite">
+            <div ref={this.decisionSectionRef} tabIndex="-1" className="DecisionsSection" aria-live="polite">
                 {this.props.isCodexAuthorized && <button
                     type="button"
                     onClick={this.emergencyStopCodex}
                     disabled={this.state.codexDisabled}
                     style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
                 >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
-                {this.state.pausedCause && <p role="alert">{t('game.paused.prefix', { cause: pausedMessage(this.state.pausedCause) })}</p>}
-                {this.state.canResume && this.props.isLeader && <button onClick={this.resumeGame}>{t('game.resume')}</button>}
                 {decision && <>
                     <p className="DecisionTitle">{t(DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic', {
                         count: ownInfluences.length,
@@ -394,7 +443,7 @@ export default class Coup extends Component {
                         {decision.options.map(option => {
                             const optionLabel = localizeOptionLabel(option, decision)
                             const imageButton = responseButtonFor(decision, option, optionLabel)
-                            const disabled = this.state.submitted || Boolean(this.state.pausedCause)
+                            const disabled = this.state.submitted || this.state.gamePaused
                             const onClick = () => this.submitChoice(option)
 
                             if (imageButton) {
@@ -417,10 +466,33 @@ export default class Coup extends Component {
                     {this.state.submitted && <p>{t('game.decision.sent')}</p>}
                     {this.state.decisionError && <p role="alert">{this.state.decisionError}</p>}
                 </>}
-                {!decision && !this.state.winner && !this.state.pausedCause && <p>{t('game.waiting')}</p>}
+                {this.state.pauseWaiting && <p className="PauseWaitingStatus" role="status">{t('game.pause.generic')}</p>}
+                {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p>{t('game.waiting')}</p>}
                 {this.state.winner && <p><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
                 {playAgain}
             </div>
+
+            {this.state.gamePaused && <div
+                ref={this.pauseOverlayRef}
+                className="PauseOverlay"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="PauseOverlayTitle"
+                tabIndex="-1"
+                onKeyDown={this.trapPauseFocus}
+            >
+                <section className="PauseDialog">
+                    <h2 id="PauseOverlayTitle">{t('game.pause.title')}</h2>
+                    {this.state.canResume && <button
+                        type="button"
+                        className="PauseResumeButton"
+                        disabled={this.state.resumePending}
+                        aria-disabled={this.state.resumePending}
+                        onClick={this.resumeGame}
+                    >{t('game.resume')}</button>}
+                    {this.state.decisionError && <p className="PauseError" role="alert">{this.state.decisionError}</p>}
+                </section>
+            </div>}
         </div>
     }
 }

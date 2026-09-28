@@ -1,13 +1,17 @@
-# Reporte F2 — issue #19, avances parciales
+# Reporte F2 — issue #19
 
-**Estado actual de la fase:** `ACTIVE`; las rutas antes compartidas ya están integradas en master y localizadas en #19. El recorrido manual está bloqueado por falta de navegador y F4 está `BLOCKED`.
-**Estado de F3:** `ACTIVE`; las ocho emisiones actuales de `g-addLog` están localizadas en origen. El recorrido manual del registro está bloqueado (ver reporte F4).
-**PR de revisión:** [#22](https://github.com/pronficilio/coup-online/pull/22), actualmente `DRAFT`. El usuario autorizó su integración parcial en `master` para revisión incremental aunque F4 esté `BLOCKED`; Orquestación hará la transición/merge. Esto no constituye aceptación F4 ni cierre de #19.
-**Base sincronizada:** `origin/master` en `2d82fa1`, integrado por el merge `74432a6`; la base anterior `c0119cb`/merge `28e1046` queda como antecedente.
+**Estado final de F2:** `CLOSED`, integrado en PR #33 (`45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`). El Verifier FINAL dio `PASS` sobre el árbol integrado. `translations.json` contiene 292 claves `es` y 292 `en`, con paridad confirmada. El build asociado al producto terminó exit 0; no se ejecutaron tests.
+**Estado final de F3:** `CLOSED`, con los mensajes localizados en origen y el protocolo preservado; ver el reporte F3 y el veredicto final de F4.
+**Issue/tracker:** PR #33 está `MERGED`; la PR documental de cierre [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión. #19 permanece `OPEN` hasta integrarla y que Orquestación cierre la unidad. Unidad `WAITING_ORCHESTRATOR`.
+
+## Historial de tandas previas a la integración de PR #33
+
+Los conteos y estados `ACTIVE` que aparecen en las siguientes notas describen sus respectivos checkpoints, no el estado integrado actual. La rama previa al merge `1b65425` registraba 307/307; el merge `45a3eaa` contiene 292/292. Se preservan ambos conteos sin inferir la causa de la diferencia.
+**Base sincronizada:** `origin/master@be93e97`, que incorpora PR #31/#29; integrada por merge `318c119` después del fast-forward inicial a `origin/master@3313d42` (merge de PR #30/#21) desde `ca16e42`. La base de PR #23 (`2d82fa1`, merge local `74432a6`) queda como antecedente.
 **Commits de la unidad:** `4b6b564`, `c9d5442`, `a63336c` y `9f97acb` (`feat(i18n): issue 19 localize lobby and game logs`), publicado en `origin/issue/19-spanish-default-dictionary`. La sincronización de tracker se registró en un commit documental posterior.
 **Fecha:** 2026-09-27.
 
-## Tanda posterior a PR #23 — estado actual
+## Tanda posterior a PR #23 — checkpoint histórico
 
 PR #23 de #14 está integrada en `origin/master` `2d82fa1`; se verificó el merge publicado y se integró a #19 mediante `74432a6`. Las rutas de lobby, decisiones, partida, tablero y servidor antes reservadas quedaron liberadas por la integración publicada; no se copiaron cambios locales desde el worktree #14.
 
@@ -17,8 +21,8 @@ PR #23 de #14 está integrada en `origin/master` `2d82fa1`; se verificó el merg
 - F3 modifica solo las ocho llamadas `addLog()` de `server/game/coup.js`. `server/index.js` no emite `g-addLog` en la base sincronizada. El payload sigue siendo un `string`; nombres de jugadores son valores y acciones/roles se localizan solo para mostrarlos.
 - `npm run build` en `coup-client` terminó con exit 0. Warnings observados: imports `logo`/`Link` sin uso en `src/App.js`, `caniuse-lite` desactualizado y `postcss-calc` que no parsea `dvh` preexistente en `ReferencePanel.css:100/106`; no aparecieron warnings nuevos en las superficies localizadas.
 - La comprobación de claves/parámetros dio 307/307 sin diferencias; `git diff --check`, `node --check server/i18n.js` y `node --check server/game/coup.js` limpios. No se añadieron ni ejecutaron tests.
-- F2 y F3 permanecen `ACTIVE` mientras no se complete el recorrido manual y F4. F4 está `BLOCKED` por falta de navegador; no se afirma cobertura verificada por recorrido ni veredicto independiente.
-- Tras `9f97acb`, se reemplazaron y releyeron los cuerpos de issue #19 y PR #22: #19 continúa `OPEN` y asignada a `pronficilio`; PR #22 continúa `OPEN`/`DRAFT`. La bitácora registra esta sincronización.
+- F2 y F3 permanecen `ACTIVE`; F4 está `ACTIVE`, pendiente de revisión independiente. El único dato de recorrido es el informe del usuario; no se afirma verificación propia ni veredicto.
+- Históricamente, tras `9f97acb`, #19 estaba `OPEN` y PR #22 `OPEN`/`DRAFT`. El estado actual es PR #22 `MERGED` en `5de95ee`; issue #19 continúa `OPEN` y asignada a `pronficilio`.
 
 ## Tanda inicial F2 — histórico (2026-09-26)
 
@@ -40,9 +44,19 @@ PR #23 de #14 está integrada en `origin/master` `2d82fa1`; se verificó el merg
 - La base de entonces `c0119cb` se integró mediante `28e1046`; `Coup.js` y demás rutas compartidas seguían reservadas a #14.
 - En ese punto F2 estaba `ACTIVE` y F3 `BLOCKED`; el cierre de issue #19 no era elegible.
 
-## Validación actual tras PR #23
+## Validación de la tanda tras PR #23 (histórica; base 2d82fa1)
 
 - Build cliente exit 0; warnings observados en esta ejecución: `logo`/`Link` sin uso en `src/App.js`, `caniuse-lite` desactualizado y `postcss-calc` con unidades `dvh` en `ReferencePanel.css:100/106`.
 - Diccionario JSON sin duplicados; 307 claves por idioma y marcadores concordantes. `git diff --check` y `node --check` de `server/i18n.js`/`server/game/coup.js` limpios.
-- Sin tests. No se realizó el recorrido manual; F2/F3 permanecen `ACTIVE` y F4 `PENDING`.
+- Sin tests. En ese punto el Alquimista aún no había hecho el recorrido manual; después el usuario informó el suyo (ver F4). F2/F3 permanecen `ACTIVE` y F4 no tiene cierre.
 - Base vigente `origin/master@2d82fa1`, merge de sincronización `74432a6`. PR #23 liberó las rutas publicadas; no se copiaron cambios locales de otros worktrees.
+
+## Addendum tras sincronizar PR #30/#21 — checkpoint histórico
+
+- La reauditoría de `origin/master@3313d42` encontró texto inglés en las cinco familias de botones de decisión usadas por `game/Coup.js`: `ba` (BLOCK ASSASSINATION), `bfa` (BLOCK FOREIGN AID), `bs` (BLOCK STEAL), `c` (CHALLENGE) y `pass` (PASS), incluidas sus variantes `-active.webp`. El par `claim` dice `CLAIM`, pero no se importa ni referencia desde `coup-client/src`.
+- `Coup.js` conecta cada imagen usada a la frase española ya existente en el diccionario; las cinco claves tienen pares `es`/`en`, así que permanecen 307 claves por idioma. `ResponseImageButton` presenta un rótulo español sobre el texto incrustado en normal y active, manteniendo imágenes, iconos, marcos, `choiceId`, `onClick` y protocolo. No se alteró el servidor.
+- La revisión independiente previa registró `FAIL` en AC1/AC2/AC4/AC7 por estas cinco familias, y `PASS` en AC3/AC5/AC6. Este reporte no cambia ese veredicto: el build posterior a la corrección terminó exit 0; falta confirmación visual independiente.
+- `npm run build` en `coup-client`: exit 0. Warnings: `logo`/`Link` sin uso en `src/App.js`; `caniuse-lite` desactualizado; `postcss-calc` no interpreta `dvh` en `ReferencePanel.css:100/106`.
+- Diccionario JSON válido, sin claves duplicadas; 307/307 claves y marcadores concordantes. `git diff --check` limpio. No se añadieron ni ejecutaron tests.
+- El entorno del Alquimista no tiene navegador local para inspeccionar el resultado visual de las etiquetas superpuestas; este build no demuestra su encaje/presentación. La revisión visual y la nueva pasada independiente quedan pendientes.
+- F2 sigue `ACTIVE`; F3 sigue `ACTIVE`; F4 sigue `ACTIVE`, sin PASS general ni cierre de issue. #19 permanece `OPEN`; #22 ya está `MERGED`; PR de continuación #33 está `DRAFT`. La verificación FINAL y la aprobación del usuario siguen pendientes.
