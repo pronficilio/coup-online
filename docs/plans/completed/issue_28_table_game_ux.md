@@ -1,13 +1,17 @@
-# Handoff para Agente Alquimista — issue #28
+# Handoff final — issue #28: tablero, influencias y mazo Court
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El ajuste `ca02833` aumenta a `.73` el alpha de `.PlayerInfluenceLostOverlay`; build y revalidación FINAL del mismo Verifier pasan, incluido C6. PR #39 está OPEN/MERGEABLE con head `b0f1fe2`, issue #28 sigue OPEN hasta merge. Esperando autorización final.
+- **Estado:** `COMPLETED`; F1–F4 `CLOSED (PASS)`. El ajuste `ca02833` aumenta a `.73` el alpha de `.PlayerInfluenceLostOverlay`; build y revalidación FINAL del mismo Verifier pasan, incluido C6.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
+
+## Cierre administrativo
+
+La PR [#39](https://github.com/pronficilio/coup-online/pull/39) se integró en `master` con `951147234b6f8f640718ed945de5907140a724a9` el 2026-09-28. GitHub cerró #28 a las 06:33:10Z; la unidad queda `COMPLETED`, sin siguiente dueño. F1–F4 tienen veredicto `PASS`; la revalidación final cubre el overlay de opacidad `.73`.
 
 ## Reclamo, aislamiento y reorientación
 
