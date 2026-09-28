@@ -7,7 +7,7 @@
 **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `FINAL` independiente.
 **Branch / worktree:** `issue/47-ambassador-exchange-options` / `.worktrees/issue-47-ambassador-exchange-options`.
 **Base inicial / actual / destino:** `origin/master@f900c094` al reclamar; branch rebasada sobre `origin/master@ce0e079`; merge target `master` de `pronficilio/coup-online`.
-**Integración:** una PR asociada únicamente a #47; aún no existe.
+**Integración:** [PR #52](https://github.com/pronficilio/coup-online/pull/52) asociada únicamente a #47, abierta y lista para revisión.
 
 ## Solicitud y definición de éxito
 
@@ -65,6 +65,6 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 
 Una unidad #47 → `issue/47-ambassador-exchange-options` → `.worktrees/issue-47-ambassador-exchange-options` → una PR a `master` de `pronficilio/coup-online`. Antes de reclamar, leer issue y comprobar branch/worktree/PR candidato; registrar claim en el fork, releer y usar aislamiento desde `origin/master` actualizado. No usar `upstream`.
 
-**Siguiente dueño:** Orquestador, revisar la integración final, sincronizar si `origin/master` avanzó y preparar una PR única asociada a #47. F2 independiente pasó sobre `cc7b568`; la revisión incluyó la ronda inicial FAIL y su corrección.
+**Siguiente dueño:** revisión de PR #52. F2 independiente pasó sobre el fix `cc7b568` (rebasado como `e7594b2`); la revisión incluyó la ronda inicial FAIL y su corrección.
 
 **Falsificación:** ¿hay un pool alcanzable de cartas donde la interfaz ofrece dos opciones con la misma pareja de roles, omite una pareja distinta, muestra una carta diferente a la incluida en el `choiceId`, o envía opciones/datos privados a un asiento no elegible?

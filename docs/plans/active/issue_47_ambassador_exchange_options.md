@@ -12,7 +12,7 @@
 **Por qué esta fase sigue:** F1 fue aceptada por el propietario y F2 confirmó selección, privacidad y nombres accesibles únicos; resta revisar integración y publicar la PR para revisión.
 
 **Estado actual:** el propietario aceptó visualmente el selector. F2 reportó inicialmente nombres accesibles duplicados; la corrección incluye origen, rol, posición localizada única y estado seleccionado. La re-verificación focalizada confirmó `PASS` en `cc7b568`.
-**Revisión de integración:** la rama está rebasada sobre `origin/master@ce0e079` (incluye PR #51 de #45), sin cambios de #47 en `ResponseImageButton.js`; el build posterior al rebase pasa. PR #47 aún no creada.
+**Revisión de integración:** la rama está rebasada sobre `origin/master@ce0e079` (incluye PR #51 de #45), sin cambios de #47 en `ResponseImageButton.js`; el build posterior al rebase pasa. [PR #52](https://github.com/pronficilio/coup-online/pull/52) está abierta y lista para revisión.
 
 ## Fuentes, contrato y alcance
 
@@ -60,7 +60,7 @@ No agregar ni ejecutar tests automatizados. Validación esperada: revisión est�
 - **Worktree destino:** `.worktrees/issue-47-ambassador-exchange-options`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **Bitácora:** `docs/plans/log/issue-47.jsonl`.
-- **PR/MR esperado:** una PR a `master`, asociada solo a #47.
+- **PR/MR:** [#52](https://github.com/pronficilio/coup-online/pull/52) a `master`, asociada solo a #47 y lista para revisión.
 - **Estado del reclamo:** issue asignada y claim visible; unidad en `WAITING_ORCHESTRATOR`, pendiente de revisión de integración y PR.
 - **Commits:** `COMMIT_REQUIRED` por fase; mensajes en el plan.
 - **Qué actualizar:** issue, plan, bitácora, handoff y reportes F1/F2.
