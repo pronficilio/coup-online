@@ -401,7 +401,9 @@ class CoupGame {
                 title: template.title,
                 description: template.description,
                 deadlineMs: this.decisionTimeoutMs,
-                options: Array.from(choices.values()).map(({ choiceId, label }) => ({ choiceId, label }))
+                options: Array.from(choices.values()).map(({ choiceId, label, roles }) => template.type === 'exchange'
+                    ? { choiceId, roles: [...roles] }
+                    : { choiceId, label })
             })
         })
         this.decisionTimer = setTimeout(() => {
@@ -949,10 +951,18 @@ class CoupGame {
             }
         }
         selectCombination(0, [])
-        const options = combinations.map((keptIndices, index) => {
+        const options = []
+        const seenRoleSets = new Set()
+        combinations.forEach(keptIndices => {
             const kept = keptIndices.map(poolIndex => pool[poolIndex])
+            const roles = kept.map(card => String(card).toLowerCase()).sort()
+            const signature = JSON.stringify(roles)
+            if (seenRoleSets.has(signature)) return
+            seenRoleSets.add(signature)
             const label = `Keep ${kept.join(' and ')}`
-            return this.createChoice(`exchange:${index}`, label, { kind: 'exchange', keptIndices, keep: kept })
+            const choice = this.createChoice(`exchange:${options.length}`, label, { kind: 'exchange', keptIndices, keep: kept })
+            choice.roles = roles
+            options.push(choice)
         })
         this.openDecision({
             type: 'exchange',
