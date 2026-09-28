@@ -1,7 +1,7 @@
 # Plan — Coup con 7–9 monedas
 
 - **Issue:** [#49](https://github.com/pronficilio/coup-online/issues/49), `OPEN`.
-- **Estado operativo:** `WAITING_EXECUTOR`; handoff preparado, sin claim ni PR.
+- **Estado operativo:** `ACTIVE`; F1–F2 `CLOSED`, F3 `READY`; issue asignada a `pronficilio`, sin PR.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Perfil:** `coup-online`; target `master` del fork `pronficilio/coup-online`; aislamiento `git_worktree`.
 - **Branch / worktree canónicos:** `issue/49-coup-seven-coins` / `.worktrees/issue-49-coup-seven-coins`.
@@ -15,7 +15,7 @@ Permitir Coup con 7, 8 o 9 monedas y conservar Coup obligatorio desde 10 monedas
 
 La lectura de `origin/master` en `0a467c1` confirma la discrepancia: `actionChoices()` ofrece `coup` desde 7 monedas, mientras `beginAction()` vuelve a `playTurn()` cuando Coup tiene menos de 10. Con 8 monedas el servidor consume la decisión, rechaza el golpe y publica un menú nuevo. La regla versionada dice que Coup cuesta 7 monedas y no tiene bloqueo; Contessa bloquea Assassinate. Esto explica el síntoma sin atribuirlo a la carta rival.
 
-La rama local `master` estaba seis commits detrás antes de actualizar refs; luego `origin` quedó actualizado en `0a467c1`. No se editó ni se usó el checkout compartido para implementar. El Executor debe basar el worktree en la referencia `origin/master` vigente y releer las issues activas que comparten protocolo o UI.
+La rama local `master` estaba seis commits detrás antes de actualizar refs; `origin/master` quedó en `0a467c1`. El worktree aislado de #49 parte de esa referencia y el checkout compartido no se usó para implementar.
 
 ## Criterios de aceptación
 

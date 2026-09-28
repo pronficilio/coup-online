@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/49 (`OPEN`, asignada a `pronficilio`).
 - **Plan exacto:** `docs/plans/coup-seven-coins/plan_coup_seven_coins.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-49.jsonl`.
-- **Estado:** `ACTIVE`; F1 `CLOSED`, F2 `READY`.
+- **Estado:** `ACTIVE`; F1–F2 `CLOSED`, F3 `READY`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido:** sí, independiente antes de integración.
 - **Pregunta de falsificación:** ¿puede una selección legal de Coup con 7–9 monedas seguir siendo rechazada o cobrada dos veces, eludir el Coup obligatorio con 10+, reabrir silenciosamente una acción inválida o permitir bloqueo de Coup por Contessa?
@@ -27,6 +27,8 @@ En `origin/master@0a467c1`, `actionChoices()` ofrece Coup desde 7 monedas, pero 
 ## Instrucción por fase
 
 **F1 — CLOSED:** la ruta confirmó la causa del ciclo y que `g-decisionRejected` ya presenta rechazos de envelopes inválidos/obsoletos. Evidencia: `docs/plans/coup-seven-coins/report_issue_49_F1.md`; commit de cierre documentado en bitácora.
+
+**F2 — CLOSED:** se quitó el umbral contradictorio de Coup `< 10`; se conservan coste 7, obligatoriedad desde 10, validación de objetivo y canal de rechazo existente. `git diff --check` y revisión estática pasaron; sin tests automatizados, build cliente ni partida dinámica. Evidencia: `docs/plans/coup-seven-coins/report_issue_49_F2.md`; commit de cierre documentado en bitácora.
 
 Al cerrar F1, ejecutar F2 del plan: alinear el mínimo de Coup en 7 con Coup obligatorio desde 10, y resolver de forma visible cualquier rechazo inválido/obsoleto pertinente sin debilitar validación autoritativa. Respetar AC1–AC6 y el alcance aprobado por #49. Antes de tocar código cliente compartido, auditar issues/worktrees/diffs #43, #44 y #45 y coordinar solapamientos. Commit `fix(coup-seven-coins): issue 49 F2 CLOSED advance_f3`.
 

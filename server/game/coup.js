@@ -648,7 +648,6 @@ class CoupGame {
         const action = { type: choice.action, actor, target: choice.target == null ? null : choice.target }
         const cost = action.type === 'coup' ? 7 : (action.type === 'assassinate' ? 3 : 0)
         if (cost && this.players[actor].money < cost) return this.playTurn()
-        if (action.type === 'coup' && this.players[actor].money < 10) return this.playTurn()
         if (action.type !== 'coup' && this.players[actor].money >= 10) return this.playTurn()
         if (action.target != null && (!this.players[action.target] || this.players[action.target].isDead || action.target === actor)) return this.playTurn()
         action.cost = cost
