@@ -2,12 +2,12 @@
 
 ## Estado vigente
 
-- Issue: [#46](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
-- Estado operativo: `WAITING_ORCHESTRATOR`; F1–F3 `CLOSED (PASS)`.
+- Issue: [#46](https://github.com/pronficilio/coup-online/issues/46), `CLOSED`.
+- Estado operativo: `COMPLETED`; F1–F3 `CLOSED (PASS)`.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Branch / worktree únicos: `issue/46-paused-disconnect` / `.worktrees/issue-46-paused-disconnect`.
-- Destino: `master` de `pronficilio/coup-online`; PR [#48](https://github.com/pronficilio/coup-online/pull/48) abierta.
-- Handoff activo: `docs/plans/active/issue_46_paused_disconnect.md`.
+- Destino: `master` de `pronficilio/coup-online`; PR [#48](https://github.com/pronficilio/coup-online/pull/48) integrada en `2f45d787ded0da2218c6c784f4dd739abdaf4c1b`.
+- Handoff completado: `docs/plans/completed/issue_46_paused_disconnect.md`.
 - Bitácora append-only: `docs/plans/log/issue-46.jsonl`.
 
 ## Solicitud y objetivo
@@ -111,7 +111,13 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 
 **Veredicto F3:** `PASS` estático sobre commit `b67d7c242fefc66050840c3a45ed045f3f7afe23`. El Verifier no encontró intercalaciones que resuciten o atasquen la partida, confirmó el tratamiento de muertos/desconectados, Codex tardío, prioridad de `gameover`, emisión a espectadores y copy bilingüe. No se ejecutaron pruebas ni build. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`.
 
-**Entrega:** PR #48 está `OPEN` hacia `master`; unidad `WAITING_ORCHESTRATOR`, siguiente dueño Orquestador. No se integró ni cerró.
+## Revisión e integración del Orquestador
+
+- Revisión del diff canónico: `PASS`; solo incluye el cambio de desconexión/estado terminal y los artefactos de la unidad. PR #48 fue la única integración de #46, apuntando a `master`.
+- Estado de PR: `MERGED`; merge commit `2f45d787ded0da2218c6c784f4dd739abdaf4c1b`.
+- CI/checks: no hay checks configurados. No se ejecutaron pruebas/build según el contrato de la unidad; Verifier FINAL independiente `PASS` estático.
+- Issue #46: `CLOSED` después del merge. La falsificación final no encontró carrera abierta que reactive/atasque la partida.
+- Unidad: `COMPLETED`.
 
 ## Supuestos, preguntas y riesgos
 
@@ -128,3 +134,4 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 ## Historial de decisiones
 
 - 2026-09-28: se elige estado terminal visible para jugador vivo desconectado en ambas fases activas; desconexión de eliminado se ignora, incluso durante pausa. No se requiere recargar ni se crea mecanismo de reconexión.
+- 2026-09-28: Orquestador aprobó el diff de PR #48; integración a `master` y cierre de #46 verificados en merge commit `2f45d787ded0da2218c6c784f4dd739abdaf4c1b`.

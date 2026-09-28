@@ -1,15 +1,15 @@
-# Handoff Para Agente Ejecutor
+# Cierre De Unidad — issue #46
 
-**Issue/Ticket:** [#46 — Disolver la partida si se desconecta un jugador activo durante una pausa](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
+**Issue/Ticket:** [#46 — Disolver la partida si se desconecta un jugador activo durante una pausa](https://github.com/pronficilio/coup-online/issues/46), `CLOSED`.
 **Plan:** `docs/plans/paused-disconnect/plan_paused_disconnect.md`.
-**Estado del plan:** `WAITING_ORCHESTRATOR`; F1–F3 `CLOSED (PASS)`.
+**Estado del plan:** `COMPLETED`; F1–F3 `CLOSED (PASS)`.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH` (transición concurrente de estado de partida y desconexión).
 **Política de verificación:** `FINAL` independiente; Verifier requerido en F3.
 **Verifier requerido ahora:** no; F3 FINAL `PASS` independiente en el commit indicado en `report_issue_46_F3.md`.
 **Pregunta de falsificación:** ¿alguna intercalación disconnect/timeout/resume/respuesta tardía deja un overlay eterno, bloquea continuar tras desconexión de eliminado o reactiva una partida disuelta?
-**Fase sugerida:** revisión del Orquestador en PR [#48](https://github.com/pronficilio/coup-online/pull/48).
-**Por qué esta fase sigue:** todas las fases cerraron, Verifier FINAL aprobó el commit F2 y la única PR canónica está abierta.
+**PR integrada:** [#48](https://github.com/pronficilio/coup-online/pull/48), merge commit `2f45d787ded0da2218c6c784f4dd739abdaf4c1b` a `master`.
+**Veredicto del Orquestador:** `PASS`; la integración cumple alcance y evidencia. Siguiente dueño: ninguno; unidad cerrada.
 
 ## Fuentes y alcance
 
@@ -32,11 +32,14 @@ La terminación visible y la continuidad de asientos eliminados están implement
 
 ## F3 cerrada
 
-Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc66050840c3a45ed045f3f7afe23`. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`. PR canónica: [#48](https://github.com/pronficilio/coup-online/pull/48), abierta hacia `master`. Siguiente dueño: Orquestador; no integrar ni cerrar.
+Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc66050840c3a45ed045f3f7afe23`. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`.
 
-## Subtareas listas
+## Resultado
 
-1. Abrir la PR única de #46 a `master` después de comprobar que no exista otra; enlazarla y dejar la unidad `WAITING_ORCHESTRATOR`.
+- La desconexión de un jugador vivo disuelve la partida y avisa a clientes conectados; la de un jugador eliminado no la pausa ni bloquea reanudar.
+- Las fases F1–F3 cerraron con `PASS`; reportes disponibles en `docs/plans/paused-disconnect/`.
+- PR única #48 integrada a `master`; issue #46 cerrada tras revisar la integración.
+- No se ejecutaron pruebas automatizadas/build conforme al plan; no hay checks configurados en la PR.
 
 ## Riesgos, evidencia y validación
 
@@ -52,8 +55,8 @@ Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc660508
 - **Worktree destino del issue:** `.worktrees/issue-46-paused-disconnect`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **Bitácora del issue:** `docs/plans/log/issue-46.jsonl`.
-- **PR/MR:** [#48](https://github.com/pronficilio/coup-online/pull/48), `OPEN`, hacia `master`, asociada únicamente a #46.
-- **Secuencia obligatoria:** registrar reclamo en el issue del fork y releer; confirmar branch/worktree existentes; crear/usar el aislamiento canónico; mover este handoff `inbox/` → `active/` solo al reclamar; registrar `claim` y `worktree_confirmed`; commits de cierre por fase.
+- **PR/MR:** [#48](https://github.com/pronficilio/coup-online/pull/48), `MERGED`, hacia `master`, asociada únicamente a #46.
+- **Secuencia realizada:** issue reclamada en el fork, branch/worktree únicos confirmados, handoff movido a `active/` y a `completed/` al cerrar; fases cerradas con commits y bitácora.
 - **Política de commits:** `COMMIT_REQUIRED` por fase; mensajes previstos en el plan.
-- **Qué actualizar:** issue, plan, bitácora y handoff al pasar a `active/`; reportes F1–F3; preservar la rama base y otros worktrees. El siguiente dueño es el Orquestador para revisar #48.
-- **Delegación:** delegar subtareas ordinarias según la jerarquía/política de agentes del proyecto; si no existe, realizar el trabajo sin inventar roles.
+- **Cierre:** issue cerrada después del merge; plan, bitácora y handoff final sincronizados. No se tocaron otros worktrees ni cambios locales del checkout principal.
+- **Delegación:** implementación realizada por Agente Menor; revisión FINAL realizada por Verifier independiente.
