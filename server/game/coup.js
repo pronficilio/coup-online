@@ -352,13 +352,14 @@ class CoupGame {
             this.reactionRequestsBySeat.set(seat, seenRequests)
         }
         if (seenRequests.has(payload.requestId)) {
-            if (seenRequests.get(payload.requestId) !== event.id) {
+            const priorRequest = seenRequests.get(payload.requestId)
+            if (priorRequest.eventId !== event.id || priorRequest.reaction !== payload.reaction) {
                 return this.rejectReaction(socketID, payload.requestId, 'duplicate_request_id')
             }
             this.emitReactionState(socketID, seat, event.id, payload.requestId)
             return true
         }
-        seenRequests.set(payload.requestId, event.id)
+        seenRequests.set(payload.requestId, { eventId: event.id, reaction: payload.reaction })
 
         let selections = this.reactionsByEvent.get(event.id)
         if (!selections) {

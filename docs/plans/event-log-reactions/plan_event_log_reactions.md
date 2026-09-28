@@ -1,6 +1,6 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 no iniciada; issue `OPEN`, asignada a `pronficilio`.
 
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
 **Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
@@ -44,7 +44,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Entrada:** issue #40, mensajes `addLog`, flujo de resolución de acciones, sockets y modelos de juego.
 - **Áreas:** `server/game/coup.js`, `server/test/coup.test.js` y otros tests server estrictamente necesarios, `server/i18n.js` si hace falta el contrato localizado, este plan/handoff/bitácora. No tocar UI todavía.
 - **Trabajo:** definir envelope tipado con ID único por partida, tipo/turno y campos públicos mínimos; registrar resultados reales sin duplicar bloqueos/pérdidas; conservar privacidad de Exchange; mantener historial/estado de reacción en memoria; validar seat/evento/reacción del lado servidor; emitir totales, selección propia y presencia efímera según issue.
-- **Checkpoint activo:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` registra el contrato y la primera implementación; no cierra F1. Las verificaciones de concurrencia, rechazo y privacidad siguen pendientes.
+- **Checkpoint/reporte:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` y `docs/plans/event-log-reactions/report_issue_40_F1.md` registran contrato, implementación y evidencia. Las verificaciones F1 requeridas pasan; la suite completa tiene cuatro fallos preexistentes en pausa/reanudación, descritos para revisión del Orquestador.
 - **Salida/evidencia:** contrato y código revisables, verificaciones aplicables y nota breve de privacidad/concurrencia.
 - **Avance:** el servidor rechaza emisor, evento o reacción inválidos; repetir/reordenar emisiones mantiene una sola selección por asiento/evento y conteos exactos; rematch limpia el estado; payloads públicos no incluyen datos ocultos.
 - **Pivotar:** si el protocolo actual no permite identidad inequívoca por socket o el modelo no puede arbitrar selección de forma segura, detenerse y devolver una propuesta de contrato al Orquestador.
@@ -52,6 +52,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Bloquear/cancelar:** bloquear si no puede probarse la identidad autoritativa o evitar filtraciones; cancelar solo si el usuario retira la función.
 - **Commit:** `feat(event-reactions): issue 40 F1 CLOSED advance_f2` (`COMMIT_REQUIRED`).
 - **Verifier:** no en esta fase; resultado independiente `FINAL` obligatorio antes de integrar.
+- **Estado de entrega:** `WAITING_ORCHESTRATOR`; no comenzar F2 antes de revisar el resultado y la nota sobre la suite completa.
 
 ### F2 — Registro y controles de reacción
 

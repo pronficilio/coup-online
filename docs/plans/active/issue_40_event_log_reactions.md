@@ -3,11 +3,12 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/40  
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`  
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`  
-**Estado del plan:** `ACTIVE`; F1 `ACTIVE`
+**Estado del plan:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 no iniciada
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
 **Verifier requerido ahora:** no; se requiere al final de F4.  
 **Pregunta de falsificación:** ¿pueden dos emisiones concurrentes dejar dos reacciones del mismo jugador en un evento, desajustar conteos, revelar vínculo persistente jugador→reacción o exponer una carta oculta?  
-**Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — envelope público y primera implementación; F1 sigue activa, validaciones pendientes.
+**Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 cerrada tras validaciones de servidor; suite completa conserva cuatro fallos preexistentes ajenos a F1, registrados para revisión.
+**Reporte F1:** `docs/plans/event-log-reactions/report_issue_40_F1.md`.
 **Branch destino:** `issue/40-event-log-reactions`  
 **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`  
 **Merge target:** `master` de `pronficilio/coup-online`  
@@ -73,6 +74,10 @@ Reservados para fases posteriores: cliente, CSS, assets, dependencias y dicciona
 - Cerrar solo con un commit que incluya cambios F1, reporte breve y evento `phase_verdict` en el log.
 - Commit: `feat(event-reactions): issue 40 F1 CLOSED advance_f2`.
 - Después, mantener issue/plan/handoff en estado real y detenerse en `WAITING_ORCHESTRATOR` para revisión del Orquestador antes de entrar a F2.
+
+## Entrega de F1
+
+F1 está cerrada y el worktree queda en `WAITING_ORCHESTRATOR`. Se completaron las pruebas específicas de payload, elegibilidad, catálogos, idempotencia/reemplazo/toggle, agregados, montos, Exchange, snapshots y reset. Sintaxis y whitespace pasan. La suite completa da 43/47: los cuatro fallos de pausa/reanudación ya corresponden a expectativas incompatibles con las rutas existentes en `origin/master`; el reporte deja los detalles para que el Orquestador decida seguimiento. No se inicia F2 hasta recibir su revisión.
 
 ## Política para todo el issue
 
