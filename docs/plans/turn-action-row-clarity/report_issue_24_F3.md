@@ -130,3 +130,34 @@ La usuaria aprobó el preview actual y autorizó preparar merge/cierre al comple
 ## Sincronización posterior a `origin/master@9511472`
 
 Después del rebase, `origin/master` avanzó a `a3d23f3c5f262fc02fe15ffbb554472b3d829aec`. En el rango `9511472..a3d23f3`, 13 rutas corresponden a README, planes/handoffs/log; el cambio de producto está acotado a `server/game/coup.js`, donde el commit `39fdd1d` cambia `DEFAULT_TIMEOUT_MS` de `60000` a `120000`. Orquestación autorizó integrar el target actual por merge sobre la rama ya rebaseada. Se conservaron la fila #24 en README y el registro/docs de #24; los handoffs de #19/#28/#36 siguen movidos a `docs/plans/completed/`, sin restaurar sus rutas activas. El F3 siguiente debe contemplar el timeout de dos minutos si comprueba esa ruta. La selección de target con una resolución sigue pendiente; no declarar F3 PASS.
+
+## Recheck F3 final — HEAD 4241b667
+
+**Veredicto:** `PASS`. Se conserva el `FAIL` histórico por renderer duplicado y los `BLOCKED` anteriores; este veredicto aplica al checkpoint exacto indicado.
+
+- **Checkpoint:** F3, FINAL independiente.
+- **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`.
+- **HEAD:** `4241b667b0ef66f5d75411f001b240c79262094a` (`docs(action-rows): record rebased F3 checkpoint`).
+- **Base y merge-base:** `origin/master@a3d23f3c5f262fc02fe15ffbb554472b3d829aec`; el merge-base y `git merge-base --is-ancestor origin/master HEAD` confirman que esta base es ancestro.
+
+### Claim y verificación adversarial
+
+El action rail único conserva las opciones legales, targets y envío del renderer genérico; mantiene su posición/ciclo compacto y coexiste con la pausa, los modales y los datos de tablero del merge #28.
+
+- **AC1, AC3–AC6 (renderer, elegibilidad, envío y cancelación):** `rg -n "renderActionDecision\\(" coup-client/src/components/game/Coup.js` da definición en `:605` y una única invocación en `:799`, bajo el portal `.ActionDecisionRail` (`:796-800`). `DecisionsSection` conserva Codex y el renderer no-action (`:835-874`). `actionOptionGroups()` agrupa las opciones recibidas y conserva objetos/choiceId originales (`:182-189`); solo se produce markup para grupos no vacíos (`:654-715`). El cerrojo de envío y la emisión de `choiceId`, `decisionId` y `stateVersion` se ven en `:560-577`. Los targets proceden del mismo grupo; cancelar no envía y Escape/cancel usan refs de retorno (`:579-603`). El servidor conserva límites/targets de 3, 7 y 10 monedas (`server/game/coup.js:614-632`).
+- **AC2, AC6–AC7 (fila y acceso):** el divisor es hermano de la fila y solo se inserta entre filas permitidas consecutivas (`Coup.js:654-715`); botones nativos, Escape y manejadores de foco son visibles en fuente (`:579-603`), con estados de hover/foco en CSS (`CoupStyles.css:1223-1232`). La usuaria confirmó en preview un panel y Cancelar visible/funcional y aprobó el diseño. No informó conteo de DOM/IDs, inspección DevTools ni prueba de teclado/foco; no los atribuyo.
+- **AC8 (rail y modales):** portal a `document.body`, `position:absolute`, medición `getBoundingClientRect()+scrollX/scrollY` y nueva medición en resize están en `Coup.js:458-481,792-800` y `CoupStyles.css:1429-1439`. El orden revisado es rail 40, ReactModal 100, panel de referencia 1000 y pausa 2001 (`CoupStyles.css:264-267,1429-1433`; `RulesModal.js:29`; `CheatSheetModal.js:45`; `ReferencePanel.css:64-68`). La usuaria confirmó que los modales de Reglas y Resumen aparecen por encima del rail. Hubo revisiones visuales previas de la relación con el resumen; no afirmo mediciones de scroll con DevTools.
+- **AC9–AC10 (ciclo y pausa):** una decisión nueva restaura el modo expandido; mouseleave espera 500 ms, reentrada cancela timers y el filtro `matchMedia` excluye touch/no-hover (`Coup.js:323-337,483-557`). Cleanup cubre cambio/cierre/pausa y unmount (`:339-395,453-456`). CSS fija compacto a 50% y títulos de fila a 70% (`CoupStyles.css:1181-1190,1385-1391,1466-1468`); `prefers-reduced-motion` desactiva las transiciones (`:1416-1425`). Pausa/bloqueo/restauración de foco permanecen en fuente (`Coup.js:370-413,738-760,881-901`). La usuaria revisó previamente la compactación y aceptó el waiver limitado a la falta de animación al desmontar detalles; ese aspecto sigue exceptuado, no verificado.
+- **Integración #28:** `Coup.js` pasa `responseWindowOpen`, `responseAvailable` y `courtCount` a `PlayerBoard` (`:771-779,824-832`); el servidor entrega `courtCount` y define timeout predeterminado de 120 s (`server/game/coup.js:26,156-172`).
+
+### Gates y evidencia humana
+
+- `git status --short --branch`: branch correcto y árbol limpio al iniciar esta vuelta.
+- `git diff --check origin/master...HEAD`: exit 0, sin salida.
+- `npm run build` en `coup-client`: exit 0, informado por Orquestación para el código tras integrar la base actual; warnings conocidos de imports sin uso en `App.js`, `dvh` en `ReferencePanel.css`, `caniuse-lite` desactualizado y deprecación `fs.F_OK`. No repetí build.
+- No ejecuté tests automatizados, según el handoff.
+- Orquestación confirmó preview del worktree en `http://localhost:3006` y backend `:18000`. Después de pedirle específicamente a la usuaria que escogiera un destino legal y comprobara que la acción se resolvía una sola vez, respondió «se ve bien, lo apruebo». Por el contexto directo tomo esa respuesta como aprobación humana del recorrido requerido. No describió target, conteo, DevTools ni foco de teclado; no los reporto como observados. La usuaria había confirmado por separado un panel, Cancelar funcional y modales sobre el rail.
+
+### Alcance y limitaciones
+
+El `PASS` se basa en revisión estática del HEAD exacto, gates documentados y aprobación humana contextual del recorrido final de target. No significa que esta sesión haya medido el DOM, probado cada umbral monetario ni interactuado personalmente con el navegador. La falta de animación al desmontar detalles conserva el waiver explícito de AC9. No modifiqué producto ni tracker, no abrí PR, no hice merge ni cerré la issue.

@@ -2,14 +2,14 @@
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Plan exacto:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`; último F3 recheck `BLOCKED` hasta observar una sola resolución tras escoger un destino legal. El primer F3 `FAIL` por doble montaje se corrigió. Waiver AC9 aceptado sigue vigente.
-**Fase activa:** sincronización terminada en merge `cafc4c69762c548435c3f0b31876b6d49bda7717` sobre `origin/master@a3d23f3`; rail #24 + tablero #28 preservados y timeout servidor actualizado a 120 s. `git diff --check`, build frontend y `node --check server/game/coup.js` pasan. Tras publicar el checkpoint documental final, entregar su HEAD exacto a un Verifier F3 independiente. F3 sigue `BLOCKED` hasta observar que seleccionar un target legal resuelve exactamente una vez. El preview y los overlays están aprobados; AC9 waiver vigente.
+**Estado:** `READY_TO_MERGE`; F1, F2 y F3 `PASS`. El primer F3 `FAIL` por doble montaje fue corregido y el F3 independiente final pasó en `4241b667` sobre `origin/master@a3d23f3`. Waiver AC9 aceptado sigue vigente.
+**Fase activa:** sincronización terminada en merge `cafc4c69762c548435c3f0b31876b6d49bda7717` sobre `origin/master@a3d23f3`; rail #24 + tablero #28 preservados y timeout servidor actualizado a 120 s. `git diff --check`, build frontend y `node --check server/game/coup.js` pasan. El preview aprobado y los overlays están documentados; pendiente crear una PR a `master`, después fusionarla y cerrar la issue según autorización de la usuaria.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; Verifier independiente requerido en F3.
 **Bitácora exacta:** `docs/plans/log/issue-24.jsonl`.
 **Branch / worktree / merge target:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / `master` de `pronficilio/coup-online`.
-**PR/MR:** ninguna; una sola PR cuando se completen las fases.
+**PR/MR:** ninguna; abrir una única PR a `master` con `Closes #24`.
 
-**Estado del preview:** la usuaria aprobó el preview actual, confirmó un solo panel de acciones, Cancelar funcional y los modales de Reglas/Resumen por encima del rail; también aceptó explícitamente que los detalles se desmontan sin animación/transición visible. El último recorrido aún no observó una selección de destino legal con resolución única. No parar los servidores `:3006`/`:18000`; coordinar un reinicio de CRA solo si Orquestación lo requiere tras el rebase.
+**Estado del preview:** la usuaria aprobó el preview actual, confirmó un solo panel de acciones, Cancelar funcional y los modales de Reglas/Resumen por encima del rail; también aceptó explícitamente que los detalles se desmontan sin animación/transición visible. Tras el pedido explícito de probar una selección de destino legal y su resolución única, respondió «se ve bien, lo apruebo»; F3 registró esa aprobación como evidencia contextual, sin atribuirle conteo de DOM, DevTools ni prueba de foco. No parar los servidores `:3006`/`:18000` hasta completar la revisión/merge.
 
 ## Reclamo y aislamiento
 
