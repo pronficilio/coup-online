@@ -31,4 +31,11 @@
 
 **Claim y aislamiento:** claim remoto publicado y releído en https://github.com/pronficilio/coup-online/issues/42#issuecomment-5865946026. Branch/worktree `issue/42-home-coin-turn-favicon` / `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`, creado desde `origin/master@f900c0947a0b27ac9c6e0372e3c1871a883be7e6`. La bitácora registra setup y confirmación. Mantener F1 `ACTIVE`; no registrar `phase_verdict` hasta integrar de forma segura y satisfacer todos los criterios.
 
+## Checkpoint independiente F1 (2026-09-28)
+
+- El Agente Menor generó `coup-client/public/favicon-turn/frame-a.png` … `frame-f.png` desde las fuentes locales con Pillow LANCZOS y PNG optimizado. Los seis archivos son 32×32 RGBA con alfa; tamaños A–F: 2,915, 2,436, 1,689, 872, 1,680 y 2,434 bytes; total 12,026 bytes (≤50 KB). No se versionaron fuentes `fotos/`.
+- `coup-client/src/components/game/TurnFavicon.js` recibe `isMyTurn`, muestra A de inmediato y avanza cada 220 ms. Su cleanup detiene el intervalo y restablece el `href` original cuando cambia la prop o se desmonta.
+- Revisión de archivos: los seis frames visibles en orden y alfa presente (`0–255`); `git diff --check` pasó.
+- Pendiente por coordinación: integrar el predicado en `Coup.js` cuando F2 #40 deje libre esa superficie; después compilar `coup-client` y revisar en navegador inicio, repetición y parada ante cambio de turno/pausa/final/desmontaje. No se ejecutaron tests. F1 permanece `ACTIVE`; este checkpoint no es `phase_verdict`.
+
 **Nota de coordinación previa a claim:** issue #40 sigue abierta con F2 `ACTIVE`. No editar `Coup.js` a la vez que esa unidad: relee su issue y worktree/branch al empezar. El Orquestador registró que #24 se cerró con PR #41 y que #42 necesita integrar el favicon en la misma superficie.
