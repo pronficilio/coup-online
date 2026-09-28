@@ -2,7 +2,7 @@
 
 ## Veredicto
 
-`ACTIVE` tras devolución de F4 sobre bae24fc (criterio 2, severidad media). La nueva variante aplica el wrap/ancho del Event Log en todos los conteos, separa los asientos afectados en tabletas y 6p móvil, y elimina el piso del lift. Build y checks estáticos pasan; queda revisión visual del propietario para esta variante antes del siguiente F4.
+`CLOSED` en `4ccce679f082d84956de844472e395fc67a90bf7`. F2 incorpora las correcciones geométricas devueltas por F4 y el criterio adicional del halo local durante respuestas. Build y checks estáticos pasan. F4 permanece `ACTIVE`, pendiente del Verifier independiente; el reporte no afirma captura ni inspección manual de una partida viva.
 
 Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost cards and board position`. Commit de cierre de seguimiento: `fix(game-ui): issue 28 F2 responsive geometry and response highlight`.
 
@@ -32,6 +32,25 @@ Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost
 - `coup-client/src/components/game/PlayerBoard.js`
 - `coup-client/src/components/game/PlayerBoardStyles.css`
 - `coup-client/src/i18n/translations.json`
+
+## Resolución de la última devolución F2 (2026-09-27)
+
+El Verifier devolvió F4 sobre `bae24fc` porque el Event Log podía cruzarse con asientos en conteos 2–4/6 y en tablet, y porque el lift se saturaba en pantallas altas. El HEAD `4ccce679f082d84956de844472e395fc67a90bf7` aplica estos cambios dentro de F2:
+
+- Limita el Event Log con `clamp(88px, calc(14vw + 38px), 180px)` y permite envolver texto hasta 1199 px; conserva sus coordenadas (`top:60px; right:15px` hasta 1023 px y `top:10vh; right:10vw` desde 1024 px).
+- Ajusta anchura/posición de asientos superiores en tablet y en configuraciones móviles de seis jugadores para reservar el área del log sin ocultar cartas. El tablero continúa siendo la única superficie desplazada verticalmente; la expresión `min(-40px, calc(...))` elimina el piso de `-240px` que saturaba el desplazamiento en viewports altos.
+- Conserva el ajuste de cinco jugadores, que compensa el anillo superior al 20.88% con `translate: 0 -6.88%`.
+- Implementa el criterio visual adicional del propietario: `Coup.js` abre el estado local solo con una decisión Challenge/Block/Block Challenge que trae opciones; `responseAvailable` cae al enviar una opción —también Pass—; `g-decisionClosed` elimina la ventana. `PlayerBoard.js` aplica `PlayerBoardSeat--respondable` únicamente al asiento observador y suspende el resaltado de turno formal mientras la respuesta local siga abierta. Espectadores y clientes sin opciones no reciben el halo. No se alteró el protocolo.
+
+### Verificaciones sobre el candidato
+
+- `npm run build` en `coup-client`: código 0; build optimizado listo. Avisos: imports `logo`/`Link` sin uso en `src/App.js`; `postcss-calc` no interpreta `dvh` en `ReferencePanel.css:100,106`; `caniuse-lite` desactualizado.
+- `git diff origin/master...HEAD --check`: pasa.
+- `node --check server/game/coup.js`: pasa.
+- Parseo de `translations.json` y cada línea de `docs/plans/log/issue-28.jsonl`: pasa.
+- No se añadieron ni ejecutaron tests automatizados. No se tomó captura en esta interacción; las estimaciones geométricas documentadas en el informe F4 derivan del cascade CSS y no de una medición renderizada.
+
+F2 queda `CLOSED`. F4 queda `ACTIVE` para la revisión FINAL independiente y la revisión visual del propietario según handoff; no se declara F4 PASS.
 
 ## Seguimiento del Verifier independiente (2026-09-27)
 

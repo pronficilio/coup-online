@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE para los hallazgos nuevos del criterio 2; F4 RETURNED por FAIL medio independiente sobre `bae24fc`. El usuario revisó 2 jugadores en móvil; aún falta revisar el candidato corregido y los demás tamaños/transiciones.
+- **Estado:** ACTIVE; F1/F2/F3 CLOSED; F4 ACTIVE, pendiente revisión FINAL independiente sobre `4ccce67`. El cambio actual cubre geometría responsive y halo local de respuesta. Registrar por separado el alcance de la próxima revisión visual; no afirmar revisión manual de estados de juego no observados.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -54,6 +54,12 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 - No crear una sala de juego ni tocar el servicio del puerto 8000.
 - El lift usa el ancho máximo de 900 px del tablero; esta variante amplía el límite del Event Log y calibra las mesas centradas, 5p y 6p en móvil/tablet.
 - El usuario reportó una revisión satisfactoria solo con dos jugadores en móvil. La revisión de esta variante en otros conteos, escritorio y estados del halo sigue pendiente.
+
+## F2 cerrada; F4 pendiente
+
+F2 se cerró en el commit de fase `fix(game-ui): issue 28 F2 CLOSED responsive seats and response highlight`. Sobre HEAD `4ccce679f082d84956de844472e395fc67a90bf7`, el Event Log queda limitado y con wrap hasta 1199 px, los asientos superiores conflictivos se compactan/desplazan en tablet y 6p móvil, y el lift responsive ya no tiene el piso que lo saturaba. El asiento local usa halo rojo cuando su decisión de respuesta trae opciones; el halo se apaga al enviar cualquier elección (incluido Pass) y al cerrar la decisión. Sin opciones locales/espectador no se marca; no cambian reglas ni protocolo.
+
+Validaciones del candidato: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff origin/master...HEAD --check`, `node --check server/game/coup.js` y parseo de `translations.json`/JSONL pasan. No se ejecutaron tests automatizados. No se generó captura ni se afirma inspección visual manual de esta variante; F4 queda `ACTIVE` para la revisión independiente y la confirmación visual del propietario según el alcance anotado.
 
 ## Commits y validación
 
