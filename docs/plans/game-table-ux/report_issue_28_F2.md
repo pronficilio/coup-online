@@ -2,9 +2,9 @@
 
 ## Veredicto
 
-`CLOSED` en `4ccce679f082d84956de844472e395fc67a90bf7`. F2 incorpora las correcciones geométricas devueltas por F4 y el criterio adicional del halo local durante respuestas. Build y checks estáticos pasan. F4 permanece `ACTIVE`, pendiente del Verifier independiente; el reporte no afirma captura ni inspección manual de una partida viva.
+`CLOSED` en el commit de fase `44e0a3a8bcbd61422a03a79053fbd4d7fe314bb9` (`fix(game-ui): issue 28 F2 CLOSED responsive seats and response highlight`); el código de producto verificado está en `4ccce679f082d84956de844472e395fc67a90bf7`. F2 incorpora las correcciones geométricas devueltas por F4 y el criterio adicional del halo local durante respuestas. Build y checks estáticos pasan. F4 permanece `ACTIVE`, pendiente del Verifier independiente; el reporte no afirma captura ni inspección manual de una partida viva.
 
-Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost cards and board position`. Commit de cierre de seguimiento: `fix(game-ui): issue 28 F2 responsive geometry and response highlight`.
+Commit de implementación original: `feat(game-ui): issue 28 F2 influences, lost cards and board position`. Commit de código del seguimiento: `fix(game-ui): issue 28 F2 responsive geometry and response highlight`. Commit de cierre de fase: `44e0a3a8bcbd61422a03a79053fbd4d7fe314bb9`.
 
 ## Cambios
 
