@@ -72,6 +72,7 @@ class CoupGame {
     }
 
     start() {
+        if (this.phase !== 'lobby') return false
         if (this.players.length < 2 || this.players.length > 6) return false
         const connectedHumanIDs = this.players.filter(player => player.controller === 'human').map(player => player.socketID)
         const connectedIDs = new Set([...connectedHumanIDs, ...this.spectatorSocketIDs].filter(Boolean))
@@ -90,7 +91,7 @@ class CoupGame {
         const disconnected = this.players.find(player => player.controller === 'human'
             && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
         if (disconnected) {
-            this.pause(`${disconnected.name} disconnected before the game started.`)
+            this.dissolve(disconnected.name)
             return false
         }
         this.updatePlayers()
@@ -208,16 +209,25 @@ class CoupGame {
 
     onDisconnect(socketID) {
         const player = this.players.find(candidate => candidate.socketID === socketID)
-        if (!player || this.phase === 'gameover') return
-        const cause = `${player.name} disconnected; recreate the game to continue.`
-        if (this.phase === 'paused') {
-            this.pausedDecision = null
-            this.bumpVersion()
-            this.emitGamePaused(cause)
-            this.updatePlayers()
-            return
-        }
-        this.pause(cause)
+        if (!player || player.isDead || !['running', 'paused'].includes(this.phase)) return
+        this.dissolve(player.name)
+    }
+
+    dissolve(playerName) {
+        if (!['running', 'paused'].includes(this.phase)) return false
+        this.phase = 'dissolved'
+        this.bumpVersion()
+        this.cancelCodexRequests('cancelled')
+        this.clearDecisionTimer()
+        this.activeDecision = null
+        this.pausedDecision = null
+        this.currentAction = null
+        this.updatePlayers()
+        this.publicEmit('g-gameDissolved', {
+            playerName: String(playerName || ''),
+            stateVersion: this.stateVersion
+        })
+        return true
     }
 
     unansweredHumanSeats(decision) {
@@ -253,7 +263,7 @@ class CoupGame {
     }
 
     pause(cause, { recoverable = false } = {}) {
-        if (this.phase === 'paused' || this.phase === 'gameover') return
+        if (this.phase !== 'running') return
         const decision = this.activeDecision
         const resumeOwnerSeats = recoverable ? this.unansweredHumanSeats(decision) : []
         this.cancelCodexRequests('cancelled')
@@ -520,14 +530,11 @@ class CoupGame {
             this.rejectDecision(socketID, 'Only a player who did not answer this decision can resume it.')
             return false
         }
-        const disconnected = this.players.find(player => player.controller === 'human'
+        const disconnected = this.players.find(player => !player.isDead && player.controller === 'human'
             && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
         if (disconnected) {
-            this.pausedDecision = null
-            this.bumpVersion()
             this.rejectDecision(socketID, 'Every seat must still be connected to resume.')
-            this.emitGamePaused(`${disconnected.name} disconnected; recreate the game to continue.`)
-            this.updatePlayers()
+            this.dissolve(disconnected.name)
             return false
         }
         const decision = this.pausedDecision
@@ -641,7 +648,6 @@ class CoupGame {
         const action = { type: choice.action, actor, target: choice.target == null ? null : choice.target }
         const cost = action.type === 'coup' ? 7 : (action.type === 'assassinate' ? 3 : 0)
         if (cost && this.players[actor].money < cost) return this.playTurn()
-        if (action.type === 'coup' && this.players[actor].money < 10) return this.playTurn()
         if (action.type !== 'coup' && this.players[actor].money >= 10) return this.playTurn()
         if (action.target != null && (!this.players[action.target] || this.players[action.target].isDead || action.target === actor)) return this.playTurn()
         action.cost = cost
