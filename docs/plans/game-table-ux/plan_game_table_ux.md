@@ -108,3 +108,13 @@ Al seleccionar una acción que inicia una ventana de decisión, el recuadro rojo
 **Riesgo MEDIUM:** una cifra desactualizada confunde un dato público de juego; el servidor mantiene la autoridad y solo expone el tamaño, nunca identidades. **Verificación FINAL** por cambio de varias superficies cliente/servidor.
 
 Pregunta adversarial: ¿hay un instante, reinicio o intercambio en que el valor visible difiera del tamaño real de `this.deck`, o una instantánea nueva publica información de influencias privadas?
+
+## Salida pendiente de F4 — 2026-09-27
+
+El propietario confirmó en `http://localhost:3016` los dos casos solicitados del producto `4ccce67`: 5p móvil (~390 px), con asientos completos y Event Log legible/desplazable sin cruce; y ciclo del halo local durante Challenge/Block (solo con opciones, se apaga al enviar Pass/otra opción o cerrar). La rama está en `7711d20`, que solo contiene documentación. F4 queda `ACTIVE` mientras el mismo Verifier realiza la revisión FINAL independiente. No cerrar ni publicar la issue antes de ese PASS.
+
+## Devolución F4 por escritorio ancho — 2026-09-27
+
+El mismo Verifier emitió `FAIL` medio en criterio 2 sobre el producto `4ccce679f082d84956de844472e395fc67a90bf7`. A 1200×900 el tablero de 900 px empieza en x≈150; el asiento superior derecho de 5p queda cerca de x≈790 y sus cartas llegan hasta x≈859. Desde 1200 px el Event Log pierde el ancho limitado/wrap, conserva el borde derecho x≈1080 (`right:10vw`) y una línea larga puede ocupar ~260 px, empezando cerca de x≈820: cruce estimado de ~39 px con las cartas en la misma zona vertical. C1, C3–C7 pasaron estáticamente. El propietario confirmó solo el caso móvil 5p y el ciclo del halo, no escritorio.
+
+F2 volvió a `ACTIVE` para mantener el `clamp()` y `overflow-wrap:anywhere` en todos los anchos, sin mover el anclaje del Event Log. El nuevo candidato se compila ahora; después se pedirá al propietario revisar 5p desktop (1280 px) y el mismo Verifier repetirá F4 sobre el nuevo SHA. No push/PR ni cierre antes del PASS.

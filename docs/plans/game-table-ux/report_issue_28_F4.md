@@ -91,3 +91,30 @@ El nuevo candidato limita y envuelve el Event Log para todos los conteos hasta 1
 ## Cierre F2 sobre HEAD `4ccce67` (2026-09-27)
 
 F2 cierra la geometría y el comportamiento del halo en ese HEAD; la evidencia detallada está en `report_issue_28_F2.md`. El build, diff-check, `node --check` y parseo JSON pasan. No hay captura de esta variante en el reporte. F4 permanece `ACTIVE`, sin PASS, para verificación FINAL independiente tras la revisión visual pendiente del propietario.
+
+## Confirmación visual del propietario — candidato `4ccce67` (2026-09-27)
+
+El propietario confirmó “todo confirmado” tras revisar el preview actual `http://localhost:3016`, servido desde este worktree y conectado a la API `:8015`. El bundle contiene el marcador del producto `4ccce67`; el tip `7711d20` solo añade documentación y `git diff 4ccce67..HEAD -- coup-client server` está vacío.
+
+Alcance confirmado por el propietario:
+
+- En móvil (~390 px) con cinco jugadores, los asientos quedan completos y el Event Log permanece legible y desplazable sin cruces.
+- Durante una ventana Challenge/Block, el asiento local se ilumina solo mientras tiene opciones; se apaga al enviar Pass/otra opción o al cerrar la ventana.
+
+Esto cierra la revisión visual solicitada en esos dos casos. La confirmación anterior de dos jugadores en móvil pertenece a un preview previo; no se atribuye a este SHA ni se afirma revisión manual de escritorio u otros conteos. F4 sigue `ACTIVE` hasta que el mismo Verifier independiente emita el pase FINAL sobre el producto `4ccce67`. No se ejecutaron tests automatizados.
+
+## Tercera revisión independiente — producto `4ccce67` (2026-09-27)
+
+**Veredicto: `FAIL` medio, criterio 2.** El mismo Verifier revisó estáticamente el producto `4ccce679f082d84956de844472e395fc67a90bf7`; el tip documental `7711d20` no alteraba el cliente ni el servidor. No modificó archivos ni ejecutó build, tests o capturas.
+
+| Criterio | Resultado | Evidencia |
+|---|---|---|
+| 1. Influencias localizadas y legibles | PASS | Se retiró la sección global; `PlayerBoard.js` conserva nombres de rol y estados activo/perdido. |
+| 2. Tablero, HUD, margen y Event Log | **FAIL — medio** | A 1200×900, el tablero de 900 px empieza en x≈150; asiento superior derecho 5p cerca de x≈790 y cartas hasta x≈859. El Event Log termina en x≈1080 (`right:10vw`), pero desde 1200 px no se limita ni envuelve su ancho. Una línea larga de ~260 px empieza cerca de x≈820 e invade las cartas ~39 px en zona vertical compartida. Cálculo CSS, no medición del navegador. |
+| 3. Contador Court | PASS | `courtCount` aparece junto al mazo. |
+| 4. Privacidad y estado público | PASS | El cliente recibe sus influencias propias; espectadores no reciben manos; `courtCount` no revela roles. |
+| 5. Reglas y protocolo | PASS | Se conserva 2–6 jugadores y el protocolo de decisiones. |
+| 6. Cartas perdidas y pruebas temporales | PASS | Las pérdidas reveladas se marcan y una carta devuelta tras desafío no queda marcada. |
+| 7. Halo respondible | PASS | Depende de opciones locales; el propietario confirmó que se apaga al responder o cerrar. |
+
+El propietario confirmó visualmente 5p móvil (~390 px) y el ciclo del halo, pero no 5p escritorio; la confirmación móvil no cubre este fallo. F2 y F4 se devuelven para aplicar el límite/wrap del Event Log también desde 1200 px, sin mover sus anclajes, y repetir el build, la revisión visual de 5p desktop y la verificación FINAL del mismo Verifier. No push/PR ni cierre hasta PASS.

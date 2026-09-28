@@ -167,6 +167,8 @@
     /* border-left: 0px; */
     padding-right: 5px;
     padding-left: 5px;
+    box-sizing: border-box;
+    width: clamp(88px, calc(14vw + 38px), 180px);
     position: absolute;
     font-size: 12px;
     right: 15px;
@@ -178,21 +180,11 @@
     overflow-y: scroll;
     height: 9VH;
     padding-right: 3px;
+    overflow-wrap: anywhere;
 }
 .EventLogTitle {
     margin: 0;
     margin-bottom: 5px;
-}
-
-@media only screen and (max-width: 1199px) {
-    .EventLogContainer {
-        box-sizing: border-box;
-        width: clamp(88px, calc(14vw + 38px), 180px);
-    }
-
-    .EventLogBody {
-        overflow-wrap: anywhere;
-    }
 }
 
 .bold {

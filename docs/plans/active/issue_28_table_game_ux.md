@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1/F2/F3 CLOSED; F4 ACTIVE, pendiente revisión FINAL independiente sobre `4ccce67`. El cambio actual cubre geometría responsive y halo local de respuesta. Registrar por separado el alcance de la próxima revisión visual; no afirmar revisión manual de estados de juego no observados.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE, F4 RETURNED por un solapamiento del Event Log con 5p en escritorio ancho (`4ccce67`). El propietario confirmó 5p móvil (~390 px) y el ciclo del halo en `localhost:3016` (`API :8015`); esa revisión no cubre escritorio. F2 amplía ahora el límite y wrap del log a todos los anchos; build y revisión visual 5p desktop pendientes. Después, repetir F4 con el mismo Verifier. Sin push/PR hasta PASS.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -47,23 +47,24 @@ Entrega `docs/plans/game-table-ux/report_issue_28_F1.md` con fuentes, observacio
 
 El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F3 está cerrada; el seguimiento F2 compila y sus cotas son estáticas. El propietario debe revisar el preview actualizado en 5p/390 px y los estados del halo antes de repetir F4.
 
-## Preview local para revisión visual
+## Preview revisado por el propietario
 
-- Cliente: `http://localhost:3015` — volver a iniciar desde este worktree; el proceso previo ya no responde.
-- Backend: `http://localhost:8015` — comprobar el endpoint Socket.IO antes de usarlo; la ruta `/` no es una ruta de aplicación.
+- Cliente: `http://localhost:3016`, levantado desde este worktree; el bundle contiene el marcador del candidato `4ccce67`.
+- Backend: `http://localhost:8015`; el endpoint `/exists/preview-check` respondió HTTP 200.
 - No crear una sala de juego ni tocar el servicio del puerto 8000.
 - El lift usa el ancho máximo de 900 px del tablero; esta variante amplía el límite del Event Log y calibra las mesas centradas, 5p y 6p en móvil/tablet.
-- El usuario reportó una revisión satisfactoria solo con dos jugadores en móvil. La revisión de esta variante en otros conteos, escritorio y estados del halo sigue pendiente.
+- El propietario confirma que en móvil (~390 px) con 5 jugadores los asientos quedan completos y el Event Log es legible/desplazable sin cruces. También confirma que en Challenge/Block el asiento local se ilumina solo mientras tiene opciones y se apaga al enviar Pass/otra opción o al cerrar.
+- La confirmación manual corresponde a esos casos; no afirma revisión de escritorio ni de otros conteos en esta variante.
 
 ## F2 cerrada; F4 pendiente
 
 F2 se cerró en el commit de fase `fix(game-ui): issue 28 F2 CLOSED responsive seats and response highlight`. Sobre HEAD `4ccce679f082d84956de844472e395fc67a90bf7`, el Event Log queda limitado y con wrap hasta 1199 px, los asientos superiores conflictivos se compactan/desplazan en tablet y 6p móvil, y el lift responsive ya no tiene el piso que lo saturaba. El asiento local usa halo rojo cuando su decisión de respuesta trae opciones; el halo se apaga al enviar cualquier elección (incluido Pass) y al cerrar la decisión. Sin opciones locales/espectador no se marca; no cambian reglas ni protocolo.
 
-Validaciones del candidato: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff origin/master...HEAD --check`, `node --check server/game/coup.js` y parseo de `translations.json`/JSONL pasan. No se ejecutaron tests automatizados. No se generó captura ni se afirma inspección visual manual de esta variante; F4 queda `ACTIVE` para la revisión independiente y la confirmación visual del propietario según el alcance anotado.
+Validaciones del candidato: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff origin/master...HEAD --check`, `node --check server/game/coup.js` y parseo de `translations.json`/JSONL pasan. No se ejecutaron tests automatizados. F4 queda `ACTIVE` a la espera del PASS independiente.
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en este branch. F2 se reabrió para corregir las colisiones del Event Log en varias cuentas y el lift de tabletas altas. Build, diff-check, sintaxis y JSON pasan; el usuario debe revisar visualmente esta nueva variante en 3015. Después, el mismo Verifier repetirá F4. No tests, push ni PR antes del PASS.
+Cada fase con artefactos requiere commit en este branch. F2 se reabrió para corregir las colisiones del Event Log en varias cuentas y el lift de tabletas altas. La revisión visual del propietario ya cubre 5p móvil y los estados abrir/enviar/cerrar del halo; el mismo Verifier repite F4. No tests, push ni PR antes del PASS.
 
 ## Criterio visual añadido por el propietario — incorporar en F2/F4
 
@@ -71,4 +72,4 @@ Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment
 
 Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
 
-Alquimista: el candidato actualizado está compilado en 3015; solicita revisión visual del propietario y luego pide al mismo Verifier repetir F4 sobre el SHA exacto.
+Alquimista: el propietario confirmó en `http://localhost:3016` el caso 5p móvil (~390 px) y los estados del halo. Solicita al mismo Verifier repetir F4 sobre el producto `4ccce67`; el tip documental `7711d20` no cambia código.
