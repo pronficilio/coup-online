@@ -1,17 +1,17 @@
 # Handoff activo — issue #40
 
-**Issue:** https://github.com/pronficilio/coup-online/issues/40  
-**Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`  
-**Bitácora exacta:** `docs/plans/log/issue-40.jsonl`  
+**Issue:** https://github.com/pronficilio/coup-online/issues/40
+**Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`
+**Bitácora exacta:** `docs/plans/log/issue-40.jsonl`
 **Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, revisión estática en curso.
-**Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
+**Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`
 **Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, antes de preparar la PR.
 **Pregunta de falsificación:** ¿alguna secuencia de cliente rompe los doce criterios de aceptación, filtra una carta o vínculo persistente jugador→evento/reacción, duplica conteos o deja globos/timers obsoletos?
 **Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 aprobada por el Orquestador; la suite general conserva cuatro fallos de expectativas antiguas de pausa/reanudación, fuera del alcance F1.
 **Reporte F1:** `docs/plans/event-log-reactions/report_issue_40_F1.md`.
-**Branch destino:** `issue/40-event-log-reactions`  
-**Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`  
-**Merge target:** `master` de `pronficilio/coup-online`  
+**Branch destino:** `issue/40-event-log-reactions`
+**Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`
+**Merge target:** `master` de `pronficilio/coup-online`
 **PR esperada:** una PR desde el branch canónico a `master`; todavía no existe.
 
 ## Fase activa: F4 — Falsificación y entrega

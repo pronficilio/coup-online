@@ -2,11 +2,11 @@
 
 **Estado:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
 
-**Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
+**Issue canónico:** https://github.com/pronficilio/coup-online/issues/40
 **Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
-**Bitácora:** `docs/plans/log/issue-40.jsonl`  
-**Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.  
-**Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.  
+**Bitácora:** `docs/plans/log/issue-40.jsonl`
+**Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
+**Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.
 **Base / destino:** `origin/master` (`0a467c10a8d2c6c1b57eff5911c682aab9362ebf`) / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue completo; aún no existe.
 

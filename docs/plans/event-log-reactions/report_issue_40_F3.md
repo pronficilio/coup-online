@@ -1,8 +1,8 @@
 # Reporte F3 — Globos efímeros de presencia
 
-**Issue:** #40 — rediseñar el registro de eventos y añadir reacciones efímeras  
+**Issue:** #40 — rediseñar el registro de eventos y añadir reacciones efímeras
 **Estado:** F3 `CLOSED / PASS` tras una corrección AC9 descubierta durante F4. Revisión del Orquestador; F4 independiente continúa.
-**Branch/worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`  
+**Branch/worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`
 **Alcance:** presencia temporal junto al participante; sin vínculo persistente con un evento.
 
 ## Implementación
