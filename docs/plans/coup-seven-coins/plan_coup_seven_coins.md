@@ -1,7 +1,7 @@
 # Plan — Coup con 7–9 monedas
 
 - **Issue:** [#49](https://github.com/pronficilio/coup-online/issues/49), `OPEN`.
-- **Estado operativo:** `ACTIVE`; F1–F2 `CLOSED`, F3 `READY`; issue asignada a `pronficilio`, sin PR.
+- **Estado operativo:** `WAITING_USER`; F1–F2 `CLOSED`, F3 `BLOCKED` por observación humana requerida; issue asignada a `pronficilio`, sin PR.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Perfil:** `coup-online`; target `master` del fork `pronficilio/coup-online`; aislamiento `git_worktree`.
 - **Branch / worktree canónicos:** `issue/49-coup-seven-coins` / `.worktrees/issue-49-coup-seven-coins`.
