@@ -476,9 +476,12 @@ export default class Coup extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         const decision = this.state.decision
+        const previousDecision = prevState.decision
+        const isSameRailDecision = previousDecision
+            && this.isActionRailDecision(previousDecision)
+            && previousDecision.decisionId === decision?.decisionId
         const newActionDecision = this.isActionRailDecision(decision)
-            && (!this.isActionRailDecision(prevState.decision)
-                || prevState.decision.decisionId !== decision.decisionId)
+            && !isSameRailDecision
         if (newActionDecision && !this.state.actionRailPosition) {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })

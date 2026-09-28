@@ -45,9 +45,10 @@ Las decisiones Exchange dejan de renderizarse en `DecisionsSection`. El flujo ex
 - Parseo de `coup-client/src/i18n/translations.json`: pasó.
 - `git diff --check`: pasó.
 - No se agregaron ni ejecutaron tests automatizados.
-- Build cliente intentado con `react-scripts` 5.0.1 disponible en el checkout principal; falló antes de completar la compilación con `Module not found: Can't resolve 'react/jsx-runtime'` desde el `src` de este worktree. El `node_modules` del worktree no existe, por lo que el build no valida los cambios de UI.
-- No se hizo walkthrough visual en navegador/escritorio/móvil; el build no produjo una app para inspeccionar.
+- El primer build con dependencias del checkout principal no pudo resolver `react/jsx-runtime`. Instalé las dependencias fijadas por `package-lock.json` dentro del worktree y `npm run build` terminó con exit 0 (`Compiled with warnings`).
+- Quedan warnings preexistentes: imports sin uso en `src/App.js`, mezcla `&&`/`||` en el manejo de desconexión de #46 en `Coup.js:445`, y parseo de unidades `dvh` en `ReferencePanel.css`. No se reportaron warnings ESLint en `ExchangeDecisionPanel.js` ni en los cambios nuevos del rail.
+- No se hizo walkthrough visual en navegador/escritorio/móvil; el build produjo el bundle, pero aquí no hay herramienta de navegador para inspeccionarlo.
 
 ## Siguiente acción
 
-Mantener F1 `ACTIVE` hasta compilar con dependencias resolubles y recorrer una pareja duplicada y una distinta en móvil y escritorio. Luego registrar el veredicto de fase. No iniciar F2 hasta cerrar F1; el Verifier independiente sigue requerido para la verificación FINAL.
+Mantener F1 `ACTIVE` hasta recorrer una pareja duplicada y una distinta en móvil y escritorio. Luego registrar el veredicto de fase. No iniciar F2 hasta cerrar F1; el Verifier independiente sigue requerido para la verificación FINAL.
