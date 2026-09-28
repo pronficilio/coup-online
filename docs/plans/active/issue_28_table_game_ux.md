@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. F4 FINAL independiente pasó para `d37dacc`; el propietario confirmó unión y mesa de cinco jugadores en escritorio. Se prepara una PR hacia `master`; integrar antes de cerrar la issue remota.
+- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. [PR #39](https://github.com/pronficilio/coup-online/pull/39) está OPEN y `MERGEABLE`, base `master`, `Fixes #28`; GitHub reportó que no hay checks configurados. F4 FINAL pasó para `d37dacc`; el propietario confirmó unión y mesa de cinco jugadores en escritorio. La issue remota sigue OPEN hasta integrar la PR.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.

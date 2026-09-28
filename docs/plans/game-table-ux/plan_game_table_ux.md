@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El mismo Verifier dio PASS FINAL sobre `d37dacc` después de la confirmación visual propietaria de 5p desktop. Se prepara una PR hacia `master`; integrar antes de cerrar la issue remota.
+- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. [PR #39](https://github.com/pronficilio/coup-online/pull/39) está OPEN y `MERGEABLE` hacia `master`, vinculada con `Fixes #28`; GitHub no reporta checks. El mismo Verifier dio PASS FINAL sobre `d37dacc` después de la confirmación visual propietaria 5p desktop. La issue remota sigue OPEN hasta integrar.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
