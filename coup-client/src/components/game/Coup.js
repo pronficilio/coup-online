@@ -6,6 +6,7 @@ import EventLog from './EventLog'
 import CheatSheetModal from '../CheatSheetModal'
 import RulesModal from '../RulesModal'
 import ReferencePanel from './ReferencePanel'
+import ExchangeDecisionPanel from './ExchangeDecisionPanel'
 import { t } from '../../i18n'
 import { lobbyError } from '../../i18n/lobby'
 import ResponseImageButton from './ResponseImageButton'
@@ -326,13 +327,13 @@ export default class Coup extends Component {
             if (this.state.dissolved || this.state.winner) return
             this.actionSubmissionLock = false
             this.clearActionPanelTimers()
-            const actionDecision = decision && decision.type === 'action'
+            const railDecision = decision && (decision.type === 'action' || decision.type === 'exchange')
             this.setState(state => ({
                 decision,
                 actionTarget: null,
                 submitted: false,
                 decisionError: state.gamePaused ? state.decisionError : '',
-                actionRailPosition: actionDecision ? this.measureActionRailPosition() : null,
+                actionRailPosition: railDecision ? this.measureActionRailPosition() : null,
                 actionPanelCompact: false,
                 actionPanelHasEntered: false,
                 actionPanelShowDetails: true,
@@ -467,7 +468,7 @@ export default class Coup extends Component {
 
     componentDidMount() {
         if (typeof window !== 'undefined') window.addEventListener('resize', this.handleActionRailResize)
-        if (this.state.decision && this.state.decision.type === 'action' && !this.state.actionRailPosition) {
+        if (this.isActionRailDecision(this.state.decision) && !this.state.actionRailPosition) {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
         }
@@ -475,9 +476,12 @@ export default class Coup extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         const decision = this.state.decision
-        const newActionDecision = decision && decision.type === 'action'
-            && (!prevState.decision || prevState.decision.type !== 'action'
-                || prevState.decision.decisionId !== decision.decisionId)
+        const previousDecision = prevState.decision
+        const isSameRailDecision = previousDecision
+            && this.isActionRailDecision(previousDecision)
+            && previousDecision.decisionId === decision?.decisionId
+        const newActionDecision = this.isActionRailDecision(decision)
+            && !isSameRailDecision
         if (newActionDecision && !this.state.actionRailPosition) {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
@@ -509,8 +513,10 @@ export default class Coup extends Component {
         return this.state.actionRailPosition
     }
 
+    isActionRailDecision = decision => Boolean(decision && (decision.type === 'action' || decision.type === 'exchange'))
+
     handleActionRailResize = () => {
-        if (!this.state.decision || this.state.decision.type !== 'action') return
+        if (!this.isActionRailDecision(this.state.decision)) return
         this.setState({ actionRailPosition: this.measureActionRailPosition() })
     }
 
@@ -801,6 +807,8 @@ export default class Coup extends Component {
         const me = this.state.players.find(player => player.name === this.props.name)
         const decision = this.state.decision
         const actionDecision = decision && decision.type === 'action'
+        const exchangeDecision = decision && decision.type === 'exchange'
+        const railDecision = Boolean(actionDecision || exchangeDecision)
         const ownInfluences = this.state.ownInfluences
         const responseWindowOpen = Boolean(
             decision &&
@@ -834,10 +842,19 @@ export default class Coup extends Component {
         const actionRailStyle = railPosition
             ? { left: `${railPosition.left}px`, top: `${railPosition.top}px` }
             : undefined
-        const actionDecisionRail = actionDecision && typeof document !== 'undefined'
+        const actionDecisionRail = railDecision && typeof document !== 'undefined'
             ? createPortal(<div className="ActionDecisionRail" style={actionRailStyle} aria-live="polite">
                 <CheatSheetModal />
-                {this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
+                {actionDecision
+                    ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
+                    : <ExchangeDecisionPanel
+                        decision={decision}
+                        keepCount={ownInfluences.length}
+                        submitted={this.state.submitted}
+                        paused={this.state.gamePaused}
+                        error={this.state.decisionError}
+                        onChoose={this.submitChoice}
+                    />}
             </div>, document.body)
             : null
 
@@ -851,8 +868,8 @@ export default class Coup extends Component {
                     {this.state.currentPlayer && <p>{t('game.turn.current', { playerName: this.state.currentPlayer })}</p>}
                 </div>
                 <RulesModal />
-                {!actionDecision && <CheatSheetModal />}
-                {actionDecision && <div
+                {!railDecision && <CheatSheetModal />}
+                {railDecision && <div
                     ref={this.actionRailAnchorRef}
                     className="CheatSheet ActionDecisionAnchorProbe"
                     aria-hidden="true"
@@ -880,7 +897,7 @@ export default class Coup extends Component {
                     disabled={this.state.codexDisabled}
                     style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
                 >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
-                {decision && decision.type !== 'action' && <>
+                {decision && decision.type !== 'action' && decision.type !== 'exchange' && <>
                     <p className="DecisionTitle">{t(DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic', {
                         count: ownInfluences.length,
                         influenceLabel: ownInfluences.length === 1 ? t('game.influence.singular') : t('game.influence.plural')

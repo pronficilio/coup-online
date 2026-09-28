@@ -394,15 +394,23 @@ class CoupGame {
             if (this.activeDecision.responses.has(actorKey)) return
             const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
             if (!player) return
-            if (player.controller === 'human') this.socketEmit(player.socketID, 'g-decision', {
-                decisionId: id,
-                stateVersion: this.stateVersion,
-                type: template.type,
-                title: template.title,
-                description: template.description,
-                deadlineMs: this.decisionTimeoutMs,
-                options: Array.from(choices.values()).map(({ choiceId, label }) => ({ choiceId, label }))
-            })
+            if (player.controller === 'human') {
+                const firstChoice = choices.values().next().value
+                this.socketEmit(player.socketID, 'g-decision', {
+                    decisionId: id,
+                    stateVersion: this.stateVersion,
+                    type: template.type,
+                    title: template.title,
+                    description: template.description,
+                    deadlineMs: this.decisionTimeoutMs,
+                    ...(template.type === 'exchange' && firstChoice && firstChoice.poolSlots
+                        ? { poolSlots: firstChoice.poolSlots.map(({ role, original }) => ({ role, original })) }
+                        : {}),
+                    options: Array.from(choices.values()).map(({ choiceId, label, roles }) => template.type === 'exchange'
+                        ? { choiceId, roles: [...roles] }
+                        : { choiceId, label })
+                })
+            }
         })
         this.decisionTimer = setTimeout(() => {
             if (this.activeDecision && this.activeDecision.id === id) {
@@ -949,10 +957,23 @@ class CoupGame {
             }
         }
         selectCombination(0, [])
-        const options = combinations.map((keptIndices, index) => {
+        const options = []
+        const seenRoleSets = new Set()
+        const poolSlots = pool.map((role, index) => ({
+            role: String(role).toLowerCase(),
+            original: index < keepCount
+        }))
+        combinations.forEach(keptIndices => {
             const kept = keptIndices.map(poolIndex => pool[poolIndex])
+            const roles = kept.map(card => String(card).toLowerCase()).sort()
+            const signature = JSON.stringify(roles)
+            if (seenRoleSets.has(signature)) return
+            seenRoleSets.add(signature)
             const label = `Keep ${kept.join(' and ')}`
-            return this.createChoice(`exchange:${index}`, label, { kind: 'exchange', keptIndices, keep: kept })
+            const choice = this.createChoice(`exchange:${options.length}`, label, { kind: 'exchange', keptIndices, keep: kept })
+            choice.roles = roles
+            choice.poolSlots = poolSlots
+            options.push(choice)
         })
         this.openDecision({
             type: 'exchange',
