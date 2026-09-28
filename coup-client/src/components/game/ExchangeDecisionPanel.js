@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { t } from '../../i18n'
 import dukeImage from '../../assets/characters/duque.webp'
 import captainImage from '../../assets/characters/capitan.webp'
@@ -27,46 +27,90 @@ function roleName(role) {
     return key ? t(key) : t('game.roles.unknown')
 }
 
-function optionLabel(option) {
-    const roles = Array.isArray(option.roles) ? option.roles : []
-    return t('game.decision.option.keep', { roles: roles.map(roleName).join(' y ') })
+function roleSignature(roles) {
+    return JSON.stringify(roles.map(role => String(role).toLowerCase()).sort())
+}
+
+function initialSelection(poolSlots) {
+    return poolSlots.reduce((selected, slot, index) => {
+        if (slot.original) selected.push(index)
+        return selected
+    }, [])
 }
 
 export default function ExchangeDecisionPanel({ decision, keepCount, submitted, paused, error, onChoose }) {
-    const influenceLabel = keepCount === 1 ? t('game.influence.singular') : t('game.influence.plural')
+    const poolSlots = Array.isArray(decision.poolSlots) ? decision.poolSlots : []
+    const [selectionState, setSelectionState] = useState(null)
+    const currentSelection = selectionState && selectionState.decisionId === decision.decisionId
+        ? selectionState
+        : {
+            decisionId: decision.decisionId,
+            selectedIndices: initialSelection(poolSlots),
+            nextSlot: keepCount === 2 ? 1 : 0
+        }
+    const selectedIndices = currentSelection.selectedIndices
+    const selectedRoles = selectedIndices.map(index => poolSlots[index] && poolSlots[index].role).filter(Boolean)
+    const selectionSignature = roleSignature(selectedRoles)
+    const selectedOption = (Array.isArray(decision.options) ? decision.options : []).find(option =>
+        roleSignature(Array.isArray(option.roles) ? option.roles : []) === selectionSignature
+    )
+    const caption = t('game.decision.exchange.keepCaption', {
+        roles: selectedRoles.map(roleName).join(` ${t('game.common.and')} `)
+    })
+
+    const selectSlot = index => {
+        if (submitted || paused || selectedIndices.includes(index) || selectedIndices.length !== keepCount) return
+        const replaceSlot = keepCount === 1 ? 0 : currentSelection.nextSlot
+        const nextSelected = selectedIndices.slice()
+        nextSelected[replaceSlot] = index
+        setSelectionState({
+            decisionId: decision.decisionId,
+            selectedIndices: nextSelected,
+            nextSlot: keepCount === 2 ? (replaceSlot === 1 ? 0 : 1) : 0
+        })
+    }
 
     return <section className="ActionDecision DecisionActionPanel ExchangeDecisionPanel" aria-labelledby="exchange-decision-title">
         <h2 id="exchange-decision-title" className="ActionDecisionTitle">
-            {t('game.decision.title.exchange', { count: keepCount, influenceLabel })}
+            {t('game.decision.title.exchange', {
+                count: keepCount,
+                influenceLabel: keepCount === 1 ? t('game.influence.singular') : t('game.influence.plural')
+            })}
         </h2>
         <p className="DecisionActionPrompt">
             {t('game.decision.description.exchange', { count: keepCount })}
         </p>
-        <div className="ExchangeDecisionOptions" role="group" aria-label={t('game.decision.title.exchange', { count: keepCount, influenceLabel })}>
-            {(Array.isArray(decision.options) ? decision.options : []).map(option => {
-                const optionRoles = Array.isArray(option.roles) ? option.roles : []
-                const label = optionLabel(option)
+        <div className="ExchangePoolCards" role="group" aria-label={t('game.decision.exchange.poolLabel')}>
+            {poolSlots.map((slot, index) => {
+                const role = String(slot.role).toLowerCase()
+                const label = roleName(role)
+                const selected = selectedIndices.includes(index)
+                const source = slot.original
+                    ? t('game.decision.exchange.originalCard')
+                    : t('game.decision.exchange.drawnCard')
                 return <button
-                    key={option.choiceId}
-                    className="ExchangeDecisionOption"
+                    key={`${decision.decisionId}-slot-${index}`}
                     type="button"
+                    className={`ExchangePoolCard${selected ? ' ExchangePoolCard--selected' : ''}`}
                     disabled={submitted || paused}
-                    aria-label={label}
-                    onClick={() => onChoose(option)}
+                    aria-pressed={selected}
+                    aria-label={t('game.decision.exchange.cardLabel', { source, role: label, selected: selected ? t('game.decision.exchange.selected') : '' })}
+                    onClick={() => selectSlot(index)}
                 >
-                    <span className="ExchangeDecisionCards" aria-hidden="true">
-                        {optionRoles.map((role, index) => <img
-                            className="ExchangeDecisionCard"
-                            key={`${option.choiceId}-${role}-${index}`}
-                            src={ROLE_IMAGES[String(role).toLowerCase()]}
-                            alt=""
-                            draggable="false"
-                        />)}
+                    <span className="ExchangePoolCardImage">
+                        <img src={ROLE_IMAGES[role]} alt="" aria-hidden="true" draggable="false" />
                     </span>
-                    <span className="ExchangeDecisionOptionLabel">{label}</span>
+                    <span className="ExchangePoolCardLabel">{label}</span>
+                    <span className="ExchangePoolCardSource">{source}</span>
                 </button>
             })}
         </div>
+        <button
+            type="button"
+            className="ExchangeKeepSubmit"
+            disabled={submitted || paused || !selectedOption}
+            onClick={() => selectedOption && onChoose(selectedOption)}
+        >{caption}</button>
         {submitted && <p className="ExchangeDecisionStatus" role="status">{t('game.decision.exchange.sent')}</p>}
         {error && <p className="ActionError" role="alert">{error}</p>}
     </section>

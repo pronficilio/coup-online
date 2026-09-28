@@ -11,6 +11,8 @@
 **Fase sugerida:** F1 — cuatro cartas en pantalla con selección alternante y confirmación dinámica.
 **Por qué esta fase sigue:** el usuario sustituyó la galería de parejas por selección continua de cartas; se conserva la deduplicación del server y se reemplaza el renderer antes del walkthrough.
 
+**Estado actual F1:** implementación lista y build verificado sobre `origin/master@db1d22c`; servicios previstos en `http://localhost:3103` / backend `3104` responden. El walkthrough visual desktop/móvil sigue pendiente del propietario; F1 permanece `ACTIVE`.
+
 ## Fuentes, contrato y alcance
 
 - Plan canónico: `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
