@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/40  
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`  
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`  
-**Estado del plan:** `WAITING_EXECUTOR`; F1 `READY`  
+**Estado del plan:** `ACTIVE`; F1 `ACTIVE`
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
 **Verifier requerido ahora:** no; se requiere al final de F4.  
 **Pregunta de falsificación:** ¿pueden dos emisiones concurrentes dejar dos reacciones del mismo jugador en un evento, desajustar conteos, revelar vínculo persistente jugador→reacción o exponer una carta oculta?  
@@ -23,7 +23,9 @@ El cliente hoy recibe `g-addLog` como string. La UI de reacciones depende de IDs
 
 ## Reclamo, rama y aislamiento
 
-Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El propietario pidió que el Orquestador creara ahora el branch/worktree; por eso ya existen desde `origin/master` en `a3d23f3c5f262fc02fe15ffbb554472b3d829aec`. Antes de cambios de producto, vuelve a leer issue #40/PR/branch en el fork, verifica que no exista reclamo incompatible, registra tu propio claim remoto con branch/worktree/target/estado, y comprueba físicamente `pwd`, branch, worktree y status limpio. Trabaja únicamente en este worktree.
+Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim del Alquimista quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787): branch `issue/40-event-log-reactions`, worktree `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`, target `master`, estado `F1 ACTIVE`. Solo había el handoff del Orquestador; no se encontró claim incompatible ni PR candidata. El aislamiento fue confirmado en el worktree canónico, limpio, en `c44b768` sobre `origin/master@a3d23f3`. La superficie cliente queda intacta; F1 se limita a servidor.
+
+El runtime no expone capacidad de subagentes. Dada la instrucción explícita del propietario de ejecutar F1, el Alquimista continúa directamente y deja esta excepción registrada; no inventará una herramienta de delegación.
 
 Comprobaciones iniciales esperadas:
 

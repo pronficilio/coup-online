@@ -1,8 +1,9 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `PLANNED`; F1 `READY`; issue `OPEN`, asignada a `pronficilio`.  
+**Estado:** `ACTIVE`; F1 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
+
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
-**Handoff:** `docs/plans/inbox/issue_40_event_log_reactions.md`  
+**Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
 **Bitácora:** `docs/plans/log/issue-40.jsonl`  
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.  
 **Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.  
