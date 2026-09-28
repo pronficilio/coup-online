@@ -28,7 +28,7 @@ Incluye deduplicar por combinación no ordenada de roles conservados, publicar l
 
 No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo de envío (`decisionId`, `stateVersion`, `choiceId`), ids de opciones permitidas, resolución de cartas devueltas ni UX de otros tipos de decisión. No revelar las opciones a otros asientos/Codex por una proyección pública más amplia.
 
-## F1 — Deduplicar resultados y renderizar parejas Exchange (`READY`)
+## F1 — Deduplicar resultados y renderizar parejas Exchange (`BLOCKED`)
 
 **Pregunta única:** ¿puede una clave canónica de roles conservados eliminar duplicados sin fusionar resultados distintos, y puede el panel existente alojar esas elecciones ilustradas sin exponer datos privados ni cambiar el envío?
 
@@ -62,6 +62,6 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 
 Una unidad #47 → `issue/47-ambassador-exchange-options` → `.worktrees/issue-47-ambassador-exchange-options` → una PR a `master` de `pronficilio/coup-online`. Antes de reclamar, leer issue y comprobar branch/worktree/PR candidato; registrar claim en el fork, releer y usar aislamiento desde `origin/master` actualizado. No usar `upstream`.
 
-**Siguiente dueño:** Ejecutor, F1 implementación localizada tras auditar los solapamientos #43/#44/#45. Verifier independiente requerido en F2. El Orquestador revisa la integración y evidencia final.
+**Siguiente dueño:** Orquestador/usuario, proporcionar navegador accesible o evidencia visual verificable de las parejas duplicadas/distintas en móvil y escritorio. Después el Alquimista reanuda F1 y, al cerrarla, invoca al Verifier independiente en F2. El Orquestador revisa la integración y evidencia final.
 
 **Falsificación:** ¿hay un pool alcanzable de cartas donde la interfaz ofrece dos opciones con la misma pareja de roles, omite una pareja distinta, muestra una carta diferente a la incluida en el `choiceId`, o envía opciones/datos privados a un asiento no elegible?

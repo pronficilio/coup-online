@@ -9,7 +9,7 @@
 **Verifier requerido ahora:** no; F1 corresponde al Ejecutor, Verifier requerido en F2.
 **Pregunta de falsificación:** ¿un pool válido pierde una pareja distinta, conserva una pareja duplicada, expone roles a otro jugador o permite que lo mostrado no corresponda al resultado resuelto?
 **Fase sugerida:** F1 — deduplicación semántica y opciones visuales en el panel de acciones.
-**Por qué esta fase sigue:** aún no se modificó el flujo; hay que validar la clave canónica y coordinar el renderer compartido con #44/#45.
+**Por qué esta fase sigue:** la implementación de F1 y el build ya están listos; falta un walkthrough visual verificable en móvil y escritorio, con parejas duplicadas y distintas. No iniciar F2 hasta cerrar esta validación.
 
 ## Fuentes, contrato y alcance
 
@@ -23,7 +23,7 @@
 
 ## Coordinación con unidades activas
 
-- #43 (`turn-vote-highlights`) toca `Coup.js`/`PlayerBoard.js`; #44 (`player-decisions-layout`) cambia ubicación de decisiones respecto al tablero. Revisar issues/branches/diffs antes de tocar `Coup.js` y coordinar base. Evitar integrar dos ediciones concurrentes del renderer/layout.
+- #43 (`turn-vote-highlights`) toca `Coup.js`/`PlayerBoard.js`; #44 (`player-decisions-layout`) cambia ubicación de decisiones respecto al tablero. Sus ramas/diffs se auditaron antes de implementar; coordinar base si esas unidades reanudan cambios sobre el renderer/layout.
 - #45 (`submitted-response-highlight`) cambia resaltado/estado enviado en el renderer genérico. Mantener o integrar su contrato de disabled/selected y secuenciar cambios si editan los mismos nodos.
 - El checkout raíz compartido tiene cambios locales ajenos a #47; trabajar solo en `.worktrees/issue-47-ambassador-exchange-options` y no moverlos.
 
