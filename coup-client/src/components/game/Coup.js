@@ -19,14 +19,6 @@ import challengeActiveImage from '../../assets/action-buttons/c-active.webp'
 import passImage from '../../assets/action-buttons/pass.webp'
 import passActiveImage from '../../assets/action-buttons/pass-active.webp'
 
-const INFLUENCE_COLORS = {
-    duke: '#D55DC7',
-    captain: '#80C6E5',
-    assassin: '#2B2B2B',
-    contessa: '#E35646',
-    ambassador: '#B4CA1F'
-}
-
 const RESPONSE_WINDOW_TYPES = new Set(['challenge', 'block', 'block_challenge'])
 
 function responseButtonFor(decision, option, localizedLabel) {
@@ -225,6 +217,7 @@ export default class Coup extends Component {
         this.state = {
             players: [],
             ownInfluences: [],
+            courtCount: null,
             currentPlayer: '',
             decision: null,
             submitted: false,
@@ -251,6 +244,7 @@ export default class Coup extends Component {
             this.setState({
                 players: snapshot.players,
                 ownInfluences: Array.isArray(snapshot.ownInfluences) ? snapshot.ownInfluences : [],
+                courtCount: Number.isFinite(snapshot.courtCount) ? snapshot.courtCount : null,
                 currentPlayer: snapshot.currentPlayer || this.state.currentPlayer
             })
         })
@@ -383,6 +377,15 @@ export default class Coup extends Component {
         const me = this.state.players.find(player => player.name === this.props.name)
         const decision = this.state.decision
         const ownInfluences = this.state.ownInfluences
+        const responseWindowOpen = Boolean(
+            decision &&
+            RESPONSE_WINDOW_TYPES.has(decision.type) &&
+            Array.isArray(decision.options) &&
+            decision.options.length > 0 &&
+            !this.state.gamePaused &&
+            !this.props.isSpectator
+        )
+        const responseAvailable = responseWindowOpen && !this.state.submitted
         let playAgain = null
         if (this.state.winner && this.state.canPlayAgain && this.props.isLeader) {
             playAgain = <button className="startGameButton" onClick={this.playAgain}>{t('game.playAgain')}</button>
@@ -395,7 +398,7 @@ export default class Coup extends Component {
             </div>
         }
 
-        return <div className="GameContainer">
+        return <div className="GameContainer" data-player-count={this.state.players.length}>
             <div className="GameHeader">
                 <div className="PlayerInfo">
                     <p>{t('game.player.identity', { playerName: this.props.name })}{this.props.isSpectator ? ` ${t('game.spectator')}` : ''}</p>
@@ -409,20 +412,14 @@ export default class Coup extends Component {
                 <EventLog logs={this.state.logs} />
             </div>
 
-            {ownInfluences.length > 0 && <div className="InfluenceSection">
-                <p>{t('game.player.influences')}</p>
-                {ownInfluences.map((influence, index) => <div key={`${influence}-${index}`} className="InfluenceUnitContainer">
-                    <span className="circle" style={{ backgroundColor: INFLUENCE_COLORS[influence] }} />
-                    <br />
-                    <h3>{roleName(influence)}</h3>
-                </div>)}
-            </div>}
-
             <PlayerBoard
                 players={this.state.players}
                 observerName={this.props.name}
                 observerInfluences={ownInfluences}
                 currentPlayer={this.state.currentPlayer}
+                responseWindowOpen={responseWindowOpen}
+                responseAvailable={responseAvailable}
+                courtCount={this.state.courtCount}
             />
             <ReferencePanel />
 
