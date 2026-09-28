@@ -1,7 +1,7 @@
 # Plan: jugadores Codex y palanca de emergencia
 
 Issue: #14 — Integrar jugadores IA con Codex y una palanca de emergencia
-Estado: ACTIVE; F0 y F1 CLOSED (PHASE PASS); F2/F3 implementados; en Hetzner el web `84b6f96` y API/runner `4ab5e52` están saludables; OAuth normal y una decisión real GPT-6 Luna `low` verificados; palanca roja restringida al líder autorizado por el código y rearmada; Draft PR #23 abierto contra `master`; escenarios manuales y revisión final pendientes.
+Estado: `CLOSED` administrativamente a petición del propietario tras validar una partida Codex vs. Codex sin problemas. PR #23 integrado en `master` con merge commit `2d82fa1e0d67ba9e48d7885f9c3ae171360425bd`. F0/F1 cuentan con PHASE PASS; F2/F3 implementados y POC desplegada. La validación reportada no equivale a un veredicto FINAL independiente ni certifica toda la checklist original.
 Ejecución / riesgo / verificación: FULL / HIGH / PHASE
 Branch / worktree: issue/14-codex-ai-players / .worktrees/issue-14-codex-ai-players
 Merge target: master
@@ -100,7 +100,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Commit:** implementación inicial `608089d4c839f367b9b0b0e92009d3daf536ce5c` devuelta; correcciones, regresiones y evidencia revisadas en `ceb9fee68d600c679ea1c58da2a805b3a91be4ee`.
 - **Validación:** `npm test` en `server/`, pruebas directas `node test/coup.test.js` y `node test/lobby.test.js`, `node --check`, `git diff --check` y PHASE independiente `PASS`.
 
-### F2 — Añadir el controlador Codex con el login del propietario (`IMPLEMENTADO; PRUEBA REAL PENDIENTE`)
+### F2 — Añadir el controlador Codex con el login del propietario (`IMPLEMENTADO; PRUEBA REAL COMPLETADA`)
 
 - **Pregunta:** ¿puede un proceso separado ejecutar una decisión Codex acotada y devolver una opción válida sin recibir secretos ajenos ni acceso operativo al servidor?
 - **Entrada:** proyecciones y decisiones autoritativas F1.
@@ -110,7 +110,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Repetición:** máximo dos intentos de corrección por fallo de esquema, timeout o respuesta obsoleta antes de pausar la partida y registrar el fallo.
 **F2 evidencia (2026-09-26):** `npm test` cubre App Server JSON-RPC, opciones legales, timeouts y cancelaciones; la CLI 0.157.1 completó localmente `initialize` y `thread/start` efímero sin login ni turno; imagen Docker construida; el contenedor pasa healthcheck y un proceso con UID/GID del API conecta al socket `0660` grupo 10002. F4 completó después el OAuth de navegador y la primera decisión real de GPT-6 Luna `low` en Hetzner.
 
-### F3 — Añadir asientos IA y palanca roja (`IMPLEMENTADO; REVISIÓN F4 PENDIENTE`)
+### F3 — Añadir asientos IA y palanca roja (`IMPLEMENTADO; PARTIDA CODEX VS. CODEX VALIDADA POR EL PROPIETARIO`)
 
 - **Pregunta:** ¿pueden los jugadores configurar asientos IA en el lobby actual y apagar Codex sin agregar autenticación ni permitir que un cliente lo reactive?
 - **Entrada:** controlador Codex F2 y contratos del lobby/socket.
@@ -120,7 +120,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Repetición:** una corrección acotada por vía de bypass demostrada.
 - **Validación local:** pruebas cubren anfitrión + dos IA, IA contra IA con espectador, clave de lobby, apagado concurrente, marcador persistente y cuotas. Queda validar la operación tras login en Hetzner.
 
-### F4 — Verificar la integración completa y preparar handoff de release (`PENDING`)
+### F4 — Verificar la integración completa y preparar handoff de release (`CERRADO ADMINISTRATIVAMENTE`)
 
 - **Pregunta:** ¿se puede completar una partida mixta y apagar/recuperar Codex sin violar reglas, privacidad o el límite de gasto?
 - **Entrada:** F0–F3 implementadas localmente.
@@ -128,7 +128,7 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 - **Cierre:** recorrido humano vs dos IA e IA vs IA en Hetzner; acciones/desafíos/bloqueos/intercambio/timeout y kill switch revisados; compilar cliente y servidor; revisión final; mantener release previo listo para rollback. No iniciar torneos masivos.
 - **Pivote:** si falla una invariante de reglas, privacidad o kill switch, devolver a su fase propietaria.
 - **Repetición:** una ronda de correcciones/revisión focalizada por criterio fallido.
-- **Estado:** la validación local pasó (suite del servidor 36/36, `node --check` y build de cliente; se mantienen dos warnings previos en `src/App.js`). El release POC `4ab5e52` está activo en Hetzner; API y runner están saludables, la web responde HTTP 200 y el runner no comparte la red del juego ni publica puertos. OAuth normal quedó guardado y una decisión real GPT-6 Luna `low` devolvió una elección legal. Tras el apagado accidental, la palanca se restringió al socket líder con código válido tanto en cliente como en servidor; el release está desplegado y Codex rearmado. Pendiente el recorrido manual de persona vs. dos IA, IA vs. IA, desafíos/bloqueos y palanca roja.
+- **Estado:** validación local registrada (suite del servidor 36/36 y build del cliente); el release POC `4ab5e52` se desplegó en Hetzner y una decisión real GPT-6 Luna `low` devolvió una opción legal. Tras el apagado accidental, la palanca se restringió al líder con código válido tanto en cliente como en servidor. El propietario reportó que completó una partida Codex vs. Codex sin problemas y pidió el cierre administrativo. No hay veredicto FINAL independiente y no se afirma que esta prueba cubra persona contra dos IA, desafíos/bloqueos y operación de la palanca.
 
 ## Riesgos y mitigaciones
 
@@ -141,9 +141,9 @@ Integrar jugadores Codex como participantes del mismo motor de partida que los j
 
 ## Operación
 
-- Ejecución `FULL`; riesgo `HIGH`; pruebas de motor, runner, socket, cuotas y build completadas localmente; queda prueba real de cuenta y operación de Hetzner.
+- Ejecución `FULL`; riesgo `HIGH`; pruebas de motor, runner, socket, cuotas y build completadas localmente; el propietario confirmó una partida Codex vs. Codex en Hetzner.
 - Pregunta de falsificación: ¿puede otro socket, una respuesta tardía o un proceso Codex ya activo ejecutar una acción tras cambiar de fase o después de activar la palanca?
-- Siguiente paso: el release POC privado ya está en `/opt/coup/releases/5a13376`; la release anterior `55be894` queda disponible para rollback. Esperar a que el propietario habilite device-code, iniciar un nuevo flujo y probar una sola jugada antes de invitar amigos. No se ha llamado al modelo.
+- Siguiente paso: ninguno para la issue, cerrada administrativamente tras la validación manual comunicada por el propietario. El despliegue POC y su rollback quedan documentados en `docs/plans/codex-ai-players/poc-runbook.md`.
 - Branch esperado: `issue/<id>-codex-ai-players`.
 - Worktree esperado: `.worktrees/issue-<id>-codex-ai-players`.
 - Merge target: `master`.

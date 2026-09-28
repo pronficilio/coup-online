@@ -1,14 +1,14 @@
 # Restaurar los originales de personajes — issue #36
 
-**Estado:** WAITING_ORCHESTRATOR; F1 CLOSED (PASS).
+**Estado:** COMPLETED; F1 CLOSED (PASS).
 **Issue:** https://github.com/pronficilio/coup-online/issues/36
-**Handoff:** docs/plans/active/issue_36_character_image_restoration.md
+**Handoff final:** docs/plans/completed/issue_36_character_image_restoration.md
 **Bitácora:** docs/plans/log/issue-36.jsonl
 **Modo / riesgo / verificación:** LIGHT / LOW / NONE.
 **Branch / worktree / merge target:** issue/36-character-image-restoration / .worktrees/issue-36-character-image-restoration / master.
 **Base:** origin/master en 5fffacfd; originales de personajes tomados de be93e975, primer padre del merge de PR #34.
-**PR:** https://github.com/pronficilio/coup-online/pull/37, abierta hacia `master`.
-**Siguiente dueño:** Orquestador para integrar la PR.
+**PR:** https://github.com/pronficilio/coup-online/pull/37, integrada a `master` en `094a61e4a45b08ffb6aba68098bb424d21b9b7d2`.
+**Siguiente dueño:** ninguno; issue #36 cerrada.
 
 ## Solicitud
 
@@ -62,3 +62,7 @@ Los seis WebP se restauraron byte por byte desde `be93e975072b364365a90206931f73
 | **Total** |  | **701,718** |
 
 No se ejecutaron tests ni build.
+
+## Cierre administrativo
+
+GitHub muestra #36 `CLOSED` y PR #37 `MERGED`. La unidad queda `COMPLETED`; no hay trabajo pendiente.

@@ -3,8 +3,8 @@
 - **Tracker:** https://github.com/pronficilio/coup-online/issues/19
 - **Plan:** `docs/plans/game-language/plan_game_language.md`
 - **Bitácora append-only:** `docs/plans/log/issue-19.jsonl`
-- **Unidad:** `WAITING_ORCHESTRATOR`; F1, F2, F3 y F4 `CLOSED`.
-- **Issue:** #19 permanece `OPEN` hasta integrar la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) y que Orquestación cierre la unidad.
+- **Unidad:** `COMPLETED`; F1, F2, F3 y F4 `CLOSED`.
+- **Issue:** #19 `CLOSED` después de integrar la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) en `master` con `64c1b295fe9586ea05c4e7dc2a713faec948ec24`.
 - **PR de producto:** [#33](https://github.com/pronficilio/coup-online/pull/33), `MERGED` en `master` mediante `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`.
 
 ## Veredicto final
@@ -13,9 +13,9 @@ El Verifier FINAL revisó el árbol integrado del merge `45a3eaa2e6d16aac2ca954b
 
 El árbol integrado tiene 292 claves en `es` y 292 en `en`, con paridad confirmada por el Verifier. La rama previa al merge `1b65425` tenía 307/307; ambos conteos se conservan asociados a sus árboles y no se infiere la causa de la diferencia. `npm run build` ya había terminado con exit 0; no se ejecutaron tests.
 
-## Siguiente acción
+## Cierre administrativo
 
-Orquestación revisa e integra la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38). Después verifica el tracker y cierra #19. Hasta entonces, la issue permanece `OPEN` y esta unidad `WAITING_ORCHESTRATOR`.
+La PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) se integró en `master` con `64c1b295fe9586ea05c4e7dc2a713faec948ec24` el 2026-09-27. GitHub muestra #19 `CLOSED`; la PR de producto #33 ya estaba integrada en `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. La unidad queda `COMPLETED`, sin siguiente dueño.
 
 ## Referencias
 

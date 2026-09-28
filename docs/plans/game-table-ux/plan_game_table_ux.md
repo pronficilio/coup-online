@@ -1,12 +1,13 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El ajuste `ca02833` (`rgba(120, 120, 120, 0.73)`) pasó build y revalidación F4 FINAL del mismo Verifier, incluido C6. PR #39 está OPEN/MERGEABLE en `b0f1fe2`; la issue remota sigue abierta hasta integrar y espera autorización final.
+- **Estado:** `COMPLETED`; F1–F4 `CLOSED (PASS)`. El ajuste `ca02833` (`rgba(120, 120, 120, 0.73)`) pasó build y revalidación F4 FINAL del mismo Verifier, incluido C6. PR #39 está `MERGED`; la issue #28 está `CLOSED`.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
-- **Handoff:** `docs/plans/active/issue_28_table_game_ux.md`.
+- **Handoff final:** `docs/plans/completed/issue_28_table_game_ux.md`.
 - **Bitácora append-only:** `docs/plans/log/issue-28.jsonl`.
+- **Siguiente dueño:** ninguno; la unidad está completada.
 
 ## Solicitud reescrita
 
@@ -130,3 +131,7 @@ El mismo Verifier emitió `PASS` FINAL sobre `d37daccdbe37d997aaee3d7e23eb64e771
 ### Ajuste final de legibilidad de influencias perdidas — 2026-09-28
 
 Tras su revisión con el inspector de elementos, el propietario pidió elevar el alpha del fondo de `.PlayerInfluenceLostOverlay` de `0.43` a `0.73`, conservando `rgba(120, 120, 120, ...)`. El cambio quedó en `ca02833`; `npm run build` pasa con los avisos conocidos y el CSS generado contiene `hsla(0,0%,47%,.73)`. El mismo Verifier repitió F4 FINAL y dio PASS en C1–C7; en C6 confirma que el rol y la marca siguen legibles y que solo se oscurecen cartas perdidas. F2/F4 quedan cerradas de nuevo; se actualiza la PR #39 con este candidato antes de pedir aprobación de merge.
+
+## Cierre administrativo — 2026-09-28
+
+PR #39 se integró en `master` con merge commit `951147234b6f8f640718ed945de5907140a724a9`. GitHub cerró #28 a las 06:33:10Z; la unidad queda `COMPLETED`. El producto `ca02833` y los reportes F1–F4 quedaron integrados. No hay trabajo pendiente para esta unidad.

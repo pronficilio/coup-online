@@ -1,12 +1,12 @@
 # Idioma español predeterminado y diccionario bilingüe — issue #19
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 `CLOSED`; F4 `CLOSED`. Verifier FINAL `PASS` sobre el merge integrado `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe` y aceptación de AC7 tras la respuesta del usuario.
+**Estado:** `COMPLETED`; F1, F2, F3 y F4 `CLOSED`. Verifier FINAL `PASS` sobre el merge integrado `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe` y aceptación de AC7 tras la respuesta del usuario.
 **Unidad:** https://github.com/pronficilio/coup-online/issues/19
-**Handoff:** `docs/plans/active/issue_19_game_language.md`
+**Handoff final:** `docs/plans/completed/issue_19_game_language.md`
 **Bitácora:** `docs/plans/log/issue-19.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
-**Siguiente dueño:** Orquestación: revisar e integrar la [PR documental #38](https://github.com/pronficilio/coup-online/pull/38), actualizar el tracker y cerrar #19. La issue permanece `OPEN` hasta integrar los documentos finales; el Alquimista deja las cuatro fases `CLOSED` y la unidad `WAITING_ORCHESTRATOR`.
-**Integración:** PR #22 se fusionó parcialmente con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; la continuación #33 se fusionó en `master` con `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Esa integración contiene el producto #19. La PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión desde la misma rama/worktree; publica el PASS final, las fases cerradas y el conteo integrado 292/292, sin modificar producto.
+**Siguiente dueño:** ninguno; la issue #19 está `CLOSED` y la unidad `COMPLETED`.
+**Integración:** PR #22 se fusionó parcialmente con `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`; la continuación de producto #33 se fusionó en `master` con `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. La PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) quedó integrada en `master` con `64c1b295fe9586ea05c4e7dc2a713faec948ec24`, cerrando la documentación de fases y la unidad.
 
 ## Solicitud y definición de éxito
 
@@ -142,7 +142,7 @@ El archivo propuesto para el diccionario es `coup-client/src/i18n/translations.j
 
 ## Topología, riesgos y decisiones
 
-El issue #19 sigue abierto y está asignado a `pronficilio` en el fork. PR #22 se fusionó a `master` mediante `5de95ee`; el worktree canónico #19 se sincronizó por fast-forward desde `ca16e42` hasta `origin/master@3313d42` y luego integró `origin/master@be93e97` con merge `318c119`. El usuario autorizó la integración parcial para revisión incremental; no equivale a aceptación F4 ni al cierre de la issue.
+Históricamente, el issue #19 estuvo abierto y asignado a `pronficilio` mientras se completaban las fases. Después del PASS FINAL, PR #33 integró el producto y PR #38 integró el cierre documental; el issue quedó cerrado tras el merge de #38. El usuario autorizó la integración parcial de #22 para revisión incremental; esa autorización no sustituyó la aceptación F4, que se obtuvo posteriormente y quedó documentada arriba.
 
 Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas y evitar exponer IDs ingleses. La base publicada de PR #23 ya está integrada; no se copian cambios locales de otros worktrees. No cambiar reglas, enums o payloads para traducir etiquetas. Aplicar el glosario y referencias españolas existentes.
 
@@ -172,3 +172,4 @@ Riesgo principal: mantener equivalencia semántica de las decisiones dinámicas 
 - 2026-09-27: Verifier FINAL independiente revisó código `c9d62676ffa33a177a0edced26dfc91e2529365c` (HEAD en ese momento `cbfaee5fa527994e186a2b9116815da7bcd13d34`, commit solo documental) y devolvió global `BLOCKED`: AC1/AC3/AC5/AC6 `PASS`, AC2/AC4 `PASS` estático, AC7 `BLOCKED` a la espera del recorrido humano normal/activo y escritorio/ancho estrecho. F4 sigue `BLOCKED`, unidad `WAITING_USER`; issue #19 `OPEN`, PR #33 `DRAFT`, F2/F3 `ACTIVE`. No hubo tests ni observación en navegador por parte del Verifier.
 - 2026-09-27: tras registrar el veredicto, se reemplazaron y releyeron los cuerpos de #19 y PR #33. API confirmó #19 `OPEN`/asignada a `pronficilio`, PR #33 `OPEN`/`DRAFT` con branch head `94c1082e5104e9d26b6c255e520b2f12ea44c1d4`. Ambos cuerpos mantienen F4 `BLOCKED`, AC7 pendiente de observación humana, y no reclaman PASS/cierre.
 - 2026-09-27: el usuario respondió exactamente «se ve bien». El Verifier acepta la respuesta como aprobación visual general para AC2 y AC4, sin inferir navegador, dispositivo, ancho, controles o pasos. AC7 permanece `BLOCKED`: falta confirmar si las selecciones conservaron su acción y qué se observó en escritorio/ancho estrecho respecto a inglés visible, recorte y contacto con icono/marco. Unidad `WAITING_USER`; #19 `OPEN`, PR #33 `DRAFT`.
+- 2026-09-27: PR #38 se integró a `master` con merge commit `64c1b295fe9586ea05c4e7dc2a713faec948ec24`; GitHub muestra #19 `CLOSED` desde 2026-09-27T23:50:13Z. La unidad pasa a `COMPLETED`; no queda siguiente dueño.
