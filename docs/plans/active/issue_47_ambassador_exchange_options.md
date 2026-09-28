@@ -2,16 +2,16 @@
 
 **Issue/Ticket:** [#47 — Optimizar y visualizar las opciones de intercambio del Embajador](https://github.com/pronficilio/coup-online/issues/47), `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
-**Estado del plan:** `ACTIVE`; F1 reabierta con el nuevo diseño solicitado por el usuario.
+**Estado del plan:** `ACTIVE`; F1 aceptada por el usuario, F2 verificación independiente en curso.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `MEDIUM` (decisión de juego y render privado por asiento).
 **Política de verificación:** `FINAL` independiente.
-**Verifier requerido ahora:** no; F1 corresponde al Ejecutor, Verifier requerido en F2.
+**Verifier requerido ahora:** sí; F2 revisa el commit `3773322` sin modificar producto.
 **Pregunta de falsificación:** ¿una selección alternante deja menos/más cartas iluminadas que las permitidas, hace inalcanzable una pareja legal, proyecta roles a otro asiento o envía un `choiceId` distinto del caption?
-**Fase sugerida:** F1 — cuatro cartas en pantalla con selección alternante y confirmación dinámica.
-**Por qué esta fase sigue:** el usuario sustituyó la galería de parejas por selección continua de cartas; se conserva la deduplicación del server y se reemplaza el renderer antes del walkthrough.
+**Fase sugerida:** F2 — verificación independiente final.
+**Por qué esta fase sigue:** el usuario confirmó que el selector de cuatro cartas funciona y pidió avanzar; toca falsificar alcance, conteo, privacidad y correspondencia caption/choiceId sobre el commit exacto.
 
-**Estado actual F1:** implementación lista y build verificado sobre `origin/master@db1d22c`; servicios previstos en `http://localhost:3103` / backend `3104` responden. El walkthrough visual desktop/móvil sigue pendiente del propietario; F1 permanece `ACTIVE`.
+**Estado actual F1:** el propietario aceptó visualmente el selector tras corregir el servicio 3103 obsoleto; cliente y backend actualizados respondieron HTTP 200. Build y revisión estática pasan. No se informó una validación móvil separada.
 
 ## Fuentes, contrato y alcance
 
@@ -47,7 +47,7 @@
 2. Sincronizar branch con `origin/master` vigente sin perder los commits actuales.
 3. Implementar metadata privada de slots original/draw, persistencia en timeout/resume y deduplicación por multiconjunto.
 4. Reemplazar galería por cartas individuales, selección inicial, cursor alternante, caption y confirmación; no modificar `ResponseImageButton.js`.
-5. Revisar estados, build y hacer walkthrough usando `http://localhost:3103` (backend `3104`) en escritorio/móvil: selección inicial, clics alternados, caption/confirmación y respuesta posterior. No declarar verificaciones no realizadas.
+5. Revisar estados, build y hacer walkthrough usando `http://localhost:3103` (backend `3104`); el propietario confirmó el selector y su funcionamiento. No se informó una validación móvil separada.
 6. Guardar `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md`; conservar el reporte F1 previo como evidencia de la presentación supersedida.
 7. Verifier independiente en F2 revisa el commit exacto e intenta falsificar AC1–AC6.
 

@@ -1,6 +1,6 @@
 # Issue #47 — Reporte F1 v2: selección de cartas del pool
 
-**Estado:** implementación lista; fase `ACTIVE` a la espera del walkthrough visual del propietario.  
+**Estado:** `PASS`; el propietario confirmó que el selector funciona y pidió avanzar a F2.
 **Base:** `origin/master@db1d22c`; branch `issue/47-ambassador-exchange-options`.  
 **Diseño:** sustituye la galería del reporte F1 anterior, que queda como evidencia histórica supersedida.
 
@@ -24,9 +24,9 @@
 | `git diff --check` | PASS |
 | `npm run build` en `coup-client` | PASS, exit 0 |
 | Advertencias de build | Preexistentes: imports sin uso en `App.js`, operadores mixtos en `Coup.js` y parseo de `dvh` en `ReferencePanel.css` |
-| Walkthrough visual desktop/móvil, incluyendo interacción real | PENDIENTE del propietario en `http://localhost:3103` con backend `3104` |
+| Revisión del propietario en la app actualizada de 3103/3104 | PASS; confirmó que el selector quedó bien y funciona. Una revisión móvil separada no fue reportada |
 | Tests automatizados | No agregados ni ejecutados, según el plan |
 
 ## Veredicto F1
 
-La implementación, la revisión estática y el build pasan. No declaro cerrado F1: falta comprobar visualmente el estado inicial, sustitución B/A, selección de roles repetidos, caption y respuesta posterior en desktop y móvil. Los servicios locales responden en los puertos previstos según la comprobación del Orquestador. Mantener F1 `ACTIVE` hasta que el propietario complete ese recorrido; después solicitar Verifier independiente F2.
+La implementación, la revisión estática y el build pasan. El propietario confirmó el selector y su funcionamiento tras reiniciar el proceso obsoleto que inicialmente seguía sirviendo el renderer anterior; el bundle nuevo contenía `ExchangePoolCards`. No indicó una revisión móvil separada. F1 queda aceptada por instrucción explícita del propietario; F2 verificará independientemente el commit `3773322` sin ejecutar tests automatizados.

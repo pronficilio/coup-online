@@ -1,6 +1,6 @@
 # Plan — opciones visuales para el intercambio del Embajador (#47)
 
-**Estado:** `ACTIVE`; F1 `ACTIVE` tras rediseño solicitado por el usuario; issue `OPEN` asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1 `PASS` por aceptación del usuario; F2 `ACTIVE` con verificador independiente; issue `OPEN` asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/47
 **Handoff:** `docs/plans/active/issue_47_ambassador_exchange_options.md`
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
@@ -28,7 +28,7 @@ Incluye deduplicar por multiconjunto de roles, publicar al jugador elegible las 
 
 No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo de envío (`decisionId`, `stateVersion`, `choiceId`), ids de opciones permitidas, resolución de cartas devueltas ni UX de otros tipos de decisión. No revelar las opciones a otros asientos/Codex por una proyección pública más amplia.
 
-## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`ACTIVE`)
+## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`PASS`)
 
 **Pregunta única:** ¿puede el jugador formar cualquier combinación válida intercambiando iterativamente cartas iluminadas dentro del panel de acciones, con el server manteniendo autoridad y privacidad?
 
@@ -40,14 +40,14 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 - Usar el rojo neón y contorno blanco del estado de turno existente (`PlayerBoardStyles.css`) para resaltar cartas seleccionadas; preservar foco visible, teclado, estado enviado/pausa/error y eliminar el segundo renderer de `.DecisionsSection`.
 - Sincronizar branch sobre `origin/master` vigente antes de tocar producto; coordinar #43/#44/#45 por las superficies compartidas.
 - **Salida:** reporte `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md` con matriz de estados/clics, una/dos influencias, roles repetidos, privacidad/protocolo, build y walkthrough visual.
-- **Avanzar:** todo par legal es alcanzable, cada clic conserva exactamente `keepCount`, color/caption reflejan la selección y confirmar envía el `choiceId` correspondiente; walkthrough desktop/móvil PASS.
+- **Avanzar:** todo par legal es alcanzable, cada clic conserva exactamente `keepCount`, color/caption reflejan la selección y confirmar envía el `choiceId` correspondiente. El propietario revisó el selector y confirmó que funciona; no indicó una revisión móvil separada.
 - **Pivotar:** si la rotación alternante impide llegar a una pareja o confunde el estado con roles repetidos, documentar una secuencia reproducible y proponer la variación mínima sin cambiar el diseño de cartas individuales.
 - **Repetir:** una iteración acotada por defecto visual o de accesibilidad reproducible.
 - **Bloquear:** conflicto no resuelto con #43/#44/#45, filtración de cartas, selección distinta de lo enviado o ausencia de navegador para el walkthrough final.
 - **Commit:** `COMMIT_REQUIRED`; `feat(exchange): issue 47 F1 select from four visible cards`.
 - **Validación:** inspección estática del algoritmo de slots y proyección Socket.IO; build cliente si está disponible; walkthrough manual desktop/móvil de inicialización, clics alternados, roles repetidos y confirmación; `git diff --check`. No agregar ni ejecutar pruebas automatizadas.
 
-## F2 — Verificación independiente final (`PENDING`)
+## F2 — Verificación independiente final (`ACTIVE`)
 
 **Pregunta única:** ¿hay una secuencia de clics/estado donde sea inalcanzable una pareja legal, el número de cartas iluminadas sea incorrecto, se filtren roles privados o el botón inferior envíe una pareja distinta a la mostrada?
 
