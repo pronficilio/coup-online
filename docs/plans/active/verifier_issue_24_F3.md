@@ -1,11 +1,11 @@
 # PHASE independiente F3 — issue #24, renderer de acciones del turno
 
-**Estado:** `READY_FOR_INDEPENDENT_RECHECK`; debe ejecutarlo un Verifier distinto del primer intento F3 sobre el HEAD publicado que indique Orquestación.
+**Estado:** `WAITING_FOR_REBASE_AND_INDEPENDENT_RECHECK`; ejecutar sobre el HEAD publicado después de sincronizar PR #39/#28 y conservar el rail #24.
 **Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), todavía `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`.
 **Reporte de implementación F2:** `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`; destino `master` del fork.
-**Base actual del target:** `origin/master@64c1b295fe9586ea05c4e7dc2a713faec948ec24` (merge de PR #38, cierre documental de #19). El branch #24 se sincronizó mediante merge `e034a8a` para evitar re-replay de 21 commits; el rango incorporado contiene solo docs de #19 y README. Revisar el HEAD publicado que acompaña este handoff y confirmar que el worktree esté limpio.
+**Base actual del target:** `origin/master@951147234b6f8f640718ed945de5907140a724a9` (merge de PR #39/#28). El branch #24 parte de la sincronización anterior en `64c1b29` mediante `e034a8a`; ahora debe rebasearse sobre la nueva base. PR #39 integra rediseño del tablero e introduce cambios compartidos en `Coup.js`, `CoupStyles.css` y servidor. Confirmar que el nuevo HEAD preserva esos cambios de #28 y el portal/action rail, contrato de decisión y documentación #24 antes de continuar F3.
 
 **Primer resultado F3:** `FAIL` en `6d63199910c5a0e3b24ed60c847eef1bb231f6f7`; reporte en `docs/plans/turn-action-row-clarity/report_issue_24_F3.md`. F2 eliminó la segunda llamada action en `DecisionsSection`; verificar el commit exacto que Orquestación proporcione tras confirmar el push.
 
@@ -13,7 +13,7 @@
 
 F2 se cerró previamente `CLOSED / PASS` por aprobación de la usuaria del preview, con una excepción explícita de AC9: ella observó que los detalles se desmontan sin animación/transición visible y aceptó expresamente esa limitación. F2 está reabierta por el doble montaje hallado abajo. El waiver AC9 sigue vigente; no reportar esa transición como verificada ni pedir al usuario que vuelva a aprobarlo. Verificar el resto de AC9 y el renderer; si se descubre cualquier limitación adicional, documentarla como hallazgo y devolverla al Orquestador.
 
-La usuaria no cerró issue ni aprobó PR/integración. El Verifier debe limitarse a revisión, evidencia, build y handoff; no cambiar estado remoto de issue, abrir PR, integrar ni cerrar.
+La usuaria aprobó el preview y autorizó merge/cierre al completar verificación final. Esto no equivale a F3 PASS. El Verifier debe limitarse a revisión, evidencia, build y handoff; no abrir PR, integrar ni cerrar. Issue #24 continúa OPEN y no hay PR.
 
 ## Pregunta de falsificación
 

@@ -1,12 +1,12 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE` tras el hallazgo de F3; último intento F3 `FAIL`, repetir independientemente después de la corrección.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`; último recheck F3 `BLOCKED` hasta observar una acción con destino legal resolver exactamente una vez. El primer F3 `FAIL` por doble montaje se corrigió.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** F2 corrigió únicamente el doble montaje action; tras el push del checkpoint, un Verifier independiente distinto repite F3 FINAL. Se conserva el waiver aceptado de AC9.
+**Siguiente dueño:** Alquimista rebasea sobre `origin/master@951147234b6f8f640718ed945de5907140a724a9`, preservando los cambios de tablero #28 y el action rail #24. Después de diff-check/build y publicación, un Verifier independiente completa F3 con el único recorrido dinámico pendiente. Se conserva el waiver aceptado de AC9.
 
 ## Solicitud y definición de éxito
 
@@ -24,7 +24,7 @@ La persona usuaria quiere que las acciones disponibles durante su turno indiquen
 - `g-decision` expone solo opciones legales. `Coup.js` presenta solo acciones con opciones recibidas y localiza la etiqueta desde `choiceId`; el saldo público sirve para verificar los límites en el recorrido manual.
 - Las referencias visuales estaban en `fotos/`, fuera del historial versionado. Las tres copias de `references/` preservan la evidencia para el Ejecutor.
 - Reglas visibles ya comprobadas en el cliente: Assassinate requiere 3 monedas; Coup requiere 7; con 10 o más monedas solo Coup está permitido. Declarar una influencia no requiere tenerla.
-- Base inicial de la reanudación F2: `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Sincronización posterior: merge de `origin/master@64c1b295fe9586ea05c4e7dc2a713faec948ec24`, que integra el cierre documental de #19 vía PR #38 y solo cambia docs. Target actual: `master`.
+- Base inicial de la reanudación F2: `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Sincronización posterior: merge de `origin/master@64c1b295fe9586ea05c4e7dc2a713faec948ec24`, que integra el cierre documental de #19 vía PR #38. El target avanzó después a `origin/master@951147234b6f8f640718ed945de5907140a724a9` con PR #39/#28, con cambios funcionales en tablero y superficies compartidas; rebase #24 pendiente. Target: `master`.
 
 La revisión F1 confirmó que el renderer y los textos requeridos ya están publicados. En ese momento #19 permanecía abierto por validación manual/Verifier; después se cerró al integrar la PR documental #38 en `origin/master@64c1b29`. No reserva archivos de producto que bloqueen #24.
 
@@ -95,12 +95,12 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Cierre previo F2:** la usuaria aprobó el preview actual; su aceptación cubre el resultado visual del panel y reconoce el hallazgo de que los detalles se desmontan sin transición visible. Este punto queda exceptuado de AC9 por aceptación expresa, no reportado como comportamiento verificado. El cierre se revocó tras el fallo F3 descrito abajo.
 
-### F3 — Verificación independiente y entrega (`FAIL anterior`; recheck listo tras el fix)
+### F3 — Verificación independiente y entrega (`BLOCKED`; recheck de base pendiente)
 
 **Pregunta:** ¿puede refutarse que solo se muestran acciones legales, que summary/rail preservan su relación document-absolute al scroll, o que el ciclo mouse compacta/restaura sin cambiar el contrato de decisión?
 
 **Último resultado:** `FAIL` en `6d63199910c5a0e3b24ed60c847eef1bb231f6f7`. El reporte `docs/plans/turn-action-row-clarity/report_issue_24_F3.md` encontró dos montajes de `renderActionDecision()` para una decisión action, IDs/refs duplicados y foco de targets/cancelación potencialmente desviado.
-**Siguiente entrada:** el fix F2 ya quitó la llamada duplicada y el build/diff-check pasaron; la rama incorpora `origin/master@64c1b29` mediante merge documental, no replay de los commits F2. Un Verifier independiente nuevo recibe `docs/plans/active/verifier_issue_24_F3.md` tras publicar el sync checkpoint. El hallazgo anterior no equivale a PASS y se debe repetir F3.
+**Siguiente entrada:** el fix F2 quitó la llamada duplicada. Un Verifier observó un único panel, Cancelar funcional y overlays correctos; F3 sigue `BLOCKED` porque no se observó elegir un destino legal y confirmar exactamente una resolución. La rama debe rebasearse desde `origin/master@64c1b29` a `origin/master@9511472`, preservando #28 + #24; después de build/diff-check, un Verifier independiente recibe el brief actualizado. Ni el FAIL inicial ni la aprobación visual equivalen a PASS.
 
 **Salida:** informe FINAL independiente, capturas de estados normal/hover y rail absolute, evidencia de omisión de acciones no legales y estados expandidos/compactos, entrega del branch/PR canónico al Orquestador.
 
@@ -115,7 +115,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 ## Trazabilidad y topología
 
-Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. El branch conserva el rebase sobre `45a3eaa` y suma el merge documental de `origin/master@64c1b29`; F2 está activa por F3 FAIL, con waiver AC9 de la usuaria aún vigente. Issue abierta, sin PR; otro Verifier independiente recibe el F3 recheck.
+Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR tras terminar F1–F3. El branch conserva rebase previo a `45a3eaa` y merge documental `64c1b29`; `origin/master@9511472` añade cambios de #28 y el rebase actual está pendiente. F2 está activa; el último F3 está bloqueado por la resolución dinámica del target, waiver AC9 sigue vigente. Issue abierta, sin PR; repetir F3 luego del rebase.
 
 ## Decisiones
 

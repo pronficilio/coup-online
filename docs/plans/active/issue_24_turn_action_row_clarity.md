@@ -2,18 +2,18 @@
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Plan exacto:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE` tras F3 `FAIL`; waiver AC9 aceptado sigue vigente.
-**Fase activa:** retirar el doble montaje action detectado por F3. Después del fix, repetir F3 con un Verifier independiente distinto; el brief es `docs/plans/active/verifier_issue_24_F3.md`.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`; último F3 recheck `BLOCKED` hasta observar una sola resolución tras escoger un destino legal. El primer F3 `FAIL` por doble montaje se corrigió. Waiver AC9 aceptado sigue vigente.
+**Fase activa:** rebasear sobre `origin/master@951147234b6f8f640718ed945de5907140a724a9`, preservando el action rail #24 junto con el tablero #28; ejecutar diff-check/build y luego entregar el HEAD exacto a un Verifier F3 independiente. Falta observar una selección de target y una sola resolución; el preview y los overlays modales están aprobados. El brief es `docs/plans/active/verifier_issue_24_F3.md`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; Verifier independiente requerido en F3.
 **Bitácora exacta:** `docs/plans/log/issue-24.jsonl`.
 **Branch / worktree / merge target:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / `master` de `pronficilio/coup-online`.
 **PR/MR:** ninguna; una sola PR cuando se completen las fases.
 
-**Estado del preview:** la usuaria aprobó el preview actual para cerrar F2 y aceptó explícitamente que los detalles se desmontan sin animación/transición visible. El servidor `:3006` no necesita reinicio por este cambio de documentación; no reiniciar los servidores durante la revisión F3 salvo coordinación con Orquestación.
+**Estado del preview:** la usuaria aprobó el preview actual, confirmó un solo panel de acciones, Cancelar funcional y los modales de Reglas/Resumen por encima del rail; también aceptó explícitamente que los detalles se desmontan sin animación/transición visible. El último recorrido aún no observó una selección de destino legal con resolución única. No parar los servidores `:3006`/`:18000`; coordinar un reinicio de CRA solo si Orquestación lo requiere tras el rebase.
 
 ## Reclamo y aislamiento
 
-Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado era `cfbbb7b` y luego se rebaseó inicialmente sobre `origin/master@5de95ee`. La reanudación F2 posterior rebaseó sobre `45a3eaa`; el sync actual incorpora `origin/master@64c1b29` mediante el merge documental `e034a8a`.
+Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado era `cfbbb7b` y luego se rebaseó inicialmente sobre `origin/master@5de95ee`. La reanudación F2 posterior rebaseó sobre `45a3eaa`; el sync de documentación #19 incorporó `origin/master@64c1b29` mediante `e034a8a`. Ahora `origin/master` avanzó a `951147234b6f8f640718ed945de5907140a724a9` al integrar PR #39/#28; ese PR modifica Coup.js/CoupStyles.css y otras superficies compartidas. El rebase solicitado aún está pendiente en este handoff.
 
 ## F2 — implementación y evidencia histórica; reabierta por F3 FAIL
 
@@ -33,7 +33,7 @@ Las PR #23 de #14 y #22 de #19 ya están integradas. El renderer vigente está e
 
 **Revisión y validación:** el Alquimista revisó el diff DOM/CSS; `git diff --check` pasa y `npm run build` terminó exit 0 con warnings conocidos. No tests automatizados. Checkpoint `b59bb022ee79e455fce3bfe281255cee359f034e` publicado. El Orquestador reinició CRA desde ese HEAD, confirmó `Compiled successfully` y bundle disponible en `http://localhost:3006` (HTTP 200, 2,393,146 bytes); backend `:18000` permanece activo. Preview listo para la usuaria.
 
-**Siguiente acción:** el Alquimista quita únicamente la segunda llamada action dentro de `DecisionsSection`, preservando el portal como renderer único, el botón de emergencia Codex y los demás decision types. Después de diff-check/build y push, asignar F3 a otro Verifier independiente para repetir el conteo de `.DecisionActionPanel`, IDs/refs y foco de targets/cancelación. No abrir PR, integrar ni cerrar issue.
+**Siguiente acción:** el Alquimista rebasea `issue/24-turn-action-row-clarity` sobre `origin/master@951147234b6f8f640718ed945de5907140a724a9`, preservando las adiciones de tablero #28 y el renderer action/rail/pausa de #24. Después corre diff-check y build, publica el HEAD y entrega el reporte/handoff a un Verifier independiente para revisar integración y completar F3. Solo falta observar que seleccionar un destino legal produzca exactamente una resolución. La usuaria ya autorizó una integración/cierre posteriores a la verificación, pero este checkpoint no abre PR, integra ni cierra la issue.
 
 ## Quinta revisión visual — tamaño de títulos al compactar
 
