@@ -2,7 +2,7 @@
 
 **Veredicto:** `ACTIVE`
 **Branch / worktree:** `issue/47-ambassador-exchange-options` / `.worktrees/issue-47-ambassador-exchange-options`
-**Base usada para comenzar F1:** `origin/master` en `f900c094`; después se incorporó el merge de #46 (`2f45d78`). Durante esta fase `origin/master` avanzó además a `0a467c1` con documentación de cierre de #46; queda pendiente sincronizar el último commit antes de entregar integración.
+**Base usada para comenzar F1:** `origin/master` en `f900c094`; después se incorporó el merge de #46 (`2f45d78`). `origin/master` avanzó a `0a467c1` con documentación de cierre de #46; el branch se rebasó exitosamente sobre esa base después del commit F1.
 **Alcance revisado:** `server/game/coup.js`, `Coup.js`, `CoupStyles.css`, `ExchangeDecisionPanel.js`, `translations.json`.
 
 ## Resultado de deduplicación
