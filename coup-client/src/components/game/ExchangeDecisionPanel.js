@@ -94,7 +94,12 @@ export default function ExchangeDecisionPanel({ decision, keepCount, submitted, 
                     className={`ExchangePoolCard${selected ? ' ExchangePoolCard--selected' : ''}`}
                     disabled={submitted || paused}
                     aria-pressed={selected}
-                    aria-label={t('game.decision.exchange.cardLabel', { source, role: label, selected: selected ? t('game.decision.exchange.selected') : '' })}
+                    aria-label={t('game.decision.exchange.cardLabel', {
+                        source,
+                        role: label,
+                        position: t('game.decision.exchange.cardPosition', { position: index + 1, count: poolSlots.length }),
+                        selected: selected ? t('game.decision.exchange.selected') : ''
+                    })}
                     onClick={() => selectSlot(index)}
                 >
                     <span className="ExchangePoolCardImage">

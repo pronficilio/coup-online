@@ -35,11 +35,12 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 - Conservar la deduplicación server por firma canónica multiconjunto y su primera combinación física representante.
 - Proyectar solo al asiento elegible una lista ordenada de slots del pool con rol e indicador original/draw; no enviar índices de resolución ni `choice.value`. Preservar esta metadata en pausas/reanudaciones si la decisión puede recuperarse.
 - Mostrar cada carta física del pool una sola vez (4 si el jugador conserva dos influencias; 3 con una influencia), diferenciando original/draw por posición y nombre accesible, sin depender del rol para identificar copias iguales.
+- El nombre accesible de cada carta incluye una posición localizada única dentro del pool, además de su origen, rol y estado seleccionado; no añade texto visible.
 - Estado inicial: slots de la mano original iluminados; cartas robadas no iluminadas. Para dos originales, reemplazar el slot 1 (B) en el primer clic, slot 0 (A) en el segundo y alternar después. Un clic en seleccionada no cambia selección ni cursor. Para una original, reemplazar la única seleccionada en cada clic.
 - Mantener exactamente `keepCount` cartas iluminadas. Calcular su multiconjunto de roles y asociarlo al `choiceId` permitido existente. No enviar hasta confirmar el rótulo inferior dinámico `Conservar X y Y`, que también será el botón de envío según aclaración del usuario.
 - Usar el rojo neón y contorno blanco del estado de turno existente (`PlayerBoardStyles.css`) para resaltar cartas seleccionadas; preservar foco visible, teclado, estado enviado/pausa/error y eliminar el segundo renderer de `.DecisionsSection`.
 - Sincronizar branch sobre `origin/master` vigente antes de tocar producto; coordinar #43/#44/#45 por las superficies compartidas.
-- **Salida:** reporte `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md` con matriz de estados/clics, una/dos influencias, roles repetidos, privacidad/protocolo, build y walkthrough visual.
+- **Salida:** reporte de diseño/recorrido `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md` y correcciones focalizadas en `report_issue_47_F1_accessibility_fix.md`.
 - **Avanzar:** todo par legal es alcanzable, cada clic conserva exactamente `keepCount`, color/caption reflejan la selección y confirmar envía el `choiceId` correspondiente. El propietario revisó el selector y confirmó que funciona; no indicó una revisión móvil separada.
 - **Pivotar:** si la rotación alternante impide llegar a una pareja o confunde el estado con roles repetidos, documentar una secuencia reproducible y proponer la variación mínima sin cambiar el diseño de cartas individuales.
 - **Repetir:** una iteración acotada por defecto visual o de accesibilidad reproducible.
@@ -47,12 +48,12 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 - **Commit:** `COMMIT_REQUIRED`; `feat(exchange): issue 47 F1 select from four visible cards`.
 - **Validación:** inspección estática del algoritmo de slots y proyección Socket.IO; build cliente si está disponible; walkthrough manual desktop/móvil de inicialización, clics alternados, roles repetidos y confirmación; `git diff --check`. No agregar ni ejecutar pruebas automatizadas.
 
-## F2 — Verificación independiente final (`FAIL`; reintento focalizado pendiente)
+## F2 — Verificación independiente final (`FAIL`; re-verificación focalizada pendiente)
 
 **Pregunta única:** ¿hay una secuencia de clics/estado donde sea inalcanzable una pareja legal, el número de cartas iluminadas sea incorrecto, se filtren roles privados o el botón inferior envíe una pareja distinta a la mostrada?
 
 - Verifier independiente revisa el commit final e intenta falsificar reachability de las parejas, alternancia B/A, conteo de selección (dos cartas o una en el caso de una influencia), mapping caption→choiceId y proyección privada al asiento elegible.
-- **Salida:** `docs/plans/ambassador-exchange-options/report_issue_47_F2_verifier.md` y verdict `PASS`/`FAIL`/`BLOCKED`.
+- **Salida:** `docs/plans/ambassador-exchange-options/report_issue_47_F2_verifier.md` para la revisión inicial y un reporte de re-verificación focalizada sobre el fix de nombre accesible.
 - **Avanzar:** `PASS` documentado y unidad `WAITING_ORCHESTRATOR` para revisión de PR.
 - **Pivotar:** corregir el caso exacto señalado, conservar evidencia y solicitar re-verificación focalizada.
 - **Repetir:** una verificación sobre el commit corregido.

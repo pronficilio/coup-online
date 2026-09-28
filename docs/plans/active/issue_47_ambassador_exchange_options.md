@@ -11,7 +11,7 @@
 **Fase sugerida:** F1 — añadir posición de slot a cada nombre accesible para distinguir copias con igual rol y origen.
 **Por qué esta fase sigue:** el verificador encontró nombres accesibles indistinguibles para slots físicos duplicados; corregir sin alterar la selección aprobada y repetir F2.
 
-**Estado actual F1:** el propietario aceptó visualmente el selector. F2 encontró un defecto accesible en la identidad de slots repetidos; se conserva el diseño y se reabre F1 para una corrección focalizada.
+**Estado actual F1:** el propietario aceptó visualmente el selector. F2 encontró un defecto accesible en la identidad de slots repetidos; se conserva el diseño y se reabre F1 para una corrección focalizada. Cada `aria-label` ahora incluye origen, rol, posición localizada única y estado seleccionado. El build pasa; F2 queda pendiente de re-verificación independiente.
 
 ## Fuentes, contrato y alcance
 
@@ -48,8 +48,8 @@
 3. Implementar metadata privada de slots original/draw, persistencia en timeout/resume y deduplicación por multiconjunto.
 4. Reemplazar galería por cartas individuales, selección inicial, cursor alternante, caption y confirmación; no modificar `ResponseImageButton.js`.
 5. Revisar estados, build y hacer walkthrough usando `http://localhost:3103` (backend `3104`); el propietario confirmó el selector y su funcionamiento. No se informó una validación móvil separada.
-6. Guardar `docs/plans/ambassador-exchange-options/report_issue_47_F1_v2.md`; conservar el reporte F1 previo como evidencia de la presentación supersedida.
-7. Verifier independiente en F2 revisa el commit exacto e intenta falsificar AC1–AC6.
+6. Mantener el reporte F1 v2 como evidencia de diseño y añadir `docs/plans/ambassador-exchange-options/report_issue_47_F1_accessibility_fix.md` para esta corrección acotada.
+7. Verifier independiente vuelve a revisar el commit exacto; F2 sigue pendiente hasta esa verificación.
 
 No agregar ni ejecutar tests automatizados. Validación esperada: revisión estática, `git diff --check`, build y recorrido manual móvil/escritorio de selección, alternancia, caption y confirmación.
 
