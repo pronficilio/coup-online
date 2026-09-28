@@ -16,7 +16,7 @@
 
 ## Fase activa: F4 — Falsificación y entrega
 
-F1–F3 están cerradas con `PASS` en el mismo branch. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3` (`204df10`); F3 se documenta en `docs/plans/event-log-reactions/report_issue_40_F3.md` y su evidencia está en `evidence_issue_40_F3/`. La F4 debe verificar unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación escritorio/móvil antes de dejar una PR lista para revisión del Orquestador.
+F1–F3 están cerradas con `PASS` en el mismo branch. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3` (`0eae42d` tras el rebase); F3 está en `feat(reaction-bubbles): issue 40 F3 CLOSED advance_f4` (`03062c9`). El reporte F3 es `docs/plans/event-log-reactions/report_issue_40_F3.md`, con evidencia en `evidence_issue_40_F3/`. F4 debe verificar unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación escritorio/móvil antes de dejar una PR lista para revisión del Orquestador.
 
 ## Dependencia de F1
 
@@ -24,7 +24,7 @@ F1 ya cerró el contrato tipado, los resultados públicos y el estado autoritati
 
 ## Reclamo, rama y aislamiento
 
-Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se rebasó sobre `origin/master@f900c09` antes de comenzar F2; no se creó otro worktree ni se integró la rama de #24 como dependencia.
+Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se rebasó sobre `origin/master@f900c09` antes de F2 y sobre `origin/master@0a467c1` después de F3, preservando #46. No se creó otro worktree ni se integró la rama de #24 como dependencia.
 
 F1 se ejecutó directamente en el worktree por falta de delegación disponible en ese contexto. F2 y F3 continúan bajo dirección del Orquestador tras cerrar el hilo del Alquimista que no inició trabajo después de su reanudación.
 

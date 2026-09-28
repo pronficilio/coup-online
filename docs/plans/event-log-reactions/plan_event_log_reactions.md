@@ -7,7 +7,7 @@
 **Bitácora:** `docs/plans/log/issue-40.jsonl`  
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.  
 **Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.  
-**Base / destino:** `origin/master` (`f900c0947a0b27ac9c6e0372e3c1871a883be7e6`) / `master` de `pronficilio/coup-online`.
+**Base / destino:** `origin/master` (`0a467c10a8d2c6c1b57eff5911c682aab9362ebf`) / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue completo; aún no existe.
 
 ## Solicitud y resultado esperado
@@ -21,7 +21,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - `server/game/coup.js` emite mensajes de texto por `g-addLog`; el cliente los guarda como strings en `Coup.js` y los presenta en `EventLog.js`.
 - Las traducciones actuales están en `coup-client/src/i18n/translations.json`; el tablero expone nombre, monedas y asiento en `PlayerBoard.js`.
 - Los PNG de `fotos/` son referencias locales excluidas de Git y pueden faltar en este worktree. No importarlos ni agregarlos al PR sin validar disponibilidad y optimizar los derivados.
-- La issue #24 se cerró al fusionarse la PR #41 (`2160ada`); su rail y sus estilos ya están en `origin/master`. Esta rama se rebasó sobre `f900c09` antes de F2. Preservar el rail integrado y mantener el CSS del registro en `EventLogStyles.css`.
+- La issue #24 se cerró al fusionarse la PR #41 (`2160ada`); su rail y sus estilos ya están en `origin/master`. Esta rama se rebasó sobre `f900c09` antes de F2 y sobre `0a467c1` tras F3, que incluye el cierre de #46. Preservar ambos cambios y mantener el CSS del registro en `EventLogStyles.css`.
 - El Orquestador creó este branch/worktree a petición explícita del usuario, antes del reclamo del Alquimista. El Alquimista debe volver a leer issue/PR/branch, confirmar que no hay reclamo incompatible y registrar su propio `claim` remoto antes de cambios de producto.
 
 ## Decisiones aprobadas
@@ -53,7 +53,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Commit:** `feat(event-reactions): issue 40 F1 CLOSED advance_f2` (`COMMIT_REQUIRED`).
 - **Verifier:** no en esta fase; resultado independiente `FINAL` obligatorio antes de integrar.
 - **Revisión del Orquestador:** F1 aprobada. Las cuatro fallas generales son expectativas existentes de pausa/reanudación no modificadas en F1; están registradas para seguimiento de la suite y no bloquean la superficie independiente de F2.
-- **Estado de entrega:** F2 `ACTIVE`; #24 y PR #41 están integradas en `origin/master@f900c09`. Preservar el rail de acciones, usar CSS separado para EventLog y limitar el cableado de `Coup.js` al componente del registro.
+- **Estado de entrega:** F4 `ACTIVE`; F1–F3 `CLOSED / PASS`. #24/PR #41 y #46/PR #48 están integradas en `origin/master@0a467c1`. Preservar el rail, cierre de partida, CSS separado de EventLog y cableado de presencia.
 
 ### F2 — Registro y controles de reacción
 
