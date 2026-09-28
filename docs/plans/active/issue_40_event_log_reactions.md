@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/40  
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`  
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`  
-**Estado del plan:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `CLOSED / PASS`; F4 `ACTIVE`
+**Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, revisión estática en curso.
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
 **Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, antes de preparar la PR.
 **Pregunta de falsificación:** ¿alguna secuencia de cliente rompe los doce criterios de aceptación, filtra una carta o vínculo persistente jugador→evento/reacción, duplica conteos o deja globos/timers obsoletos?
@@ -16,7 +16,7 @@
 
 ## Fase activa: F4 — Falsificación y entrega
 
-F1–F3 están cerradas con `PASS` en el mismo branch. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3` (`0eae42d` tras el rebase); F3 está en `feat(reaction-bubbles): issue 40 F3 CLOSED advance_f4` (`03062c9`). El reporte F3 es `docs/plans/event-log-reactions/report_issue_40_F3.md`, con evidencia en `evidence_issue_40_F3/`. F4 debe verificar unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación escritorio/móvil antes de dejar una PR lista para revisión del Orquestador.
+F1–F3 están cerradas con `PASS`. F3 se reabrió durante F4 al comprobar la issue #40: AC9 requiere opacidad y escala, y el primer acabado solo tenía opacidad/blur. Se añadió escala breve y el build posterior pasó. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3` (`0eae42d` tras el rebase); F3 parte de `03062c9` más el commit correctivo AC9. El reporte F3 es `docs/plans/event-log-reactions/report_issue_40_F3.md`, con evidencia en `evidence_issue_40_F3/`. F4 debe verificar unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación escritorio/móvil antes de dejar una PR lista para revisión del Orquestador.
 
 ## Dependencia de F1
 

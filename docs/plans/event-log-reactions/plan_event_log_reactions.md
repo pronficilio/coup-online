@@ -1,6 +1,6 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `CLOSED / PASS`; F4 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
 
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
 **Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
@@ -84,11 +84,11 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Repetir:** repetir una vez tras corregir un fallo visual o de temporizador reproducible.
 - **Bloquear/cancelar:** bloquear si hace falta identificar globalmente el evento en el globo o alterar privacidad aprobada.
 - **Commit:** `feat(reaction-bubbles): issue 40 F3 CLOSED advance_f4` (`COMMIT_REQUIRED`).
-- **Entrega/revisión:** F3 `CLOSED / PASS`. El reporte `docs/plans/event-log-reactions/report_issue_40_F3.md` documenta el reemplazo y expiración por asiento, limpieza de timers, límite de privacidad, build y recorrido visual de seis asientos en escritorio/móvil. F4 debe falsificar las secuencias de reemplazo, retiro y caducidad en el flujo completo.
+- **Entrega/revisión:** F3 `CLOSED / PASS`, incluida la corrección AC9 de opacidad/escala detectada durante F4. El build posterior al rebase y la corrección pasó; quedan documentados los avisos preexistentes y de #46. Reporte y recorrido visual: `docs/plans/event-log-reactions/report_issue_40_F3.md`, `evidence_issue_40_F3/`. F4 falsifica las secuencias de reemplazo, retiro y caducidad en el flujo completo.
 
 ### F4 — Falsificación y entrega
 
-**Estado:** `ACTIVE`; F3 fue cerrada `PASS` por revisión del Orquestador. Informe: `docs/plans/event-log-reactions/report_issue_40_F3.md`; capturas desktop/móvil en `evidence_issue_40_F3/`.
+**Estado:** `ACTIVE`; F3 `CLOSED / PASS` tras corregir la escala requerida por AC9. El Verifier realiza la revisión estática independiente antes del veredicto final.
 
 **Pregunta única:** ¿Puede una ruta cliente o secuencia concurrente refutar unicidad, conteos, privacidad, caducidad o presentación sin horas?
 
