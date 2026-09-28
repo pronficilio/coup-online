@@ -148,3 +148,19 @@ En el reintento, el propietario reportó `Error del servidor` al unirse. `JoinGa
 ### Límites de evidencia
 
 La revisión visual fue realizada por el propietario, no por este Verifier: cubre cinco jugadores en móvil (~390 px), cinco jugadores en escritorio y el ciclo descrito del halo. No se afirma revisión visual manual de todas las cantidades de jugadores o resoluciones. Para los demás casos de 2–6 jugadores, tablet, pantallas altas, privacidad y lógica del contador, la evidencia es estática y procede del CSS/DOM y del flujo de servidor ya auditados. No se ejecutaron builds, tests, capturas ni cambios de producto durante esta repetición.
+
+## Addendum F4 — revalidación del overlay de pérdida en `ca02833` (2026-09-28)
+
+**Veredicto: `PASS`.** El mismo Verifier revisó `ca02833eef06d4961a125e89138906587862b383`. El diff de producto `ecd6c62..ca02833` cambia únicamente `background` de `.PlayerInfluenceLostOverlay` en `PlayerBoardStyles.css:445`, de `rgba(120, 120, 120, 0.43)` a `rgba(120, 120, 120, 0.73)`; no altera geometría, orden, contenido ni protocolo.
+
+| Criterio | Resultado | Evidencia en el candidato |
+|---|---|---|
+| 1. Influencias propias | PASS | Sin cambios respecto al F4 PASS de `d37dacc`; `PlayerBoard.js` sigue mostrando las etiquetas localizadas propias sin la sección global. |
+| 2. Tablero, HUD y responsive | PASS | Sin cambios de producto desde el PASS anterior, salvo la opacidad de pérdida; el fix global de ancho/wrap del Event Log permanece. |
+| 3. Contador Court | PASS | Sin cambios; `courtCount` y su presentación sobre el mazo permanecen. |
+| 4. Sincronización y privacidad | PASS estático | Sin cambios del servidor; no se amplía el payload ni se exponen identidades ocultas. |
+| 5. Reglas y protocolo | PASS | Sin cambios de reglas o protocolo. |
+| 6. Estado de cartas perdidas | PASS | `PlayerBoard.js:42–47` define pérdida por `slotIndex < revealed.length`; la etiqueta localizada/rol está en un elemento hermano del slot (`:64–79`), fuera de la capa gris. La marca × permanece sobre la capa y conserva fondo oscuro, borde y glifo blanco (`PlayerBoardStyles.css:436–463`). El selector aplica la capa solo al slot `--lost`; las influencias rivales ocultas usan `--back` (`PlayerBoard.js:83–98`), y una influencia temporal devuelta a Court no se agrega a `revealedInfluences` según el flujo de servidor ya auditado. |
+| 7. Halo de respuesta | PASS | Sin cambios respecto al F4 PASS anterior; sigue limitado a opciones locales en una ventana abierta. |
+
+El aumento de opacidad refuerza la lectura de carta descartada sin oscurecer el texto de rol situado fuera del overlay ni la marca ×, que es un hijo superpuesto con alto contraste. La capa sigue excluida de cartas ocultas y temporales por el estado y selector existentes. Esto se verificó por lectura estática; no se hizo una nueva inspección visual de esta variante. El build (código 0, con avisos conocidos) y `git diff --check` fueron reportados por el coordinador; no se volvieron a ejecutar build ni tests. No se hizo commit.

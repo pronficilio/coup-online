@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. [PR #39](https://github.com/pronficilio/coup-online/pull/39) está OPEN y `MERGEABLE` hacia `master`, vinculada con `Fixes #28`; GitHub no reporta checks. El mismo Verifier dio PASS FINAL sobre `d37dacc` después de la confirmación visual propietaria 5p desktop. La issue remota sigue OPEN hasta integrar.
+- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El ajuste final `ca02833` (`rgba(120, 120, 120, 0.73)`) pasó build y revalidación F4 FINAL del mismo Verifier, incluido C6. Se actualizará la PR #39 con el candidato; la issue remota sigue abierta hasta integrar.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -126,3 +126,7 @@ El propietario reportó que `http://localhost:3016` no respondía. Se encontró 
 En la revisión posterior, el propietario informó `Error del servidor` al intentar unirse. `JoinGame` muestra ese texto cuando falla por red/HTTP la consulta `/exists`; un código inválido tiene otro mensaje. Se reinició el cliente con `HOST=0.0.0.0`. `ss` confirmó `0.0.0.0:3016` y `*:8016`, y el API contestó HTTP 200 con CORS desde la dirección de red. Luego el propietario confirmó que el preview ya funciona y que en escritorio se ven bien los cinco jugadores y las cartas. F4 FINAL independiente se repite sobre `d37dacc`; no publicar/cerrar antes del PASS.
 
 El mismo Verifier emitió `PASS` FINAL sobre `d37daccdbe37d997aaee3d7e23eb64e7712cf237`; revisó el tip documental `6003c8f` y confirmó que no había diff de cliente/servidor frente al producto. C1–C7 pasan, con ~41 px calculados entre el Event Log y las cartas superiores a 1200×900; la confirmación visual de 5p desktop es del propietario. El desglose y límites de evidencia están en `report_issue_28_F4.md`. F2/F4 quedan cerradas con PASS; se prepara PR y la issue no se cerrará hasta integrar.
+
+### Ajuste final de legibilidad de influencias perdidas — 2026-09-28
+
+Tras su revisión con el inspector de elementos, el propietario pidió elevar el alpha del fondo de `.PlayerInfluenceLostOverlay` de `0.43` a `0.73`, conservando `rgba(120, 120, 120, ...)`. El cambio quedó en `ca02833`; `npm run build` pasa con los avisos conocidos y el CSS generado contiene `hsla(0,0%,47%,.73)`. El mismo Verifier repitió F4 FINAL y dio PASS en C1–C7; en C6 confirma que el rol y la marca siguen legibles y que solo se oscurecen cartas perdidas. F2/F4 quedan cerradas de nuevo; se actualiza la PR #39 con este candidato antes de pedir aprobación de merge.
