@@ -1,6 +1,6 @@
 # Issue #47 — Corrección F1 de identidad accesible por slot
 
-**Estado:** corrección implementada y compilada; F1 espera la re-verificación focalizada de F2.  
+**Estado:** corrección implementada, compilada y verificada independientemente en F2 (`PASS`).
 **Hallazgo origen:** `docs/plans/ambassador-exchange-options/report_issue_47_F2_verifier.md`, commit `284b8b9`.  
 **Alcance:** distinguir cartas físicas que comparten rol y origen en sus nombres accesibles, sin alterar presentación ni comportamiento.
 
@@ -25,4 +25,4 @@ El build mantiene advertencias preexistentes en `App.js`, `Coup.js` y el cálcul
 
 ## Siguiente paso
 
-F1 queda lista para la revisión focalizada del Verifier: confirmar que dos cartas físicas con el mismo origen y rol tienen nombres accesibles distintos y que la diferencia se debe solo a la posición, y comprobar que el mismo nombre conserva origen/rol/selección. F2 permanece pendiente hasta que esa re-verificación quede documentada.
+F2 confirmó que dos cartas físicas con el mismo origen y rol tienen nombres accesibles distintos por posición, conservando origen/rol/selección y `aria-pressed`; el reporte final está en `report_issue_47_F2_verifier.md`.

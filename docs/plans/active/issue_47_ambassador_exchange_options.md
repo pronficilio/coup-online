@@ -2,16 +2,16 @@
 
 **Issue/Ticket:** [#47 — Optimizar y visualizar las opciones de intercambio del Embajador](https://github.com/pronficilio/coup-online/issues/47), `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
-**Estado del plan:** `ACTIVE`; F2 detectó nombres accesibles duplicados para cartas físicas iguales; F1 reabierta para corrección focalizada.
+**Estado del plan:** `WAITING_ORCHESTRATOR`; F1 y F2 pasan, listo para revisión de PR.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `MEDIUM` (decisión de juego y render privado por asiento).
 **Política de verificación:** `FINAL` independiente.
-**Verifier requerido ahora:** sí, tras el ajuste F1; repetir F2 focalizada en la identidad accesible de slots repetidos.
+**Verifier requerido ahora:** no; F2 PASS sobre el commit `cc7b568`.
 **Pregunta de falsificación:** ¿una selección alternante deja menos/más cartas iluminadas que las permitidas, hace inalcanzable una pareja legal, proyecta roles a otro asiento o envía un `choiceId` distinto del caption?
-**Fase sugerida:** F1 — añadir posición de slot a cada nombre accesible para distinguir copias con igual rol y origen.
-**Por qué esta fase sigue:** el verificador encontró nombres accesibles indistinguibles para slots físicos duplicados; corregir sin alterar la selección aprobada y repetir F2.
+**Fase sugerida:** revisión Orquestador y preparación de PR única a `master`.
+**Por qué esta fase sigue:** F1 fue aceptada por el propietario y F2 confirmó selección, privacidad y nombres accesibles únicos; resta revisar integración y publicar la PR para revisión.
 
-**Estado actual F1:** el propietario aceptó visualmente el selector. F2 encontró un defecto accesible en la identidad de slots repetidos; se conserva el diseño y se reabre F1 para una corrección focalizada. Cada `aria-label` ahora incluye origen, rol, posición localizada única y estado seleccionado. El build pasa; F2 queda pendiente de re-verificación independiente.
+**Estado actual:** el propietario aceptó visualmente el selector. F2 reportó inicialmente nombres accesibles duplicados; la corrección incluye origen, rol, posición localizada única y estado seleccionado. La re-verificación focalizada confirmó `PASS` en `cc7b568`.
 
 ## Fuentes, contrato y alcance
 
@@ -49,7 +49,7 @@
 4. Reemplazar galería por cartas individuales, selección inicial, cursor alternante, caption y confirmación; no modificar `ResponseImageButton.js`.
 5. Revisar estados, build y hacer walkthrough usando `http://localhost:3103` (backend `3104`); el propietario confirmó el selector y su funcionamiento. No se informó una validación móvil separada.
 6. Mantener el reporte F1 v2 como evidencia de diseño y añadir `docs/plans/ambassador-exchange-options/report_issue_47_F1_accessibility_fix.md` para esta corrección acotada.
-7. Verifier independiente vuelve a revisar el commit exacto; F2 sigue pendiente hasta esa verificación.
+7. Verifier independiente re-revisó el commit de corrección exacto y F2 terminó `PASS`; no se ejecutaron tests automatizados.
 
 No agregar ni ejecutar tests automatizados. Validación esperada: revisión estática, `git diff --check`, build y recorrido manual móvil/escritorio de selección, alternancia, caption y confirmación.
 
@@ -60,7 +60,7 @@ No agregar ni ejecutar tests automatizados. Validación esperada: revisión est�
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **Bitácora:** `docs/plans/log/issue-47.jsonl`.
 - **PR/MR esperado:** una PR a `master`, asociada solo a #47.
-- **Estado del reclamo:** issue asignada y claim visible; handoff ya está en `active`; el Alquimista debe sincronizar el branch actual con `origin/master` vigente antes de editar producto.
+- **Estado del reclamo:** issue asignada y claim visible; unidad en `WAITING_ORCHESTRATOR`, pendiente de revisión de integración y PR.
 - **Commits:** `COMMIT_REQUIRED` por fase; mensajes en el plan.
 - **Qué actualizar:** issue, plan, bitácora, handoff y reportes F1/F2.
 - **Delegación:** delegar subtareas ordinarias según jerarquía/política existente; no inventar roles.

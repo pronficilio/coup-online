@@ -1,6 +1,6 @@
 # Plan — opciones visuales para el intercambio del Embajador (#47)
 
-**Estado:** `ACTIVE`; F2 inicial `FAIL`, F1 reabierta para una corrección de accesibilidad acotada; issue `OPEN` asignada a `pronficilio`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `PASS`, F2 re-verificación focalizada `PASS`; issue `OPEN` asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/47
 **Handoff:** `docs/plans/active/issue_47_ambassador_exchange_options.md`
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
@@ -28,7 +28,7 @@ Incluye deduplicar por multiconjunto de roles, publicar al jugador elegible las 
 
 No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo de envío (`decisionId`, `stateVersion`, `choiceId`), ids de opciones permitidas, resolución de cartas devueltas ni UX de otros tipos de decisión. No revelar las opciones a otros asientos/Codex por una proyección pública más amplia.
 
-## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`ACTIVE`, corrección focalizada)
+## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`PASS`)
 
 **Pregunta única:** ¿puede el jugador formar cualquier combinación válida intercambiando iterativamente cartas iluminadas dentro del panel de acciones, con el server manteniendo autoridad y privacidad?
 
@@ -48,7 +48,7 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 - **Commit:** `COMMIT_REQUIRED`; `feat(exchange): issue 47 F1 select from four visible cards`.
 - **Validación:** inspección estática del algoritmo de slots y proyección Socket.IO; build cliente si está disponible; walkthrough manual desktop/móvil de inicialización, clics alternados, roles repetidos y confirmación; `git diff --check`. No agregar ni ejecutar pruebas automatizadas.
 
-## F2 — Verificación independiente final (`FAIL`; re-verificación focalizada pendiente)
+## F2 — Verificación independiente final (`PASS`)
 
 **Pregunta única:** ¿hay una secuencia de clics/estado donde sea inalcanzable una pareja legal, el número de cartas iluminadas sea incorrecto, se filtren roles privados o el botón inferior envíe una pareja distinta a la mostrada?
 
@@ -65,6 +65,6 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 
 Una unidad #47 → `issue/47-ambassador-exchange-options` → `.worktrees/issue-47-ambassador-exchange-options` → una PR a `master` de `pronficilio/coup-online`. Antes de reclamar, leer issue y comprobar branch/worktree/PR candidato; registrar claim en el fork, releer y usar aislamiento desde `origin/master` actualizado. No usar `upstream`.
 
-**Siguiente dueño:** Alquimista, reemplazar la galería de opciones F1 por la interacción de cartas descrita arriba. El navegador está disponible en `http://localhost:3103` con backend en `3104` para el walkthrough. Verifier independiente en F2 después del cierre F1.
+**Siguiente dueño:** Orquestador, revisar la integración final, sincronizar si `origin/master` avanzó y preparar una PR única asociada a #47. F2 independiente pasó sobre `cc7b568`; la revisión incluyó la ronda inicial FAIL y su corrección.
 
 **Falsificación:** ¿hay un pool alcanzable de cartas donde la interfaz ofrece dos opciones con la misma pareja de roles, omite una pareja distinta, muestra una carta diferente a la incluida en el `choiceId`, o envía opciones/datos privados a un asiento no elegible?
