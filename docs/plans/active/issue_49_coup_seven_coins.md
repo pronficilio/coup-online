@@ -1,9 +1,9 @@
 # Handoff para Agente Alquimista — issue #49
 
-- **Issue:** https://github.com/pronficilio/coup-online/issues/49 (`OPEN`, sin assignee al handoff).
+- **Issue:** https://github.com/pronficilio/coup-online/issues/49 (`OPEN`, asignada a `pronficilio`).
 - **Plan exacto:** `docs/plans/coup-seven-coins/plan_coup_seven_coins.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-49.jsonl`.
-- **Estado:** `WAITING_EXECUTOR`; F1 `READY`.
+- **Estado:** `ACTIVE`; F1 `CLOSED`, F2 `READY`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido:** sí, independiente antes de integración.
 - **Pregunta de falsificación:** ¿puede una selección legal de Coup con 7–9 monedas seguir siendo rechazada o cobrada dos veces, eludir el Coup obligatorio con 10+, reabrir silenciosamente una acción inválida o permitir bloqueo de Coup por Contessa?
@@ -14,7 +14,7 @@
 
 ## Evidencia de intake
 
-En `origin/master@0a467c1`, `actionChoices()` ofrece Coup desde 7 monedas, pero `beginAction()` vuelve a abrir la decisión si Coup tiene menos de 10. Así, con 8 monedas la selección legal se descarta en silencio y se recrea el menú. Las reglas versionadas establecen coste de 7, obligatoriedad con 10 y que Coup no se bloquea; Contessa bloquea Assassinate. No se modificó código.
+En `origin/master@0a467c1`, `actionChoices()` ofrece Coup desde 7 monedas, pero `beginAction()` vuelve a abrir la decisión si Coup tiene menos de 10. Así, con 8 monedas la selección legal se descarta en silencio y se recrea el menú. Las reglas versionadas establecen coste de 7, obligatoriedad con 10 y que Coup no se bloquea; Contessa bloquea Assassinate. F1 cerró por inspección estática en `docs/plans/coup-seven-coins/report_issue_49_F1.md`; no se ejecutaron pruebas ni partida dinámica.
 
 ## Secuencia obligatoria de reclamo y aislamiento
 
@@ -26,7 +26,7 @@ En `origin/master@0a467c1`, `actionChoices()` ofrece Coup desde 7 monedas, pero 
 
 ## Instrucción por fase
 
-**F1 — READY:** seguir la ruta de la decisión desde las opciones del servidor hasta `beginAction()` y el manejo de `rejectDecision` en cliente. Confirmar la secuencia causal y delimitar si existe otro rechazo silencioso relevante. Escribir `docs/plans/coup-seven-coins/report_issue_49_F1.md`; no modificar producto en F1. Cerrar con commit `docs(coup-seven-coins): issue 49 F1 CLOSED advance_f2`.
+**F1 — CLOSED:** la ruta confirmó la causa del ciclo y que `g-decisionRejected` ya presenta rechazos de envelopes inválidos/obsoletos. Evidencia: `docs/plans/coup-seven-coins/report_issue_49_F1.md`; commit de cierre documentado en bitácora.
 
 Al cerrar F1, ejecutar F2 del plan: alinear el mínimo de Coup en 7 con Coup obligatorio desde 10, y resolver de forma visible cualquier rechazo inválido/obsoleto pertinente sin debilitar validación autoritativa. Respetar AC1–AC6 y el alcance aprobado por #49. Antes de tocar código cliente compartido, auditar issues/worktrees/diffs #43, #44 y #45 y coordinar solapamientos. Commit `fix(coup-seven-coins): issue 49 F2 CLOSED advance_f3`.
 
