@@ -1,6 +1,6 @@
 # Plan — Mantener resaltada la respuesta elegida mientras esperan los demás (#45)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `BLOCKED` solo por walkthrough manual pendiente tras un reintento autorizado; issue `OPEN`.
+**Estado:** F1 `CLOSED`; unidad `WAITING_ORCHESTRATOR`; issue `OPEN`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/45
 **Handoff:** `docs/plans/active/issue_45_submitted_response_highlight.md`
 **Bitácora:** `docs/plans/log/issue-45.jsonl` (append-only).
@@ -19,9 +19,9 @@ Persistir la opción elegida por el cliente durante la espera compartida; aplica
 
 Fuera de alcance: reglas o protocolo del juego, assets gráficos, rail de acciones, layout #44 y señalización del tablero #43.
 
-## F1 — Persistencia visual de la opción enviada (`BLOCKED`)
+## F1 — Persistencia visual de la opción enviada (`CLOSED`)
 
-**Estado actual:** implementación localizada en `ResponseImageButton.js`; queda bloqueada únicamente la validación manual de una partida con otro participante. El worktree propio parte del `origin/master` vigente (`f900c09`). No se pudo verificar el diff anunciado por #43 (su branch/worktree aún no aparecen), así que el cambio se restringió al componente que posee las imágenes y al contrato `disabled` ya provisto por el padre; no se tocaron `Coup.js`, `PlayerBoard.js` ni estilos compartidos. La inspección estática confirmó que `disabled` pasa a `true` al enviar, vuelve a `false` en rechazo o nueva decisión, y el componente se desmonta al cerrar la decisión/pausar. El bloqueo de topología anterior queda supersedido para esta edición estrictamente localizada; sigue siendo necesario evitar ampliar el alcance sin revisar #43. Tras la autorización del Orquestador para reintentar el walkthrough local, el sandbox no pudo conectar por loopback y no encontró navegador; la inspección externa del Orquestador vio `127.0.0.1:8000` en escucha, sin PID visible. No hubo evidencia dinámica y F1 continúa `BLOCKED`; no se modifican criterios.
+**Resultado:** implementación localizada en `ResponseImageButton.js`. No se pudo verificar el diff anunciado por #43 (su branch/worktree no aparecía al implementar), así que el cambio quedó en el componente de imágenes y el contrato `disabled` ya provisto por el padre; no se tocaron `Coup.js`, `PlayerBoard.js` ni estilos compartidos. La inspección estática confirmó que `disabled` pasa a `true` al enviar, vuelve a `false` en rechazo o nueva decisión, y el componente se desmonta al cerrar la decisión/pausar. El propietario completó después el walkthrough en una partida de tres participantes: la respuesta elegida se mantuvo `active` tras apartar el puntero; probó `Pasar` y varios bloqueos, y reportó que todo luce bien ([comentario en #45](https://github.com/pronficilio/coup-online/issues/45#issuecomment-5875638751)). F1 queda `CLOSED` para el flujo observado con mouse. No se afirma cobertura dinámica de teclado ni touch. El intento local anterior desde el sandbox queda como evidencia histórica del reintento fallido, supersedido por este walkthrough del propietario.
 
 **Pregunta única:** ¿el cliente puede conservar el resaltado de la respuesta enviada sin activar otras opciones ni retener selección obsoleta?
 
@@ -29,8 +29,8 @@ Fuera de alcance: reglas o protocolo del juego, assets gráficos, rail de accion
 - Releer #43 y #44 y comprobar su estado y diffs para evitar editar simultáneamente el renderer/componente de respuestas. Mantener el alcance aislado a la selección visual post-envío.
 - Guardar de forma transitoria la opción local enviada y aplicar la presentación `-active` a esa opción aunque su botón esté `disabled`; no inferir una selección de la posición del puntero.
 - Limpiar la selección al cerrar o cambiar la decisión. Confirmar que errores/reintentos respeten el estado real de envío.
-- **Salida:** cambio acotado y `report_issue_45_F1.md` con el ciclo observado y validación; el walkthrough manual sigue pendiente.
-- **Avanzar:** la opción elegida permanece resaltada mientras se espera; las demás no se resaltan ni se pueden accionar; una decisión nueva no hereda la elección anterior.
+- **Salida:** cambio acotado y `report_issue_45_F1.md` con el ciclo observado y validación; walkthrough del propietario completado y atribuido.
+- **Avanzar:** propietario observó la opción elegida resaltada tras apartar el puntero en una partida de tres participantes y probó `Pasar` y varios bloqueos; la inspección estática confirma limpieza al rechazo/cambio/cierre. Sin afirmaciones dinámicas para teclado/touch.
 - **Pivotar:** si el servidor confirma/reemplaza opciones de otra forma, adaptar la limpieza al evento/identidad de decisión vigentes sin cambiar el contrato.
 - **Repetir:** una corrección focalizada para cualquier estado visual que no coincida con la respuesta enviada.
 - **Bloquear:** conflicto activo en componente compartido con #43/#44 o imposibilidad de verificar la ventana de espera; registrar condición y evidencia.
