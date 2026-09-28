@@ -127,3 +127,7 @@ Quité únicamente la segunda llamada a `renderActionDecision()` dentro de `Deci
 - No se ejecutaron tests automatizados ni recorrido visual. La corrección evita la copia duplicada por composición; el nuevo Verifier debe comprobar DOM único, ausencia de IDs duplicados y foco al abrir/cancelar objetivos.
 
 F2 queda `ACTIVE` hasta que otro Verifier independiente repita F3 en el HEAD publicado. El intento anterior sigue `FAIL` y su reporte se conserva; el waiver visual AC9 continúa aceptado.
+
+## Sincronización documental de base para recheck
+
+Mientras F3 esperaba el nuevo Verifier, `origin/master` avanzó de `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe` a `64c1b295fe9586ea05c4e7dc2a713faec948ec24` al integrar PR #38, que cierra documentalmente #19. El rango incorporado contiene únicamente `README_plans.md` y archivos docs/log de #19, sin código de producto. Para evitar re-replay de los 21 commits F2, el branch #24 se sincronizó con merge `e034a8a`; el README registra #19 `CLOSED` y mantiene #24 `ACTIVE`, F2 reabierta/F3 último `FAIL`. La API confirma #19 `CLOSED` y PR #38 merged.

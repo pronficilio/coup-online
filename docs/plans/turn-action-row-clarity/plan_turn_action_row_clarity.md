@@ -19,14 +19,14 @@ La persona usuaria quiere que las acciones disponibles durante su turno indiquen
 - El issue #6 está `CLOSED` y la PR #11 integrada. Su panel muestra hoy siete acciones y calcula deshabilitación por saldo insuficiente para Coup/Assassinate y por Coup obligatorio con 10+ monedas.
 - El issue #21 sigue abierto, pero su contrato se limita a controles gráficos de respuesta (`Block`, `Challenge`, `Pass`) y excluye explícitamente las acciones principales.
 - El issue #14 se cerró tras integrar la PR #23. `Coup.js` ahora monta un renderer genérico para `decision.options`; el viejo `ActionDecision.js` conserva markup y estilos, pero ya no se importa desde `Coup.js`.
-- El issue #19 sigue abierto tras integrar parcialmente su PR #22 en `5de95ee`. La localización publicada ya incluye las etiquetas y descripciones de las siete acciones y las claves `es`/`en` necesarias. Sus tareas restantes requieren recorrido manual y Verifier, sin otra PR de producto abierta que reserve el renderer de #24.
+- Al preparar F2, #19 seguía abierto tras integrar parcialmente su PR #22 en `5de95ee`; luego se cerró al integrar la PR documental #38 en `64c1b29`. La localización publicada ya incluye las etiquetas y descripciones de las siete acciones y las claves `es`/`en` necesarias. No hay otra PR de producto abierta que reserve el renderer de #24.
 - El servidor genera los `choiceId` permitidos para cada decisión. En `actionChoices`, Coup con 10+ monedas es la única opción; por debajo se agrega Coup a partir de 7 monedas y Assassinate a partir de 3. Las opciones con objetivo combinan acción y asiento (por ejemplo `coup:<seat>`). El cliente debe enviar esos IDs exactos; el servidor conserva la autoridad de elegibilidad.
 - `g-decision` expone solo opciones legales. `Coup.js` presenta solo acciones con opciones recibidas y localiza la etiqueta desde `choiceId`; el saldo público sirve para verificar los límites en el recorrido manual.
 - Las referencias visuales estaban en `fotos/`, fuera del historial versionado. Las tres copias de `references/` preservan la evidencia para el Ejecutor.
 - Reglas visibles ya comprobadas en el cliente: Assassinate requiere 3 monedas; Coup requiere 7; con 10 o más monedas solo Coup está permitido. Declarar una influencia no requiere tenerla.
-- Base rebaseada desde el remoto: `origin/master`, commit `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Target: `master`.
+- Base inicial de la reanudación F2: `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Sincronización posterior: merge de `origin/master@64c1b295fe9586ea05c4e7dc2a713faec948ec24`, que integra el cierre documental de #19 vía PR #38 y solo cambia docs. Target actual: `master`.
 
-La revisión F1 confirmó que el renderer y los textos requeridos ya están publicados. #19 permanece abierto por validación manual y Verifier, pero no tiene cambios de producto pendientes que bloqueen #24. El feedback de esos recorridos puede incorporarse a la revisión final de #24.
+La revisión F1 confirmó que el renderer y los textos requeridos ya están publicados. En ese momento #19 permanecía abierto por validación manual/Verifier; después se cerró al integrar la PR documental #38 en `origin/master@64c1b29`. No reserva archivos de producto que bloqueen #24.
 
 ## Criterios de aceptación
 
@@ -67,7 +67,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Pregunta:** ¿el renderer comunica dónde activar las acciones legales y mantiene la lista sincronizada con las opciones del servidor?
 
-**Entrada:** F1 `CLOSED / PASS`; branch rebaseado sobre `origin/master@5de95ee`; PR #23/#22 releídas.
+**Entrada:** F1 `CLOSED / PASS`; branch rebaseado inicialmente sobre `origin/master@45a3eaa` y sincronizado luego mediante merge de `origin/master@64c1b29`; PR #23/#22 releídas.
 
 **Subtareas:** bifurcar solo `decision.type === 'action'`; agrupar opciones por prefijo de `choiceId`; renderizar una fila solo cuando `decision.options` contiene una o más opciones de esa acción; montar CheatSheet + panel en portal a `document.body` y posicionar el rail como `absolute` usando medición del ancla real (`rect + scroll`); conservar coordenadas documentales durante scroll y volver a medir en resize; conservar separadores hermanos entre filas permitidas consecutivas, saltando las omitidas; al elegir Coup, Assassinate o Steal, mostrar destinos legales y Cancelar; al elegir destino, enviar una vez la opción original; las filas/helpers/estilos disabled quedan preservados pero no montados; no emitir al enfocar, abrir destinos o cancelar; aplicar estado visual y descripciones accesibles a las filas permitidas; compactar tras mouseleave de 500 ms solo después de una primera entrada, cancelando el timer al reentrar, desmontando detalles de verdad y restaurándolos al reentrar; excluir touch/no-hover y limpiar timers en todos los cambios de ciclo de vida.
 
@@ -93,14 +93,14 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Quinta revisión visual (feedback vigente):** en modo compacto, solo los títulos de fila de acción se reducen 30% (70% de su font-size normal) con transición breve; al rehidratar y expandir regresan a 100%. El encabezado general del panel no cambia.
 
-**Cierre manual F2:** la usuaria aprobó el preview actual; su aceptación cubre el resultado visual del panel y reconoce el hallazgo de que los detalles se desmontan sin transición visible. Este punto queda exceptuado de AC9 por aceptación expresa, no reportado como comportamiento verificado. No se abre PR ni se cierra la issue; el trabajo pasa a revisión FINAL independiente.
+**Cierre previo F2:** la usuaria aprobó el preview actual; su aceptación cubre el resultado visual del panel y reconoce el hallazgo de que los detalles se desmontan sin transición visible. Este punto queda exceptuado de AC9 por aceptación expresa, no reportado como comportamiento verificado. El cierre se revocó tras el fallo F3 descrito abajo.
 
 ### F3 — Verificación independiente y entrega (`FAIL anterior`; recheck listo tras el fix)
 
 **Pregunta:** ¿puede refutarse que solo se muestran acciones legales, que summary/rail preservan su relación document-absolute al scroll, o que el ciclo mouse compacta/restaura sin cambiar el contrato de decisión?
 
 **Último resultado:** `FAIL` en `6d63199910c5a0e3b24ed60c847eef1bb231f6f7`. El reporte `docs/plans/turn-action-row-clarity/report_issue_24_F3.md` encontró dos montajes de `renderActionDecision()` para una decisión action, IDs/refs duplicados y foco de targets/cancelación potencialmente desviado.
-**Siguiente entrada:** el fix F2 ya quitó la llamada duplicada y el build/diff-check pasaron; después de publicar este checkpoint, un Verifier independiente nuevo recibe `docs/plans/active/verifier_issue_24_F3.md`. El hallazgo anterior no equivale a PASS y se debe repetir F3.
+**Siguiente entrada:** el fix F2 ya quitó la llamada duplicada y el build/diff-check pasaron; la rama incorpora `origin/master@64c1b29` mediante merge documental, no replay de los commits F2. Un Verifier independiente nuevo recibe `docs/plans/active/verifier_issue_24_F3.md` tras publicar el sync checkpoint. El hallazgo anterior no equivale a PASS y se debe repetir F3.
 
 **Salida:** informe FINAL independiente, capturas de estados normal/hover y rail absolute, evidencia de omisión de acciones no legales y estados expandidos/compactos, entrega del branch/PR canónico al Orquestador.
 
@@ -115,7 +115,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 ## Trazabilidad y topología
 
-Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama fue rebaseada sobre `origin/master@45a3eaa`; F2 quedó cerrada con waiver de AC9 aceptado por la usuaria. Issue abierta, sin PR; el Verifier independiente recibe F3.
+Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. El branch conserva el rebase sobre `45a3eaa` y suma el merge documental de `origin/master@64c1b29`; F2 está activa por F3 FAIL, con waiver AC9 de la usuaria aún vigente. Issue abierta, sin PR; otro Verifier independiente recibe el F3 recheck.
 
 ## Decisiones
 

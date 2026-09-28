@@ -13,7 +13,7 @@
 
 ## Reclamo y aislamiento
 
-Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado es `cfbbb7b` y esta reanudación ocurre sobre la misma rama/worktree, rebaseada sobre `origin/master@5de95ee`.
+Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado era `cfbbb7b` y luego se rebaseó inicialmente sobre `origin/master@5de95ee`. La reanudación F2 posterior rebaseó sobre `45a3eaa`; el sync actual incorpora `origin/master@64c1b29` mediante el merge documental `e034a8a`.
 
 ## F2 — implementación y evidencia histórica; reabierta por F3 FAIL
 
@@ -43,7 +43,7 @@ Solo `.DecisionActionLabel` pasa a 70% del font-size normal mientras está compa
 
 La usuaria inspeccionó el preview actual en `http://localhost:3006`, aprobó el resultado para cerrar F2 y aceptó expresamente que los detalles se desmontan sin animación/transición visible. El cierre es `F2 CLOSED / PASS` con waiver acotado a esa parte visual de AC9. El hallazgo no se oculta ni se califica como comportamiento verificado. Ancho y títulos aún tienen transiciones rápidas; el resto del ciclo, controles, datos y accesibilidad pasa al intento de refutación independiente.
 
-El rebase de F2 quedó sobre `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. En los conflictos funcionales de `Coup.js` se mantuvieron pause overlay/retorno de foco y se integraron limpieza/reinicio de timers/rail; build y diff-check por checkpoint están registrados en el reporte F2.
+El rebase de F2 quedó inicialmente sobre `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Después `master` avanzó a `64c1b295fe9586ea05c4e7dc2a713faec948ec24` al integrar PR #38, cierre documental de #19. Para evitar re-replay de 21 commits, se sincronizó con merge `e034a8a`; los archivos incorporados son docs de #19 y README, sin cambios de producto. Se verificó que #19 está `CLOSED` y la fila #24 mantiene F2 `ACTIVE`/F3 `FAIL`.
 
 ## Reapertura F2 — defecto duplicado confirmado por Verifier
 
