@@ -1,14 +1,14 @@
 # Reporte F2 — issue #24
 
-**Veredicto del checkpoint inicial:** `BLOCKED`; **estado actual:** `ACTIVE`
+**Veredicto del checkpoint inicial:** `BLOCKED` (histórico); **veredicto actual F2:** `CLOSED / PASS` con excepción aceptada en AC9.
 
 **Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), sigue `OPEN` y asignada a `pronficilio`.
 
-**Fase siguiente:** F3 permanece `PENDING`; requiere que F2 complete su recorrido manual.
+**Fase siguiente:** F3 `ACTIVE / READY` para Verifier independiente FINAL; brief en `docs/plans/active/verifier_issue_24_F3.md`.
 
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`.
 
-**Comportamiento vigente:** quinta iteración de F2. Además del rail document-absolute y el ciclo mouse de 500 ms, los títulos de las filas se reducen al 70% mientras el panel está compacto y vuelven al 100% al expandir. La inspección visual sigue pendiente.
+**Comportamiento vigente:** rail `absolute` en portal a `document.body`, alineado con Resumen de reglas mediante coordenadas documentales; aparecen solo acciones legales. El panel inicia expandido y se compacta tras mouseleave de 500 ms, con títulos de fila al 70% y acciones/precios disponibles. La usuaria aprobó el preview y aceptó expresamente que el desmontaje de detalles no tiene animación/transición visible. Esta diferencia queda como waiver de la parte de transición de desmontaje en AC9, no como comportamiento verificado.
 
 ## Trabajo del checkpoint inicial (histórico; véanse las revisiones posteriores para el comportamiento vigente)
 
@@ -28,7 +28,7 @@ Estos puntos son observaciones del código y no confirman el comportamiento en n
 - No se ejecutaron tests automatizados, según el handoff.
 - La inspección de disponibilidad de navegador no encontró Playwright, Puppeteer, `@playwright/test`, Chromium, `chromium-browser` ni `google-chrome` disponibles en este entorno. El Chrome instalado en Windows, ejecutado desde WSL, falla antes de abrir con `/bin/bash: ... WSL (2 - ) ERROR: UtilBindVsockAnyPort:307: socket failed 1`.
 
-## Evidencia pendiente
+## Evidencia no disponible en el checkpoint inicial (histórico; el cierre vigente aparece al final)
 
 No se hizo recorrido manual ni se generaron capturas. Quedan sin observarse en ejecución:
 
@@ -90,6 +90,24 @@ F2 sigue `ACTIVE`; la usuaria aún debe revisar absolute/scroll, ancho y desmont
 
 La usuaria pidió reducir 30% el tamaño de los nombres de cada acción cuando el panel está compacto, con transición rápida, dejando intacto el encabezado general. Añadí únicamente estilos a `.DecisionActionLabel`: 0.812rem frente a 1.16rem normal en escritorio (70%) y 0.728rem frente a 1.04rem bajo 560px (70%). `font-size` transiciona en 120 ms; `prefers-reduced-motion: reduce` desactiva esa transición. Al quitar `DecisionActionPanel--compact`, los títulos regresan a tamaño normal junto con el ancho y los detalles rehidratados. No cambian renderer, ciclo de timers, opciones ni protocolo.
 
-`git diff --check`: **pasa**. `npm run build` desde `coup-client`: **exit 0**, “Compiled with warnings”. Warnings preexistentes: `logo`/`Link` sin uso en `App.js`, `postcss-calc` no parsea `dvh` en `ReferencePanel.css:100,106`, caniuse-lite desactualizado; ninguno apunta a `CoupStyles.css`. Gzip: JS 109.37 kB, CSS 7.11 kB (+35 B). No se ejecutaron tests automatizados ni recorrido visual para esta corrección. La inspección del tamaño/timing queda pendiente de la usuaria en `http://localhost:3006` tras recarga CRA desde el nuevo HEAD; F2 continúa ACTIVE.
+`git diff --check`: **pasa**. `npm run build` desde `coup-client`: **exit 0**, “Compiled with warnings”. Warnings preexistentes: `logo`/`Link` sin uso en `App.js`, `postcss-calc` no parsea `dvh` en `ReferencePanel.css:100,106`, caniuse-lite desactualizado; ninguno apunta a `CoupStyles.css`. Gzip: JS 109.37 kB, CSS 7.11 kB (+35 B). No se ejecutaron tests automatizados ni recorrido visual para esta corrección. En ese checkpoint de la quinta revisión, la inspección de tamaño/timing todavía estaba pendiente; la aprobación posterior y el waiver se registran abajo.
 
 El cambio CSS de esta revisión está en commit de producto `9af435d`; el commit de sincronización documental sigue inmediatamente después. No afecta al resto del ciclo de compactación ni a los detalles que se remontan al expandir.
+
+## Cierre F2 — aprobación humana y waiver explícito de AC9
+
+La usuaria revisó el preview vigente en `http://localhost:3006`, aprobó el resultado para cerrar F2 y señaló que los detalles se desmontan sin animación/transición visible. Aceptó expresamente esa limitación. F2 queda `CLOSED / PASS` con un waiver acotado a la transición visual del desmontaje de prompt/descripciones/metadatos de AC9. El hallazgo permanece registrado aquí; no se afirma que la animación de desmontaje haya pasado. La transición rápida de ancho y font-size, el timer, la restauración de detalles al reentrar y los demás requisitos permanecen sujetos a la revisión adversarial de F3.
+
+La aprobación de preview no sustituye la revisión independiente de opciones/`choiceId`, flujo de destino/cancelación, responsive, decisiones no-action, accesibilidad ni estado tras rebase. El Verifier recibe esos puntos en `docs/plans/active/verifier_issue_24_F3.md`. La issue permanece `OPEN`, asignada a `pronficilio`; no hay PR ni integración.
+
+El branch se rebaseó sobre `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Al resolver conflictos en `Coup.js`, se conservaron pausa/overlay y retorno de foco de master, junto con los timers y estado compacto de #24; los conflictos funcionales se compilaron antes de continuar. El resultado final de `git diff --check` y del build de este HEAD rebaseado se registra al cierre del checkpoint abajo.
+
+## Validación final del cierre y límites
+
+- Rebase completado sobre `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe` (HEAD pre-cierre documental `5b618d22dbf3b596cae703555f1a7cb839ffea4d`). Conflictos funcionales de `Coup.js` se resolvieron preservando `gamePaused`, el pause overlay y retorno de foco de master, más limpieza/reinicio del ciclo compacto de #24.
+- `git diff --check`: **exit 0**, sin errores.
+- `npm run build` en `coup-client`: **exit 0**, `Compiled with warnings`. Warnings: `logo` y `Link` sin uso en `src/App.js`; `postcss-calc` no parsea unidades `dvh` en `ReferencePanel.css:100,106`; `caniuse-lite` desactualizado; deprecación Node `fs.F_OK`. Ninguno apunta a archivos del renderer de acciones. Gzip: JS 109.82 kB, CSS 8.17 kB.
+- No se ejecutaron tests automatizados. El build valida integración/compilación, no reemplaza el recorrido del Verifier.
+- La aprobación humana del preview se registró antes del rebase; no se repitió el recorrido visual después de integrar el pause overlay de master. El Verifier debe revisar esa integración además de los criterios del renderer.
+
+F2 queda `CLOSED / PASS` por aprobación del preview y revisión/build de la unidad, con waiver explícito para la animación visual ausente al desmontar detalles. F3 está `ACTIVE / READY`; la issue sigue abierta, sin PR ni integración.

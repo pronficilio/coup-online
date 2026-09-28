@@ -1,12 +1,12 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`. F2 continúa tras la quinta revisión visual: en modo compacto, los títulos de cada acción bajan a 70% del tamaño normal con transición rápida y vuelven al tamaño normal al expandir.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS` con excepción aceptada en AC9; F3 `ACTIVE / READY` para Verifier independiente.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** tras el checkpoint, la usuaria inspecciona la relación summary/acciones al hacer scroll, el ciclo de expansión/compactación con mouse y que toque conserve el panel completo. Alquimista continúa F2; F3 no está listo.
+**Siguiente dueño:** Verifier independiente FINAL; revisar el HEAD publicado y probar adversarialmente las AC, registrando como waiver la falta de animación visible al desmontar detalles.
 
 ## Solicitud y definición de éxito
 
@@ -24,7 +24,7 @@ La persona usuaria quiere que las acciones disponibles durante su turno indiquen
 - `g-decision` expone solo opciones legales. `Coup.js` presenta solo acciones con opciones recibidas y localiza la etiqueta desde `choiceId`; el saldo público sirve para verificar los límites en el recorrido manual.
 - Las referencias visuales estaban en `fotos/`, fuera del historial versionado. Las tres copias de `references/` preservan la evidencia para el Ejecutor.
 - Reglas visibles ya comprobadas en el cliente: Assassinate requiere 3 monedas; Coup requiere 7; con 10 o más monedas solo Coup está permitido. Declarar una influencia no requiere tenerla.
-- Base rebaseada desde el remoto: `origin/master`, commit `5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`. Target: `master`.
+- Base rebaseada desde el remoto: `origin/master`, commit `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. Target: `master`.
 
 La revisión F1 confirmó que el renderer y los textos requeridos ya están publicados. #19 permanece abierto por validación manual y Verifier, pero no tiene cambios de producto pendientes que bloqueen #24. El feedback de esos recorridos puede incorporarse a la revisión final de #24.
 
@@ -38,7 +38,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 6. Los textos visibles usan el mecanismo de idioma integrado. Las filas permitidas tienen nombre accesible; foco visible, Enter/Espacio y Escape funcionan. Las ayudas disabled/hint ocultas y sus traducciones permanecen para posible reactivación.
 7. En escritorio y móvil aparecen las filas permitidas en estado normal y hover/foco, sin filas ni huecos para acciones omitidas. No se muestran hints disabled; se conserva su markup/helper y estilos para reactivarlos luego. El panel no tapa la selección de objetivos ni las respuestas.
 8. El rail usa `position: absolute` en un portal a `document.body`. Al empezar la decisión, mide el `.CheatSheet` real con `getBoundingClientRect()` y convierte a coordenadas de documento con scroll; durante scroll conserva esas coordenadas para que resumen y acciones se desplacen juntos con alineación y separación constante. En resize vuelve a medir el ancla equivalente.
-9. Cada decisión action inicia expandida. En dispositivos con hover y puntero fino, tras la primera entrada del mouse, salir del panel inicia 500 ms; reentrar cancela el timer. Al vencer, pasa a la mitad del ancho normal y retira del DOM descripción/prompt/metadatos tras la transición breve; los títulos de fila bajan a 70% del font-size normal con transición rápida y vuelven al 100% al expandir. Precios y controles siguen disponibles. Touch/no-hover no compacta. Timers se limpian al reentrar, cambiar/finalizar la decisión y desmontar.
+9. Cada decisión action inicia expandida. En dispositivos con hover y puntero fino, tras la primera entrada del mouse, salir del panel inicia 500 ms; reentrar cancela el timer. Al vencer, pasa a la mitad del ancho normal; los títulos de fila bajan a 70% del font-size normal y vuelven al 100% al expandir. Precios y controles siguen disponibles. Touch/no-hover no compacta. Timers se limpian al reentrar, cambiar/finalizar la decisión y desmontar. **Excepción aceptada por la usuaria para F2:** los detalles se desmontan sin animación visible de colapso; la usuaria revisó el preview y acepta expresamente esa limitación. Se registra como waiver de la transición visual de desmontaje, no como criterio verificado.
 10. Se respeta `prefers-reduced-motion`. El build y el recorrido manual quedan documentados. El Verifier independiente intenta refutar la relación absolute al scroll, el ciclo de compactación, que solo aparezcan opciones legales y que target/cancel/emisión sigan el contrato. No se agregan tests automatizados.
 
 ## Alcance y fuera de alcance
@@ -63,7 +63,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Commit:** `COMMIT_REQUIRED`; `docs(action-rows): issue 24 F1 generic renderer confirmed`.
 **Validación:** releer issues/PRs, inspeccionar código integrado y `git diff --check`.
 
-### F2 — Implementar y documentar la fila interactiva (`ACTIVE`)
+### F2 — Implementar y documentar la fila interactiva (`CLOSED / PASS`, waiver AC9 aceptado)
 
 **Pregunta:** ¿el renderer comunica dónde activar las acciones legales y mantiene la lista sincronizada con las opciones del servidor?
 
@@ -73,7 +73,8 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Áreas previstas:** `coup-client/src/components/game/Coup.js`, estilos del renderer y `coup-client/src/i18n/translations.json` solo si hacen falta claves espejo nuevas. No revivir `ActionDecision.js` ni editar servidor/protocolo.
 
-**Avanzar:** criterios AC1–AC10 se observan en los límites monetarios y en escritorio/móvil con teclado/tacto/mouse; solo aparecen acciones presentes en las opciones legales y se emiten sus `choiceId` originales; el rail mantiene alineación y separación documentales al scroll; el ciclo mouse/touch/reduced-motion funciona; build y evidencia manual quedan registrados.
+**Cierre F2:** la usuaria aprobó el preview vigente en `http://localhost:3006` y aceptó expresamente que los detalles se desmontan sin animación/transición visible. F2 queda `CLOSED / PASS` con waiver documentado para esa parte visual de AC9; la observación permanece visible en el reporte y en este plan. El build del HEAD rebaseado y el diff-check se registrarán en el checkpoint final. No se ejecutan tests automatizados.
+**Avanzar a F3:** Verifier independiente intenta refutar AC1–AC10 (considerando únicamente el waiver explícito de AC9), verifica el renderer y el rebase sobre `origin/master@45a3eaa`; una excepción adicional o regresión devuelve la unidad al Orquestador.
 **Pivotar:** si portal/layout no mantiene la relación document-absolute del rail o altera decisiones ajenas a `action`, regresar al Orquestador con reproducción.
 **Repetir:** una corrección localizada por criterio con fallo reproducible.
 **Bloquear/cancelar:** vuelve a reservarse un archivo compartido o aparece una necesidad de cambiar reglas/protocolo.
@@ -91,19 +92,19 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Quinta revisión visual (feedback vigente):** en modo compacto, solo los títulos de fila de acción se reducen 30% (70% de su font-size normal) con transición breve; al rehidratar y expandir regresan a 100%. El encabezado general del panel no cambia.
 
-**Validación pendiente:** inspección visual de la usuaria: relación summary/rail al scroll, ciclo compactar/expandir, touch/no-hover, filas permitidas, overlay, divider/hover, responsive y flujo de decisiones. No añadir tests. No se abre PR ni se cierra la issue.
+**Cierre manual F2:** la usuaria aprobó el preview actual; su aceptación cubre el resultado visual del panel y reconoce el hallazgo de que los detalles se desmontan sin transición visible. Este punto queda exceptuado de AC9 por aceptación expresa, no reportado como comportamiento verificado. No se abre PR ni se cierra la issue; el trabajo pasa a revisión FINAL independiente.
 
-### F3 — Verificación independiente y entrega (`PENDING`)
+### F3 — Verificación independiente y entrega (`ACTIVE / READY`)
 
 **Pregunta:** ¿puede refutarse que solo se muestran acciones legales, que summary/rail preservan su relación document-absolute al scroll, o que el ciclo mouse compacta/restaura sin cambiar el contrato de decisión?
 
-**Entrada:** F2 `CLOSED`, diff y evidencia vigentes.
+**Entrada:** F2 `CLOSED / PASS` con waiver explícito AC9, diff y evidencia vigentes; brief: `docs/plans/active/verifier_issue_24_F3.md`.
 
 **Salida:** informe FINAL independiente, capturas de estados normal/hover y rail absolute, evidencia de omisión de acciones no legales y estados expandidos/compactos, entrega del branch/PR canónico al Orquestador.
 
-**Prueba adversarial:** comparar cada fila con `decision.options`; intentar confirmar que las acciones omitidas no aparecen, no ocupan huecos ni crean IDs/handlers. Hacer scroll repetido y confirmar que resumen y panel se desplazan juntos con coords documentales, alineación y gap constantes. Probar mouseenter/leave 500 ms, reentrada antes/después, ancho 50%, montaje/desmontaje de detalles, touch/no-hover, reduced motion, targets, cancelación, envío único, límites monetarios, idiomas y cambio/fin de decisión.
+**Prueba adversarial:** comparar cada fila con `decision.options`; intentar confirmar que las acciones omitidas no aparecen, no ocupan huecos ni crean IDs/handlers. Hacer scroll repetido y confirmar que resumen y panel se desplazan juntos con coords documentales, alineación y gap constantes. Probar mouseenter/leave 500 ms, reentrada antes/después, ancho 50%, detalles desmontados/remontados (la ausencia de animación de desmontaje es waiver explícito), touch/no-hover, reduced motion, targets, cancelación, envío único, límites monetarios, idiomas y cambio/fin de decisión.
 
-**Avanzar:** criterios AC1–AC10 pasan y Verifier `PASS`; dejar unidad en `WAITING_ORCHESTRATOR` para revisión de una única PR.
+**Avanzar:** criterios AC1–AC10 pasan, excepto la transición visual de desmontaje de detalles que la usuaria aceptó expresamente como waiver de AC9; Verifier `PASS`; dejar unidad en `WAITING_ORCHESTRATOR` para revisión de una única PR.
 **Pivotar:** devolver a F2 solo el criterio refutado con reproducción.
 **Repetir:** una verificación focalizada tras una corrección y commit nuevos.
 **Bloquear/cancelar:** dependencia reabierta, build no reproducible o queda un fallo de criterio.
@@ -112,7 +113,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 ## Trazabilidad y topología
 
-Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama se rebaseó sobre `origin/master@5de95ee` antes de F2 y contiene el plan, la evidencia F1, el checkpoint de reclamo y los cambios/documentos F2; el checkpoint `BLOCKED` anterior fue reabierto tras la revisión visual de la usuaria.
+Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad usa `issue/24-turn-action-row-clarity` y `.worktrees/issue-24-turn-action-row-clarity`; target `master` del fork; una sola PR al completar F1–F3. La rama fue rebaseada sobre `origin/master@45a3eaa`; F2 quedó cerrada con waiver de AC9 aceptado por la usuaria. Issue abierta, sin PR; el Verifier independiente recibe F3.
 
 ## Decisiones
 
@@ -123,3 +124,4 @@ Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad 
 - 2026-09-27: el Alquimista reclamó la issue en el fork y confirmó branch/worktree limpios; F2 comienza sobre `Coup.js`.
 - 2026-09-27: la implementación F2 y el build pasan, pero F2 queda `BLOCKED` porque no hay navegador funcional para completar el recorrido manual obligatorio. El Orquestador coordina el entorno; F3 sigue pendiente.
 - 2026-09-27: la usuaria inspeccionó el cliente en `localhost:3006` y aportó feedback visual sobre separadores y colocación del panel action. F2 vuelve a `ACTIVE` para corregir ambos puntos; no se alteran criterios ni contrato.
+- 2026-09-27: la usuaria aprobó el preview final de F2 y aceptó expresamente que el desmontaje de detalles en compacto no presenta animación/transición visible. Cierre `F2 CLOSED / PASS` con waiver explícito para esa parte de AC9; no se afirma que esa transición visual haya pasado. F3 pasa a `ACTIVE / READY` para revisión independiente.
