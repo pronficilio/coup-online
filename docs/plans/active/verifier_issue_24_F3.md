@@ -1,11 +1,11 @@
 # PHASE independiente F3 — issue #24, renderer de acciones del turno
 
-**Estado:** `WAITING_FOR_REBASE_AND_INDEPENDENT_RECHECK`; ejecutar sobre el HEAD publicado después de sincronizar PR #39/#28 y conservar el rail #24.
+**Estado:** `READY_FOR_INDEPENDENT_RECHECK`; ejecutar sobre el HEAD publicado por Orquestación, ya sincronizado con `origin/master@a3d23f3`, conservando rail #24 y board #28. El último veredicto F3 sigue `BLOCKED`; no convertirlo en PASS hasta completar el walkthrough pendiente.
 **Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), todavía `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`.
 **Reporte de implementación F2:** `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`; destino `master` del fork.
-**Base actual del target:** `origin/master@951147234b6f8f640718ed945de5907140a724a9` (merge de PR #39/#28). El branch #24 parte de la sincronización anterior en `64c1b29` mediante `e034a8a`; ahora debe rebasearse sobre la nueva base. PR #39 integra rediseño del tablero e introduce cambios compartidos en `Coup.js`, `CoupStyles.css` y servidor. Confirmar que el nuevo HEAD preserva esos cambios de #28 y el portal/action rail, contrato de decisión y documentación #24 antes de continuar F3.
+**Base actual del target:** `origin/master@a3d23f3c5f262fc02fe15ffbb554472b3d829aec`. La rama #24 fue rebaseada sobre `951147234` y sincronizada después por merge `cafc4c69762c548435c3f0b31876b6d49bda7717`. PR #39/#28 añade el rediseño del tablero y el target posterior cambia el timeout de decisión en `server/game/coup.js` de 60 a 120 s. Confirmar que el HEAD publicado conserva ambos UX, el contrato/rail action, pausa y documentos #24; comprobar que los handoffs de #19/#28/#36 permanecen en `docs/plans/completed/`.
 
 **Primer resultado F3:** `FAIL` en `6d63199910c5a0e3b24ed60c847eef1bb231f6f7`; reporte en `docs/plans/turn-action-row-clarity/report_issue_24_F3.md`. F2 eliminó la segunda llamada action en `DecisionsSection`; verificar el commit exacto que Orquestación proporcione tras confirmar el push.
 
@@ -25,8 +25,10 @@ La usuaria aprobó el preview y autorizó merge/cierre al completar verificació
 2. **Rail y ancla:** comprobar en DOM que `ActionDecisionRail` está en portal a `document.body` y usa `position: absolute`; revisar que la medición use `getBoundingClientRect() + scrollX/scrollY`, que no se recalculen coordenadas al hacer scroll y que resize vuelva a medir el ancla. Recorrer scroll inicial y repetido para refutar deriva, cambio de alineación/gap, z-index insuficiente o interferencia con PlayerBoard/cartas.
 3. **Filas, foco y divisor:** revisar estado normal, hover, foco teclado, foco restaurado/cancelación, separador como hermano del hover entre filas permitidas consecutivas; confirmar responsive, touch/no-hover, textos ES/EN y `prefers-reduced-motion`.
 4. **Ciclo compacto:** decisión nueva inicia expandida; mouseenter habilita el ciclo; mouseleave compacta tras 500 ms; reentrada previa cancela timer y restaura; compacto conserva títulos, precios y controles, ocupa 50% del ancho normal del rail y baja solo `.DecisionActionLabel` a 70%; los detalles se desmontan/remontan. La ausencia de animación al desmontar es la excepción aceptada; la transición de ancho/font-size sigue sujeta a revisión. Touch/no-hover no compacta. Confirmar cleanup al cambiar/cerrar/pausar/finalizar decisión y unmount.
-5. **Integración master:** revisar especialmente `Coup.js` después de la sincronización documental: pause overlay, estado `gamePaused`, bloqueo de decisiones y retorno de foco deben conservar comportamiento de master mientras el renderer action usa timers/rail. El merge `e034a8a` no introdujo cambios de producto ni conflictos en `Coup.js`; no aceptar que se haya perdido el flujo de pausa o el ciclo de compactación.
+5. **Integración master:** revisar especialmente `Coup.js` y `server/game/coup.js` después de sincronizar `origin/master@a3d23f3`: pause overlay, `gamePaused`, bloqueo de decisiones, retorno de foco, `courtCount`, ventana de respuesta, timeout de 120 s y ciclo compacto deben conservarse. El merge de `a3d23f3` solo añade ese ajuste de timeout en código servidor; los otros cambios son seguimiento documental.
 6. **Foco del fallo previo:** para una decisión action debe existir exactamente un `.DecisionActionPanel`, dentro de `.ActionDecisionRail`; `DecisionsSection` no debe montar una segunda copia. Comprobar que no hay IDs duplicados, que `firstActionTargetRef` apunta a la instancia del rail y que abrir/cancelar target devuelve el foco a la fila del mismo panel. El botón Codex de emergencia debe seguir en `DecisionsSection`; los decision types no-action deben conservar ahí su renderer.
+
+**Timeout de la base actual:** `server/game/coup.js` define `DEFAULT_TIMEOUT_MS = 120000`; si se revisa el camino de pausa por timeout, esperar alrededor de 120 s (dos minutos), no 60 s.
 
 ## Validación y entrega
 

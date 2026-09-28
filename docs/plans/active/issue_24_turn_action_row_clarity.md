@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Plan exacto:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`
 **Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE`; último F3 recheck `BLOCKED` hasta observar una sola resolución tras escoger un destino legal. El primer F3 `FAIL` por doble montaje se corrigió. Waiver AC9 aceptado sigue vigente.
-**Fase activa:** rebasear sobre `origin/master@951147234b6f8f640718ed945de5907140a724a9`, preservando el action rail #24 junto con el tablero #28; ejecutar diff-check/build y luego entregar el HEAD exacto a un Verifier F3 independiente. Falta observar una selección de target y una sola resolución; el preview y los overlays modales están aprobados. El brief es `docs/plans/active/verifier_issue_24_F3.md`.
+**Fase activa:** sincronización terminada en merge `cafc4c69762c548435c3f0b31876b6d49bda7717` sobre `origin/master@a3d23f3`; rail #24 + tablero #28 preservados y timeout servidor actualizado a 120 s. `git diff --check`, build frontend y `node --check server/game/coup.js` pasan. Tras publicar el checkpoint documental final, entregar su HEAD exacto a un Verifier F3 independiente. F3 sigue `BLOCKED` hasta observar que seleccionar un target legal resuelve exactamente una vez. El preview y los overlays están aprobados; AC9 waiver vigente.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; Verifier independiente requerido en F3.
 **Bitácora exacta:** `docs/plans/log/issue-24.jsonl`.
 **Branch / worktree / merge target:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / `master` de `pronficilio/coup-online`.
@@ -13,7 +13,7 @@
 
 ## Reclamo y aislamiento
 
-Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado era `cfbbb7b` y luego se rebaseó inicialmente sobre `origin/master@5de95ee`. La reanudación F2 posterior rebaseó sobre `45a3eaa`; el sync de documentación #19 incorporó `origin/master@64c1b29` mediante `e034a8a`. Ahora `origin/master` avanzó a `951147234b6f8f640718ed945de5907140a724a9` al integrar PR #39/#28; ese PR modifica Coup.js/CoupStyles.css y otras superficies compartidas. El rebase solicitado aún está pendiente en este handoff.
+Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado era `cfbbb7b` y luego se rebaseó inicialmente sobre `origin/master@5de95ee`. La reanudación F2 posterior rebaseó sobre `45a3eaa`; el sync documental #19 incorporó `origin/master@64c1b29` mediante `e034a8a`. La rama se rebaseó sobre `origin/master@9511472` (PR #39/#28) y después se sincronizó con `origin/master@a3d23f3`, incluyendo cierres documentales #14/#19/#28/#36 y el ajuste aprobado del timeout de decisión de 60 a 120 s. Los handoffs #19/#28/#36 quedan en `completed`; no se restaura su ubicación activa.
 
 ## F2 — implementación y evidencia histórica; reabierta por F3 FAIL
 
@@ -33,7 +33,7 @@ Las PR #23 de #14 y #22 de #19 ya están integradas. El renderer vigente está e
 
 **Revisión y validación:** el Alquimista revisó el diff DOM/CSS; `git diff --check` pasa y `npm run build` terminó exit 0 con warnings conocidos. No tests automatizados. Checkpoint `b59bb022ee79e455fce3bfe281255cee359f034e` publicado. El Orquestador reinició CRA desde ese HEAD, confirmó `Compiled successfully` y bundle disponible en `http://localhost:3006` (HTTP 200, 2,393,146 bytes); backend `:18000` permanece activo. Preview listo para la usuaria.
 
-**Siguiente acción:** el Alquimista rebasea `issue/24-turn-action-row-clarity` sobre `origin/master@951147234b6f8f640718ed945de5907140a724a9`, preservando las adiciones de tablero #28 y el renderer action/rail/pausa de #24. Después corre diff-check y build, publica el HEAD y entrega el reporte/handoff a un Verifier independiente para revisar integración y completar F3. Solo falta observar que seleccionar un destino legal produzca exactamente una resolución. La usuaria ya autorizó una integración/cierre posteriores a la verificación, pero este checkpoint no abre PR, integra ni cierra la issue.
+**Siguiente acción:** publicar el checkpoint documental que registra merge y validación, y entregar el HEAD remoto exacto a un Verifier independiente. En la base actual `DEFAULT_TIMEOUT_MS=120000`, así que un recorrido de timeout espera alrededor de dos minutos. Solo falta observar que seleccionar un destino legal produzca exactamente una resolución. La usuaria ya autorizó una integración/cierre posteriores a la verificación, pero este checkpoint no abre PR, integra ni cierra la issue.
 
 ## Quinta revisión visual — tamaño de títulos al compactar
 
