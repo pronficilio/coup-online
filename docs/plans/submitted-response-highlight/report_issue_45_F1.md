@@ -4,6 +4,7 @@
 **Estado de unidad:** `WAITING_ORCHESTRATOR`.
 **Branch/worktree:** `issue/45-persist-submitted-response-highlight` / `.worktrees/issue-45-persist-submitted-response-highlight`.
 **Base:** `origin/master` = `f900c0947a0b27ac9c6e0372e3c1871a883be7e6` en la API al reclamar.
+**Sincronización:** merge de `origin/master@db1d22c11fc78dcd91b5f4242b1ae1591f9ba16b` en `918e070`; sin conflictos restantes.
 **Tracker:** #45 `OPEN`, asignada a `pronficilio`.
 **PR:** ninguna.
 
@@ -42,6 +43,13 @@ El cambio de producto quedó estrictamente en `coup-client/src/components/game/R
 - El propietario probó una partida con tres participantes. Reportó que la respuesta elegida permanece `active` al apartar el puntero mientras esperan los demás; también probó `Pasar` y varios bloqueos, y reportó que todo luce bien.
 - Esto satisface el walkthrough manual pendiente de F1 para el flujo observado con mouse. No se afirma cobertura dinámica de teclado ni touch; esas modalidades conservan inspección estática del evento `click` nativo, sin observación manual reportada.
 - Veredicto F1: `CLOSED`. La evidencia no cambia el alcance ni los criterios pendientes de otras fases.
+
+### Validación después de sincronizar la base (2026-09-28)
+
+- `origin/master` avanzó 15 commits desde la base del branch; se integró por merge, siguiendo los precedentes locales. El único conflicto fue la lista de seguimiento en `README_plans.md`; se conservaron la entrada #45 y las entradas nuevas #46/#49.
+- `npm run build` en `coup-client`: terminó con código 0 (`Compiled with warnings`). Advertencias: `logo`/`Link` sin uso en `src/App.js`; operadores mixtos en `Coup.js:444` (cambio traído por la base sincronizada); `postcss-calc` no interpreta las expresiones `dvh` en `ReferencePanel.css:100,106`; `caniuse-lite` desactualizado. No hubo error de compilación.
+- `git diff --check` y `git diff --check origin/master...HEAD`: sin errores. No se agregaron ni ejecutaron pruebas automatizadas.
+- El merge trajo al branch cambios de base para #46/#49 en `Coup.js`, traducciones y servidor; no se editaron esos archivos para #45.
 
 ## Falsificación y siguiente acción
 

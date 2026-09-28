@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-45.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Branch / worktree:** `issue/45-persist-submitted-response-highlight` / `.worktrees/issue-45-persist-submitted-response-highlight`.
-**Base / destino:** `origin/master` vigente al reclamar / `master` de `pronficilio/coup-online`.
+**Base / destino:** `origin/master` vigente al reclamar (`f900c09`), sincronizado por merge con `origin/master@db1d22c` (`918e070`) / `master` de `pronficilio/coup-online`.
 **Integración:** una PR asociada a #45.
 
 ## Solicitud y definición de éxito
