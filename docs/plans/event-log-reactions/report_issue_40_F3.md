@@ -35,7 +35,7 @@ Las capturas históricas de `evidence_issue_40_F3/` muestran el componente aisla
 
 ## Verificaciones
 
-- `npm run build` en `coup-client/`: `PASS`. Build de producción completado. Avisos preexistentes: imports `logo` y `Link` sin uso en `src/App.js`; mezcla `&&`/`||` en `Coup.js:451` del cambio #46; `postcss-calc` no interpreta `dvh` en `ReferencePanel.css:100,106`; base Browserslist desactualizada.
+- `npm run build` en `coup-client/`: `PASS`, repetido tras rebasar sobre `origin/master@db1d22c`. Avisos preexistentes: imports `logo` y `Link` sin uso en `src/App.js`; mezcla `&&`/`||` en `Coup.js:451` del cambio #46; `postcss-calc` no interpreta `dvh` en `ReferencePanel.css:100,106`; base Browserslist desactualizada.
 - Recorrido Chromium integrado: `PASS`, sin errores de página; reemplazo, temporizador reiniciado, concurrencia, retiro, caducidad, targets touch y distribución 2–6 verificados.
 - `git diff --check`: `PASS`; `translations.json`: parseo JSON `PASS`.
 - No se ejecutaron pruebas automatizadas de cliente.
