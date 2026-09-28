@@ -2,7 +2,7 @@ const gameUtils = require('./utils')
 const constants = require('../utilities/constants')
 const crypto = require('node:crypto')
 const { RULESET_VERSION } = require('../ai/codex-protocol')
-const { translate, roleLabel, actionLabel } = require('../i18n')
+const { actionLabel } = require('../i18n')
 
 const EFFORTS = new Set(['low', 'medium', 'high'])
 const ACTION_COSTS = { coup: 7, assassinate: 3 }
@@ -24,6 +24,55 @@ const BLOCKS = {
 }
 
 const DEFAULT_TIMEOUT_MS = 120000
+
+const EVENT_TYPES = new Set([
+    'action_declared', 'action_result', 'challenge_started', 'block_declared',
+    'block_challenge_started', 'claim_proved', 'claim_not_proved',
+    'influence_lost', 'player_eliminated'
+])
+
+const REACTION_OPTIONS = Object.freeze({
+    support: Object.freeze(['like', 'bravo', 'laugh', 'skeptical']),
+    aggressive: Object.freeze(['surprise', 'thinking', 'dislike', 'secret']),
+    challenge: Object.freeze(['thinking', 'skeptical', 'surprise', 'bravo']),
+    block: Object.freeze(['like', 'bravo', 'skeptical', 'surprise']),
+    proved: Object.freeze(['bravo', 'surprise', 'secret', 'like']),
+    failed: Object.freeze(['surprise', 'laugh', 'skeptical', 'dislike']),
+    loss: Object.freeze(['surprise', 'dislike', 'thinking']),
+    exchange: Object.freeze(['thinking', 'secret', 'like']),
+    blocked: Object.freeze(['thinking', 'skeptical', 'surprise', 'dislike']),
+    emptySteal: Object.freeze(['surprise', 'thinking', 'skeptical', 'dislike'])
+})
+
+function reactionsForEvent(event) {
+    const { type, data = {} } = event
+    if (type === 'action_declared') {
+        if (data.action === 'exchange') return REACTION_OPTIONS.exchange
+        if (data.action === 'coup' || data.action === 'assassinate') return REACTION_OPTIONS.aggressive
+        return REACTION_OPTIONS.support
+    }
+    if (type === 'action_result') {
+        if (data.action === 'exchange') return REACTION_OPTIONS.exchange
+        if (data.result === 'blocked') return REACTION_OPTIONS.blocked
+        if (data.action === 'steal' && data.amount === 0) return REACTION_OPTIONS.emptySteal
+        return REACTION_OPTIONS.support
+    }
+    if (type === 'challenge_started' || type === 'block_challenge_started') return REACTION_OPTIONS.challenge
+    if (type === 'block_declared') return REACTION_OPTIONS.block
+    if (type === 'claim_proved') return REACTION_OPTIONS.proved
+    if (type === 'claim_not_proved') return REACTION_OPTIONS.failed
+    if (type === 'influence_lost' || type === 'player_eliminated') return REACTION_OPTIONS.loss
+    return []
+}
+
+function cloneLogEvent(event) {
+    return {
+        ...event,
+        data: { ...event.data },
+        translation: { key: event.translation.key, params: { ...event.translation.params } },
+        reactions: event.reactions.slice()
+    }
+}
 
 function decisionTimeoutFromEnv() {
     const value = Number(process.env.DECISION_TIMEOUT_MS)
@@ -63,6 +112,12 @@ class CoupGame {
         this.decisionTimer = null
         this.codexRequests = new Map()
         this.publicHistory = []
+        this.publicLogEvents = []
+        this.logEventsByID = new Map()
+        this.reactionsByEvent = new Map()
+        this.reactionRequestsBySeat = new Map()
+        this.reactionPresenceBySeat = new Map()
+        this.logEventSerial = 0
         this.turnNumber = 0
         this.matchID = crypto.randomBytes(16).toString('hex')
         this.phase = 'lobby'
@@ -79,10 +134,12 @@ class CoupGame {
         connectedIDs.forEach(socketID => {
             const socket = this.gameSocket.sockets && this.gameSocket.sockets[socketID]
             if (!socket) return
-            if (this.players.some(player => player.socketID === socketID)) {
+            if (this.seatForSocket(socketID) >= 0) {
                 socket.on('g-submitDecision', envelope => this.submitDecision(socketID, envelope))
                 socket.on('disconnect', () => this.onDisconnect(socketID))
             }
+            socket.on('g-reactToEvent', payload => this.reactToEvent(socketID, payload))
+            socket.on('g-requestEventLogState', payload => this.requestEventLogState(socketID, payload))
             socket.on('g-playAgain', payload => this.playAgain(socketID, payload))
             socket.on('g-resume', payload => this.resume(socketID, payload))
         })
@@ -95,6 +152,7 @@ class CoupGame {
             return false
         }
         this.updatePlayers()
+        this.emitEventLogStateToAll()
         this.playTurn()
         return true
     }
@@ -109,6 +167,12 @@ class CoupGame {
         this.winner = null
         this.currentAction = null
         this.publicHistory = []
+        this.publicLogEvents = []
+        this.logEventsByID.clear()
+        this.reactionsByEvent.clear()
+        this.reactionRequestsBySeat.clear()
+        this.reactionPresenceBySeat.clear()
+        this.logEventSerial = 0
         this.turnNumber = 0
         this.matchID = crypto.randomBytes(16).toString('hex')
         this.deck = gameUtils.buildDeck(this.rng)
@@ -174,8 +238,149 @@ class CoupGame {
         }))
     }
 
-    addLog(message) {
-        this.publicEmit('g-addLog', message)
+    addLog(type, data, translation) {
+        if (!EVENT_TYPES.has(type) || !data || !translation || typeof translation.key !== 'string') {
+            throw new TypeError('Event log entries require a known type, public data, and a translation key.')
+        }
+        const event = {
+            id: `${this.matchID}-event-${++this.logEventSerial}`,
+            type,
+            turn: Math.max(1, this.turnNumber),
+            data: { ...data },
+            translation: { key: translation.key, params: { ...translation.params } },
+            reactions: []
+        }
+        event.reactions = reactionsForEvent(event).slice()
+        this.publicLogEvents.push(event)
+        this.logEventsByID.set(event.id, event)
+        this.publicEmit('g-addLog', cloneLogEvent(event))
+        return event
+    }
+
+    reactionCounts(eventID) {
+        const selections = this.reactionsByEvent.get(eventID)
+        const counts = {}
+        if (selections) selections.forEach(reaction => {
+            counts[reaction] = (counts[reaction] || 0) + 1
+        })
+        return counts
+    }
+
+    eventLogSnapshot(socketID) {
+        const seat = this.seatForSocket(socketID)
+        const isSpectator = this.spectatorSocketIDs.includes(socketID)
+        if (seat < 0 && !isSpectator) return null
+        return {
+            matchId: this.matchID,
+            events: this.publicLogEvents.map(cloneLogEvent),
+            reactionCounts: this.publicLogEvents.map(event => ({
+                eventId: event.id,
+                counts: this.reactionCounts(event.id)
+            })),
+            ownReactions: seat < 0 ? [] : this.publicLogEvents.reduce((selected, event) => {
+                const reaction = this.reactionsByEvent.get(event.id)?.get(seat)
+                if (reaction) selected.push({ eventId: event.id, reaction })
+                return selected
+            }, [])
+        }
+    }
+
+    requestEventLogState(socketID, payload) {
+        if (payload !== undefined) {
+            this.socketEmit(socketID, 'g-reactionRejected', { requestId: null, reason: 'invalid_payload' })
+            return false
+        }
+        const state = this.eventLogSnapshot(socketID)
+        if (!state) return false
+        this.socketEmit(socketID, 'g-eventLogState', state)
+        return true
+    }
+
+    emitEventLogStateToAll() {
+        const socketIDs = new Set([
+            ...this.players.filter(player => player.controller === 'human').map(player => player.socketID),
+            ...this.spectatorSocketIDs
+        ])
+        socketIDs.forEach(socketID => {
+            const state = this.eventLogSnapshot(socketID)
+            if (state) this.socketEmit(socketID, 'g-eventLogState', state)
+        })
+    }
+
+    rejectReaction(socketID, requestId, reason) {
+        this.socketEmit(socketID, 'g-reactionRejected', {
+            requestId: typeof requestId === 'string' ? requestId : null,
+            reason
+        })
+        return false
+    }
+
+    emitReactionState(socketID, seat, eventID, requestId) {
+        this.publicEmit('g-reactionCounts', { eventId: eventID, counts: this.reactionCounts(eventID) })
+        this.socketEmit(socketID, 'g-reactionOwn', {
+            eventId: eventID,
+            reaction: this.reactionsByEvent.get(eventID)?.get(seat) || null,
+            requestId
+        })
+    }
+
+    reactToEvent(socketID, payload) {
+        const seat = this.seatForSocket(socketID)
+        const validObject = payload && typeof payload === 'object' && !Array.isArray(payload)
+            && Object.keys(payload).length === 3
+            && Object.prototype.hasOwnProperty.call(payload, 'eventId')
+            && Object.prototype.hasOwnProperty.call(payload, 'reaction')
+            && Object.prototype.hasOwnProperty.call(payload, 'requestId')
+        if (!validObject
+            || typeof payload.eventId !== 'string' || payload.eventId.length > 128
+            || typeof payload.reaction !== 'string'
+            || typeof payload.requestId !== 'string' || !payload.requestId.length || payload.requestId.length > 128) {
+            return this.rejectReaction(socketID, payload && payload.requestId, 'invalid_payload')
+        }
+        if (seat < 0 || this.phase === 'lobby') {
+            return this.rejectReaction(socketID, payload.requestId, 'ineligible_actor')
+        }
+        const event = this.logEventsByID.get(payload.eventId)
+        if (!event) return this.rejectReaction(socketID, payload.requestId, 'unknown_event')
+        if (!event.reactions.includes(payload.reaction)) {
+            return this.rejectReaction(socketID, payload.requestId, 'reaction_not_allowed')
+        }
+
+        let seenRequests = this.reactionRequestsBySeat.get(seat)
+        if (!seenRequests) {
+            seenRequests = new Map()
+            this.reactionRequestsBySeat.set(seat, seenRequests)
+        }
+        if (seenRequests.has(payload.requestId)) {
+            if (seenRequests.get(payload.requestId) !== event.id) {
+                return this.rejectReaction(socketID, payload.requestId, 'duplicate_request_id')
+            }
+            this.emitReactionState(socketID, seat, event.id, payload.requestId)
+            return true
+        }
+        seenRequests.set(payload.requestId, event.id)
+
+        let selections = this.reactionsByEvent.get(event.id)
+        if (!selections) {
+            selections = new Map()
+            this.reactionsByEvent.set(event.id, selections)
+        }
+        const current = selections.get(seat)
+        if (current === payload.reaction) {
+            selections.delete(seat)
+            if (selections.size === 0) this.reactionsByEvent.delete(event.id)
+            const presence = this.reactionPresenceBySeat.get(seat)
+            if (presence && presence.eventId === event.id) {
+                this.reactionPresenceBySeat.delete(seat)
+                this.publicEmit('g-reactionPresence', { seat, reaction: null })
+            }
+        } else {
+            selections.set(seat, payload.reaction)
+            this.reactionPresenceBySeat.set(seat, { eventId: event.id, reaction: payload.reaction })
+            this.publicEmit('g-reactionPresence', { seat, reaction: payload.reaction })
+        }
+        this.emitReactionState(socketID, seat, event.id, payload.requestId)
+        return true
     }
 
     addHistory(event) {
@@ -287,6 +492,20 @@ class CoupGame {
 
     rejectDecision(socketID, reason) {
         this.socketEmit(socketID, 'g-decisionRejected', { reason })
+    }
+
+    logActionResult(action, result, details = {}) {
+        const data = {
+            actorSeat: action.actor,
+            action: action.type,
+            result,
+            ...(action.target == null ? {} : { targetSeat: action.target }),
+            ...details
+        }
+        const key = action.type === 'exchange'
+            ? 'game.log.exchangeResolved'
+            : (result === 'blocked' ? 'game.log.actionBlocked' : 'game.log.actionResult')
+        return this.addLog('action_result', data, { key })
     }
 
     isEnvelope(envelope) {
@@ -669,11 +888,12 @@ class CoupGame {
         this.currentAction = action
         if (cost) this.players[actor].money -= cost
         const logKey = action.target == null ? 'game.log.actionUsed' : 'game.log.actionUsedTarget'
-        this.addLog(translate(logKey, {
-            playerName: this.players[actor].name,
-            actionLabel: actionLabel(action.type),
-            targetName: action.target == null ? '' : this.players[action.target].name
-        }))
+        this.addLog('action_declared', {
+            actorSeat: actor,
+            action: action.type,
+            ...(action.target == null ? {} : { targetSeat: action.target }),
+            ...(ROLE_BY_ACTION[action.type] ? { claimRole: String(ROLE_BY_ACTION[action.type]).toLowerCase() } : {})
+        }, { key: logKey })
         this.updatePlayers()
         const claim = ROLE_BY_ACTION[action.type]
         if (!claim) return this.afterActionClaim(action)
@@ -703,10 +923,12 @@ class CoupGame {
                     type: 'challenge', actorSeat: selected.seat, targetSeat: action.actor,
                     action: action.type, claimRole: String(role).toLowerCase(), result: 'challenged'
                 })
-                this.addLog(translate('game.log.challengeStarted', {
-                    challengerName: this.players[selected.seat].name,
-                    challengeeName: this.players[action.actor].name
-                }))
+                this.addLog('challenge_started', {
+                    actorSeat: selected.seat,
+                    targetSeat: action.actor,
+                    action: action.type,
+                    claimRole: String(role).toLowerCase()
+                }, { key: 'game.log.challengeStarted' })
                 this.openProofDecision({
                     claimant: action.actor,
                     challenger: selected.seat,
@@ -766,10 +988,12 @@ class CoupGame {
                     type: 'block', actorSeat: block.blocker, targetSeat: action.actor,
                     action: action.type, claimRole: String(block.role).toLowerCase(), result: 'resolved'
                 })
-                this.addLog(translate('game.log.blockDeclared', {
-                    blockerName: this.players[block.blocker].name,
-                    roleLabel: roleLabel(block.role)
-                }))
+                this.addLog('block_declared', {
+                    actorSeat: block.blocker,
+                    targetSeat: action.actor,
+                    action: action.type,
+                    claimRole: String(block.role).toLowerCase()
+                }, { key: 'game.log.blockDeclared' })
                 this.challengeBlock(block)
             }
         })
@@ -788,6 +1012,9 @@ class CoupGame {
                 if (!selected) {
                     block.historyEntry.result = 'resolved'
                     block.action.historyEntry.result = 'blocked'
+                    if (block.action.type === 'foreign_aid') {
+                        this.logActionResult(block.action, 'blocked', { blockerSeat: block.blocker, amount: 0 })
+                    }
                     return this.advanceTurn()
                 }
                 block.historyEntry.result = 'challenged'
@@ -795,10 +1022,12 @@ class CoupGame {
                     type: 'block_challenge', actorSeat: selected.seat, targetSeat: block.blocker,
                     action: block.action.type, claimRole: String(block.role).toLowerCase(), result: 'challenged'
                 })
-                this.addLog(translate('game.log.blockChallengeStarted', {
-                    challengerName: this.players[selected.seat].name,
-                    blockerName: this.players[block.blocker].name
-                }))
+                this.addLog('block_challenge_started', {
+                    actorSeat: selected.seat,
+                    targetSeat: block.blocker,
+                    action: block.action.type,
+                    claimRole: String(block.role).toLowerCase()
+                }, { key: 'game.log.blockChallengeStarted' })
                 this.openProofDecision({
                     claimant: block.blocker,
                     challenger: selected.seat,
@@ -809,6 +1038,9 @@ class CoupGame {
                     description: `${this.players[block.blocker].name} must prove the blocking claim.`,
                     onProved: () => {
                         block.action.historyEntry.result = 'blocked'
+                        if (block.action.type === 'foreign_aid') {
+                            this.logActionResult(block.action, 'blocked', { blockerSeat: block.blocker, amount: 0 })
+                        }
                         this.loseInfluence(selected.seat, () => this.advanceTurn())
                     },
                     onConceded: () => this.loseInfluence(block.blocker, () => this.resolveAction(block.action))
@@ -838,16 +1070,21 @@ class CoupGame {
                 if (response.choice.value.kind === 'prove') {
                     const provenCard = response.choice.value.card
                     if (historyEntry) historyEntry.result = 'proved'
-                    this.addLog(translate('game.log.claimProved', {
-                        playerName: player.name,
-                        roleLabel: roleLabel(provenCard)
-                    }))
+                    this.addLog('claim_proved', {
+                        actorSeat: claimant,
+                        ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
+                        role: String(provenCard).toLowerCase()
+                    }, { key: 'game.log.claimProved' })
                     this.returnProvenInfluence(claimant, provenCard)
                     this.updatePlayers()
                     onProved()
                 } else {
                     if (historyEntry) historyEntry.result = 'failed'
-                    this.addLog(translate('game.log.claimNotProved', { playerName: player.name }))
+                    this.addLog('claim_not_proved', {
+                        actorSeat: claimant,
+                        ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
+                        ...(historyEntry && historyEntry.claimRole ? { claimRole: historyEntry.claimRole } : {})
+                    }, { key: 'game.log.claimNotProved' })
                     onConceded()
                 }
             }
@@ -892,10 +1129,10 @@ class CoupGame {
                 if (cardIndex < 0) return this.pause('Influence changed during a loss decision.')
                 const [card] = this.players[seat].influences.splice(cardIndex, 1)
                 player.revealedInfluences.push(card)
-                this.addLog(translate('game.log.influenceLost', {
-                    playerName: player.name,
-                    roleLabel: roleLabel(card)
-                }))
+                this.addLog('influence_lost', {
+                    actorSeat: seat,
+                    role: String(card).toLowerCase()
+                }, { key: 'game.log.influenceLost' })
                 this.checkEliminated()
                 this.addHistory({
                     type: 'influence_loss', actorSeat: seat, revealedRole: String(card).toLowerCase(),
@@ -912,7 +1149,9 @@ class CoupGame {
             if (!player.isDead && player.influences.length === 0) {
                 player.isDead = true
                 player.money = 0
-                this.addLog(translate('game.log.playerEliminated', { playerName: player.name }))
+                this.addLog('player_eliminated', {
+                    actorSeat: player.seat
+                }, { key: 'game.log.playerEliminated' })
             }
         })
     }
@@ -921,13 +1160,21 @@ class CoupGame {
         if (this.phase !== 'running') return
         const actor = this.players[action.actor]
         const target = action.target == null ? null : this.players[action.target]
-        if (action.type === 'income') actor.money += 1
-        else if (action.type === 'foreign_aid') actor.money += 2
-        else if (action.type === 'tax') actor.money += 3
+        if (action.type === 'income') {
+            actor.money += 1
+            this.logActionResult(action, 'resolved', { amount: 1 })
+        } else if (action.type === 'foreign_aid') {
+            actor.money += 2
+            this.logActionResult(action, 'resolved', { amount: 2 })
+        } else if (action.type === 'tax') {
+            actor.money += 3
+            this.logActionResult(action, 'resolved', { amount: 3 })
+        }
         else if (action.type === 'steal' && target && !target.isDead) {
             const amount = Math.min(2, target.money)
             target.money -= amount
             actor.money += amount
+            this.logActionResult(action, 'resolved', { amount })
         } else if ((action.type === 'coup' || action.type === 'assassinate') && target && !target.isDead) {
             action.historyEntry.result = 'resolved'
             return this.loseInfluence(action.target, () => this.advanceTurn())
@@ -991,6 +1238,7 @@ class CoupGame {
                 this.deck.push(...returned)
                 this.deck = gameUtils.shuffleArray(this.deck, this.rng)
                 this.updatePlayers()
+                this.logActionResult({ actor: seat, type: 'exchange', target: null }, 'resolved')
                 this.advanceTurn()
             }
         })
@@ -1028,6 +1276,7 @@ class CoupGame {
         }
         this.resetGame()
         this.updatePlayers()
+        this.emitEventLogStateToAll()
         this.playTurn()
         return true
     }

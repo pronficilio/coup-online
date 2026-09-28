@@ -44,6 +44,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Entrada:** issue #40, mensajes `addLog`, flujo de resolución de acciones, sockets y modelos de juego.
 - **Áreas:** `server/game/coup.js`, `server/test/coup.test.js` y otros tests server estrictamente necesarios, `server/i18n.js` si hace falta el contrato localizado, este plan/handoff/bitácora. No tocar UI todavía.
 - **Trabajo:** definir envelope tipado con ID único por partida, tipo/turno y campos públicos mínimos; registrar resultados reales sin duplicar bloqueos/pérdidas; conservar privacidad de Exchange; mantener historial/estado de reacción en memoria; validar seat/evento/reacción del lado servidor; emitir totales, selección propia y presencia efímera según issue.
+- **Checkpoint activo:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` registra el contrato y la primera implementación; no cierra F1. Las verificaciones de concurrencia, rechazo y privacidad siguen pendientes.
 - **Salida/evidencia:** contrato y código revisables, verificaciones aplicables y nota breve de privacidad/concurrencia.
 - **Avance:** el servidor rechaza emisor, evento o reacción inválidos; repetir/reordenar emisiones mantiene una sola selección por asiento/evento y conteos exactos; rematch limpia el estado; payloads públicos no incluyen datos ocultos.
 - **Pivotar:** si el protocolo actual no permite identidad inequívoca por socket o el modelo no puede arbitrar selección de forma segura, detenerse y devolver una propuesta de contrato al Orquestador.

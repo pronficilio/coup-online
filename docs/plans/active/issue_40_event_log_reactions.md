@@ -7,6 +7,7 @@
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
 **Verifier requerido ahora:** no; se requiere al final de F4.  
 **Pregunta de falsificación:** ¿pueden dos emisiones concurrentes dejar dos reacciones del mismo jugador en un evento, desajustar conteos, revelar vínculo persistente jugador→reacción o exponer una carta oculta?  
+**Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — envelope público y primera implementación; F1 sigue activa, validaciones pendientes.
 **Branch destino:** `issue/40-event-log-reactions`  
 **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`  
 **Merge target:** `master` de `pronficilio/coup-online`  
@@ -67,6 +68,7 @@ Reservados para fases posteriores: cliente, CSS, assets, dependencias y dicciona
 ## Criterios y cierre F1
 
 - Cumplir íntegramente pregunta, avance, pivote, repetición acotada y bloqueo escritos en F1 del plan; no reducir AC del issue.
+- Cerrar los pendientes del checkpoint F1 antes de añadir `phase_verdict`.
 - Evidencia mínima: esquema/revisión del payload, archivos de servidor modificados, resultados verificables de las validaciones aplicables, y refutación de privacidad/concurrencia.
 - Cerrar solo con un commit que incluya cambios F1, reporte breve y evento `phase_verdict` en el log.
 - Commit: `feat(event-reactions): issue 40 F1 CLOSED advance_f2`.
