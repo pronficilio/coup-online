@@ -2,7 +2,7 @@
 
 **Issue/Ticket:** [#47 — Optimizar y visualizar las opciones de intercambio del Embajador](https://github.com/pronficilio/coup-online/issues/47), `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
-**Estado del plan:** `ACTIVE`; F1 `ACTIVE`.
+**Estado del plan:** `BLOCKED`; F1 `BLOCKED` por walkthrough visual pendiente.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `MEDIUM` (decisión de juego y render privado por asiento).
 **Política de verificación:** `FINAL` independiente.

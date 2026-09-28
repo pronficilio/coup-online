@@ -1,6 +1,6 @@
 # Reporte F1 — intercambio del Embajador (#47)
 
-**Veredicto:** `ACTIVE`
+**Veredicto:** `BLOCKED`
 **Branch / worktree:** `issue/47-ambassador-exchange-options` / `.worktrees/issue-47-ambassador-exchange-options`
 **Base usada para comenzar F1:** `origin/master` en `f900c094`; después se incorporó el merge de #46 (`2f45d78`). `origin/master` avanzó a `0a467c1` con documentación de cierre de #46; el branch se rebasó exitosamente sobre esa base después del commit F1.
 **Alcance revisado:** `server/game/coup.js`, `Coup.js`, `CoupStyles.css`, `ExchangeDecisionPanel.js`, `translations.json`.
@@ -51,4 +51,4 @@ Las decisiones Exchange dejan de renderizarse en `DecisionsSection`. El flujo ex
 
 ## Siguiente acción
 
-Mantener F1 `ACTIVE` hasta recorrer una pareja duplicada y una distinta en móvil y escritorio. Luego registrar el veredicto de fase. No iniciar F2 hasta cerrar F1; el Verifier independiente sigue requerido para la verificación FINAL.
+F1 queda `BLOCKED`: hace falta un navegador accesible o evidencia visual externa para recorrer una pareja duplicada y una distinta en móvil y escritorio. Desbloquea el Orquestador/usuario al proporcionar ese entorno o walkthrough verificable. No iniciar F2 hasta cerrar F1; el Verifier independiente sigue requerido para la verificación FINAL.

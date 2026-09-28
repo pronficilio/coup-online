@@ -1,6 +1,6 @@
 # Plan — opciones visuales para el intercambio del Embajador (#47)
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`; issue `OPEN` asignada a `pronficilio`.
+**Estado:** `BLOCKED`; F1 `BLOCKED`; issue `OPEN` asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/47
 **Handoff:** `docs/plans/active/issue_47_ambassador_exchange_options.md`
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
