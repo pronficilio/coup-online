@@ -2,14 +2,14 @@
 
 **Issue/Ticket:** [#46 — Disolver la partida si se desconecta un jugador activo durante una pausa](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
 **Plan:** `docs/plans/paused-disconnect/plan_paused_disconnect.md`.
-**Estado del plan:** `READY_FOR_ORCHESTRATOR_REVIEW`; F1–F3 `CLOSED (PASS)`.
+**Estado del plan:** `WAITING_ORCHESTRATOR`; F1–F3 `CLOSED (PASS)`.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH` (transición concurrente de estado de partida y desconexión).
 **Política de verificación:** `FINAL` independiente; Verifier requerido en F3.
 **Verifier requerido ahora:** no; F3 FINAL `PASS` independiente en el commit indicado en `report_issue_46_F3.md`.
 **Pregunta de falsificación:** ¿alguna intercalación disconnect/timeout/resume/respuesta tardía deja un overlay eterno, bloquea continuar tras desconexión de eliminado o reactiva una partida disuelta?
-**Fase sugerida:** crear la PR canónica a `master` y entregar al Orquestador.
-**Por qué esta fase sigue:** todas las fases cerraron y Verifier FINAL aprobó el commit F2; falta publicar una única integración para revisión del Orquestador.
+**Fase sugerida:** revisión del Orquestador en PR [#48](https://github.com/pronficilio/coup-online/pull/48).
+**Por qué esta fase sigue:** todas las fases cerraron, Verifier FINAL aprobó el commit F2 y la única PR canónica está abierta.
 
 ## Fuentes y alcance
 
@@ -32,7 +32,7 @@ La terminación visible y la continuidad de asientos eliminados están implement
 
 ## F3 cerrada
 
-Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc66050840c3a45ed045f3f7afe23`. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`. Siguiente acción: publicar una PR canónica para revisión del Orquestador; no integrar ni cerrar.
+Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc66050840c3a45ed045f3f7afe23`. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`. PR canónica: [#48](https://github.com/pronficilio/coup-online/pull/48), abierta hacia `master`. Siguiente dueño: Orquestador; no integrar ni cerrar.
 
 ## Subtareas listas
 
@@ -52,8 +52,8 @@ Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc660508
 - **Worktree destino del issue:** `.worktrees/issue-46-paused-disconnect`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **Bitácora del issue:** `docs/plans/log/issue-46.jsonl`.
-- **PR/MR esperado:** una PR hacia `master`, asociada únicamente a #46.
+- **PR/MR:** [#48](https://github.com/pronficilio/coup-online/pull/48), `OPEN`, hacia `master`, asociada únicamente a #46.
 - **Secuencia obligatoria:** registrar reclamo en el issue del fork y releer; confirmar branch/worktree existentes; crear/usar el aislamiento canónico; mover este handoff `inbox/` → `active/` solo al reclamar; registrar `claim` y `worktree_confirmed`; commits de cierre por fase.
 - **Política de commits:** `COMMIT_REQUIRED` por fase; mensajes previstos en el plan.
-- **Qué actualizar:** issue, plan, bitácora y handoff al pasar a `active/`; reportes F1–F3; preservar la rama base y otros worktrees.
+- **Qué actualizar:** issue, plan, bitácora y handoff al pasar a `active/`; reportes F1–F3; preservar la rama base y otros worktrees. El siguiente dueño es el Orquestador para revisar #48.
 - **Delegación:** delegar subtareas ordinarias según la jerarquía/política de agentes del proyecto; si no existe, realizar el trabajo sin inventar roles.

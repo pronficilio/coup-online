@@ -3,10 +3,10 @@
 ## Estado vigente
 
 - Issue: [#46](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
-- Estado operativo: `READY_FOR_ORCHESTRATOR_REVIEW`; F1–F3 `CLOSED (PASS)`.
+- Estado operativo: `WAITING_ORCHESTRATOR`; F1–F3 `CLOSED (PASS)`.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Branch / worktree únicos: `issue/46-paused-disconnect` / `.worktrees/issue-46-paused-disconnect`.
-- Destino: `master` de `pronficilio/coup-online`; una PR asociada a #46.
+- Destino: `master` de `pronficilio/coup-online`; PR [#48](https://github.com/pronficilio/coup-online/pull/48) abierta.
 - Handoff activo: `docs/plans/active/issue_46_paused_disconnect.md`.
 - Bitácora append-only: `docs/plans/log/issue-46.jsonl`.
 
@@ -110,6 +110,8 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 - Validación: revisión de diff independiente; no añadir ni ejecutar tests automatizados.
 
 **Veredicto F3:** `PASS` estático sobre commit `b67d7c242fefc66050840c3a45ed045f3f7afe23`. El Verifier no encontró intercalaciones que resuciten o atasquen la partida, confirmó el tratamiento de muertos/desconectados, Codex tardío, prioridad de `gameover`, emisión a espectadores y copy bilingüe. No se ejecutaron pruebas ni build. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`.
+
+**Entrega:** PR #48 está `OPEN` hacia `master`; unidad `WAITING_ORCHESTRATOR`, siguiente dueño Orquestador. No se integró ni cerró.
 
 ## Supuestos, preguntas y riesgos
 
