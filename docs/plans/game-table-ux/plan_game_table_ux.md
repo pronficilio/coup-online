@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El ajuste final `ca02833` (`rgba(120, 120, 120, 0.73)`) pasó build y revalidación F4 FINAL del mismo Verifier, incluido C6. Se actualizará la PR #39 con el candidato; la issue remota sigue abierta hasta integrar.
+- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El ajuste `ca02833` (`rgba(120, 120, 120, 0.73)`) pasó build y revalidación F4 FINAL del mismo Verifier, incluido C6. PR #39 está OPEN/MERGEABLE en `b0f1fe2`; la issue remota sigue abierta hasta integrar y espera autorización final.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
