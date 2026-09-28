@@ -12,6 +12,7 @@
 **Por qué esta fase sigue:** F1 fue aceptada por el propietario y F2 confirmó selección, privacidad y nombres accesibles únicos; resta revisar integración y publicar la PR para revisión.
 
 **Estado actual:** el propietario aceptó visualmente el selector. F2 reportó inicialmente nombres accesibles duplicados; la corrección incluye origen, rol, posición localizada única y estado seleccionado. La re-verificación focalizada confirmó `PASS` en `cc7b568`.
+**Revisión de integración:** la rama está rebasada sobre `origin/master@ce0e079` (incluye PR #51 de #45), sin cambios de #47 en `ResponseImageButton.js`; el build posterior al rebase pasa. PR #47 aún no creada.
 
 ## Fuentes, contrato y alcance
 

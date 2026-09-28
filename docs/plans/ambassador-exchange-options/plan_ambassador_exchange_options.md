@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `FINAL` independiente.
 **Branch / worktree:** `issue/47-ambassador-exchange-options` / `.worktrees/issue-47-ambassador-exchange-options`.
-**Base inicial / actual / destino:** `origin/master@f900c094` al reclamar; branch rebasada sobre `origin/master@db1d22c`; merge target `master` de `pronficilio/coup-online`.
+**Base inicial / actual / destino:** `origin/master@f900c094` al reclamar; branch rebasada sobre `origin/master@ce0e079`; merge target `master` de `pronficilio/coup-online`.
 **Integración:** una PR asociada únicamente a #47; aún no existe.
 
 ## Solicitud y definición de éxito

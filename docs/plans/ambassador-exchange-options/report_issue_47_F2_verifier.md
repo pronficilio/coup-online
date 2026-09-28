@@ -37,3 +37,7 @@ El defecto encontrado es reproducible por inspección del render y afecta la ide
 ### Cierre de esta ronda
 
 La corrección distingue copias con origen y rol idénticos y conserva en cada nombre el origen, rol, posición, total del pool y estado seleccionado; `aria-pressed` permanece sincronizado. No pude falsificar el criterio focalizado para pools de tres o cuatro cartas. **F2 focalizada sobre `cc7b568`: `PASS`.** La ronda inicial `FAIL` y su hallazgo quedan conservados arriba como historial.
+
+## Nota de integración del Orquestador
+
+Después del veredicto, la rama se rebasó sin conflictos sobre `origin/master@ce0e079`, que integra PR #51 de #45. El cambio del verificador está en el commit rebasado `e7594b2`; la revisión comparativa confirma que los archivos de intercambio revisados (`ExchangeDecisionPanel.js`, `translations.json` y `server/game/coup.js`) son idénticos entre `cc7b568` y `e7594b2`. El diff de #47 contra el nuevo `master` no incluye `ResponseImageButton.js`. Build cliente post-rebase y `git diff --check`: PASS. Tests automatizados: no ejecutados.
