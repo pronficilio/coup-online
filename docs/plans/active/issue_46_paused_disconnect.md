@@ -2,14 +2,14 @@
 
 **Issue/Ticket:** [#46 — Disolver la partida si se desconecta un jugador activo durante una pausa](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
 **Plan:** `docs/plans/paused-disconnect/plan_paused_disconnect.md`.
-**Estado del plan:** `ACTIVE`; F1–F2 `CLOSED (PASS)`, F3 `ACTIVE`.
+**Estado del plan:** `READY_FOR_ORCHESTRATOR_REVIEW`; F1–F3 `CLOSED (PASS)`.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH` (transición concurrente de estado de partida y desconexión).
 **Política de verificación:** `FINAL` independiente; Verifier requerido en F3.
-**Verifier requerido ahora:** sí; revisión FINAL independiente de F3 antes de entregar al Orquestador.
+**Verifier requerido ahora:** no; F3 FINAL `PASS` independiente en el commit indicado en `report_issue_46_F3.md`.
 **Pregunta de falsificación:** ¿alguna intercalación disconnect/timeout/resume/respuesta tardía deja un overlay eterno, bloquea continuar tras desconexión de eliminado o reactiva una partida disuelta?
-**Fase sugerida:** F3 — revisión FINAL independiente.
-**Por qué esta fase sigue:** implementación F2 cerrada con revisión estática; el nivel HIGH exige refutar carreras/eventos obsoletos antes de entregar integración.
+**Fase sugerida:** crear la PR canónica a `master` y entregar al Orquestador.
+**Por qué esta fase sigue:** todas las fases cerraron y Verifier FINAL aprobó el commit F2; falta publicar una única integración para revisión del Orquestador.
 
 ## Fuentes y alcance
 
@@ -28,11 +28,15 @@ La matriz de fases y asientos, rutas de eventos, ciclo de vida de namespace y co
 
 ## F2 cerrada
 
-La terminación visible y la continuidad de asientos eliminados están implementadas y revisadas estáticamente. Evidencia: `docs/plans/paused-disconnect/report_issue_46_F2.md`. F3 requiere Verifier independiente.
+La terminación visible y la continuidad de asientos eliminados están implementadas y revisadas estáticamente. Evidencia: `docs/plans/paused-disconnect/report_issue_46_F2.md`.
+
+## F3 cerrada
+
+Verifier FINAL independiente emitió `PASS` estático sobre `b67d7c242fefc66050840c3a45ed045f3f7afe23`. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`. Siguiente acción: publicar una PR canónica para revisión del Orquestador; no integrar ni cerrar.
 
 ## Subtareas listas
 
-1. F3: Verifier independiente revisa diff e intenta falsificar la pregunta del plan con intercalaciones y eventos obsoletos.
+1. Abrir la PR única de #46 a `master` después de comprobar que no exista otra; enlazarla y dejar la unidad `WAITING_ORCHESTRATOR`.
 
 ## Riesgos, evidencia y validación
 

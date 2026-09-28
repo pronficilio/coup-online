@@ -3,7 +3,7 @@
 ## Estado vigente
 
 - Issue: [#46](https://github.com/pronficilio/coup-online/issues/46), `OPEN`.
-- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`, F2 `CLOSED (PASS)`, F3 `ACTIVE`.
+- Estado operativo: `READY_FOR_ORCHESTRATOR_REVIEW`; F1–F3 `CLOSED (PASS)`.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Branch / worktree únicos: `issue/46-paused-disconnect` / `.worktrees/issue-46-paused-disconnect`.
 - Destino: `master` de `pronficilio/coup-online`; una PR asociada a #46.
@@ -97,7 +97,7 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 
 ### F3 — revisión independiente final
 
-- Estado: `ACTIVE`; pendiente de Verifier independiente.
+- Estado: `CLOSED (PASS)` por Verifier FINAL independiente.
 - Pregunta: ¿puede una desconexión de jugador muerto bloquear o una carrera tardía resucitar la partida, y quedan todos informados al disolver?
 - Entrada: commit F2 y diff completo de #46.
 - Salida: reporte FINAL independiente que intenta refutar los criterios 1–8.
@@ -108,6 +108,8 @@ La fase de servidor debe cambiar a terminal antes del broadcast. Esto hace que r
 - Artefactos: reporte F3 y actualización de plan/bitácora.
 - Política: `COMMIT_REQUIRED`; `fix(paused-disconnect): issue 46 F3 CLOSED advance_review`.
 - Validación: revisión de diff independiente; no añadir ni ejecutar tests automatizados.
+
+**Veredicto F3:** `PASS` estático sobre commit `b67d7c242fefc66050840c3a45ed045f3f7afe23`. El Verifier no encontró intercalaciones que resuciten o atasquen la partida, confirmó el tratamiento de muertos/desconectados, Codex tardío, prioridad de `gameover`, emisión a espectadores y copy bilingüe. No se ejecutaron pruebas ni build. Reporte: `docs/plans/paused-disconnect/report_issue_46_F3.md`.
 
 ## Supuestos, preguntas y riesgos
 
