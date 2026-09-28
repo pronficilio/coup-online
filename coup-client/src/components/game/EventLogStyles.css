@@ -1,0 +1,385 @@
+.EventLogPanel {
+    --event-log-ink: #322a23;
+    --event-log-muted: #76695d;
+    --event-log-line: rgba(87, 65, 42, 0.14);
+    position: fixed;
+    z-index: 40;
+    top: 68px;
+    right: clamp(10px, 2vw, 24px);
+    display: flex;
+    width: min(340px, calc(100vw - 24px));
+    max-height: min(48vh, 500px);
+    flex-direction: column;
+    overflow: hidden;
+    box-sizing: border-box;
+    border: 1px solid rgba(108, 83, 55, 0.2);
+    border-radius: 16px;
+    background: rgba(252, 250, 246, 0.96);
+    box-shadow: 0 10px 32px rgba(49, 36, 23, 0.18), 0 2px 8px rgba(49, 36, 23, 0.1);
+    color: var(--event-log-ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.EventLogPanelHeader {
+    display: flex;
+    min-height: 46px;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 9px;
+    box-sizing: border-box;
+    padding: 8px 10px 8px 14px;
+    border-bottom: 1px solid var(--event-log-line);
+}
+
+.EventLogPanelTitle {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.EventLogPanelTotal {
+    display: inline-flex;
+    min-width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: rgba(108, 83, 55, 0.1);
+    color: var(--event-log-muted);
+    font-family: system-ui, sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.EventLogPanelToggle,
+.EventLogReactButton,
+.EventLogReactionCountButton,
+.EventLogReactionOption {
+    font: inherit;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.EventLogPanelToggle {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--event-log-ink);
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.EventLogPanelToggle:hover {
+    transform: scale(1.04);
+    border-color: var(--event-log-line);
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.EventLogPanelToggle:focus-visible,
+.EventLogReactButton:focus-visible,
+.EventLogReactionCountButton:focus-visible,
+.EventLogReactionOption:focus-visible {
+    outline: 3px solid rgba(72, 119, 166, 0.72);
+    outline-offset: 2px;
+}
+
+.EventLogPanelBody {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px 10px 10px;
+    scrollbar-color: rgba(108, 83, 55, 0.38) transparent;
+    scrollbar-width: thin;
+}
+
+.EventLogPanel--collapsed .EventLogPanelBody {
+    display: none;
+}
+
+.EventLogTurnGroup + .EventLogTurnGroup {
+    margin-top: 4px;
+    padding-top: 5px;
+    border-top: 1px solid var(--event-log-line);
+}
+
+.EventLogTurnHeading {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    margin: 4px 0 5px;
+    padding: 3px 8px;
+    border: 1px solid rgba(108, 83, 55, 0.1);
+    border-radius: 999px;
+    background: rgba(245, 240, 232, 0.96);
+    color: var(--event-log-muted);
+    font-family: system-ui, sans-serif;
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.EventLogEntry {
+    position: relative;
+    padding: 8px 4px 7px;
+    border-bottom: 1px solid rgba(87, 65, 42, 0.09);
+}
+
+.EventLogEntry:last-child {
+    border-bottom-color: transparent;
+}
+
+.EventLogEntryMain {
+    display: grid;
+    grid-template-columns: 27px minmax(0, 1fr);
+    align-items: start;
+    gap: 8px;
+}
+
+.EventLogEntryIcon {
+    display: inline-flex;
+    width: 26px;
+    height: 26px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(108, 83, 55, 0.1);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.72);
+    font-family: system-ui, sans-serif;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+.EventLogEntryMessage {
+    margin: 1px 0 0;
+    color: var(--event-log-ink);
+    font-size: 0.78rem;
+    line-height: 1.38;
+    overflow-wrap: anywhere;
+}
+
+.EventLogPlayerName {
+    color: var(--event-player-color, #514535);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: color-mix(in srgb, var(--event-player-color, #514535) 45%, transparent);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.EventLogEntryReactions {
+    display: flex;
+    min-height: 26px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin: 5px 0 0 35px;
+}
+
+.EventLogReactionCountButton,
+.EventLogReactButton {
+    display: inline-flex;
+    min-width: 29px;
+    height: 25px;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border: 1px solid rgba(108, 83, 55, 0.14);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #453a2e;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    font-size: 0.72rem;
+    line-height: 1;
+    transition: background-color 130ms ease, border-color 130ms ease, box-shadow 130ms ease, transform 130ms ease;
+}
+
+.EventLogReactionCountButton:hover,
+.EventLogReactButton:hover {
+    transform: translateY(-1px);
+    border-color: rgba(108, 83, 55, 0.34);
+    background: #fff;
+}
+
+.EventLogReactionCountButton--selected {
+    border-color: rgba(64, 116, 165, 0.48);
+    background: rgba(220, 236, 250, 0.88);
+    box-shadow: inset 0 0 0 1px rgba(64, 116, 165, 0.12);
+}
+
+.EventLogReactButton {
+    width: 26px;
+    min-width: 26px;
+    padding: 0;
+    color: var(--event-log-muted);
+    font-size: 1rem;
+}
+
+.EventLogReactButton--active {
+    border-color: rgba(64, 116, 165, 0.42);
+    background: rgba(220, 236, 250, 0.88);
+    color: #305b80;
+}
+
+.EventLogPlusIcon {
+    position: relative;
+    display: block;
+    width: 10px;
+    height: 10px;
+}
+
+.EventLogPlusIcon::before,
+.EventLogPlusIcon::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 10px;
+    height: 1.5px;
+    border-radius: 2px;
+    background: currentColor;
+    content: '';
+    transform: translate(-50%, -50%);
+}
+
+.EventLogPlusIcon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.EventLogReactionTray {
+    display: flex;
+    width: fit-content;
+    max-width: calc(100% - 34px);
+    align-items: center;
+    gap: 4px;
+    margin: 6px 0 1px 34px;
+    padding: 5px;
+    border: 1px solid rgba(108, 83, 55, 0.16);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 5px 16px rgba(49, 36, 23, 0.13);
+    animation: EventLogTrayIn 150ms ease-out both;
+}
+
+.EventLogReactionOption {
+    display: inline-flex;
+    min-width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 3px 5px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: transparent;
+    color: #453a2e;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    font-size: 0.74rem;
+    transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease;
+}
+
+.EventLogReactionOption:hover {
+    transform: translateY(-2px) scale(1.06);
+    background: #f4f0e9;
+}
+
+.EventLogReactionOption--selected {
+    border-color: rgba(64, 116, 165, 0.32);
+    background: rgba(220, 236, 250, 0.72);
+}
+
+.EventLogReactionEmoji {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+.EventLogReactionCount {
+    color: var(--event-log-muted);
+    font-size: 0.63rem;
+    font-weight: 700;
+}
+
+.EventLogEmpty {
+    margin: 10px 3px;
+    color: var(--event-log-muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.EventLogStatus {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+@keyframes EventLogTrayIn {
+    from { opacity: 0; transform: translateY(3px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 720px) {
+    .EventLogPanel {
+        top: auto;
+        right: 10px;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        left: 10px;
+        width: auto;
+        max-height: min(62vh, 62dvh, 560px);
+        border-radius: 18px;
+    }
+
+    .EventLogPanel:not(.EventLogPanel--expanded) .EventLogPanelBody {
+        display: none;
+    }
+
+    .EventLogPanelHeader {
+        min-height: 48px;
+        padding-left: 15px;
+    }
+
+    .EventLogPanelBody {
+        padding-right: 12px;
+        padding-left: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .EventLogPanelTitle { font-size: 0.9rem; }
+    .EventLogPanelTotal { min-width: 20px; height: 20px; }
+    .EventLogPanelHeader { gap: 6px; }
+    .EventLogEntryMessage { font-size: 0.74rem; }
+    .EventLogReactionTray { max-width: calc(100% - 28px); margin-left: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .EventLogPanelToggle,
+    .EventLogReactionCountButton,
+    .EventLogReactButton,
+    .EventLogReactionOption {
+        transition: none;
+    }
+    .EventLogReactionTray { animation: none; }
+}

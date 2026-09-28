@@ -1,13 +1,13 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 no iniciada; issue `OPEN`, asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `READY`; issue `OPEN`, asignada a `pronficilio`.
 
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
 **Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
 **Bitácora:** `docs/plans/log/issue-40.jsonl`  
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.  
 **Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.  
-**Base / destino:** `origin/master` (`a3d23f3c5f262fc02fe15ffbb554472b3d829aec`) / `master` de `pronficilio/coup-online`.  
+**Base / destino:** `origin/master` (`f900c0947a0b27ac9c6e0372e3c1871a883be7e6`) / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue completo; aún no existe.
 
 ## Solicitud y resultado esperado
@@ -21,7 +21,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - `server/game/coup.js` emite mensajes de texto por `g-addLog`; el cliente los guarda como strings en `Coup.js` y los presenta en `EventLog.js`.
 - Las traducciones actuales están en `coup-client/src/i18n/translations.json`; el tablero expone nombre, monedas y asiento en `PlayerBoard.js`.
 - Los PNG de `fotos/` son referencias locales excluidas de Git y pueden faltar en este worktree. No importarlos ni agregarlos al PR sin validar disponibilidad y optimizar los derivados.
-- La issue #24 está abierta y asignada a `pronficilio`, con un worktree activo que toca el shell/estilos de la UI del turno. No cambiar en paralelo las mismas zonas de `coup-client/src/components/game/Coup.js` o estilos compartidos. Consultar su estado/diff antes de editar esas superficies y sincronizar `master` antes de integrar. La lógica de servidor F1 es independiente.
+- La issue #24 se cerró al fusionarse la PR #41 (`2160ada`); su rail y sus estilos ya están en `origin/master`. Esta rama se rebasó sobre `f900c09` antes de F2. Preservar el rail integrado y mantener el CSS del registro en `EventLogStyles.css`.
 - El Orquestador creó este branch/worktree a petición explícita del usuario, antes del reclamo del Alquimista. El Alquimista debe volver a leer issue/PR/branch, confirmar que no hay reclamo incompatible y registrar su propio `claim` remoto antes de cambios de producto.
 
 ## Decisiones aprobadas
@@ -52,21 +52,24 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Bloquear/cancelar:** bloquear si no puede probarse la identidad autoritativa o evitar filtraciones; cancelar solo si el usuario retira la función.
 - **Commit:** `feat(event-reactions): issue 40 F1 CLOSED advance_f2` (`COMMIT_REQUIRED`).
 - **Verifier:** no en esta fase; resultado independiente `FINAL` obligatorio antes de integrar.
-- **Estado de entrega:** `WAITING_ORCHESTRATOR`; no comenzar F2 antes de revisar el resultado y la nota sobre la suite completa.
+- **Revisión del Orquestador:** F1 aprobada. Las cuatro fallas generales son expectativas existentes de pausa/reanudación no modificadas en F1; están registradas para seguimiento de la suite y no bloquean la superficie independiente de F2.
+- **Estado de entrega:** F2 `ACTIVE`; #24 y PR #41 están integradas en `origin/master@f900c09`. Preservar el rail de acciones, usar CSS separado para EventLog y limitar el cableado de `Coup.js` al componente del registro.
 
 ### F2 — Registro y controles de reacción
 
 **Pregunta única:** ¿Puede leerse cada evento y seleccionarse la reacción contextual sin horas ni pérdida de contexto?
 
 - **Entrada:** envelope F1 integrado en el mismo branch y contrato de payload cerrado.
-- **Áreas:** `coup-client/src/components/game/EventLog.js`, estilos de juego, `Coup.js`, traducciones es/en y assets optimizados si se justifican. Inspeccionar issue #24 antes de tocar archivos cliente compartidos.
+- **Áreas:** `coup-client/src/components/game/EventLog.js`, `EventLogStyles.css`, cableado mínimo en `Coup.js` y traducciones es/en. No se requieren assets raster.
 - **Trabajo:** renderizar todos los tipos/resultados, participantes con colores, iconos y grupos por turno; bandeja contextual; conteo/selección propia y click para agregar/reemplazar/quitar; conservar scroll; panel escritorio/móvil.
 - **Salida/evidencia:** recorrido de todas las categorías, variantes bloqueadas y robo de 0/1/2 monedas; capturas representativas de escritorio/móvil.
 - **Avance:** cobertura completa, ausencia total de horas, opciones por contexto correctas y estado del cliente consistente con servidor.
 - **Pivotar:** recolocar/reducir el panel si cubre asientos o controles; no retirar categorías ni reacciones aprobadas.
 - **Repetir:** una repetición por defecto ante un defecto visual reproducible, después de una corrección acotada.
-- **Bloquear/cancelar:** bloquear si issue #24 mantiene una edición incompatible en la misma superficie; coordinar secuencia con Orquestador.
+- **Bloquear/cancelar:** bloquear si aparece un conflicto con el rail de #24 ya integrado o si el registro tapa decisiones/asientos sin una recolocación clara.
 - **Commit:** `feat(event-log): issue 40 F2 CLOSED advance_f3` (`COMMIT_REQUIRED`).
+- **Entrega/revisión:** F2 `CLOSED / PASS`. El reporte `docs/plans/event-log-reactions/report_issue_40_F2.md` registra el build, los avisos existentes fuera del diff, el recorrido con las nueve categorías y los resultados ingreso/ayuda/impuesto/bloqueo/robo 0–2/intercambio. Las capturas de escritorio, bandeja y móvil están en `evidence_issue_40_F2/`.
+- **Estado de entrega:** F3 queda `READY` tras el checkpoint F2 del Orquestador. F2 no incluyó cambios de PlayerBoard ni globos de presencia.
 
 ### F3 — Globos efímeros y acabado accesible
 

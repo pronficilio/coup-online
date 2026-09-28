@@ -288,7 +288,6 @@ export default class Coup extends Component {
             dissolved: false,
             disconnectedPlayer: '',
             canPlayAgain: false,
-            logs: [],
             disconnected: false,
             codexDisabled: Boolean(props.codexDisabled),
             actionRailPosition: null,
@@ -322,7 +321,6 @@ export default class Coup extends Component {
             })
         })
         socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
-        socket.on('g-addLog', message => this.setState(state => ({ logs: state.logs.concat(String(message)) })))
         socket.on('g-decision', decision => {
             if (this.state.dissolved || this.state.winner) return
             this.actionSubmissionLock = false
@@ -874,7 +872,7 @@ export default class Coup extends Component {
                     className="CheatSheet ActionDecisionAnchorProbe"
                     aria-hidden="true"
                 />}
-                <EventLog logs={this.state.logs} />
+                <EventLog socket={this.props.socket} players={this.state.players} />
             </div>
 
             {actionDecisionRail}

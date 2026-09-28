@@ -3,31 +3,30 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/40  
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`  
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`  
-**Estado del plan:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 no iniciada
+**Estado del plan:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `READY`
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
 **Verifier requerido ahora:** no; se requiere al final de F4.  
 **Pregunta de falsificación:** ¿pueden dos emisiones concurrentes dejar dos reacciones del mismo jugador en un evento, desajustar conteos, revelar vínculo persistente jugador→reacción o exponer una carta oculta?  
-**Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 cerrada tras validaciones de servidor; suite completa conserva cuatro fallos preexistentes ajenos a F1, registrados para revisión.
+**Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 aprobada por el Orquestador; la suite general conserva cuatro fallos de expectativas antiguas de pausa/reanudación, fuera del alcance F1.
 **Reporte F1:** `docs/plans/event-log-reactions/report_issue_40_F1.md`.
 **Branch destino:** `issue/40-event-log-reactions`  
 **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`  
 **Merge target:** `master` de `pronficilio/coup-online`  
 **PR esperada:** una PR desde el branch canónico a `master`; todavía no existe.
 
-## Fase sugerida
+## Siguiente fase: F3 — Globos efímeros de presencia
 
-**F1 — Contrato público y autoridad del servidor.**  
-Pregunta: ¿puede el servidor identificar eventos públicos y mantener reacciones válidas, únicas por asiento/evento y libres de datos privados?
+F1 y F2 fueron aprobadas por el Orquestador. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3`; el reporte es `docs/plans/event-log-reactions/report_issue_40_F2.md` y la evidencia visual está en `docs/plans/event-log-reactions/evidence_issue_40_F2/`. La PR #41 de issue #24 se integró en `2160ada` y el cierre documental llegó en `f900c09`; esta rama se rebasó sobre ese `origin/master`.
 
-## Por qué sigue F1
+## Dependencia de F1
 
-El cliente hoy recibe `g-addLog` como string. La UI de reacciones depende de IDs de evento y un estado autoritativo que aún no existe. Cerrar primero el envelope público, los resultados reales, la privacidad de Exchange y la regla de una selección por jugador/evento habilita F2 sin clasificar frases localizadas ni duplicar reglas en el cliente.
+F1 ya cerró el contrato tipado, los resultados públicos y el estado autoritativo de reacciones que consume el cliente.
 
 ## Reclamo, rama y aislamiento
 
-Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim del Alquimista quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787): branch `issue/40-event-log-reactions`, worktree `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`, target `master`, estado `F1 ACTIVE`. Solo había el handoff del Orquestador; no se encontró claim incompatible ni PR candidata. El aislamiento fue confirmado en el worktree canónico, limpio, en `c44b768` sobre `origin/master@a3d23f3`. La superficie cliente queda intacta; F1 se limita a servidor.
+Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se rebasó sobre `origin/master@f900c09` antes de comenzar F2; no se creó otro worktree ni se integró la rama de #24 como dependencia.
 
-El runtime no expone capacidad de subagentes. Dada la instrucción explícita del propietario de ejecutar F1, el Alquimista continúa directamente y deja esta excepción registrada; no inventará una herramienta de delegación.
+F1 se ejecutó directamente en el worktree por falta de delegación disponible en ese contexto. F2 y F3 continúan bajo dirección del Orquestador tras cerrar el hilo del Alquimista que no inició trabajo después de su reanudación.
 
 Comprobaciones iniciales esperadas:
 
@@ -48,23 +47,22 @@ No dupliques ni recrees el branch/worktree. No trabajes desde el checkout raíz 
 - `docs/agentes/ALQUIMISTA.md` y `docs/agentes/AGENTE_MENOR.md`: contratos de ejecución y delegación.
 - `docs/plans/PROJECT_ORCHESTRATION.yaml`: `master`, fork `pronficilio/coup-online`, un issue → un branch/worktree/PR.
 - `server/game/coup.js`, `server/i18n.js`, `coup-client/src/components/game/EventLog.js`, `Coup.js`, `PlayerBoard.js`, sus hojas de estilo y `coup-client/src/i18n/translations.json`.
-- Issue #24 sigue abierta y tiene cambios de UI del turno en `Coup.js`/estilos. Relee el estado/diff y coordina antes de editar las mismas superficies; no copies ni reviertas ese trabajo. F1 de servidor puede proceder de manera independiente.
+- Issue #24 se cerró con PR #41 y su rail quedó integrado en `origin/master@f900c09`; F2 parte de esa versión y conserva sus cambios.
 - Los archivos `fotos/` son referencias locales opcionales y pueden faltar en el worktree. No añadir sus PNG directamente al PR por inferencia.
 
-## Subtareas listas para delegación
+## F2 cerrada — Registro y controles de reacción
 
-1. Cerrar contrato de eventos públicos desde `addLog` y puntos de resolución: ID por partida, tipo, turno, actores/destinos públicos, resultado y datos localizables; ninguna identidad privada de Exchange.
-2. Implementar estado por partida para conteos por reacción y selección propia; derivar asiento del socket, validar catálogo por tipo/resultado, y soportar reemplazo, toggle/remoción y emisiones simultáneas sin duplicados.
-3. Emitir cambios agregados solo con conteos y confirmación privada de la selección propia; emitir presencia efímera con asiento/reacción sin agregar un mapa persistente de identidades al registro.
-4. Añadir y revisar verificaciones de servidor para payload inválido, actor no elegible, evento desconocido, concurrencia, toggle/reemplazo y reset de rematch.
+F2 implementó los criterios del plan, compiló y capturó el recorrido de las nueve categorías en escritorio/móvil, la bandeja contextual y resultados de ingreso, ayuda, impuesto, bloqueo, robo de 0/1/2 monedas e intercambio. Ver `docs/plans/event-log-reactions/report_issue_40_F2.md` y `docs/plans/event-log-reactions/evidence_issue_40_F2/`.
 
-Coordina la delegación según la política real de agentes del entorno. Si no hay Agente Menor utilizable, registra esa limitación y sigue el contrato local sin inventar herramientas.
-
-## Alcance de archivos F1
+## Alcance F1 (cerrado)
 
 Permitidos: `server/game/coup.js`, `server/test/coup.test.js` y tests server estrictamente necesarios, `server/i18n.js` si el contrato lo exige, más este plan/handoff/bitácora y reporte F1.
 
 Reservados para fases posteriores: cliente, CSS, assets, dependencias y diccionario cliente. No cambies reglas de Coup, decisiones, validación de acciones existente ni proveedores de IA.
+
+## Alcance F2 cerrado
+
+Cambios entregados: `coup-client/src/components/game/EventLog.js`, `EventLogStyles.css`, montaje mínimo en `Coup.js`, `coup-client/src/i18n/translations.json`, reporte, capturas y bitácora. El rail de acciones integrado se conservó intacto.
 
 ## Criterios y cierre F1
 
@@ -75,9 +73,21 @@ Reservados para fases posteriores: cliente, CSS, assets, dependencias y dicciona
 - Commit: `feat(event-reactions): issue 40 F1 CLOSED advance_f2`.
 - Después, mantener issue/plan/handoff en estado real y detenerse en `WAITING_ORCHESTRATOR` para revisión del Orquestador antes de entrar a F2.
 
-## Entrega de F1
+## Entrega de F1 y autorización de F2
 
-F1 está cerrada y el worktree queda en `WAITING_ORCHESTRATOR`. Se completaron las pruebas específicas de payload, elegibilidad, catálogos, idempotencia/reemplazo/toggle, agregados, montos, Exchange, snapshots y reset. Sintaxis y whitespace pasan. La suite completa da 43/47: los cuatro fallos de pausa/reanudación ya corresponden a expectativas incompatibles con las rutas existentes en `origin/master`; el reporte deja los detalles para que el Orquestador decida seguimiento. No se inicia F2 hasta recibir su revisión.
+El Orquestador aprobó F1. Se completaron las pruebas específicas de payload, elegibilidad, catálogos, idempotencia/reemplazo/toggle, agregados, montos, Exchange, snapshots y reset. Sintaxis y whitespace pasan. La suite completa da 43/47: cuatro expectativas existentes de pausa/reanudación no corresponden a las rutas base vigentes; se registraron para seguimiento y no bloquearon F2.
+
+## Criterios de cierre F2
+
+- Todos los nueve tipos de evento y resultados aprobados aparecen con datos reales, participantes coloreados y sin horas.
+- Bandeja contextual coincide con `event.reactions`; conteos, selección propia, clic directo, reemplazo y retiro se reconcilian con el servidor.
+- El snapshot recupera historial/selección y las actualizaciones de conteo no fuerzan scroll.
+- Panel legible y accesible en escritorio/móvil; no duplica ni altera el rail de acciones #24.
+- F2 cerró con build cliente PASS, recorrido visual en Chromium sin errores de página, cinco capturas comprimidas y el commit `feat(event-log): issue 40 F2 CLOSED advance_f3`. El build conserva avisos en `App.js` y `ReferencePanel.css`, fuera del diff F2.
+
+## Alcance reservado para F3
+
+Implementar presencia efímera en `PlayerBoard` y el cableado/timers necesarios en `Coup.js`: un globo junto a cada nombre, del lado opuesto al contador de monedas; reemplazo y reinicio al recibir otra reacción; coexistencia entre asientos; expiración con salida suave y movimiento reducido. No incluir ID de evento ni vínculo persistente participante→reacción.
 
 ## Política para todo el issue
 
