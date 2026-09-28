@@ -71,10 +71,16 @@ export default class EventLog extends Component {
             matchId: null,
             expanded: !isMobileViewport(),
             menuEventId: null,
-            status: ''
+            status: '',
+            loaded: false
         }
         this.scrollRef = createRef()
+        this.panelRef = createRef()
         this.requestSerial = 0
+        this.hasExpandedOnce = !isMobileViewport()
+        this.followLatestOnReopen = true
+        this.pendingFollowBottom = false
+        this.savedScrollTop = 0
     }
 
     componentDidMount() {
@@ -111,12 +117,15 @@ export default class EventLog extends Component {
 
     handleAddLog = event => {
         if (!event || typeof event !== 'object' || typeof event.id !== 'string' || typeof event.type !== 'string') return
-        const shouldFollow = this.isNearBottom()
+        const wasExpanded = this.state.expanded
+        const shouldFollow = wasExpanded ? this.isNearBottom() : this.followLatestOnReopen
         this.setState(state => {
             if (state.events.some(existing => existing.id === event.id)) return null
             return { events: state.events.concat(event) }
         }, () => {
-            if (shouldFollow) this.scrollToBottom()
+            if (!shouldFollow) return
+            if (wasExpanded && this.state.expanded) this.scrollToBottom()
+            else this.pendingFollowBottom = true
         })
     }
 
@@ -161,7 +170,9 @@ export default class EventLog extends Component {
             if (this.state.reactionCounts[event.id]) reactionCounts[event.id] = this.state.reactionCounts[event.id]
             if (this.state.ownReactions[event.id]) ownReactions[event.id] = this.state.ownReactions[event.id]
         })
-        const shouldFollow = !this.state.loaded || matchChanged || this.isNearBottom()
+        const wasExpanded = this.state.expanded
+        const shouldFollow = !this.state.loaded || matchChanged
+            || (wasExpanded ? this.isNearBottom() : this.followLatestOnReopen)
         this.setState({
             events: snapshot.events.concat(tailEvents),
             reactionCounts,
@@ -171,7 +182,9 @@ export default class EventLog extends Component {
             status: '',
             loaded: true
         }, () => {
-            if (shouldFollow) this.scrollToBottom()
+            if (!shouldFollow) return
+            if (wasExpanded || this.state.expanded) this.scrollToBottom()
+            else this.pendingFollowBottom = true
         })
     }
 
@@ -294,13 +307,27 @@ export default class EventLog extends Component {
         return option ? t(option.label) : t('game.eventLog.reaction.unknown')
     }
 
-    react(event, reaction) {
+    react(event, reaction, restoreMenuFocus = false) {
         const socket = this.props.socket
         if (!socket || !event || !event.id) return
+        const activeElement = typeof document === 'undefined' ? null : document.activeElement
         this.requestSerial += 1
         const requestId = `event-reaction-${Date.now().toString(36)}-${this.requestSerial}`
         socket.emit('g-reactToEvent', { eventId: event.id, reaction, requestId })
-        this.setState({ menuEventId: null, status: '' })
+        this.setState({ menuEventId: null, status: '' }, () => {
+            if (restoreMenuFocus || (activeElement && !activeElement.isConnected)) {
+                this.focusReactionTrigger(event.id)
+            }
+        })
+    }
+
+    focusReactionTrigger(eventId) {
+        const panel = this.panelRef.current
+        if (!panel) return
+        const entry = Array.from(panel.querySelectorAll('.EventLogEntry'))
+            .find(element => element.dataset.eventId === eventId)
+        const trigger = entry && entry.querySelector('.EventLogReactButton')
+        if (trigger) trigger.focus({ preventScroll: true })
     }
 
     toggleReactionMenu(eventId) {
@@ -311,8 +338,21 @@ export default class EventLog extends Component {
     }
 
     toggleExpanded = () => {
+        const wasExpanded = this.state.expanded
+        if (wasExpanded) {
+            this.followLatestOnReopen = this.isNearBottom()
+            this.savedScrollTop = this.scrollRef.current ? this.scrollRef.current.scrollTop : 0
+        }
+        const shouldFollowAfterOpening = !wasExpanded
+            && (!this.hasExpandedOnce || this.pendingFollowBottom)
         this.setState(state => ({ expanded: !state.expanded, menuEventId: null }), () => {
-            if (this.state.expanded) this.scrollToBottom()
+            if (!this.state.expanded) return
+            if (shouldFollowAfterOpening) this.scrollToBottom()
+            else if (this.scrollRef.current) this.scrollRef.current.scrollTop = this.savedScrollTop
+            this.pendingFollowBottom = false
+            this.hasExpandedOnce = true
+            this.followLatestOnReopen = this.isNearBottom()
+            if (this.scrollRef.current) this.savedScrollTop = this.scrollRef.current.scrollTop
         })
     }
 
@@ -333,7 +373,7 @@ export default class EventLog extends Component {
                     key={reaction}
                     aria-label={t('game.eventLog.reactWith', { reaction: label, count })}
                     aria-pressed={own === reaction}
-                    onClick={() => this.react(event, reaction)}
+                    onClick={() => this.react(event, reaction, true)}
                 >
                     <span className="EventLogReactionEmoji" aria-hidden="true">{option.emoji}</span>
                     {count > 0 && <span className="EventLogReactionCount">{count}</span>}
@@ -347,7 +387,7 @@ export default class EventLog extends Component {
         const own = this.state.ownReactions[event.id]
         const allowed = Array.isArray(event.reactions) ? event.reactions : []
         const visibleReactions = allowed.filter(reaction => (counts[reaction] || 0) > 0)
-        return <article className="EventLogEntry" key={event.id}>
+        return <article className="EventLogEntry" key={event.id} data-event-id={event.id}>
             <div className="EventLogEntryMain">
                 <span className="EventLogEntryIcon" aria-hidden="true">{EVENT_ICONS[event.type] || '•'}</span>
                 <p className="EventLogEntryMessage">{this.eventMessage(event)}</p>
@@ -403,7 +443,7 @@ export default class EventLog extends Component {
 
     render() {
         const expanded = this.state.expanded
-        return <section className={`EventLogPanel${expanded ? ' EventLogPanel--expanded' : ' EventLogPanel--collapsed'}`}>
+        return <section ref={this.panelRef} className={`EventLogPanel${expanded ? ' EventLogPanel--expanded' : ' EventLogPanel--collapsed'}`}>
             <header className="EventLogPanelHeader">
                 <h2 className="EventLogPanelTitle">{t('game.eventLog.title')}</h2>
                 <span className="EventLogPanelTotal" aria-label={t('game.eventLog.eventCount', { count: this.state.events.length })}>

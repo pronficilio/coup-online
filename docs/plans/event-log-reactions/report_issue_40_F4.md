@@ -1,7 +1,7 @@
 # Reporte F4 — Falsificación y entrega
 
 **Issue:** #40 — rediseñar el registro de eventos y añadir reacciones efímeras
-**Estado:** `ACTIVE`; primera revisión independiente `FAIL`; correcciones aplicadas y segunda revisión `FINAL` pendiente.
+**Estado:** `ACTIVE`; dos revisiones independientes devolvieron `FAIL`; los defectos reproducibles se corrigieron y el E2E live pasó. Tercera revisión independiente `FINAL` pendiente. La publicación/integración de la PR de AC12 requiere autorización del propietario.
 **Branch/worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`
 **Base:** `origin/master@db1d22c11fc78dcd91b5f4242b1ae1591f9ba16b`
 
@@ -36,4 +36,25 @@ Capturas de este recorrido en `evidence_issue_40_F4/`:
 
 ## Segunda revisión independiente
 
-Pendiente. Un Verifier nuevo debe leer el issue #40, comparar AC1–AC12 con el código actualizado y los reportes F1–F3, inspeccionar este recorrido y emitir `PASS`, `FAIL` o `BLOCKED` sin modificar archivos ni ejecutar tests. Registrar aquí su dictamen y defectos reproducibles antes de cerrar F4.
+El segundo Verifier independiente (`Curie`) también devolvió `FAIL`:
+
+- **AC9 — parcial:** seleccionar una reacción retiraba el menú y dejaba el foco perdido.
+- **AC10 — FAIL:** en móvil, cerrar y reabrir el registro desplazaba la lista hasta el final.
+- **AC12 — parcial:** aún no se había probado una partida real con dos clientes y tampoco existía la PR.
+- **AC1–8 y AC11 — PASS**; no se registraron defectos nuevos en privacidad, contratos ni datos de las filas.
+
+### Correcciones desde el segundo `FAIL`
+
+- `EventLog` devuelve el foco al control de reacción del mismo evento cuando se elige o retira una reacción. Se añadió el anclaje `data-event-id` para recuperar el control correcto.
+- En móvil, el panel conserva `scrollTop` al cerrarse y abrirse. Los eventos nuevos recibidos mientras estaba plegado solo fuerzan seguimiento si el usuario estaba siguiendo el final.
+- El fixture móvil con 30 eventos confirmó: bottom gap inicial `0`; scroll `172` antes de cerrar y `172` al reabrir; un evento añadido mientras el panel estaba plegado también conservó `172`. La selección por teclado restauró el foco al botón del evento correcto. Sin errores de página.
+- Recorrido live con Chromium contra el cliente y servidor reales, dos sesiones conectadas como Alicia y Bruno: se generó un evento de partida real; Alicia cambió `Me gusta` por `Bravo` tras 2.6 s y la burbuja seguía visible 1.3 s después (reset de 3.5 s); Bruno reaccionó al mismo evento y ambas burbujas coexistieron; retirar la reacción de Alicia dejó solo la de Bruno; después expiraron ambas. Se comprobó foco restaurado y no hubo errores de página.
+- `npm run build` pasó tras las correcciones. Se mantienen los avisos preexistentes descritos arriba.
+
+Capturas del E2E live:
+
+- [Dos reacciones concurrentes en móvil](evidence_issue_40_F4/mobile-live-two-player-concurrent.jpg).
+- [Dos reacciones concurrentes en escritorio](evidence_issue_40_F4/desktop-live-two-player-concurrent.jpg).
+- [Retiro de la reacción de Alicia](evidence_issue_40_F4/desktop-live-withdrawal.jpg) y [expiración de las burbujas](evidence_issue_40_F4/desktop-live-expiration.jpg).
+
+La partida live satisface la evidencia funcional pendiente de AC12. La PR única hacia `master` y su integración siguen pendientes; no se publicarán sin autorización del propietario. La tercera revisión independiente debe comparar AC1–AC12 contra el issue actualizado, código, reportes y capturas; no modificar archivos ni ejecutar tests. Registrar aquí su dictamen y defectos reproducibles antes de cerrar F4.

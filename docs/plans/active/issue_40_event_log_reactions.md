@@ -3,9 +3,9 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/40
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`
-**Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, segundo veredicto independiente pendiente tras el primer `FAIL`.
+**Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F2 se reabrió y volvió a `PASS` tras el segundo `FAIL`; F4 `ACTIVE`, tercer veredicto independiente pendiente.
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`
-**Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, antes de preparar la PR.
+**Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, sobre las correcciones de foco/scroll y el E2E live antes de cerrar F4.
 **Pregunta de falsificación:** ¿alguna secuencia de cliente rompe los doce criterios de aceptación, filtra una carta o vínculo persistente jugador→evento/reacción, duplica conteos o deja globos/timers obsoletos?
 **Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 aprobada por el Orquestador; la suite general conserva cuatro fallos de expectativas antiguas de pausa/reanudación, fuera del alcance F1.
 **Reporte F1:** `docs/plans/event-log-reactions/report_issue_40_F1.md`.
@@ -16,7 +16,7 @@
 
 ## Fase activa: F4 — Falsificación y entrega
 
-F1–F3 están cerradas con `PASS`. La primera revisión independiente F4 dio `FAIL` en AC7: `Coup` no pasaba `reactionPresence` a `PlayerBoard`; AC8 no podía mostrarse y faltaba evidencia funcional AC12. F3 se reabrió y corrigió el cableado, los objetivos táctiles y el recorrido integrado. El build pasó con avisos preexistentes. Chromium confirmó reemplazo y reset del timer, concurrencia, retiro, expiración, movimiento reducido, botones móviles de 44×44 px y layouts de 2–6 asientos en escritorio/móvil. El harness simula eventos de socket en el cliente; no es una partida live multi-cliente. El reporte F3 está en `docs/plans/event-log-reactions/report_issue_40_F3.md`, con evidencia integrada en `evidence_issue_40_F4/`. F4 requiere ahora un segundo veredicto independiente sobre unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación.
+F1–F3 están cerradas con `PASS`. El segundo Verifier independiente encontró pérdida de foco después de seleccionar una reacción (AC9) y salto al final al reabrir el registro móvil (AC10). F2 se reabrió y corrigió ambos defectos. Un walkthrough real con dos clientes confirmó evento de servidor, reemplazo/reset, concurrencia, retiro, expiración y foco restaurado sin errores de página; el fixture móvil con 30 eventos confirmó continuidad de `scrollTop`. `npm run build` pasó con avisos preexistentes. Las capturas están en `evidence_issue_40_F4/`. F4 necesita una tercera revisión independiente sobre AC1–AC12. La PR a `master` y la integración de AC12 siguen pendientes de autorización del propietario.
 
 ## Dependencia de F1
 
@@ -24,7 +24,7 @@ F1 ya cerró el contrato tipado, los resultados públicos y el estado autoritati
 
 ## Reclamo, rama y aislamiento
 
-Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se rebasó sobre `origin/master@f900c09` antes de F2, `origin/master@0a467c1` después de F3 y `origin/master@db1d22c` tras el merge de #50, preservando #46 y #49. No se creó otro worktree ni se integró la rama de #24 como dependencia.
+Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se rebasó sobre `origin/master@f900c09`, `0a467c1` y `db1d22c`; `origin/master` avanzó después a `ce0e079` por la integración de #51, por lo que el branch debe sincronizarse antes de la revisión final. No se creó otro worktree ni se integró la rama de #24 como dependencia.
 
 F1 se ejecutó directamente en el worktree por falta de delegación disponible en ese contexto. F2 y F3 continúan bajo dirección del Orquestador tras cerrar el hilo del Alquimista que no inició trabajo después de su reanudación.
 
@@ -91,7 +91,7 @@ El Orquestador aprobó F1. Se completaron las pruebas específicas de payload, e
 
 ## Alcance activo F4
 
-Revisión independiente de solo lectura frente a issue #40 y su plan aprobado. Falsificar concurrencia/unicidad, agregados, reacciones propias, privacidad, presencia/timers, traducciones, ausencia de horas, legibilidad móvil y regresiones del rail #24. Devolver `PASS`, `FAIL` o `BLOCKED` con criterios cubiertos, comandos/evidencia y defectos reproducibles; no modificar la implementación.
+Tercera revisión independiente de solo lectura frente a issue #40 y su plan aprobado tras corregir AC9/AC10 y probar una partida live multi-cliente. Falsificar concurrencia/unicidad, agregados, reacciones propias, privacidad, presencia/timers, traducciones, ausencia de horas, legibilidad móvil y regresiones del rail #24. Devolver `PASS`, `FAIL` o `BLOCKED` con criterios cubiertos, comandos/evidencia y defectos reproducibles; no modificar la implementación.
 
 ## Política para todo el issue
 

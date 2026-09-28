@@ -68,8 +68,8 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Repetir:** una repetición por defecto ante un defecto visual reproducible, después de una corrección acotada.
 - **Bloquear/cancelar:** bloquear si aparece un conflicto con el rail de #24 ya integrado o si el registro tapa decisiones/asientos sin una recolocación clara.
 - **Commit:** `feat(event-log): issue 40 F2 CLOSED advance_f3` (`COMMIT_REQUIRED`).
-- **Entrega/revisión:** F2 `CLOSED / PASS`. El reporte `docs/plans/event-log-reactions/report_issue_40_F2.md` registra el build, los avisos existentes fuera del diff, el recorrido con las nueve categorías y los resultados ingreso/ayuda/impuesto/bloqueo/robo 0–2/intercambio. Las capturas de escritorio, bandeja y móvil están en `evidence_issue_40_F2/`.
-- **Estado de entrega:** F2 fue aprobada por el Orquestador; F3 inicia en el mismo branch. F2 no incluyó cambios de PlayerBoard ni globos de presencia.
+- **Entrega/revisión:** F2 `CLOSED / PASS`. El reporte `docs/plans/event-log-reactions/report_issue_40_F2.md` registra el build, los avisos existentes fuera del diff, el recorrido con las nueve categorías y los resultados ingreso/ayuda/impuesto/bloqueo/robo 0–2/intercambio. En F4 se reabrió por continuidad de lectura móvil y foco del teclado tras seleccionar; ambos se corrigieron y se verificaron en walkthrough, con detalle en el addendum F2 y `report_issue_40_F4.md`.
+- **Estado de entrega:** F2 fue aprobada inicialmente por el Orquestador; F3 se ejecutó en el mismo branch. F2 no incluyó cambios de PlayerBoard ni globos de presencia.
 
 ### F3 — Globos efímeros y acabado accesible
 
@@ -88,14 +88,14 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 
 ### F4 — Falsificación y entrega
 
-**Estado:** `ACTIVE`; primera revisión independiente `FAIL` en AC7 (prop de presencia omitido), AC8 dependiente y evidencia funcional AC12 insuficiente. F3 volvió a `PASS`; está pendiente el segundo veredicto independiente.
+**Estado:** `ACTIVE`; los dos primeros veredictos independientes fueron `FAIL`. Se corrigieron las fallas de cableado/targets, foco de teclado y scroll móvil. Un E2E live de dos clientes confirmó replacement/reset, concurrencia, retiro y expiración. La tercera revisión independiente `FINAL` está pendiente; AC12 además requiere la PR e integración aprobadas por el propietario.
 
 **Pregunta única:** ¿Puede una ruta cliente o secuencia concurrente refutar unicidad, conteos, privacidad, caducidad o presentación sin horas?
 
-- **Entrada:** F1–F3 cerradas en el mismo branch.
+- **Entrada:** F1–F3 cerradas en el mismo branch; F2 se puede reabrir para corregir regresiones encontradas en falsificación.
 - **Trabajo/evidencia:** build y verificaciones pertinentes, revisión visual/funcional de escritorio y móvil, resultados de escenarios críticos y evidencia para AC1–AC12.
 - **Verifier:** revisión independiente `FINAL`, sin modificar la implementación. Debe intentar refutar unicidad bajo concurrencia, exactitud de agregados, privacidad, borde/temporizador y ausencia de horas.
-- **Avance:** evidencia cubre todos los criterios y Verifier da `PASS`; dejar PR única lista para revisión del Orquestador.
+- **Avance:** evidencia local cubre los criterios funcionales, el Verifier da `PASS` y el único branch queda listo para la PR; abrirla e integrarla requiere la autorización correspondiente del propietario.
 - **Repetir:** si hay un defecto, regresar a la fase dueña del criterio, corregir en el mismo branch y repetir solo la evidencia afectada más el checkpoint Verifier.
 - **Bloquear/cancelar:** no integrar ante `FAIL`/`BLOCKED` no resuelto ni relajar criterios; cancelar solo por decisión explícita del propietario.
 - **Commit:** `docs(event-reactions): issue 40 F4 CLOSED ready_review` (`COMMIT_REQUIRED`).
