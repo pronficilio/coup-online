@@ -1,6 +1,12 @@
 # Reporte F3 — mensajes `g-addLog` de issue #19
 
-**Estado:** `ACTIVE`; las plantillas actuales se localizaron en el servidor. El usuario informó haber recorrido una partida completa y que todo se ve en orden, pero no indicó detalles específicos de los mensajes del registro (ver `report_issue_19_F4.md`). F3 sigue `ACTIVE`, pendiente de revisión independiente.
+**Estado final:** `CLOSED`, integrado en PR #33 mediante el merge `45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. El Verifier FINAL dio `PASS` para AC1–AC7 sobre ese árbol integrado. Las ocho plantillas `g-addLog` actuales están localizadas y el payload continúa siendo `string`; no se modificaron eventos, decisiones ni valores internos.
+**Diccionario integrado:** 292 claves `es` y 292 `en`, con paridad confirmada por el Verifier. El branch previo al merge registraba 307/307; se conservan ambos conteos según sus árboles, sin inferir causa de la diferencia.
+**Tracker:** PR #33 `MERGED`; la PR documental [#38](https://github.com/pronficilio/coup-online/pull/38) está abierta para revisión. Issue #19 sigue `OPEN` hasta integrarla y que Orquestación cierre la unidad. No se ejecutaron tests; el build ya registrado terminó exit 0.
+
+## Historial de implementación y validación previo a la integración de PR #33
+
+Los estados `ACTIVE` y el conteo de 307 claves que aparecen más abajo son registros de checkpoints previos, no el estado del árbol integrado actual.
 **Base del trabajo F3:** `origin/master@2d82fa1`, integrada en #19 por `74432a6`.
 **Base actual:** `origin/master@be93e97`, que además contiene PR #31/#29 e integra en #19 por merge `318c119`; ya incluía PR #22 (`5de95ee93ba37ceb34f30af66b42cdbb1cd2f77c`) y PR #30/#21. Esta reauditoría de assets no cambia el alcance ni el protocolo de F3.
 **PR:** [#22](https://github.com/pronficilio/coup-online/pull/22) está `MERGED`; issue #19 permanece `OPEN`. El merge parcial no constituye aceptación F4 ni cierre de la issue.
