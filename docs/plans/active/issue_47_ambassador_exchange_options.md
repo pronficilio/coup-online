@@ -2,16 +2,16 @@
 
 **Issue/Ticket:** [#47 — Optimizar y visualizar las opciones de intercambio del Embajador](https://github.com/pronficilio/coup-online/issues/47), `OPEN`, asignada a `pronficilio`.
 **Plan:** `docs/plans/ambassador-exchange-options/plan_ambassador_exchange_options.md`.
-**Estado del plan:** `ACTIVE`; F1 aceptada por el usuario, F2 verificación independiente en curso.
+**Estado del plan:** `ACTIVE`; F2 detectó nombres accesibles duplicados para cartas físicas iguales; F1 reabierta para corrección focalizada.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `MEDIUM` (decisión de juego y render privado por asiento).
 **Política de verificación:** `FINAL` independiente.
-**Verifier requerido ahora:** sí; F2 revisa el commit `3773322` sin modificar producto.
+**Verifier requerido ahora:** sí, tras el ajuste F1; repetir F2 focalizada en la identidad accesible de slots repetidos.
 **Pregunta de falsificación:** ¿una selección alternante deja menos/más cartas iluminadas que las permitidas, hace inalcanzable una pareja legal, proyecta roles a otro asiento o envía un `choiceId` distinto del caption?
-**Fase sugerida:** F2 — verificación independiente final.
-**Por qué esta fase sigue:** el usuario confirmó que el selector de cuatro cartas funciona y pidió avanzar; toca falsificar alcance, conteo, privacidad y correspondencia caption/choiceId sobre el commit exacto.
+**Fase sugerida:** F1 — añadir posición de slot a cada nombre accesible para distinguir copias con igual rol y origen.
+**Por qué esta fase sigue:** el verificador encontró nombres accesibles indistinguibles para slots físicos duplicados; corregir sin alterar la selección aprobada y repetir F2.
 
-**Estado actual F1:** el propietario aceptó visualmente el selector tras corregir el servicio 3103 obsoleto; cliente y backend actualizados respondieron HTTP 200. Build y revisión estática pasan. No se informó una validación móvil separada.
+**Estado actual F1:** el propietario aceptó visualmente el selector. F2 encontró un defecto accesible en la identidad de slots repetidos; se conserva el diseño y se reabre F1 para una corrección focalizada.
 
 ## Fuentes, contrato y alcance
 

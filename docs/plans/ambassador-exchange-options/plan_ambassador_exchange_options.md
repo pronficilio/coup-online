@@ -1,6 +1,6 @@
 # Plan — opciones visuales para el intercambio del Embajador (#47)
 
-**Estado:** `ACTIVE`; F1 `PASS` por aceptación del usuario; F2 `ACTIVE` con verificador independiente; issue `OPEN` asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F2 inicial `FAIL`, F1 reabierta para una corrección de accesibilidad acotada; issue `OPEN` asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/47
 **Handoff:** `docs/plans/active/issue_47_ambassador_exchange_options.md`
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
@@ -28,7 +28,7 @@ Incluye deduplicar por multiconjunto de roles, publicar al jugador elegible las 
 
 No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo de envío (`decisionId`, `stateVersion`, `choiceId`), ids de opciones permitidas, resolución de cartas devueltas ni UX de otros tipos de decisión. No revelar las opciones a otros asientos/Codex por una proyección pública más amplia.
 
-## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`PASS`)
+## F1 — Deduplicar resultados y seleccionar entre cartas del pool (`ACTIVE`, corrección focalizada)
 
 **Pregunta única:** ¿puede el jugador formar cualquier combinación válida intercambiando iterativamente cartas iluminadas dentro del panel de acciones, con el server manteniendo autoridad y privacidad?
 
@@ -47,7 +47,7 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 - **Commit:** `COMMIT_REQUIRED`; `feat(exchange): issue 47 F1 select from four visible cards`.
 - **Validación:** inspección estática del algoritmo de slots y proyección Socket.IO; build cliente si está disponible; walkthrough manual desktop/móvil de inicialización, clics alternados, roles repetidos y confirmación; `git diff --check`. No agregar ni ejecutar pruebas automatizadas.
 
-## F2 — Verificación independiente final (`ACTIVE`)
+## F2 — Verificación independiente final (`FAIL`; reintento focalizado pendiente)
 
 **Pregunta única:** ¿hay una secuencia de clics/estado donde sea inalcanzable una pareja legal, el número de cartas iluminadas sea incorrecto, se filtren roles privados o el botón inferior envíe una pareja distinta a la mostrada?
 
