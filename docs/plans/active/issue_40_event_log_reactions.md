@@ -24,7 +24,7 @@ F1 ya cerró el contrato tipado, los resultados públicos y el estado autoritati
 
 ## Reclamo, rama y aislamiento
 
-Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se rebasó sobre `origin/master@f900c09`, `0a467c1` y `db1d22c`; `origin/master` avanzó después a `ce0e079` por la integración de #51, por lo que el branch debe sincronizarse antes de la revisión final. No se creó otro worktree ni se integró la rama de #24 como dependencia.
+Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` está rebasado sobre `origin/master@ce0e079` tras la integración de #51, preservando #24/PR #41, #46/PR #48, #49/PR #50 y #45/PR #51. No se creó otro worktree ni se integró la rama de #24 como dependencia.
 
 F1 se ejecutó directamente en el worktree por falta de delegación disponible en ese contexto. F2 y F3 continúan bajo dirección del Orquestador tras cerrar el hilo del Alquimista que no inició trabajo después de su reanudación.
 
