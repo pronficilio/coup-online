@@ -19,3 +19,21 @@
 ## Cierre
 
 El defecto encontrado es reproducible por inspección del render y afecta la identificación accesible de cartas físicas con rol/origen duplicado. El veredicto F2 es `FAIL`; no se creó commit del reporte.
+
+## Re-verificación focalizada — `cc7b568`
+
+**Veredicto de esta ronda: PASS**
+**Commit de producto revisado:** `cc7b568348d5a9916eff6ed0a3e68f0aeaaf1085` (`fix(exchange): issue 47 accessible slot names`).
+**Alcance:** revisión del diff exacto, del render React del panel y de las claves de traducción ES/EN. No ejecuté tests automatizados ni modifiqué producto. Este resultado focalizado no borra el `FAIL` histórico de la revisión inicial sobre `3773322`.
+
+### Intentos de falsificación
+
+- **Nombres diferentes para copias físicas iguales:** el render hace `map` sobre `poolSlots`; para cada índice añade a `cardLabel` una posición calculada como `index + 1` y el total `poolSlots.length`. Así, dos slots con el mismo `role` y el mismo `original` reciben posiciones distintas aunque su origen y rol coincidan. Por ejemplo, dos originales Duque en un pool de cuatro se nombran `Tu carta: Duque, Carta 1 de 4` y `Tu carta: Duque, Carta 2 de 4`; dos draws iguales difieren del mismo modo conservando `Carta del mazo` como origen.
+- **Pools de 3 y 4 slots:** el productor construye el pool como influencias actuales más dos robos (`coup.js:947-965`), por lo que un jugador con una influencia recibe 3 slots y con dos recibe 4. El render pasa la longitud real de `poolSlots`, de modo que el nombre queda `Carta n de 3` o `Carta n de 4`, respectivamente, en el rango 1…N.
+- **Origen, rol, posición y selección:** el nombre sigue componiéndose de `source`, `label` y el estado `selected`; el rol se obtiene del slot, el origen de `slot.original`, y la posición del índice del mismo slot renderizado. `aria-pressed={selected}` continúa en el botón y usa el mismo booleano que el sufijo de nombre. No encontré una ruta donde el índice del nombre y el estado seleccionado se calculen desde identidades distintas.
+- **Traducciones:** `translations.json` define `Carta {position} de {count}` / `{source}: {role}, {position}{selected}` en ES y `Card {position} of {count}` / `{source}: {role}, {position}{selected}` en EN. Los valores de origen y sufijo seleccionado también existen para ambos idiomas. La función actual `t()` selecciona `DEFAULT_LANGUAGE = 'es'`; la plantilla EN está presente y es coherente, aunque la revisión no atribuye un recorrido runtime EN a ese selector.
+- **Regresión fuera de accesibilidad:** el diff de producto entre `3773322` y `cc7b568` solo añade interpolación de posición al `aria-label` y las claves ES/EN correspondientes. No cambia `selectedIndices`, cursor B/A, condición de clic, roles elegidos, lookup de opción/`choiceId`, payload, ni proyección del servidor. El mecanismo de privacidad revisado en la ronda inicial sigue sin cambios en este commit.
+
+### Cierre de esta ronda
+
+La corrección distingue copias con origen y rol idénticos y conserva en cada nombre el origen, rol, posición, total del pool y estado seleccionado; `aria-pressed` permanece sincronizado. No pude falsificar el criterio focalizado para pools de tres o cuatro cartas. **F2 focalizada sobre `cc7b568`: `PASS`.** La ronda inicial `FAIL` y su hallazgo quedan conservados arriba como historial.
