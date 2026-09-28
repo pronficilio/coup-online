@@ -24,17 +24,17 @@ El servidor acepta Coup con 7–9 monedas, cobra 7 una vez y resuelve la influen
 
 ## ADVERSARIAL_CHECK: BLOCKED
 
-La inspección independiente del código no encontró una refutación estática. Recibí una observación humana limitada: el propietario reporta que probó Coup con 8 monedas en el preview y que «ahora funciona bien el golpe». Esto confirma únicamente que reporta haber observado funcionar ese Coup en esa partida/caso. No se reportaron saldos antes/después, cobro exacto, influencia perdida, otros saldos, obligatoriedad con 10, ventana de bloqueo/Contessa ni replay de decisión stale. La sección 8 de `docs/agentes/VERIFICADOR_CI.md` requiere evidencia humana para los criterios interactivos restantes.
+La inspección independiente del código no encontró una refutación estática. Recibí una observación humana limitada: el propietario reporta que probó Coup con 8 monedas en el preview y que «ahora funciona bien el golpe». Después confirmó «ya hice la verificación» y autorizó seguir al merge. Registro esa declaración como confirmación de que realizó una verificación, pero no comunica resultados por AC ni detalla qué casos/interacciones observó. Por ello, no atribuyo resultados adicionales a AC1, AC2, AC4 o AC5. La sección 8 de `docs/agentes/VERIFICADOR_CI.md` requiere observaciones humanas trazables para los criterios interactivos; la afirmación general de haber verificado no permite comprobar esos resultados.
 
 ## VEREDICTO: BLOCKED
 
 ### Criterios
 
-- **AC1: BLOCKED (parcialmente observado)** — `actionChoices()` ofrece Coup con saldo ≥7; `beginAction()` fija coste 7 y deduce el coste una vez; `resolveAction()` envía Coup a `loseInfluence(target)`. El propietario reporta que Coup funcionó en una partida con 8 monedas. No confirmó saldo final, pago exacto ni pérdida de influencia específica; 7 y 9 tampoco fueron observados. La evidencia dinámica no cubre todo AC1.
-- **AC2: BLOCKED** — estáticamente, `actionChoices()` devuelve solo Coup desde ≥10 y `beginAction()` conserva el rechazo de otras acciones. Falta observar el control en una partida con ≥10.
+- **AC1: BLOCKED (parcialmente observado)** — `actionChoices()` ofrece Coup con saldo ≥7; `beginAction()` fija coste 7 y deduce el coste una vez; `resolveAction()` envía Coup a `loseInfluence(target)`. El propietario reporta que Coup funcionó en una partida con 8 monedas. No comunicó saldo final, pago exacto ni pérdida de influencia específica; tampoco compartió resultados concretos para 7 o 9. La declaración general posterior de que hizo la verificación no especifica si observó esos casos ni sus resultados.
+- **AC2: BLOCKED** — estáticamente, `actionChoices()` devuelve solo Coup desde ≥10 y `beginAction()` conserva el rechazo de otras acciones. No se comunicó resultado concreto de un turno con ≥10.
 - **AC3: PASS (limitado al caso reportado de 8 monedas)** — estáticamente, el envelope valida `decisionId`, `stateVersion` y `choiceId` contra las opciones emitidas por el servidor, y la elección Coup disponible llega a `beginAction()` sin el guard contradictorio `<10`. El propietario reporta que Coup funcionó en el preview con 8 monedas, cubriendo la selección legal que antes se reiniciaba en el caso observado. Este resultado no afirma observación de 7 o 9 monedas ni agrega detalles no reportados sobre el resultado.
-- **AC4: BLOCKED** — el servidor rechaza decisiones stale/no disponibles mediante `g-decisionRejected`; el cliente mapea esos motivos a error visible con `role="alert"`. No se hizo replay manual de una decisión obsoleta.
-- **AC5: BLOCKED** — `BLOCKS` no incluye Coup; `ROLE_BY_ACTION` no asigna reclamo a Coup; `BLOCKS.assassinate` es el que permite Contessa. Aunque el Coup de 8 monedas fue reportado como funcional, el propietario explícitamente no reportó si el objetivo recibió o no una opción de bloqueo ni observó el caso de Contessa. La ausencia de bloqueo está sustentada estáticamente, pero falta la observación interactiva requerida.
+- **AC4: BLOCKED** — el servidor rechaza decisiones stale/no disponibles mediante `g-decisionRejected`; el cliente mapea esos motivos a error visible con `role="alert"`. No se comunicó un resultado concreto de replay stale ni del aviso visible.
+- **AC5: BLOCKED** — `BLOCKS` no incluye Coup; `ROLE_BY_ACTION` no asigna reclamo a Coup; `BLOCKS.assassinate` es el que permite Contessa. El Coup de 8 monedas fue reportado como funcional, pero no se compartió resultado sobre la ventana de bloqueo ni sobre Contessa. La ausencia de bloqueo está sustentada estáticamente, pero falta una observación interactiva trazable de este criterio.
 - **AC6: PASS (estático)** — el diff no cambia autorización. `submitDecision()` deriva el asiento del socket y `submitChoice()` exige decisión vigente, asiento elegible y opción disponible; coste, objetivo y resolución permanecen en servidor.
 
 ### Refutaciones intentadas
@@ -47,13 +47,14 @@ La inspección independiente del código no encontró una refutación estática.
 
 ## Recorrido humano: observación recibida y cobertura pendiente
 
-El propietario respondió sobre el preview local: «he comprobado que ahora funciona bien el golpe». Según su aclaración, esto corresponde a Coup con **8 monedas**. Registro solamente que reporta haber observado funcionar el golpe en esa partida/caso previsto. No interpreto esa respuesta como observación del pago, saldo resultante, influencia concreta perdida, Coup con 7/9, obligatoriedad con 10, bloqueo/Contessa o decisión stale.
+El propietario respondió sobre el preview local: «he comprobado que ahora funciona bien el golpe». Según su aclaración, esto corresponde a Coup con **8 monedas**. Registro solamente que reporta haber observado funcionar el golpe en esa partida/caso previsto. Posteriormente dijo «ya hice la verificación» y autorizó seguir al merge, pero no compartió resultados por criterio. No interpreto esas respuestas como observación del pago, saldo resultante, influencia concreta perdida, Coup con 7/9, obligatoriedad con 10, bloqueo/Contessa o decisión stale.
 
-La revisión humana de Coup con 8 monedas confirma que la selección legal funcionó en el caso reportado (AC3). Permanecen sin observación humana los casos de 7 y 9 monedas, el coste/saldo exactos y la influencia perdida (cobertura completa de AC1), Coup obligatorio con 10+, ausencia de ventana de bloqueo con Coup/Contessa y rechazo visible de decisión stale. No solicito ahora otro recorrido; el veredicto permanece BLOCKED por esas evidencias faltantes.
+La revisión humana de Coup con 8 monedas confirma que la selección legal funcionó en el caso reportado (AC3). Para los demás criterios, no recibí resultados humanos específicos. La confirmación general «ya hice la verificación» no indica qué pasos ejecutó ni qué observó, por lo que no sustituye evidencia auditable por AC según la sección 8. No solicito ahora otro recorrido; el veredicto permanece BLOCKED por esa falta de evidencia específica.
 
 ## Comandos y evidencia
 
-- `git rev-parse HEAD` → `0b73305f5be684bb05cc7109701f958c26a98921`.
+- Commit exacto de producto inspeccionado: `0b73305f5be684bb05cc7109701f958c26a98921`.
+- `git diff 0b73305f5be684bb05cc7109701f958c26a98921 HEAD -- server/game/coup.js` → sin diferencias de producto; HEAD actual `49aff031970686295e5e97cee3c754f9049819d0` agrega documentación.
 - `git diff --check 0b73305^ 0b73305` → exit 0.
 - `npm ci --ignore-scripts` en `server/` y `coup-client/` para preparar el recorrido; no modificó archivos versionados.
 - `PORT=8011 CODEX_DISABLED_FILE=/tmp/coup-issue49-codex-disabled npm start` desde `server/` → `listening on 8011`.
@@ -62,6 +63,12 @@ La revisión humana de Coup con 8 monedas confirma que la selección legal funci
 
 ## Limitaciones y siguiente dueño
 
-No se ejecutaron tests automatizados. Hubo una observación humana parcial del caso de 8 monedas; no se recibió recorrido de los criterios interactivos restantes descritos arriba. Los servicios se levantaron en el worktree exacto para la revisión inicial; las sesiones asociadas fueron server (`90903`) y cliente (`89871`). Para detenerlas, enviar Ctrl-C a ambas sesiones si aún siguen activas.
+No se ejecutaron tests automatizados. Se recibió una observación humana parcial del caso de 8 monedas y una confirmación general de que el propietario realizó la verificación, pero no resultados específicos para los criterios interactivos restantes. Los servicios se levantaron en el worktree exacto para la revisión inicial; las sesiones asociadas fueron server (`90903`) y cliente (`89871`). Para detenerlas, enviar Ctrl-C a ambas sesiones si aún siguen activas.
 
 **Siguiente dueño:** Orquestador/Alquimista para registrar esta evidencia limitada y decidir el próximo paso. Verificador independiente puede reevaluar cuando haya evidencia de los criterios pendientes. No integrar ni cerrar issue con este estado.
+
+## Addendum del Orquestador — autorización explícita del propietario
+
+El 2026-09-28, el propietario confirmó «ya hice la verificacion y adelante con el merge a master». Esta autorización llega después de informar que Coup funciona en el caso de 8 monedas del preview. No especifica resultados por AC; el Orquestador no atribuye observaciones adicionales ni cambia el veredicto `BLOCKED` del Verifier a `PASS`.
+
+Por instrucción explícita del propietario, el Orquestador acepta integrar la corrección pese a que el checkpoint FINAL independiente conserva su bloqueo documental para AC1/AC2/AC4/AC5. Esta es una excepción registrada al gate `FINAL`, no un PASS del Verifier. La revisión del Orquestador queda limitada al diff de producto de una condición y a que la regla de 7 monedas concuerde con las reglas versionadas. No ejecutar pruebas automatizadas.
