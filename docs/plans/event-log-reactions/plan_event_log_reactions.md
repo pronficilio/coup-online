@@ -7,7 +7,7 @@
 **Bitácora:** `docs/plans/log/issue-40.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 **Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.
-**Base / destino:** `origin/master` (`ce0e0797dad13b4b2c4dd4b57f37458f24842a40`) / `master` de `pronficilio/coup-online`.
+**Base / destino:** `origin/master` (`2ef09de84465889521234951fed934a31dfe1b11`) / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue completo; aún no existe.
 
 ## Solicitud y resultado esperado
@@ -53,7 +53,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Commit:** `feat(event-reactions): issue 40 F1 CLOSED advance_f2` (`COMMIT_REQUIRED`).
 - **Verifier:** no en esta fase; resultado independiente `FINAL` obligatorio antes de integrar.
 - **Revisión del Orquestador:** F1 aprobada. Las cuatro fallas generales son expectativas existentes de pausa/reanudación no modificadas en F1; están registradas para seguimiento de la suite y no bloquean la superficie independiente de F2.
-- **Estado de entrega:** F4 `ACTIVE`; F1–F3 `CLOSED / PASS` y F2 reabierta/cerrada tras corregir foco y continuidad de scroll. #24/PR #41, #46/PR #48, #49/PR #50 y #45/PR #51 están integradas en `origin/master@ce0e079`. Preservar el rail, cierre de partida, CSS separado de EventLog y cableado de presencia.
+- **Estado de entrega:** F4 `ACTIVE`; F1–F3 `CLOSED / PASS` y F2 reabierta/cerrada tras corregir foco y continuidad de scroll. #24/PR #41, #46/PR #48, #49/PR #50, #45/PR #51 y #47/PR #52 están integradas en `origin/master@2ef09de`. Preservar el rail, cierre de partida, CSS separado de EventLog y cableado de presencia.
 
 ### F2 — Registro y controles de reacción
 

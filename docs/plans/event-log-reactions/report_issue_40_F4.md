@@ -3,7 +3,7 @@
 **Issue:** #40 — rediseñar el registro de eventos y añadir reacciones efímeras
 **Estado:** `ACTIVE`; dos revisiones independientes devolvieron `FAIL`; los defectos reproducibles se corrigieron y el E2E live pasó. Tercera revisión independiente `FINAL` pendiente. La publicación/integración de la PR de AC12 requiere autorización del propietario.
 **Branch/worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`
-**Base:** `origin/master@ce0e0797dad13b4b2c4dd4b57f37458f24842a40`
+**Base:** `origin/master@2ef09de84465889521234951fed934a31dfe1b11`
 
 ## Primera revisión independiente
 
@@ -22,7 +22,7 @@ La revisión también encontró aprobados los controles estáticos de cronologí
 - `Coup.js` ahora pasa `reactionPresence` a `PlayerBoard` en el montaje de la partida.
 - En viewports móviles y dispositivos coarse, los controles del registro y las opciones tienen áreas de 44×44 px. Chromium midió las cuatro opciones del selector en 44×44 px.
 - Se quitó la escala de la animación de entrada de la bandeja: el primer recorrido midió 43.12 px porque el contenedor comenzaba en `scale(0.98)`. La bandeja conserva la entrada suave de opacidad y desplazamiento; el control táctil ya no se reduce al abrir.
-- El build de producción (`npm run build` en `coup-client/`) terminó correctamente después del rebase sobre `origin/master@ce0e079`. Permanecen avisos preexistentes de imports sin uso en `App.js`, precedencia `&&`/`||` en `Coup.js:451` de #46, `dvh` en `ReferencePanel.css:100,106` y la base Browserslist desactualizada.
+- El build de producción (`npm run build` en `coup-client/`) terminó correctamente después del rebase sobre `origin/master@2ef09de`. Permanecen avisos preexistentes de imports sin uso en `App.js`, precedencia `&&`/`||` en `Coup.js:452` de #46, `dvh` en `ReferencePanel.css:100,106` y la base Browserslist desactualizada.
 - El recorrido Chromium integrado pasó sin errores de página: una nueva reacción reemplaza la anterior y reinicia los 3.5 s; dos asientos coexisten; retirar una selección quita solo su globo; los globos vencen; el movimiento reducido produce duraciones `0.001s`; los asientos quedan dentro del viewport en layouts de 2, 3, 4, 5 y 6 participantes, escritorio 1440×960 y móvil 390×844.
 - El recorrido monta el `Coup` y `PlayerBoard` reales con un `PreviewSocket` local que simula mensajes de servidor. Prueba la integración del cliente, pero no es una partida live multi-cliente. El estado autoritativo, concurrencia y privacidad se revisan con el contrato y las verificaciones de F1.
 
@@ -49,6 +49,7 @@ El segundo Verifier independiente (`Curie`) también devolvió `FAIL`:
 - En móvil, el panel conserva `scrollTop` al cerrarse y abrirse. Los eventos nuevos recibidos mientras estaba plegado solo fuerzan seguimiento si el usuario estaba siguiendo el final.
 - El fixture móvil con 30 eventos confirmó: bottom gap inicial `0`; scroll `172` antes de cerrar y `172` al reabrir; un evento añadido mientras el panel estaba plegado también conservó `172`. La selección por teclado restauró el foco al botón del evento correcto. Sin errores de página.
 - Recorrido live con Chromium contra el cliente y servidor reales, dos sesiones conectadas como Alicia y Bruno: se generó un evento de partida real; Alicia cambió `Me gusta` por `Bravo` tras 2.6 s y la burbuja seguía visible 1.3 s después (reset de 3.5 s); Bruno reaccionó al mismo evento y ambas burbujas coexistieron; retirar la reacción de Alicia dejó solo la de Bruno; después expiraron ambas. Se comprobó foco restaurado y no hubo errores de página.
+- Ese mismo E2E live se repitió tras rebasar el branch sobre `origin/master@2ef09de` (PR #52); pasó nuevamente sin errores de página y regeneró las capturas de reemplazo/concurrencia, retiro y expiración enlazadas abajo.
 - `npm run build` pasó tras las correcciones. Se mantienen los avisos preexistentes descritos arriba.
 
 Capturas del E2E live:
