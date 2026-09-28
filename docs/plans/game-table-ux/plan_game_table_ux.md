@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** ACTIVE; F1/F2/F3 CLOSED; F4 ACTIVE y pendiente de revisión FINAL independiente sobre `4ccce67`. La inspección visual del propietario cubre solo los casos anotados en el handoff; no se afirma revisión manual de todos los tamaños o estados de respuesta.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE y F4 RETURNED sobre `4ccce67`; el fix `d37dacc` amplía width/wrap del Event Log a todo viewport. Build pasa; se espera revisión visual de 5p desktop y después F4 FINAL del mismo Verifier.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -117,4 +117,4 @@ El propietario confirmó en `http://localhost:3016` los dos casos solicitados de
 
 El mismo Verifier emitió `FAIL` medio en criterio 2 sobre el producto `4ccce679f082d84956de844472e395fc67a90bf7`. A 1200×900 el tablero de 900 px empieza en x≈150; el asiento superior derecho de 5p queda cerca de x≈790 y sus cartas llegan hasta x≈859. Desde 1200 px el Event Log pierde el ancho limitado/wrap, conserva el borde derecho x≈1080 (`right:10vw`) y una línea larga puede ocupar ~260 px, empezando cerca de x≈820: cruce estimado de ~39 px con las cartas en la misma zona vertical. C1, C3–C7 pasaron estáticamente. El propietario confirmó solo el caso móvil 5p y el ciclo del halo, no escritorio.
 
-F2 volvió a `ACTIVE` para mantener el `clamp()` y `overflow-wrap:anywhere` en todos los anchos, sin mover el anclaje del Event Log. El nuevo candidato se compila ahora; después se pedirá al propietario revisar 5p desktop (1280 px) y el mismo Verifier repetirá F4 sobre el nuevo SHA. No push/PR ni cierre antes del PASS.
+F2 volvió a `ACTIVE` para mantener el `clamp()` y `overflow-wrap:anywhere` en todos los anchos, sin mover el anclaje del Event Log. El fix está comprometido en `d37dacc`; `npm run build` terminó con código 0 y el bundle de `http://localhost:3016` muestra el estilo actualizado. Se pidió al propietario revisar 5p desktop (1280×900); con su confirmación, el mismo Verifier repetirá F4 sobre este SHA. No push/PR ni cierre antes del PASS.

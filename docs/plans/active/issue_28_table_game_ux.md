@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE, F4 RETURNED por un solapamiento del Event Log con 5p en escritorio ancho (`4ccce67`). El propietario confirmó 5p móvil (~390 px) y el ciclo del halo en `localhost:3016` (`API :8015`); esa revisión no cubre escritorio. F2 amplía ahora el límite y wrap del log a todos los anchos; build y revisión visual 5p desktop pendientes. Después, repetir F4 con el mismo Verifier. Sin push/PR hasta PASS.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE, F4 RETURNED por un solapamiento del Event Log con 5p en escritorio ancho (`4ccce67`). El fix `d37dacc` extiende el límite y wrap del log a todos los anchos; build pasa. El preview `localhost:3016` sirve este candidato con API `:8015`. El propietario confirmó móvil 5p y el ciclo del halo; falta revisar 5p desktop antes de repetir F4 con el mismo Verifier. Sin push/PR hasta PASS.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -49,22 +49,22 @@ El contador va encima del mazo, según la aclaración del propietario. No crear 
 
 ## Preview revisado por el propietario
 
-- Cliente: `http://localhost:3016`, levantado desde este worktree; el bundle contiene el marcador del candidato `4ccce67`.
+- Cliente: `http://localhost:3016`, levantado desde este worktree; el bundle contiene `overflow-wrap:anywhere` y el Event Log actualizado en `d37dacc`.
 - Backend: `http://localhost:8015`; el endpoint `/exists/preview-check` respondió HTTP 200.
 - No crear una sala de juego ni tocar el servicio del puerto 8000.
 - El lift usa el ancho máximo de 900 px del tablero; esta variante amplía el límite del Event Log y calibra las mesas centradas, 5p y 6p en móvil/tablet.
 - El propietario confirma que en móvil (~390 px) con 5 jugadores los asientos quedan completos y el Event Log es legible/desplazable sin cruces. También confirma que en Challenge/Block el asiento local se ilumina solo mientras tiene opciones y se apaga al enviar Pass/otra opción o al cerrar.
 - La confirmación manual corresponde a esos casos; no afirma revisión de escritorio ni de otros conteos en esta variante.
 
-## F2 cerrada; F4 pendiente
+## F2 reabierta; F4 devuelta
 
-F2 se cerró en el commit de fase `fix(game-ui): issue 28 F2 CLOSED responsive seats and response highlight`. Sobre HEAD `4ccce679f082d84956de844472e395fc67a90bf7`, el Event Log queda limitado y con wrap hasta 1199 px, los asientos superiores conflictivos se compactan/desplazan en tablet y 6p móvil, y el lift responsive ya no tiene el piso que lo saturaba. El asiento local usa halo rojo cuando su decisión de respuesta trae opciones; el halo se apaga al enviar cualquier elección (incluido Pass) y al cerrar la decisión. Sin opciones locales/espectador no se marca; no cambian reglas ni protocolo.
+F2 cerró originalmente en el commit de fase `fix(game-ui): issue 28 F2 CLOSED responsive seats and response highlight`. F4 detectó después un cruce de Event Log en 5p desktop ancho sobre `4ccce67`; por eso F2 se reabre. El fix `d37dacc` lleva el `width` clamp y `overflow-wrap:anywhere` a todos los anchos; conserva los anclajes del log, compactación responsive y lift sin saturación. El halo local sigue limitado a ventanas respondibles con opciones y se apaga al enviar (incluido Pass) o al cerrar. Sin opciones locales/espectador no se marca; no cambian reglas ni protocolo.
 
-Validaciones del candidato: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff origin/master...HEAD --check`, `node --check server/game/coup.js` y parseo de `translations.json`/JSONL pasan. No se ejecutaron tests automatizados. F4 queda `ACTIVE` a la espera del PASS independiente.
+Validaciones del candidato `d37dacc`: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff --check`, `node --check server/game/coup.js` y parseo JSON de la bitácora pasan. No se ejecutaron tests automatizados. La revisión visual de 5p desktop y el nuevo PASS FINAL independiente quedan pendientes.
 
 ## Commits y validación
 
-Cada fase con artefactos requiere commit en este branch. F2 se reabrió para corregir las colisiones del Event Log en varias cuentas y el lift de tabletas altas. La revisión visual del propietario ya cubre 5p móvil y los estados abrir/enviar/cerrar del halo; el mismo Verifier repite F4. No tests, push ni PR antes del PASS.
+Cada fase con artefactos requiere commit en este branch. F2 se reabrió para corregir el cruce en 5p desktop ancho. El propietario ya revisó 5p móvil y estados abrir/enviar/cerrar del halo; se pidió revisar 5p desktop a 1280×900 en el preview `3016`. Tras esa confirmación, el mismo Verifier repetirá F4. No tests, push ni PR antes del PASS.
 
 ## Criterio visual añadido por el propietario — incorporar en F2/F4
 
@@ -72,4 +72,4 @@ Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment
 
 Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
 
-Alquimista: el propietario confirmó en `http://localhost:3016` el caso 5p móvil (~390 px) y los estados del halo. Solicita al mismo Verifier repetir F4 sobre el producto `4ccce67`; el tip documental `7711d20` no cambia código.
+Alquimista: el propietario confirmó en `http://localhost:3016` el caso 5p móvil (~390 px) y los estados del halo. El producto `d37dacc` queda pendiente de confirmación visual en escritorio 5p; luego pide al mismo Verifier repetir F4 sobre ese SHA.
