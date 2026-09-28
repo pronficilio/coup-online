@@ -1033,3 +1033,446 @@
         margin-left: 10%;
     }
   }
+
+.DecisionActionPanel {
+    box-sizing: border-box;
+    width: min(620px, calc(100vw - 24px));
+    margin: 12px auto;
+    padding: 15px 16px 16px;
+    border: 1px solid #d8c9b1;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #fbf5e9 0%, #f6eedf 100%);
+    box-shadow: 0 7px 20px rgba(51, 35, 19, 0.2);
+    color: #211d18;
+    text-align: left;
+}
+
+.DecisionActionPanel .ActionDecisionTitle {
+    margin: 0;
+    padding: 0 0 10px;
+    border-bottom: 1px solid #d8c9b1;
+    color: #211d18;
+    font-size: 1.38rem;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.DecisionActionPrompt {
+    margin: 10px 2px 12px;
+    color: #443b30;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.98rem;
+    line-height: 1.3;
+    text-align: left;
+}
+
+.DecisionActionDetails {
+    box-sizing: border-box;
+    max-height: 140px;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 160ms ease, opacity 130ms ease;
+}
+
+.DecisionActionDetails--collapsed {
+    max-height: 0;
+    opacity: 0;
+}
+
+.DecisionActionDetails--prompt {
+    display: block;
+    max-height: 84px;
+}
+
+.DecisionActionDetails--prompt.DecisionActionDetails--collapsed {
+    max-height: 0;
+}
+
+.DecisionActionDetails--row {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.DecisionActionDetails--inline {
+    display: inline-flex;
+    max-width: 180px;
+    align-items: center;
+    vertical-align: middle;
+    transition: max-width 160ms ease, opacity 130ms ease;
+}
+
+.DecisionActionDetails--inline.DecisionActionDetails--collapsed {
+    max-width: 0;
+}
+
+.DecisionActionRows {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    padding: 2px 4px 4px;
+}
+
+.DecisionActionEntry {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.DecisionActionDivider {
+    display: block;
+    height: 1px;
+    flex: 0 0 1px;
+    margin: 1px 14px;
+    background: #dfd3c0;
+    pointer-events: none;
+}
+
+.DecisionActionPanel .DecisionActionRow {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 72px;
+    height: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+    padding: 9px 11px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background-color: transparent;
+    color: #211d18;
+    cursor: pointer;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: left;
+    text-decoration: none;
+    white-space: normal;
+    transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
+    -webkit-tap-highlight-color: rgba(192, 130, 29, 0.2);
+    touch-action: manipulation;
+}
+
+.DecisionActionContent {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.DecisionActionHeading {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+}
+
+.DecisionActionLabel {
+    color: inherit;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.16rem;
+    font-variant: small-caps;
+    font-weight: 700;
+    line-height: 1.15;
+    text-transform: uppercase;
+    transition: font-size 120ms ease;
+}
+
+.DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
+    font-size: 0.812rem;
+}
+
+.DecisionActionDescription {
+    display: block;
+    color: #302a22;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.96rem;
+    line-height: 1.25;
+}
+
+.DecisionActionMeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 2px;
+}
+
+.DecisionActionMeta--unblockable {
+    display: block;
+    color: #50473c;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.DecisionActionRow .ActionPrice {
+    margin: 0;
+    flex: 0 0 82px;
+}
+
+.DecisionActionRow:hover:not(.DecisionActionRow--disabled):not(:disabled),
+.DecisionActionRow:focus-visible:not(.DecisionActionRow--disabled) {
+    border-color: #d79b29;
+    background-color: rgba(246, 190, 74, 0.28);
+    box-shadow: inset 0 0 0 1px rgba(255, 249, 220, 0.95), 0 2px 8px rgba(132, 84, 14, 0.16);
+    color: #241b10;
+}
+
+.DecisionActionRow:focus-visible,
+.DecisionActionTarget:focus-visible,
+.DecisionActionCancel:focus-visible {
+    outline: 3px solid #a96819;
+    outline-offset: 2px;
+}
+
+.DecisionActionRow:active:not(.DecisionActionRow--disabled):not(:disabled),
+.DecisionActionTarget:active:not(:disabled),
+.DecisionActionCancel:active:not(:disabled) {
+    background-color: rgba(227, 166, 51, 0.36);
+}
+
+.DecisionActionPanel .DecisionActionRow--disabled {
+    border-color: #ddd1c0;
+    background-color: rgba(255, 255, 255, 0.18);
+    background-image: repeating-linear-gradient(135deg, rgba(117, 99, 77, 0.065) 0, rgba(117, 99, 77, 0.065) 5px, transparent 5px, transparent 11px);
+    color: #696257;
+    cursor: not-allowed;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.DecisionActionRow--disabled .DecisionActionDescription,
+.DecisionActionRow--disabled .DecisionActionMeta--unblockable,
+.DecisionActionRow--disabled .ActionMetaLabel {
+    color: #696257;
+}
+
+.DecisionActionRow--disabled .ActionRoleChip {
+    filter: grayscale(0.62);
+}
+
+.DecisionActionRow--disabled .ActionPrice {
+    border-color: #d4cbbd;
+    background: rgba(224, 218, 207, 0.55);
+    color: #625d55;
+    filter: grayscale(0.75);
+}
+
+.DecisionActionHint {
+    display: block;
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 5px;
+    padding: 5px 10px;
+    border: 1px solid #1b1713;
+    border-radius: 8px;
+    background: #2b241d;
+    box-shadow: 0 3px 7px rgba(42, 28, 14, 0.28);
+    color: #fff4df;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.25;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 140ms ease;
+}
+
+.DecisionActionHint::before {
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    width: 0;
+    height: 0;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #2b241d;
+    border-left: 5px solid transparent;
+    content: '';
+}
+
+.DecisionActionRow--disabled:hover .DecisionActionHint,
+.DecisionActionRow--disabled:focus-visible .DecisionActionHint {
+    opacity: 1;
+}
+
+.DecisionActionRow:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.DecisionActionTargets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.DecisionActionPanel .DecisionActionTarget,
+.DecisionActionPanel .DecisionActionCancel {
+    box-sizing: border-box;
+    min-width: 110px;
+    min-height: 44px;
+    height: auto;
+    margin: 0;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+    touch-action: manipulation;
+}
+
+.DecisionActionPanel .DecisionActionTarget {
+    border: 1px solid #6f5133;
+    background: #6f5133;
+    color: #fff;
+}
+
+.DecisionActionPanel .DecisionActionTarget:hover:not(:disabled) {
+    border-color: #8a633d;
+    background: #8a633d;
+}
+
+.DecisionActionPanel .DecisionActionCancel {
+    border: 1px solid #8e795e;
+    background: rgba(255, 255, 255, 0.74);
+    color: #433727;
+}
+
+.DecisionActionPanel .DecisionActionCancel:hover:not(:disabled) {
+    border-color: #6f5133;
+    background: #efe4d2;
+}
+
+.DecisionActionTarget:disabled,
+.DecisionActionCancel:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+@media only screen and (max-width: 560px) {
+    .DecisionActionPanel {
+        width: calc(100vw - 18px);
+        margin: 9px auto;
+        padding: 12px 10px;
+    }
+
+    .DecisionActionRows {
+        padding-right: 2px;
+        padding-left: 2px;
+    }
+
+    .DecisionActionPanel .DecisionActionRow {
+        min-height: 68px;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .DecisionActionLabel {
+        font-size: 1.04rem;
+    }
+
+    .DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
+        font-size: 0.728rem;
+    }
+
+    .DecisionActionDescription {
+        font-size: 0.91rem;
+    }
+
+    .DecisionActionRow .ActionPrice {
+        flex-basis: 68px;
+        min-height: 38px;
+        padding: 4px;
+        font-size: 0.98rem;
+    }
+
+    .DecisionActionRow .ActionCoin {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (hover: none), (pointer: coarse) {
+    .DecisionActionHint {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .DecisionActionPanel .DecisionActionRow,
+    .DecisionActionPanel .DecisionActionLabel,
+    .DecisionActionPanel .DecisionActionTarget,
+    .DecisionActionPanel .DecisionActionCancel,
+    .DecisionActionHint,
+    .ActionDecisionRail .DecisionActionPanel,
+    .DecisionActionDetails,
+    .DecisionActionDetails--inline {
+        transition: none;
+    }
+}
+
+.ActionDecisionRail {
+    position: absolute;
+    z-index: 40;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: min(620px, calc(100vw - 20px));
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.ActionDecisionAnchorProbe {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.ActionDecisionRail .CheatSheet {
+    position: static;
+    top: auto;
+    right: auto;
+    left: auto;
+    align-self: flex-start;
+}
+
+.ActionDecisionRail .DecisionActionPanel {
+    position: static;
+    width: 100%;
+    max-height: calc(100vh - 166px);
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    transition: width 160ms ease;
+}
+
+.ActionDecisionRail .DecisionActionPanel.DecisionActionPanel--compact {
+    width: 50%;
+}
+
+@media only screen and (min-width: 1024px) {
+    .ActionDecisionRail {
+        width: min(620px, calc(100vw - 10vw - 24px));
+    }
+
+    .ActionDecisionRail .DecisionActionPanel {
+        max-height: min(calc(100vh - 22vh - 52px), 760px);
+    }
+}

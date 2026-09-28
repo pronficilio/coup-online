@@ -42,6 +42,7 @@ export default class CheatSheetModal extends Component {
             onRequestClose={this.handleCloseCheatSheetModal}
             shouldCloseOnOverlayClick={true}
             className="CheatSheetModal"
+            style={{ overlay: { zIndex: 100 } }}
             >
             <div className="CloseModalButtonContainer">
                 <button className="CloseModalButton" onClick={this.handleCloseCheatSheetModal}>

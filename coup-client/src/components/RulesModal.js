@@ -26,6 +26,7 @@ export default class RulesModal extends Component {
         contentLabel={t('rules.modal.a11yLabel')}
         onRequestClose={this.handleCloseRulesModal}
         shouldCloseOnOverlayClick={true}
+        style={{ overlay: { zIndex: 100 } }}
     >
     <div className="CloseModalButtonContainer">
         <button className="CloseModalButton" onClick={this.handleCloseRulesModal}>
