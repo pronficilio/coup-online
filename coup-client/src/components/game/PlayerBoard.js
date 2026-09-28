@@ -29,6 +29,17 @@ const ROLE_KEYS = {
     ambassador: 'game.roles.ambassador'
 }
 
+const REACTION_GLYPHS = {
+    like: '👍',
+    bravo: '👏',
+    laugh: '😂',
+    skeptical: '🤨',
+    surprise: '😮',
+    thinking: '🤔',
+    dislike: '👎',
+    secret: '🤫'
+}
+
 function roleLabel(role) {
     const key = ROLE_KEYS[String(role).toLowerCase()]
     return key ? t(key) : t('game.roles.unknown')
@@ -119,6 +130,8 @@ export default function PlayerBoard(props) {
             {seats.map(({ player, seatIndex, left, top, isObserver }) => {
                 const isCurrentPlayer = player.name === props.currentPlayer
                 const isRespondable = isObserver && props.responseAvailable
+                const serverSeat = players.findIndex(candidate => candidate.name === player.name)
+                const reactionPresence = serverSeat === -1 ? null : props.reactionPresence?.[serverSeat]
                 const seatEdge = left <= 15
                     ? 'left-far'
                     : left < 17
@@ -161,6 +174,17 @@ export default function PlayerBoard(props) {
                 >
                     <div className="PlayerBoardSeatHeader">
                         <h2 className="PlayerBoardSeatName" title={player.name}>
+                            {reactionPresence && REACTION_GLYPHS[reactionPresence.reaction] && <span
+                                key={reactionPresence.token}
+                                className={`PlayerBoardReactionBubble${reactionPresence.fading ? ' PlayerBoardReactionBubble--fading' : ''}`}
+                                role="status"
+                                aria-label={t('game.playerBoard.reactionPresence', {
+                                    playerName: player.name,
+                                    reaction: t(`game.eventLog.reaction.${reactionPresence.reaction}`)
+                                })}
+                            >
+                                <span aria-hidden="true">{REACTION_GLYPHS[reactionPresence.reaction]}</span>
+                            </span>}
                             <img
                                 className="PlayerBoardPlayerIcon"
                                 src={playerIconImage}

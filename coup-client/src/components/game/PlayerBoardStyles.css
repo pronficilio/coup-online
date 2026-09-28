@@ -276,6 +276,74 @@
     white-space: nowrap;
 }
 
+.PlayerBoardReactionBubble {
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    right: calc(100% + 5px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 26px;
+    box-sizing: border-box;
+    transform: translateY(-50%);
+    border: 1px solid rgba(91, 69, 42, 0.3);
+    border-radius: 10px;
+    background: #fffdf8;
+    box-shadow: 0 3px 9px rgba(25, 19, 12, 0.25);
+    color: #25211b;
+    font-family: system-ui, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1;
+    pointer-events: none;
+    animation: PlayerBoardReactionArrive 190ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.PlayerBoardReactionBubble::after {
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    width: 0;
+    height: 0;
+    transform: translateY(-50%);
+    border: 4px solid transparent;
+    border-left-color: #fffdf8;
+    content: '';
+}
+
+.PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardReactionBubble {
+    top: -3px;
+    right: auto;
+    left: calc(100% + 5px);
+    transform: translateY(-100%);
+}
+
+.PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardReactionBubble::after {
+    top: auto;
+    right: auto;
+    bottom: -7px;
+    left: 5px;
+    transform: none;
+    border-top-color: #fffdf8;
+    border-right-color: transparent;
+    border-left-color: transparent;
+}
+
+.PlayerBoardReactionBubble--fading {
+    animation: PlayerBoardReactionDepart 180ms ease-in both;
+}
+
+@keyframes PlayerBoardReactionArrive {
+    from { opacity: 0; filter: blur(2px); }
+    to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes PlayerBoardReactionDepart {
+    from { opacity: 1; filter: blur(0); }
+    to { opacity: 0; filter: blur(2px); }
+}
+
 .PlayerBoardPlayerIcon {
     display: block;
     flex: 0 0 17px;
@@ -518,6 +586,18 @@
         padding: 1px 4px;
         font-size: 0.52rem;
         line-height: 1;
+    }
+
+    .PlayerBoardReactionBubble {
+        right: calc(100% + 3px);
+        width: 23px;
+        height: 22px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+    }
+
+    .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardReactionBubble {
+        left: calc(100% + 3px);
     }
 
     .PlayerBoardPlayerIcon {
@@ -776,5 +856,12 @@
 @media only screen and (max-width: 300px) {
     .PlayerBoardSeat[data-player-count="5"][data-seat-index="3"] {
         translate: -34px 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .PlayerBoardReactionBubble,
+    .PlayerBoardReactionBubble--fading {
+        animation-duration: 1ms;
     }
 }

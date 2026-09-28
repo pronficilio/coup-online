@@ -1,12 +1,12 @@
-# Handoff para Agente Alquimista — issue #40
+# Handoff activo — issue #40
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/40  
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`  
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`  
-**Estado del plan:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `READY`
+**Estado del plan:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `CLOSED / PASS`; F4 `ACTIVE`
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`  
-**Verifier requerido ahora:** no; se requiere al final de F4.  
-**Pregunta de falsificación:** ¿pueden dos emisiones concurrentes dejar dos reacciones del mismo jugador en un evento, desajustar conteos, revelar vínculo persistente jugador→reacción o exponer una carta oculta?  
+**Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, antes de preparar la PR.
+**Pregunta de falsificación:** ¿alguna secuencia de cliente rompe los doce criterios de aceptación, filtra una carta o vínculo persistente jugador→evento/reacción, duplica conteos o deja globos/timers obsoletos?
 **Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 aprobada por el Orquestador; la suite general conserva cuatro fallos de expectativas antiguas de pausa/reanudación, fuera del alcance F1.
 **Reporte F1:** `docs/plans/event-log-reactions/report_issue_40_F1.md`.
 **Branch destino:** `issue/40-event-log-reactions`  
@@ -14,9 +14,9 @@
 **Merge target:** `master` de `pronficilio/coup-online`  
 **PR esperada:** una PR desde el branch canónico a `master`; todavía no existe.
 
-## Siguiente fase: F3 — Globos efímeros de presencia
+## Fase activa: F4 — Falsificación y entrega
 
-F1 y F2 fueron aprobadas por el Orquestador. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3`; el reporte es `docs/plans/event-log-reactions/report_issue_40_F2.md` y la evidencia visual está en `docs/plans/event-log-reactions/evidence_issue_40_F2/`. La PR #41 de issue #24 se integró en `2160ada` y el cierre documental llegó en `f900c09`; esta rama se rebasó sobre ese `origin/master`.
+F1–F3 están cerradas con `PASS` en el mismo branch. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3` (`204df10`); F3 se documenta en `docs/plans/event-log-reactions/report_issue_40_F3.md` y su evidencia está en `evidence_issue_40_F3/`. La F4 debe verificar unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación escritorio/móvil antes de dejar una PR lista para revisión del Orquestador.
 
 ## Dependencia de F1
 
@@ -85,9 +85,13 @@ El Orquestador aprobó F1. Se completaron las pruebas específicas de payload, e
 - Panel legible y accesible en escritorio/móvil; no duplica ni altera el rail de acciones #24.
 - F2 cerró con build cliente PASS, recorrido visual en Chromium sin errores de página, cinco capturas comprimidas y el commit `feat(event-log): issue 40 F2 CLOSED advance_f3`. El build conserva avisos en `App.js` y `ReferencePanel.css`, fuera del diff F2.
 
-## Alcance reservado para F3
+## Cierre F3
 
-Implementar presencia efímera en `PlayerBoard` y el cableado/timers necesarios en `Coup.js`: un globo junto a cada nombre, del lado opuesto al contador de monedas; reemplazo y reinicio al recibir otra reacción; coexistencia entre asientos; expiración con salida suave y movimiento reducido. No incluir ID de evento ni vínculo persistente participante→reacción.
+`Coup.js` y `PlayerBoard` muestran presencia pública por asiento con un máximo de un globo efímero, sin `eventId` ni asociación persistente. Reemplazo, retiro, expiración, limpieza de listeners/timers, traducciones y `prefers-reduced-motion` están implementados. El build y recorrido de seis asientos desktop/móvil pasaron; F4 revisa las secuencias de temporizador en el flujo completo.
+
+## Alcance activo F4
+
+Revisión independiente de solo lectura frente a issue #40 y su plan aprobado. Falsificar concurrencia/unicidad, agregados, reacciones propias, privacidad, presencia/timers, traducciones, ausencia de horas, legibilidad móvil y regresiones del rail #24. Devolver `PASS`, `FAIL` o `BLOCKED` con criterios cubiertos, comandos/evidencia y defectos reproducibles; no modificar la implementación.
 
 ## Política para todo el issue
 

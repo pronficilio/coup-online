@@ -1,6 +1,6 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `READY`; issue `OPEN`, asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS`; F3 `CLOSED / PASS`; F4 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
 
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40  
 **Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
@@ -69,7 +69,7 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Bloquear/cancelar:** bloquear si aparece un conflicto con el rail de #24 ya integrado o si el registro tapa decisiones/asientos sin una recolocación clara.
 - **Commit:** `feat(event-log): issue 40 F2 CLOSED advance_f3` (`COMMIT_REQUIRED`).
 - **Entrega/revisión:** F2 `CLOSED / PASS`. El reporte `docs/plans/event-log-reactions/report_issue_40_F2.md` registra el build, los avisos existentes fuera del diff, el recorrido con las nueve categorías y los resultados ingreso/ayuda/impuesto/bloqueo/robo 0–2/intercambio. Las capturas de escritorio, bandeja y móvil están en `evidence_issue_40_F2/`.
-- **Estado de entrega:** F3 queda `READY` tras el checkpoint F2 del Orquestador. F2 no incluyó cambios de PlayerBoard ni globos de presencia.
+- **Estado de entrega:** F2 fue aprobada por el Orquestador; F3 inicia en el mismo branch. F2 no incluyó cambios de PlayerBoard ni globos de presencia.
 
 ### F3 — Globos efímeros y acabado accesible
 
@@ -84,8 +84,11 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Repetir:** repetir una vez tras corregir un fallo visual o de temporizador reproducible.
 - **Bloquear/cancelar:** bloquear si hace falta identificar globalmente el evento en el globo o alterar privacidad aprobada.
 - **Commit:** `feat(reaction-bubbles): issue 40 F3 CLOSED advance_f4` (`COMMIT_REQUIRED`).
+- **Entrega/revisión:** F3 `CLOSED / PASS`. El reporte `docs/plans/event-log-reactions/report_issue_40_F3.md` documenta el reemplazo y expiración por asiento, limpieza de timers, límite de privacidad, build y recorrido visual de seis asientos en escritorio/móvil. F4 debe falsificar las secuencias de reemplazo, retiro y caducidad en el flujo completo.
 
 ### F4 — Falsificación y entrega
+
+**Estado:** `ACTIVE`; F3 fue cerrada `PASS` por revisión del Orquestador. Informe: `docs/plans/event-log-reactions/report_issue_40_F3.md`; capturas desktop/móvil en `evidence_issue_40_F3/`.
 
 **Pregunta única:** ¿Puede una ruta cliente o secuencia concurrente refutar unicidad, conteos, privacidad, caducidad o presentación sin horas?
 
