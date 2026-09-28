@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE, F4 RETURNED por un solapamiento del Event Log con 5p en escritorio ancho (`4ccce67`). El fix `d37dacc` extiende el límite y wrap del log a todos los anchos; build pasa. Preview actual #28: `http://172.25.161.252:3016`, API `:8016`, ambos escuchando en todas las interfaces. El propietario reportó `Error del servidor` al unirse; ese texto corresponde a una falla de red/HTTP al consultar `/exists`. Se corrigió el destino API que antes chocaba con #24 y se reinició el cliente con `HOST=0.0.0.0`; el API responde HTTP 200 con CORS. Pendiente reintento en sala nueva y revisión 5p desktop antes de F4 FINAL del mismo Verifier. Sin push/PR hasta PASS.
+- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. F4 FINAL independiente pasó para `d37dacc`; el propietario confirmó unión y mesa de cinco jugadores en escritorio. Se prepara una PR hacia `master`; integrar antes de cerrar la issue remota.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -45,23 +45,27 @@ Entrega `docs/plans/game-table-ux/report_issue_28_F1.md` con fuentes, observacio
 - Mostrar el conteo localizado de Court inmediatamente encima de la imagen del mazo, derivado del tamaño real `this.deck.length` que proyecta el servidor. En un Exchange pendiente hay dos cartas menos; al devolver las dos, el conteo final no cambia. Un reemplazo por desafío devuelve y roba una; tampoco cambia el total. Reinicio vuelve a inicializarlo.
 - Conservar 15 cartas, cinco roles, 2–6 jugadores, identidades privadas y protocolo existentes.
 
-El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F3 está cerrada; el seguimiento F2 compila y sus cotas son estáticas. El propietario debe revisar el preview actualizado en 5p/390 px y los estados del halo antes de repetir F4.
+El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F3 está cerrada; el seguimiento F2 compila. El propietario ya revisó 5p móvil y halo, y confirma acceso más la mesa 5p desktop; el mismo Verifier repite F4.
 
 ## Preview actual y alcance visual
 
 - Cliente: `http://172.25.161.252:3016`, levantado desde este worktree con `HOST=0.0.0.0`; listener confirmado en `0.0.0.0:3016`. Usa API `172.25.161.252:8016`.
 - API: `http://172.25.161.252:8016`; listener confirmado en `*:8016`; GET `/exists/3ZEBHR` respondió HTTP 200, `exists:true`, y `Access-Control-Allow-Origin: *`. No detener ni alterar los servicios de #24 en `3015/8015`.
-- El propietario informó `Error del servidor` durante la unión. `JoinGame` muestra ese texto si falla por red/HTTP la llamada a `/exists`; un código ausente responde `exists:false` y muestra “sala inválida”. Se corrigió el destino que antes apuntaba a `:8015` (#24) y el cliente ahora escucha en todas las interfaces. Pedir recarga de la URL, crear una sala nueva desde este preview y volver a intentar.
+- El propietario había informado `Error del servidor` durante la unión. Se corrigió el destino que apuntaba a `:8015` (#24), y confirmó después que ya funciona.
 - No crear una sala de juego salvo que la revisión visual requiera hacerlo; no tocar el servicio del puerto 8000.
 - El lift usa el ancho máximo de 900 px del tablero; esta variante amplía el límite del Event Log y calibra las mesas centradas, 5p y 6p en móvil/tablet.
-- El propietario había confirmado 5p móvil (~390 px) y el ciclo del halo. La revisión del candidato actual queda pendiente: reportó error de servidor al intentar unirse y se le pidió reintentar con el preview restablecido.
-- Revisión solicitada: 5p desktop a 1280×900, sin cruce entre Event Log y cartas superiores, con wrap/scroll legible y HUD fijo.
+- El propietario había confirmado 5p móvil (~390 px) y el ciclo del halo. Ahora confirma que pudo unirse y que en escritorio se ven bien los cinco jugadores y las cartas. Esta confirmación cubre la inspección visual propietaria del candidato; el mismo Verifier revisa F4 FINAL de forma independiente.
+- Revisión desktop solicitada: 5p a 1280×900, sin cruce del Event Log, con wrap/scroll legible y HUD fijo; el propietario confirmó que los cinco jugadores y las cartas se ven bien.
 
 ## F2 reabierta; F4 devuelta
 
 F2 cerró originalmente en el commit de fase `fix(game-ui): issue 28 F2 CLOSED responsive seats and response highlight`. F4 detectó después un cruce de Event Log en 5p desktop ancho sobre `4ccce67`; por eso F2 se reabre. El fix `d37dacc` lleva el `width` clamp y `overflow-wrap:anywhere` a todos los anchos; conserva los anclajes del log, compactación responsive y lift sin saturación. El halo local sigue limitado a ventanas respondibles con opciones y se apaga al enviar (incluido Pass) o al cerrar. Sin opciones locales/espectador no se marca; no cambian reglas ni protocolo.
 
-Validaciones del candidato `d37dacc`: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff --check`, `node --check server/game/coup.js` y parseo JSON de la bitácora pasan. No se ejecutaron tests automatizados. La revisión visual de 5p desktop y el nuevo PASS FINAL independiente quedan pendientes.
+Validaciones del candidato `d37dacc`: `npm run build` terminó con código 0 (avisos conocidos en `App.js`, `ReferencePanel.css` por `dvh`/`postcss-calc` y `caniuse-lite`); `git diff --check`, `node --check server/game/coup.js` y parseo JSON de la bitácora pasan. No se ejecutaron tests automatizados. El propietario confirmó la revisión visual desktop de 5p y F4 FINAL independiente pasó.
+
+## Cierre de F2/F4 — 2026-09-28
+
+El propietario confirmó que el preview volvió a funcionar y que en escritorio se ven bien los cinco jugadores y las cartas. El mismo Verifier independiente emitió `PASS` FINAL para el producto `d37daccdbe37d997aaee3d7e23eb64e7712cf237` (tip revisado `6003c8f`; diff de cliente/servidor vacío). C1–C7 pasan; la auditoría estática calcula unos 41 px entre Event Log y cartas superiores a 1200×900. El veredicto y límites de evidencia están en `docs/plans/game-table-ux/report_issue_28_F4.md`. F2 y F4 quedan `CLOSED (PASS)`; la issue remota sigue abierta hasta integrar la PR.
 
 ## Commits y validación
 

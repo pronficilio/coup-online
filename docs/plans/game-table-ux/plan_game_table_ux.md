@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE y F4 RETURNED sobre `4ccce67`; el fix `d37dacc` amplía width/wrap del Event Log a todo viewport. Build pasa; preview #28 `http://172.25.161.252:3016` con API `:8016`, ambos escuchando en todas las interfaces. El propietario reportó error al unirse; el API contesta HTTP 200/CORS y se reinició el cliente con `HOST=0.0.0.0`. Se espera reintento, revisión visual 5p desktop y después F4 FINAL del mismo Verifier.
+- **Estado:** WAITING_ORCHESTRATOR; F1–F4 `CLOSED (PASS)`. El mismo Verifier dio PASS FINAL sobre `d37dacc` después de la confirmación visual propietaria de 5p desktop. Se prepara una PR hacia `master`; integrar antes de cerrar la issue remota.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -123,4 +123,6 @@ F2 volvió a `ACTIVE` para mantener el `clamp()` y `overflow-wrap:anywhere` en t
 
 El propietario reportó que `http://localhost:3016` no respondía. Se encontró que `3015/8015` ya servían procesos del worktree #24 y que el cliente #28 en `3016` apuntaba por error a esa API `8015`. No se detuvieron esos servicios. Se reinició el cliente #28 con API `8016`, ambos en `172.25.161.252`; la API responde HTTP 200 y el bundle incorpora el nuevo límite/wrap. El enlace corregido es `http://172.25.161.252:3016`. Falta confirmar accesibilidad desde el navegador del propietario y revisión 5p desktop.
 
-En la revisión posterior, el propietario informó `Error del servidor` al intentar unirse. `JoinGame` muestra ese texto cuando falla por red/HTTP la consulta `/exists`; un código inválido tiene otro mensaje. Se reinició el cliente con `HOST=0.0.0.0`; `ss` confirmó `0.0.0.0:3016` y `*:8016`, y el API contestó HTTP 200 con CORS desde la dirección de red. Solicitar recarga, crear una sala nueva desde este preview y reintentar. La confirmación de acceso/unión y la revisión 5p desktop siguen pendientes.
+En la revisión posterior, el propietario informó `Error del servidor` al intentar unirse. `JoinGame` muestra ese texto cuando falla por red/HTTP la consulta `/exists`; un código inválido tiene otro mensaje. Se reinició el cliente con `HOST=0.0.0.0`. `ss` confirmó `0.0.0.0:3016` y `*:8016`, y el API contestó HTTP 200 con CORS desde la dirección de red. Luego el propietario confirmó que el preview ya funciona y que en escritorio se ven bien los cinco jugadores y las cartas. F4 FINAL independiente se repite sobre `d37dacc`; no publicar/cerrar antes del PASS.
+
+El mismo Verifier emitió `PASS` FINAL sobre `d37daccdbe37d997aaee3d7e23eb64e7712cf237`; revisó el tip documental `6003c8f` y confirmó que no había diff de cliente/servidor frente al producto. C1–C7 pasan, con ~41 px calculados entre el Event Log y las cartas superiores a 1200×900; la confirmación visual de 5p desktop es del propietario. El desglose y límites de evidencia están en `report_issue_28_F4.md`. F2/F4 quedan cerradas con PASS; se prepara PR y la issue no se cerrará hasta integrar.

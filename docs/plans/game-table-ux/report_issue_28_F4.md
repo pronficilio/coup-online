@@ -124,3 +124,27 @@ El propietario confirmó visualmente 5p móvil (~390 px) y el ciclo del halo, pe
 El propietario informó que `localhost:3016` no respondía durante la revisión solicitada. La inspección de procesos encontró que el cliente `3015` y API `8015` activos pertenecen al worktree #24; el cliente #28 en `3016` apuntaba por error a esa API. Se dejaron intactos los procesos #24. Se inició cliente y servidor de #28 en la dirección de red `172.25.161.252`, puertos `3016/8016`; la API respondió HTTP 200 y el bundle contiene tanto el `width` clamp global como la URL nueva `:8016`. Se pidió repetir la revisión con `http://172.25.161.252:3016`. La confirmación visual del candidato `d37dacc` permanece pendiente hasta que el propietario pueda abrirlo.
 
 En el reintento, el propietario reportó `Error del servidor` al unirse. `JoinGame` usa ese mensaje en el catch de la petición `/exists`; una sala inexistente tiene un mensaje distinto. Reinicié el cliente con `HOST=0.0.0.0`. `ss` confirmó los listeners `0.0.0.0:3016` y `*:8016`; `/exists/3ZEBHR` respondió HTTP 200 con `exists:true` y CORS abierto. Se pidió recargar el preview y crear una sala nueva en ese enlace. No se ha confirmado todavía que el navegador del propietario logre unirse ni la revisión 5p desktop; F2/F4 siguen pendientes.
+
+## Dictamen F4 FINAL independiente — producto `d37daccdbe37d997aaee3d7e23eb64e7712cf237` (2026-09-27)
+
+**Veredicto: `PASS`.** Esta es la repetición FINAL por el mismo Verifier independiente que documentó el FAIL anterior en `4ccce67`. El tip actual al revisar era `6003c8f`; `git diff d37dacc..HEAD -- coup-client server` está vacío. La única modificación de producto desde el FAIL está en `CoupStyles.css`: el ancho acotado y `overflow-wrap:anywhere` del Event Log pasan a ser globales, y se elimina la media query que los limitaba a anchos de hasta 1199 px.
+
+### Pregunta adversarial
+
+¿Puede una entrada larga del Event Log seguir ensanchándolo hasta cubrir las cartas superiores de cinco jugadores en escritorio? En el CSS revisado, no: `.EventLogContainer` conserva `width:clamp(88px, calc(14vw + 38px), 180px)` y `box-sizing:border-box` a todos los anchos; `.EventLogBody` aplica `overflow-wrap:anywhere`. A 1200×900 el anclaje desktop deja el log en x≈900–1080 y las cartas del asiento superior derecho llegan aproximadamente hasta x≈859, con unos 41 px de separación. A 1280 px la separación calculada es de unos 73 px. Son cálculos CSS, no mediciones del navegador. El propietario confirmó además que en su revisión visual de cinco jugadores en escritorio se veían bien los asientos y las cartas y no observó cruces.
+
+### Resultado por criterio
+
+| Criterio | Resultado | Evidencia |
+|---|---|---|
+| 1. Influencias propias | PASS | `Coup.js` ya no renderiza la sección global; `PlayerBoard.js` conserva las etiquetas `game.roles.*` bajo las cartas propias. |
+| 2. Tablero, HUD, Event Log, margen y asientos 2–6 | PASS | El tablero conserva su elevación responsive y la geometría de asientos revisada para móvil, tablet y escritorio; el ancho fijo máximo y el wrap global del Event Log corrigen el caso ancho que produjo el FAIL anterior. La evidencia visual del propietario cubre 5p móvil (~390 px), 5p escritorio y el ciclo del halo. La auditoría estática previa cubre cajas estimadas de asientos/Event Log para 2–6 jugadores, el rango tablet y alturas grandes; no detecta otro cruce ni recorte. |
+| 3. Contador Court | PASS | `PlayerBoard.js` muestra `courtCount` sobre el mazo, y los estilos lo mantienen legible y anclado encima de la imagen. |
+| 4. Sincronización y privacidad | PASS estático | `server/game/coup.js` deriva el contador del tamaño real del mazo; las instantáneas contemplan inicio, Exchange pendiente/resuelto, reemplazo por desafío y revancha. Las influencias ocultas ajenas no se incluyen en el payload del cliente. |
+| 5. Reglas y protocolo | PASS | Se conserva el rango de 2–6 jugadores y el protocolo de decisiones; el contador usa el evento de actualización existente. |
+| 6. Cartas perdidas y roles ocultos | PASS | El estado perdido deriva de las influencias reveladas y se presenta con marca y rol legible. Una carta temporalmente probada y devuelta no queda marcada como perdida; las cartas activas ocultas de otros jugadores permanecen ocultas. |
+| 7. Halo durante respuestas | PASS | La condición depende de una decisión de respuesta abierta y de opciones locales; el propietario confirmó visualmente que el halo aparece mientras puede responder y se apaga al enviar Pass/otra opción o al cerrarse la ventana. |
+
+### Límites de evidencia
+
+La revisión visual fue realizada por el propietario, no por este Verifier: cubre cinco jugadores en móvil (~390 px), cinco jugadores en escritorio y el ciclo descrito del halo. No se afirma revisión visual manual de todas las cantidades de jugadores o resoluciones. Para los demás casos de 2–6 jugadores, tablet, pantallas altas, privacidad y lógica del contador, la evidencia es estática y procede del CSS/DOM y del flujo de servidor ya auditados. No se ejecutaron builds, tests, capturas ni cambios de producto durante esta repetición.
