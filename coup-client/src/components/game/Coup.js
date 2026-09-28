@@ -839,7 +839,6 @@ export default class Coup extends Component {
                     disabled={this.state.codexDisabled}
                     style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
                 >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
-                {decision && decision.type === 'action' && this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)}
                 {decision && decision.type !== 'action' && <>
                     <p className="DecisionTitle">{t(DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic', {
                         count: ownInfluences.length,

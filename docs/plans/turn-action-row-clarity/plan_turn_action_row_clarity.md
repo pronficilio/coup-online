@@ -1,12 +1,12 @@
 # Plan: hacer claras las acciones del turno — issue #24
 
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS` con excepción aceptada en AC9; F3 `ACTIVE / READY` para Verifier independiente.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE` tras el hallazgo de F3; último intento F3 `FAIL`, repetir independientemente después de la corrección.
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Handoff activo:** `docs/plans/active/issue_24_turn_action_row_clarity.md`
 **Bitácora:** `docs/plans/log/issue-24.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 **Rama / worktree / integración única:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / una PR a `master` de `pronficilio/coup-online`.
-**Siguiente dueño:** Verifier independiente FINAL; revisar el HEAD publicado y probar adversarialmente las AC, registrando como waiver la falta de animación visible al desmontar detalles.
+**Siguiente dueño:** F2 corrigió únicamente el doble montaje action; tras el push del checkpoint, un Verifier independiente distinto repite F3 FINAL. Se conserva el waiver aceptado de AC9.
 
 ## Solicitud y definición de éxito
 
@@ -63,7 +63,7 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 **Commit:** `COMMIT_REQUIRED`; `docs(action-rows): issue 24 F1 generic renderer confirmed`.
 **Validación:** releer issues/PRs, inspeccionar código integrado y `git diff --check`.
 
-### F2 — Implementar y documentar la fila interactiva (`CLOSED / PASS`, waiver AC9 aceptado)
+### F2 — Implementar y documentar la fila interactiva (`ACTIVE`, reabierta por F3 FAIL)
 
 **Pregunta:** ¿el renderer comunica dónde activar las acciones legales y mantiene la lista sincronizada con las opciones del servidor?
 
@@ -73,8 +73,9 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Áreas previstas:** `coup-client/src/components/game/Coup.js`, estilos del renderer y `coup-client/src/i18n/translations.json` solo si hacen falta claves espejo nuevas. No revivir `ActionDecision.js` ni editar servidor/protocolo.
 
-**Cierre F2:** la usuaria aprobó el preview vigente en `http://localhost:3006` y aceptó expresamente que los detalles se desmontan sin animación/transición visible. F2 queda `CLOSED / PASS` con waiver documentado para esa parte visual de AC9; la observación permanece visible en el reporte y en este plan. El build del HEAD rebaseado y el diff-check se registrarán en el checkpoint final. No se ejecutan tests automatizados.
-**Avanzar a F3:** Verifier independiente intenta refutar AC1–AC10 (considerando únicamente el waiver explícito de AC9), verifica el renderer y el rebase sobre `origin/master@45a3eaa`; una excepción adicional o regresión devuelve la unidad al Orquestador.
+**Cierre previo:** la usuaria aprobó el preview vigente en `http://localhost:3006` y aceptó expresamente que los detalles se desmontan sin animación/transición visible. Ese waiver de AC9 permanece vigente, pero F2 se reabrió tras el hallazgo de montaje duplicado del Verifier.
+**Corrección requerida:** montar el renderer action solo en el portal `ActionDecisionRail`; quitar la llamada duplicada dentro de `DecisionsSection` y dejar allí el botón Codex de emergencia y el renderer de decisiones no-action. No alterar IDs, handlers, protocolo ni otro layout.
+**Avanzar a F3:** después del fix, build y `git diff --check`, un Verifier independiente distinto revisa el HEAD corregido e intenta refutar AC1–AC10, considerando únicamente el waiver explícito de AC9.
 **Pivotar:** si portal/layout no mantiene la relación document-absolute del rail o altera decisiones ajenas a `action`, regresar al Orquestador con reproducción.
 **Repetir:** una corrección localizada por criterio con fallo reproducible.
 **Bloquear/cancelar:** vuelve a reservarse un archivo compartido o aparece una necesidad de cambiar reglas/protocolo.
@@ -94,17 +95,18 @@ La revisión F1 confirmó que el renderer y los textos requeridos ya están publ
 
 **Cierre manual F2:** la usuaria aprobó el preview actual; su aceptación cubre el resultado visual del panel y reconoce el hallazgo de que los detalles se desmontan sin transición visible. Este punto queda exceptuado de AC9 por aceptación expresa, no reportado como comportamiento verificado. No se abre PR ni se cierra la issue; el trabajo pasa a revisión FINAL independiente.
 
-### F3 — Verificación independiente y entrega (`ACTIVE / READY`)
+### F3 — Verificación independiente y entrega (`FAIL anterior`; recheck listo tras el fix)
 
 **Pregunta:** ¿puede refutarse que solo se muestran acciones legales, que summary/rail preservan su relación document-absolute al scroll, o que el ciclo mouse compacta/restaura sin cambiar el contrato de decisión?
 
-**Entrada:** F2 `CLOSED / PASS` con waiver explícito AC9, diff y evidencia vigentes; brief: `docs/plans/active/verifier_issue_24_F3.md`.
+**Último resultado:** `FAIL` en `6d63199910c5a0e3b24ed60c847eef1bb231f6f7`. El reporte `docs/plans/turn-action-row-clarity/report_issue_24_F3.md` encontró dos montajes de `renderActionDecision()` para una decisión action, IDs/refs duplicados y foco de targets/cancelación potencialmente desviado.
+**Siguiente entrada:** el fix F2 ya quitó la llamada duplicada y el build/diff-check pasaron; después de publicar este checkpoint, un Verifier independiente nuevo recibe `docs/plans/active/verifier_issue_24_F3.md`. El hallazgo anterior no equivale a PASS y se debe repetir F3.
 
 **Salida:** informe FINAL independiente, capturas de estados normal/hover y rail absolute, evidencia de omisión de acciones no legales y estados expandidos/compactos, entrega del branch/PR canónico al Orquestador.
 
 **Prueba adversarial:** comparar cada fila con `decision.options`; intentar confirmar que las acciones omitidas no aparecen, no ocupan huecos ni crean IDs/handlers. Hacer scroll repetido y confirmar que resumen y panel se desplazan juntos con coords documentales, alineación y gap constantes. Probar mouseenter/leave 500 ms, reentrada antes/después, ancho 50%, detalles desmontados/remontados (la ausencia de animación de desmontaje es waiver explícito), touch/no-hover, reduced motion, targets, cancelación, envío único, límites monetarios, idiomas y cambio/fin de decisión.
 
-**Avanzar:** criterios AC1–AC10 pasan, excepto la transición visual de desmontaje de detalles que la usuaria aceptó expresamente como waiver de AC9; Verifier `PASS`; dejar unidad en `WAITING_ORCHESTRATOR` para revisión de una única PR.
+**Avanzar:** criterios AC1–AC10 pasan, excepto la transición visual de desmontaje de detalles que la usuaria aceptó expresamente como waiver de AC9; Verifier de recheck `PASS`; dejar unidad en `WAITING_ORCHESTRATOR` para revisión de una única PR.
 **Pivotar:** devolver a F2 solo el criterio refutado con reproducción.
 **Repetir:** una verificación focalizada tras una corrección y commit nuevos.
 **Bloquear/cancelar:** dependencia reabierta, build no reproducible o queda un fallo de criterio.
@@ -124,4 +126,5 @@ Issue #24 es la fuente de estado. Esta bitácora es append-only. Toda la unidad 
 - 2026-09-27: el Alquimista reclamó la issue en el fork y confirmó branch/worktree limpios; F2 comienza sobre `Coup.js`.
 - 2026-09-27: la implementación F2 y el build pasan, pero F2 queda `BLOCKED` porque no hay navegador funcional para completar el recorrido manual obligatorio. El Orquestador coordina el entorno; F3 sigue pendiente.
 - 2026-09-27: la usuaria inspeccionó el cliente en `localhost:3006` y aportó feedback visual sobre separadores y colocación del panel action. F2 vuelve a `ACTIVE` para corregir ambos puntos; no se alteran criterios ni contrato.
-- 2026-09-27: la usuaria aprobó el preview final de F2 y aceptó expresamente que el desmontaje de detalles en compacto no presenta animación/transición visible. Cierre `F2 CLOSED / PASS` con waiver explícito para esa parte de AC9; no se afirma que esa transición visual haya pasado. F3 pasa a `ACTIVE / READY` para revisión independiente.
+- 2026-09-27: la usuaria aprobó el preview de F2 y aceptó expresamente que el desmontaje de detalles en compacto no presenta animación/transición visible. Waiver limitado a esa parte de AC9; no se afirma que esa transición visual haya pasado.
+- 2026-09-27: el primer F3 independiente devolvió `FAIL` en `6d63199`: `renderActionDecision()` se montaba a la vez en el portal y dentro de `.DecisionsSection`, duplicando filas/IDs/refs y pudiendo desviar el foco de targets/cancelación. Reabrir F2; quitar únicamente el montaje duplicado y repetir F3 con otro Verifier.

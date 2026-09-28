@@ -2,8 +2,8 @@
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Plan exacto:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`
-**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `CLOSED / PASS` con waiver aceptado de AC9; F3 `ACTIVE / READY`.
-**Fase activa:** verificación FINAL independiente del HEAD rebaseado. El brief es `docs/plans/active/verifier_issue_24_F3.md`.
+**Estado:** `ACTIVE`; F1 `CLOSED / PASS`; F2 `ACTIVE` tras F3 `FAIL`; waiver AC9 aceptado sigue vigente.
+**Fase activa:** retirar el doble montaje action detectado por F3. Después del fix, repetir F3 con un Verifier independiente distinto; el brief es `docs/plans/active/verifier_issue_24_F3.md`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; Verifier independiente requerido en F3.
 **Bitácora exacta:** `docs/plans/log/issue-24.jsonl`.
 **Branch / worktree / merge target:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / `master` de `pronficilio/coup-online`.
@@ -15,7 +15,7 @@
 
 Issue #24 sigue abierta y está asignada a `pronficilio`. El Alquimista registró el reclamo en https://github.com/pronficilio/coup-online/issues/24#issuecomment-5858619440 y confirmó la topología canónica. Al reclamar, la rama estaba limpia en `40cd6dd05a7d4897e9f88d7909d6b29e09122dce`; el checkpoint F2 publicado es `cfbbb7b` y esta reanudación ocurre sobre la misma rama/worktree, rebaseada sobre `origin/master@5de95ee`.
 
-## F2 cerrada — implementación y evidencia histórica
+## F2 — implementación y evidencia histórica; reabierta por F3 FAIL
 
 Las PR #23 de #14 y #22 de #19 ya están integradas. El renderer vigente está en `Coup.js`; `ActionDecision.js` no se monta. El servidor envía únicamente opciones legales y el diccionario ya contiene labels/descripciones/roles en `es`/`en`. No cambies reglas, formas de payload o el motor del servidor para lograr la apariencia.
 
@@ -33,16 +33,22 @@ Las PR #23 de #14 y #22 de #19 ya están integradas. El renderer vigente está e
 
 **Revisión y validación:** el Alquimista revisó el diff DOM/CSS; `git diff --check` pasa y `npm run build` terminó exit 0 con warnings conocidos. No tests automatizados. Checkpoint `b59bb022ee79e455fce3bfe281255cee359f034e` publicado. El Orquestador reinició CRA desde ese HEAD, confirmó `Compiled successfully` y bundle disponible en `http://localhost:3006` (HTTP 200, 2,393,146 bytes); backend `:18000` permanece activo. Preview listo para la usuaria.
 
-**Siguiente acción:** Verifier independiente FINAL toma `docs/plans/active/verifier_issue_24_F3.md`, revisa el commit final que se publique con este handoff y documenta hallazgos en `docs/plans/turn-action-row-clarity/report_issue_24_F3.md`. La falta de animación visible al desmontar detalles queda como waiver explícito de AC9 y no se debe reportar como pase verificado. No abrir PR, integrar ni cerrar issue.
+**Siguiente acción:** el Alquimista quita únicamente la segunda llamada action dentro de `DecisionsSection`, preservando el portal como renderer único, el botón de emergencia Codex y los demás decision types. Después de diff-check/build y push, asignar F3 a otro Verifier independiente para repetir el conteo de `.DecisionActionPanel`, IDs/refs y foco de targets/cancelación. No abrir PR, integrar ni cerrar issue.
 
 ## Quinta revisión visual — tamaño de títulos al compactar
 
 Solo `.DecisionActionLabel` pasa a 70% del font-size normal mientras está compacto: 0.812rem frente a 1.16rem en escritorio, 0.728rem frente a 1.04rem hasta 560px. El cambio transiciona en 120 ms y queda dentro del selector compacto; `.ActionDecisionTitle` no cambia. La expansión devuelve los títulos a su tamaño normal junto con los detalles rehidratados. `prefers-reduced-motion` desactiva la transición. Build exit 0 y diff-check PASS; código en `9af435d`. No tests ni recorrido visual. Orquestación debe reiniciar CRA desde el checkpoint final y confirmar la carga para la usuaria.
 
-## Cierre F2 — aceptación visual y excepción AC9
+## Cierre previo F2 — aceptación visual y excepción AC9
 
 La usuaria inspeccionó el preview actual en `http://localhost:3006`, aprobó el resultado para cerrar F2 y aceptó expresamente que los detalles se desmontan sin animación/transición visible. El cierre es `F2 CLOSED / PASS` con waiver acotado a esa parte visual de AC9. El hallazgo no se oculta ni se califica como comportamiento verificado. Ancho y títulos aún tienen transiciones rápidas; el resto del ciclo, controles, datos y accesibilidad pasa al intento de refutación independiente.
 
 El rebase de F2 quedó sobre `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fcdbe`. En los conflictos funcionales de `Coup.js` se mantuvieron pause overlay/retorno de foco y se integraron limpieza/reinicio de timers/rail; build y diff-check por checkpoint están registrados en el reporte F2.
 
-**Siguiente paso:** F3 `ACTIVE / READY`; seguir el brief `docs/plans/active/verifier_issue_24_F3.md` y dejar su resultado en `docs/plans/turn-action-row-clarity/report_issue_24_F3.md`. Issue abierta, sin PR; no integrar ni cerrar.
+## Reapertura F2 — defecto duplicado confirmado por Verifier
+
+En el commit `6d63199910c5a0e3b24ed60c847eef1bb231f6f7`, F3 confirmó que `renderActionDecision()` aparecía tanto en el portal `ActionDecisionRail` como bajo `DecisionsSection`, sin CSS que escondiera la copia. Se duplicaban panel/filas/IDs/refs y el foco de targets/cancelación podía desviarse. Véase `docs/plans/turn-action-row-clarity/report_issue_24_F3.md`.
+
+La corrección retira solo la llamada dentro de `DecisionsSection`; el portal permanece como única instancia de action. Deben permanecer el control Codex de emergencia y el renderer no-action. F2 queda `ACTIVE`; F3 anterior `FAIL`, con recheck independiente pendiente tras el fix. El waiver aceptado de AC9 no cambia. Issue abierta, sin PR ni integración.
+
+**Validación del fix:** `Coup.js` contiene una única invocación de `renderActionDecision()`, bajo el portal; `.DecisionsSection` conserva Codex y decisiones no-action. `git diff --check` pasó y `npm run build` terminó exit 0 con warnings preexistentes de `App.js`, `ReferencePanel.css`/`dvh`, `caniuse-lite` y `fs.F_OK`; gzip JS 109.81 kB/CSS 8.17 kB. No tests ni recorrido visual. Tras publicar el fix, otro Verifier debe repetir F3.

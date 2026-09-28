@@ -1,14 +1,14 @@
 # Reporte F2 — issue #24
 
-**Veredicto del checkpoint inicial:** `BLOCKED` (histórico); **veredicto actual F2:** `CLOSED / PASS` con excepción aceptada en AC9.
+**Veredicto del checkpoint inicial:** `BLOCKED` (histórico); **cierre previo:** `CLOSED / PASS` con waiver AC9; **estado actual:** F2 `ACTIVE`, reabierta tras F3 `FAIL`.
 
 **Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), sigue `OPEN` y asignada a `pronficilio`.
 
-**Fase siguiente:** F3 `ACTIVE / READY` para Verifier independiente FINAL; brief en `docs/plans/active/verifier_issue_24_F3.md`.
+**Fase siguiente:** corregir el hallazgo F3 en el renderer y ejecutar build/diff-check; después repetir F3 con otro Verifier independiente usando `docs/plans/active/verifier_issue_24_F3.md`.
 
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`.
 
-**Comportamiento vigente:** rail `absolute` en portal a `document.body`, alineado con Resumen de reglas mediante coordenadas documentales; aparecen solo acciones legales. El panel inicia expandido y se compacta tras mouseleave de 500 ms, con títulos de fila al 70% y acciones/precios disponibles. La usuaria aprobó el preview y aceptó expresamente que el desmontaje de detalles no tiene animación/transición visible. Esta diferencia queda como waiver de la parte de transición de desmontaje en AC9, no como comportamiento verificado.
+**Comportamiento vigente:** rail `absolute` en portal a `document.body`, alineado con Resumen de reglas mediante coordenadas documentales; aparecen solo acciones legales. El panel inicia expandido y se compacta tras mouseleave de 500 ms, con títulos de fila al 70% y acciones/precios disponibles. F3 encontró que el renderer se montaba además dentro de `DecisionsSection`, duplicando panel/filas/IDs/refs; se quitó esa llamada y el portal queda como renderer único. La usuaria aprobó el preview y aceptó expresamente que el desmontaje de detalles no tiene animación/transición visible; ese waiver limitado de AC9 se conserva.
 
 ## Trabajo del checkpoint inicial (histórico; véanse las revisiones posteriores para el comportamiento vigente)
 
@@ -94,7 +94,7 @@ La usuaria pidió reducir 30% el tamaño de los nombres de cada acción cuando e
 
 El cambio CSS de esta revisión está en commit de producto `9af435d`; el commit de sincronización documental sigue inmediatamente después. No afecta al resto del ciclo de compactación ni a los detalles que se remontan al expandir.
 
-## Cierre F2 — aprobación humana y waiver explícito de AC9
+## Cierre previo F2 — aprobación humana y waiver explícito de AC9
 
 La usuaria revisó el preview vigente en `http://localhost:3006`, aprobó el resultado para cerrar F2 y señaló que los detalles se desmontan sin animación/transición visible. Aceptó expresamente esa limitación. F2 queda `CLOSED / PASS` con un waiver acotado a la transición visual del desmontaje de prompt/descripciones/metadatos de AC9. El hallazgo permanece registrado aquí; no se afirma que la animación de desmontaje haya pasado. La transición rápida de ancho y font-size, el timer, la restauración de detalles al reentrar y los demás requisitos permanecen sujetos a la revisión adversarial de F3.
 
@@ -110,4 +110,20 @@ El branch se rebaseó sobre `origin/master@45a3eaa2e6d16aac2ca954bf7c7e60198f0fc
 - No se ejecutaron tests automatizados. El build valida integración/compilación, no reemplaza el recorrido del Verifier.
 - La aprobación humana del preview se registró antes del rebase; no se repitió el recorrido visual después de integrar el pause overlay de master. El Verifier debe revisar esa integración además de los criterios del renderer.
 
-F2 queda `CLOSED / PASS` por aprobación del preview y revisión/build de la unidad, con waiver explícito para la animación visual ausente al desmontar detalles. F3 está `ACTIVE / READY`; la issue sigue abierta, sin PR ni integración.
+F2 estuvo `CLOSED / PASS` por aprobación del preview y revisión/build de la unidad, con waiver explícito para la animación visual ausente al desmontar detalles. El primer F3 independiente devolvió `FAIL`; la unidad F2 se reabrió.
+
+## Reapertura F2 por F3 FAIL
+
+El Verifier confirmó en `6d63199910c5a0e3b24ed60c847eef1bb231f6f7` dos llamadas que montaban `renderActionDecision()` para una decisión action: una dentro del portal `ActionDecisionRail` y otra bajo `DecisionsSection`. Sin CSS que oculte la segunda copia, el DOM duplicaba filas, IDs y refs, con riesgo de que el foco de targets/cancelación cayera en la copia incorrecta. Esto incumple AC1/AC7 y la ubicación única del rail. Reporte completo: `docs/plans/turn-action-row-clarity/report_issue_24_F3.md`.
+
+Corrección acotada: retirar la llamada action dentro de `DecisionsSection`, conservar el renderer único en portal, el botón de emergencia Codex y todos los decision types no-action. No alterar el contrato Socket.IO ni IDs/handlers. F2 queda `ACTIVE`; una persona distinta repetirá F3 después del fix. Issue `OPEN`, sin PR ni integración.
+
+## Corrección y validación para repetir F3
+
+Quité únicamente la segunda llamada a `renderActionDecision()` dentro de `DecisionsSection`. La única invocación de render action permanece en `ActionDecisionRail`; se conservaron el botón de emergencia Codex, el renderer de decisiones no-action y la implementación de targets/cancelación/timers. La búsqueda en `Coup.js` confirma una invocación del método; no se alteraron IDs, handlers, options ni protocolo.
+
+- `git diff --check`: **exit 0**.
+- `npm run build` en `coup-client`: **exit 0**, `Compiled with warnings`; warnings conocidos en imports `logo`/`Link` sin uso en `App.js`, `postcss-calc` para `dvh` en `ReferencePanel.css:100,106`, `caniuse-lite` desactualizado y deprecación Node `fs.F_OK`. Ninguno señala el renderer action. Gzip: JS 109.81 kB, CSS 8.17 kB.
+- No se ejecutaron tests automatizados ni recorrido visual. La corrección evita la copia duplicada por composición; el nuevo Verifier debe comprobar DOM único, ausencia de IDs duplicados y foco al abrir/cancelar objetivos.
+
+F2 queda `ACTIVE` hasta que otro Verifier independiente repita F3 en el HEAD publicado. El intento anterior sigue `FAIL` y su reporte se conserva; el waiver visual AC9 continúa aceptado.
