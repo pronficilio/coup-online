@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/28
 - **Plan exacto:** `docs/plans/game-table-ux/plan_game_table_ux.md`
 - **Bitácora exacta:** `docs/plans/log/issue-28.jsonl`
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE, F4 RETURNED por un solapamiento del Event Log con 5p en escritorio ancho (`4ccce67`). El fix `d37dacc` extiende el límite y wrap del log a todos los anchos; build pasa. El preview `localhost:3016` sirve este candidato con API `:8015`. El propietario confirmó móvil 5p y el ciclo del halo; falta revisar 5p desktop antes de repetir F4 con el mismo Verifier. Sin push/PR hasta PASS.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE, F4 RETURNED por un solapamiento del Event Log con 5p en escritorio ancho (`4ccce67`). El fix `d37dacc` extiende el límite y wrap del log a todos los anchos; build pasa. Preview actual #28: `http://172.25.161.252:3016`, API `:8016`, ambos escuchando en todas las interfaces. El propietario reportó `Error del servidor` al unirse; ese texto corresponde a una falla de red/HTTP al consultar `/exists`. Se corrigió el destino API que antes chocaba con #24 y se reinició el cliente con `HOST=0.0.0.0`; el API responde HTTP 200 con CORS. Pendiente reintento en sala nueva y revisión 5p desktop antes de F4 FINAL del mismo Verifier. Sin push/PR hasta PASS.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch único:** `issue/28-table-game-ux`.
 - **Worktree único:** `.worktrees/issue-28-table-game-ux`.
@@ -47,14 +47,15 @@ Entrega `docs/plans/game-table-ux/report_issue_28_F1.md` con fuentes, observacio
 
 El contador va encima del mazo, según la aclaración del propietario. No crear la variante opcional de dos jugadores ni una configuración de 10/20 cartas. F3 está cerrada; el seguimiento F2 compila y sus cotas son estáticas. El propietario debe revisar el preview actualizado en 5p/390 px y los estados del halo antes de repetir F4.
 
-## Preview revisado por el propietario
+## Preview actual y alcance visual
 
-- Cliente: `http://localhost:3016`, levantado desde este worktree; el bundle contiene `overflow-wrap:anywhere` y el Event Log actualizado en `d37dacc`.
-- Backend: `http://localhost:8015`; el endpoint `/exists/preview-check` respondió HTTP 200.
-- No crear una sala de juego ni tocar el servicio del puerto 8000.
+- Cliente: `http://172.25.161.252:3016`, levantado desde este worktree con `HOST=0.0.0.0`; listener confirmado en `0.0.0.0:3016`. Usa API `172.25.161.252:8016`.
+- API: `http://172.25.161.252:8016`; listener confirmado en `*:8016`; GET `/exists/3ZEBHR` respondió HTTP 200, `exists:true`, y `Access-Control-Allow-Origin: *`. No detener ni alterar los servicios de #24 en `3015/8015`.
+- El propietario informó `Error del servidor` durante la unión. `JoinGame` muestra ese texto si falla por red/HTTP la llamada a `/exists`; un código ausente responde `exists:false` y muestra “sala inválida”. Se corrigió el destino que antes apuntaba a `:8015` (#24) y el cliente ahora escucha en todas las interfaces. Pedir recarga de la URL, crear una sala nueva desde este preview y volver a intentar.
+- No crear una sala de juego salvo que la revisión visual requiera hacerlo; no tocar el servicio del puerto 8000.
 - El lift usa el ancho máximo de 900 px del tablero; esta variante amplía el límite del Event Log y calibra las mesas centradas, 5p y 6p en móvil/tablet.
-- El propietario confirma que en móvil (~390 px) con 5 jugadores los asientos quedan completos y el Event Log es legible/desplazable sin cruces. También confirma que en Challenge/Block el asiento local se ilumina solo mientras tiene opciones y se apaga al enviar Pass/otra opción o al cerrar.
-- La confirmación manual corresponde a esos casos; no afirma revisión de escritorio ni de otros conteos en esta variante.
+- El propietario había confirmado 5p móvil (~390 px) y el ciclo del halo. La revisión del candidato actual queda pendiente: reportó error de servidor al intentar unirse y se le pidió reintentar con el preview restablecido.
+- Revisión solicitada: 5p desktop a 1280×900, sin cruce entre Event Log y cartas superiores, con wrap/scroll legible y HUD fijo.
 
 ## F2 reabierta; F4 devuelta
 
@@ -72,4 +73,4 @@ Issue comment: https://github.com/pronficilio/coup-online/issues/28#issuecomment
 
 Cuando una acción abre una ventana de respuesta, ilumina el borde rojo del asiento local si este cliente ofrece al usuario al menos un botón/opción para elegir (por ejemplo, Challenge, Block o Pass). Esto aplica aunque `currentPlayer` siga siendo quien inició la acción. Apaga el borde al enviar cualquier respuesta, incluido Pass, y al cerrarse la decisión. No ilumines a un cliente/asiento sin opciones disponibles; no cambies reglas ni protocolo.
 
-Alquimista: el propietario confirmó en `http://localhost:3016` el caso 5p móvil (~390 px) y los estados del halo. El producto `d37dacc` queda pendiente de confirmación visual en escritorio 5p; luego pide al mismo Verifier repetir F4 sobre ese SHA.
+Alquimista: el propietario había confirmado 5p móvil (~390 px) y los estados del halo, pero reportó que el enlace local no respondía al pedirle revisar el nuevo cambio desktop. El candidato `d37dacc` ahora está en `http://172.25.161.252:3016` con API propia `:8016`; esperar confirmación de acceso/revisión 5p desktop y luego pedir al mismo Verifier repetir F4 sobre ese SHA.

@@ -1,7 +1,7 @@
 # Plan: tablero, influencias y mazo Court
 
 - **Issue:** [#28 — Ajustar tablero, marcar cartas perdidas y contar mazo Court](https://github.com/pronficilio/coup-online/issues/28)
-- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE y F4 RETURNED sobre `4ccce67`; el fix `d37dacc` amplía width/wrap del Event Log a todo viewport. Build pasa; se espera revisión visual de 5p desktop y después F4 FINAL del mismo Verifier.
+- **Estado:** ACTIVE; F1/F3 CLOSED; F2 ACTIVE y F4 RETURNED sobre `4ccce67`; el fix `d37dacc` amplía width/wrap del Event Log a todo viewport. Build pasa; preview #28 `http://172.25.161.252:3016` con API `:8016`, ambos escuchando en todas las interfaces. El propietario reportó error al unirse; el API contesta HTTP 200/CORS y se reinició el cliente con `HOST=0.0.0.0`. Se espera reintento, revisión visual 5p desktop y después F4 FINAL del mismo Verifier.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`.
 - **Branch / worktree:** `issue/28-table-game-ux` / `.worktrees/issue-28-table-game-ux`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR para la unidad.
@@ -117,4 +117,10 @@ El propietario confirmó en `http://localhost:3016` los dos casos solicitados de
 
 El mismo Verifier emitió `FAIL` medio en criterio 2 sobre el producto `4ccce679f082d84956de844472e395fc67a90bf7`. A 1200×900 el tablero de 900 px empieza en x≈150; el asiento superior derecho de 5p queda cerca de x≈790 y sus cartas llegan hasta x≈859. Desde 1200 px el Event Log pierde el ancho limitado/wrap, conserva el borde derecho x≈1080 (`right:10vw`) y una línea larga puede ocupar ~260 px, empezando cerca de x≈820: cruce estimado de ~39 px con las cartas en la misma zona vertical. C1, C3–C7 pasaron estáticamente. El propietario confirmó solo el caso móvil 5p y el ciclo del halo, no escritorio.
 
-F2 volvió a `ACTIVE` para mantener el `clamp()` y `overflow-wrap:anywhere` en todos los anchos, sin mover el anclaje del Event Log. El fix está comprometido en `d37dacc`; `npm run build` terminó con código 0 y el bundle de `http://localhost:3016` muestra el estilo actualizado. Se pidió al propietario revisar 5p desktop (1280×900); con su confirmación, el mismo Verifier repetirá F4 sobre este SHA. No push/PR ni cierre antes del PASS.
+F2 volvió a `ACTIVE` para mantener el `clamp()` y `overflow-wrap:anywhere` en todos los anchos, sin mover el anclaje del Event Log. El fix está comprometido en `d37dacc`; `npm run build` terminó con código 0 y el bundle actualizado se sirve en `http://172.25.161.252:3016`, conectado a `:8016`. Se pidió al propietario revisar 5p desktop (1280×900); con su confirmación, el mismo Verifier repetirá F4 sobre este SHA. No push/PR ni cierre antes del PASS.
+
+### Corrección de conectividad del preview
+
+El propietario reportó que `http://localhost:3016` no respondía. Se encontró que `3015/8015` ya servían procesos del worktree #24 y que el cliente #28 en `3016` apuntaba por error a esa API `8015`. No se detuvieron esos servicios. Se reinició el cliente #28 con API `8016`, ambos en `172.25.161.252`; la API responde HTTP 200 y el bundle incorpora el nuevo límite/wrap. El enlace corregido es `http://172.25.161.252:3016`. Falta confirmar accesibilidad desde el navegador del propietario y revisión 5p desktop.
+
+En la revisión posterior, el propietario informó `Error del servidor` al intentar unirse. `JoinGame` muestra ese texto cuando falla por red/HTTP la consulta `/exists`; un código inválido tiene otro mensaje. Se reinició el cliente con `HOST=0.0.0.0`; `ss` confirmó `0.0.0.0:3016` y `*:8016`, y el API contestó HTTP 200 con CORS desde la dirección de red. Solicitar recarga, crear una sala nueva desde este preview y reintentar. La confirmación de acceso/unión y la revisión 5p desktop siguen pendientes.
