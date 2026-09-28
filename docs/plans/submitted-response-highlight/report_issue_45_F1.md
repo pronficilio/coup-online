@@ -6,7 +6,7 @@
 **Base:** `origin/master` = `f900c0947a0b27ac9c6e0372e3c1871a883be7e6` en la API al reclamar.
 **Sincronización:** merge de `origin/master@db1d22c11fc78dcd91b5f4242b1ae1591f9ba16b` en `918e070`; sin conflictos restantes.
 **Tracker:** #45 `OPEN`, asignada a `pronficilio`.
-**PR:** ninguna.
+**PR:** [#51](https://github.com/pronficilio/coup-online/pull/51) abierta a `master`, referenciada a #45; no cierra la issue.
 
 ## Cambio y alcance
 

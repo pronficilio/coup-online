@@ -10,7 +10,7 @@
 - **Branch canónico:** `issue/45-persist-submitted-response-highlight`.
 - **Worktree canónico:** `.worktrees/issue-45-persist-submitted-response-highlight`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR esperada:** una PR asociada a #45; aún no existe.
+- **PR:** [#51](https://github.com/pronficilio/coup-online/pull/51), abierta hacia `master` y referenciada a #45.
 - **Fase sugerida:** F1, persistencia visual de la respuesta elegida durante la espera.
 
 ## Reclamo y aislamiento
