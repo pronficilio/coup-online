@@ -2,12 +2,13 @@
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/24
 **Plan exacto:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`
-**Estado:** `READY_TO_MERGE`; F1, F2 y F3 `PASS`. El primer F3 `FAIL` por doble montaje fue corregido y el F3 independiente final pasó en `4241b667` sobre `origin/master@a3d23f3`. Waiver AC9 aceptado sigue vigente.
-**Fase activa:** sincronización terminada en merge `cafc4c69762c548435c3f0b31876b6d49bda7717` sobre `origin/master@a3d23f3`; rail #24 + tablero #28 preservados y timeout servidor actualizado a 120 s. `git diff --check`, build frontend y `node --check server/game/coup.js` pasan. El preview aprobado y los overlays están documentados; pendiente crear una PR a `master`, después fusionarla y cerrar la issue según autorización de la usuaria.
+**Estado:** `COMPLETED`; F1–F3 `CLOSED / PASS`. El primer F3 `FAIL` por doble montaje fue corregido y el F3 independiente final pasó en `4241b667` sobre `origin/master@a3d23f3`. Waiver AC9 aceptado sigue vigente.
+**Cierre administrativo:** La PR [#41](https://github.com/pronficilio/coup-online/pull/41) se integró a `master` con merge commit `2160ada0a69e1b94eb6b8922acf674b056adafcd` el 2026-09-28. GitHub cerró automáticamente la issue #24. La usuaria aprobó el preview y autorizó la integración/cierre tras completar F3; build y `git diff --check` pasan. No quedan acciones pendientes ni siguiente dueño.
+**Integración final:** merge de la rama sincronizada con `origin/master@a3d23f3`; rail #24, tablero #28 y timeout del servidor de 120 s preservados. La aprobación contextual de la usuaria tras el pedido de seleccionar un target se registra como walkthrough aprobado, sin atribuir inspección de DevTools, conteo DOM ni prueba de foco. F3 documenta sus límites y preserva el waiver AC9 para desmontaje sin animación.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; Verifier independiente requerido en F3.
 **Bitácora exacta:** `docs/plans/log/issue-24.jsonl`.
 **Branch / worktree / merge target:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity` / `master` de `pronficilio/coup-online`.
-**PR/MR:** ninguna; abrir una única PR a `master` con `Closes #24`.
+**PR/MR:** [PR #41](https://github.com/pronficilio/coup-online/pull/41), fusionada a `master`.
 
 **Estado del preview:** la usuaria aprobó el preview actual, confirmó un solo panel de acciones, Cancelar funcional y los modales de Reglas/Resumen por encima del rail; también aceptó explícitamente que los detalles se desmontan sin animación/transición visible. Tras el pedido explícito de probar una selección de destino legal y su resolución única, respondió «se ve bien, lo apruebo»; F3 registró esa aprobación como evidencia contextual, sin atribuirle conteo de DOM, DevTools ni prueba de foco. No parar los servidores `:3006`/`:18000` hasta completar la revisión/merge.
 

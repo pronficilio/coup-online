@@ -1,7 +1,7 @@
 # PHASE independiente F3 — issue #24, renderer de acciones del turno
 
 **Estado:** `CLOSED / PASS`; F3 final independiente completado en HEAD `4241b667b0ef66f5d75411f001b240c79262094a`, sincronizado con `origin/master@a3d23f3`. El veredicto conserva los históricos `FAIL`/`BLOCKED`; el PASS corresponde únicamente a este checkpoint y evidencia.
-**Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), todavía `OPEN`, asignada a `pronficilio`.
+**Issue:** [#24](https://github.com/pronficilio/coup-online/issues/24), `CLOSED` tras fusionar PR #41.
 **Plan:** `docs/plans/turn-action-row-clarity/plan_turn_action_row_clarity.md`.
 **Reporte de implementación F2:** `docs/plans/turn-action-row-clarity/report_issue_24_F2.md`.
 **Branch/worktree:** `issue/24-turn-action-row-clarity` / `.worktrees/issue-24-turn-action-row-clarity`; destino `master` del fork.
@@ -13,7 +13,7 @@
 
 F2 se cerró previamente `CLOSED / PASS` por aprobación de la usuaria del preview, con una excepción explícita de AC9: ella observó que los detalles se desmontan sin animación/transición visible y aceptó expresamente esa limitación. F2 está reabierta por el doble montaje hallado abajo. El waiver AC9 sigue vigente; no reportar esa transición como verificada ni pedir al usuario que vuelva a aprobarlo. Verificar el resto de AC9 y el renderer; si se descubre cualquier limitación adicional, documentarla como hallazgo y devolverla al Orquestador.
 
-La usuaria aprobó el preview y autorizó merge/cierre al completar verificación final. El Orquestador interpreta esa respuesta contextual como aprobación del walkthrough de target solicitado, sin inferir detalles que la usuaria no reportó. El Verifier se limitó a revisión, evidencia, build documentado y handoff; no abrió PR, integró ni cerró. Issue #24 continúa OPEN hasta que Orquestación complete la única PR autorizada.
+La usuaria aprobó el preview y autorizó merge/cierre al completar verificación final. El Orquestador interpreta esa respuesta contextual como aprobación del walkthrough de target solicitado, sin inferir detalles que la usuaria no reportó. El Verifier se limitó a revisión, evidencia, build documentado y handoff; no abrió PR, integró ni cerró. PR #41 se fusionó y GitHub cerró la issue #24.
 
 ## Pregunta de falsificación
 
