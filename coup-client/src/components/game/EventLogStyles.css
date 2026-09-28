@@ -336,8 +336,8 @@
 }
 
 @keyframes EventLogTrayIn {
-    from { opacity: 0; transform: translateY(3px) scale(0.98); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 720px) {
@@ -372,6 +372,29 @@
     .EventLogPanelHeader { gap: 6px; }
     .EventLogEntryMessage { font-size: 0.74rem; }
     .EventLogReactionTray { max-width: calc(100% - 28px); margin-left: 28px; }
+}
+
+@media (max-width: 720px), (pointer: coarse) {
+    .EventLogPanelToggle,
+    .EventLogReactionCountButton,
+    .EventLogReactButton,
+    .EventLogReactionOption {
+        min-width: 44px;
+        height: 44px;
+        box-sizing: border-box;
+        flex-shrink: 0;
+    }
+
+    .EventLogPanelToggle,
+    .EventLogReactButton {
+        width: 44px;
+        flex: 0 0 44px;
+    }
+
+    .EventLogReactionOption {
+        width: 44px;
+        flex: 0 0 44px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {

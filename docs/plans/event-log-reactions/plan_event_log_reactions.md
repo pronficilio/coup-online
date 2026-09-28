@@ -1,6 +1,6 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`; issue `OPEN`, asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, segundo veredicto independiente tras primer `FAIL`; issue `OPEN`, asignada a `pronficilio`.
 
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40
 **Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
@@ -84,11 +84,11 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - **Repetir:** repetir una vez tras corregir un fallo visual o de temporizador reproducible.
 - **Bloquear/cancelar:** bloquear si hace falta identificar globalmente el evento en el globo o alterar privacidad aprobada.
 - **Commit:** `feat(reaction-bubbles): issue 40 F3 CLOSED advance_f4` (`COMMIT_REQUIRED`).
-- **Entrega/revisión:** F3 `CLOSED / PASS`, incluida la corrección AC9 de opacidad/escala detectada durante F4. El build posterior al rebase y la corrección pasó; quedan documentados los avisos preexistentes y de #46. Reporte y recorrido visual: `docs/plans/event-log-reactions/report_issue_40_F3.md`, `evidence_issue_40_F3/`. F4 falsifica las secuencias de reemplazo, retiro y caducidad en el flujo completo.
+- **Entrega/revisión:** F3 se reabrió tras el primer `FAIL` F4: el prop `reactionPresence` faltaba en el montaje real, los controles táctiles no alcanzaban 44 px durante la animación y faltaba evidencia integrada. Se conectó el prop, se eliminaron escalas del contenedor de bandeja y se fijaron objetivos de 44×44 px. `npm run build` pasó con avisos preexistentes; el recorrido integrado pasó reemplazo/reset, concurrencia, retiro, expiración, movimiento reducido y layouts con 2–6 asientos en escritorio/móvil. El harness simula mensajes de socket en el cliente; no es una partida live multi-cliente. Reporte: `docs/plans/event-log-reactions/report_issue_40_F3.md`; evidencia: `evidence_issue_40_F4/`.
 
 ### F4 — Falsificación y entrega
 
-**Estado:** `ACTIVE`; F3 `CLOSED / PASS` tras corregir la escala requerida por AC9. El Verifier realiza la revisión estática independiente antes del veredicto final.
+**Estado:** `ACTIVE`; primera revisión independiente `FAIL` en AC7 (prop de presencia omitido), AC8 dependiente y evidencia funcional AC12 insuficiente. F3 volvió a `PASS`; está pendiente el segundo veredicto independiente.
 
 **Pregunta única:** ¿Puede una ruta cliente o secuencia concurrente refutar unicidad, conteos, privacidad, caducidad o presentación sin horas?
 

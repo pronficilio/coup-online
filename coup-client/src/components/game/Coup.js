@@ -957,6 +957,7 @@ export default class Coup extends Component {
                 responseWindowOpen={responseWindowOpen}
                 responseAvailable={responseAvailable}
                 courtCount={this.state.courtCount}
+                reactionPresence={this.state.reactionPresence}
             />
             <ReferencePanel />
 

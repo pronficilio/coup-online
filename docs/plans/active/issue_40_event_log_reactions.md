@@ -3,7 +3,7 @@
 **Issue:** https://github.com/pronficilio/coup-online/issues/40
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`
-**Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, revisión estática en curso.
+**Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, segundo veredicto independiente pendiente tras el primer `FAIL`.
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`
 **Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, antes de preparar la PR.
 **Pregunta de falsificación:** ¿alguna secuencia de cliente rompe los doce criterios de aceptación, filtra una carta o vínculo persistente jugador→evento/reacción, duplica conteos o deja globos/timers obsoletos?
@@ -16,7 +16,7 @@
 
 ## Fase activa: F4 — Falsificación y entrega
 
-F1–F3 están cerradas con `PASS`. F3 se reabrió durante F4 al comprobar la issue #40: AC9 requiere opacidad y escala, y el primer acabado solo tenía opacidad/blur. Se añadió escala breve y el build posterior pasó. F2 está en `feat(event-log): issue 40 F2 CLOSED advance_f3` (`0eae42d` tras el rebase); F3 parte de `03062c9` más el commit correctivo AC9. El reporte F3 es `docs/plans/event-log-reactions/report_issue_40_F3.md`, con evidencia en `evidence_issue_40_F3/`. F4 debe verificar unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación escritorio/móvil antes de dejar una PR lista para revisión del Orquestador.
+F1–F3 están cerradas con `PASS`. La primera revisión independiente F4 dio `FAIL` en AC7: `Coup` no pasaba `reactionPresence` a `PlayerBoard`; AC8 no podía mostrarse y faltaba evidencia funcional AC12. F3 se reabrió y corrigió el cableado, los objetivos táctiles y el recorrido integrado. El build pasó con avisos preexistentes. Chromium confirmó reemplazo y reset del timer, concurrencia, retiro, expiración, movimiento reducido, botones móviles de 44×44 px y layouts de 2–6 asientos en escritorio/móvil. El harness simula eventos de socket en el cliente; no es una partida live multi-cliente. El reporte F3 está en `docs/plans/event-log-reactions/report_issue_40_F3.md`, con evidencia integrada en `evidence_issue_40_F4/`. F4 requiere ahora un segundo veredicto independiente sobre unicidad, agregados, privacidad, temporizadores, ausencia de horas y presentación.
 
 ## Dependencia de F1
 
@@ -87,7 +87,7 @@ El Orquestador aprobó F1. Se completaron las pruebas específicas de payload, e
 
 ## Cierre F3
 
-`Coup.js` y `PlayerBoard` muestran presencia pública por asiento con un máximo de un globo efímero, sin `eventId` ni asociación persistente. Reemplazo, retiro, expiración, limpieza de listeners/timers, traducciones y `prefers-reduced-motion` están implementados. El build y recorrido de seis asientos desktop/móvil pasaron; F4 revisa las secuencias de temporizador en el flujo completo.
+`Coup.js` pasa `reactionPresence` al `PlayerBoard` real. La presencia pública por asiento tiene como máximo un globo efímero, sin `eventId` ni asociación persistente. Reemplazo con timer reiniciado, retiro, expiración, limpieza de listeners/timers, traducciones y `prefers-reduced-motion` están implementados. El build pasó; el recorrido integrado cubrió temporizadores, dos asientos simultáneos, targets móviles de 44×44 px y layouts desktop/móvil para 2–6 jugadores.
 
 ## Alcance activo F4
 
