@@ -3,14 +3,14 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/49 (`OPEN`, asignada a `pronficilio`).
 - **Plan exacto:** `docs/plans/coup-seven-coins/plan_coup_seven_coins.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-49.jsonl`.
-- **Estado:** `WAITING_USER`; F1–F2 `CLOSED`, F3 `BLOCKED` por observación humana requerida.
+- **Estado:** `WAITING_ORCHESTRATOR_REVIEW`; F1–F2 `CLOSED`, F3 `BLOCKED`, excepción de integración autorizada por el propietario.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido:** sí, independiente antes de integración.
 - **Pregunta de falsificación:** ¿puede una selección legal de Coup con 7–9 monedas seguir siendo rechazada o cobrada dos veces, eludir el Coup obligatorio con 10+, reabrir silenciosamente una acción inválida o permitir bloqueo de Coup por Contessa?
 - **Branch canónico:** `issue/49-coup-seven-coins`.
 - **Worktree canónico:** `.worktrees/issue-49-coup-seven-coins`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR esperada:** una PR asociada a #49; aún no existe.
+- **PR:** [#50](https://github.com/pronficilio/coup-online/pull/50), abierta hacia `master`.
 
 ## Evidencia de intake
 
@@ -30,11 +30,11 @@ En `origin/master@0a467c1`, `actionChoices()` ofrece Coup desde 7 monedas, pero 
 
 **F2 — CLOSED:** se quitó el umbral contradictorio de Coup `< 10`; se conservan coste 7, obligatoriedad desde 10, validación de objetivo y canal de rechazo existente. `git diff --check` y revisión estática pasaron; sin tests automatizados, build cliente ni partida dinámica. Evidencia: `docs/plans/coup-seven-coins/report_issue_49_F2.md`; commit de cierre documentado en bitácora.
 
-**F3 — BLOCKED:** Verifier FINAL independiente inspeccionó `0b73305f5be684bb05cc7109701f958c26a98921` y no encontró refutación estática; devolvió `BLOCKED` porque el protocolo exige observación humana de los criterios interactivos. La app de desarrollo del worktree está lista en `http://127.0.0.1:3000/`, backend local puerto `8011`; página, bundle y endpoint API devuelven HTTP 200. Sigue pendiente el walkthrough descrito en `docs/plans/coup-seven-coins/report_issue_49_F3.md`; no abrir PR ni cambiar código antes del veredicto actualizado.
+**F3 — BLOCKED con excepción de integración:** Verifier FINAL inspeccionó `0b73305f5be684bb05cc7109701f958c26a98921`; no encontró refutación estática y aceptó como PASS limitado el caso Coup con 8 monedas confirmado por el propietario. AC1/AC2/AC4/AC5 siguen `BLOCKED` en su reporte por falta de datos humanos por criterio. El propietario confirmó que hizo la verificación y autorizó explícitamente el merge; el Orquestador registra la excepción sin convertir el veredicto en PASS. PR #50 está abierta.
 
 Al cerrar F1, ejecutar F2 del plan: alinear el mínimo de Coup en 7 con Coup obligatorio desde 10, y resolver de forma visible cualquier rechazo inválido/obsoleto pertinente sin debilitar validación autoritativa. Respetar AC1–AC6 y el alcance aprobado por #49. Antes de tocar código cliente compartido, auditar issues/worktrees/diffs #43, #44 y #45 y coordinar solapamientos. Commit `fix(coup-seven-coins): issue 49 F2 CLOSED advance_f3`.
 
-En F3, pedir al Verifier independiente que intente refutar AC1–AC6 sobre el diff real; no debe arreglar. Documentar el resultado. No agregar ni ejecutar pruebas automatizadas sin instrucción del propietario. Commit de cierre `docs(coup-seven-coins): issue 49 F3 CLOSED ready_review`.
+F3 produjo el reporte independiente y permanece `BLOCKED`; la excepción aprobada por el propietario se documenta en ese reporte. No agregar ni ejecutar pruebas automatizadas sin instrucción del propietario.
 
 ## Criterios de aceptación
 

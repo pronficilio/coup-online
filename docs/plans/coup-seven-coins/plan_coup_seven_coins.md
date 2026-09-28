@@ -1,7 +1,7 @@
 # Plan — Coup con 7–9 monedas
 
 - **Issue:** [#49](https://github.com/pronficilio/coup-online/issues/49), `OPEN`.
-- **Estado operativo:** `WAITING_USER`; F1–F2 `CLOSED`, F3 `BLOCKED` por observación humana requerida; issue asignada a `pronficilio`, sin PR.
+- **Estado operativo:** `WAITING_ORCHESTRATOR_REVIEW`; PR #50 abierta a `master`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Perfil:** `coup-online`; target `master` del fork `pronficilio/coup-online`; aislamiento `git_worktree`.
 - **Branch / worktree canónicos:** `issue/49-coup-seven-coins` / `.worktrees/issue-49-coup-seven-coins`.
@@ -16,6 +16,10 @@ Permitir Coup con 7, 8 o 9 monedas y conservar Coup obligatorio desde 10 monedas
 La lectura de `origin/master` en `0a467c1` confirma la discrepancia: `actionChoices()` ofrece `coup` desde 7 monedas, mientras `beginAction()` vuelve a `playTurn()` cuando Coup tiene menos de 10. Con 8 monedas el servidor consume la decisión, rechaza el golpe y publica un menú nuevo. La regla versionada dice que Coup cuesta 7 monedas y no tiene bloqueo; Contessa bloquea Assassinate. Esto explica el síntoma sin atribuirlo a la carta rival.
 
 La rama local `master` estaba seis commits detrás antes de actualizar refs; `origin/master` quedó en `0a467c1`. El worktree aislado de #49 parte de esa referencia y el checkout compartido no se usó para implementar.
+
+## Estado de integración
+
+El propietario confirmó que realizó la verificación y autorizó el merge. El reporte independiente F3 permanece `BLOCKED` por falta de observaciones detalladas por criterio; el Orquestador documentó la excepción autorizada y no presenta ese estado como Verifier PASS. La PR única #50 está abierta a `master`; la integración/cierre quedan en manos del Orquestador.
 
 ## Criterios de aceptación
 

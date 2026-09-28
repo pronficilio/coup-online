@@ -65,7 +65,7 @@ La revisión humana de Coup con 8 monedas confirma que la selección legal funci
 
 No se ejecutaron tests automatizados. Se recibió una observación humana parcial del caso de 8 monedas y una confirmación general de que el propietario realizó la verificación, pero no resultados específicos para los criterios interactivos restantes. Los servicios se levantaron en el worktree exacto para la revisión inicial; las sesiones asociadas fueron server (`90903`) y cliente (`89871`). Para detenerlas, enviar Ctrl-C a ambas sesiones si aún siguen activas.
 
-**Siguiente dueño:** Orquestador/Alquimista para registrar esta evidencia limitada y decidir el próximo paso. Verificador independiente puede reevaluar cuando haya evidencia de los criterios pendientes. No integrar ni cerrar issue con este estado.
+**Siguiente dueño al emitir este reporte:** Orquestador/Alquimista, sujeto al `BLOCKED` descrito aquí. La instrucción posterior del propietario y la decisión de integración del Orquestador constan en el addendum siguiente.
 
 ## Addendum del Orquestador — autorización explícita del propietario
 
