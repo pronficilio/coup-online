@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/42 (abierta, asignada a `pronficilio`).
 - **Plan exacto:** `docs/plans/home-coin-turn-favicon/plan_home_coin_turn_favicon.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-42.jsonl`.
-- **Estado del plan:** unidad `ACTIVE`; F1 `ACTIVE` (helper/assets independientes; montaje pendiente de secuenciación con #40).
+- **Estado del plan:** unidad `WAITING_ORCHESTRATOR`; F1 `ACTIVE` (assets/helper listos; integración y validación pendientes).
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Pregunta de falsificación:** ¿puede el favicon seguir animado cuando ya no es el turno local, con pausa/final, como espectador o después de desmontar la partida?
@@ -30,6 +30,8 @@
 - **Qué debe actualizar el Alquimista:** claim en issue/log, mover handoff `inbox→active`, estado del plan/issue, reporte F1, tamaños, validación y commit; detenerse y devolver a Orquestador si #40 requiere secuenciación de integración.
 
 **Claim y aislamiento:** claim remoto publicado y releído en https://github.com/pronficilio/coup-online/issues/42#issuecomment-5865946026. Branch/worktree `issue/42-home-coin-turn-favicon` / `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`, creado desde `origin/master@f900c0947a0b27ac9c6e0372e3c1871a883be7e6`. La bitácora registra setup y confirmación. Mantener F1 `ACTIVE`; no registrar `phase_verdict` hasta integrar de forma segura y satisfacer todos los criterios.
+
+**Siguiente acción y condición de reactivación:** la unidad queda `WAITING_ORCHESTRATOR`. Reactivar la integración solo después de que F2 de #40 esté cerrada y commiteada y `Coup.js` esté estable. Entonces releer el estado actual de #40 y #42, sus branches/worktrees y el diff antes de editar `Coup.js`. No tocar esa superficie mientras #40 siga activa. La decisión está registrada en el [comentario de coordinación de #42](https://github.com/pronficilio/coup-online/issues/42#issuecomment-5866424625). F1 permanece `ACTIVE`; no hay `phase_verdict`.
 
 ## Checkpoint independiente F1 (2026-09-28)
 
