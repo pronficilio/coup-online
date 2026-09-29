@@ -4,7 +4,7 @@
 - **Plan exacto:** `docs/plans/codex-event-reactions/plan_codex_event_reactions.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-62.jsonl` (append-only).
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente.
-- **Estado actual:** F0 `CLOSED` tras addendum documental solicitado en revisión; unidad `WAITING_ORCHESTRATOR`. F1 y F2 siguen `PENDING`; no iniciar F1 hasta autorización explícita del Orquestador.
+- **Estado actual:** F0 y F1 `CLOSED`; F0 aprobado por el Orquestador; F1 lista para revisión del Orquestador; F2 `PENDING`.
 - **Pregunta de falsificación:** ¿una reacción omitida/inválida/obsoleta afecta una elección de juego válida, expone identidad privada o se atribuye a asiento/evento incorrecto?
 - **Dependencias ya integradas:** #14 runner Codex y #40 registro tipado con conteos agregados/presencia. Issue #60 solo anima el panel, no es dependencia funcional; no tocarla.
 - **Alcance:** enlazar oportunidad de reacción a una decisión Codex existente, exponer solo conteos agregados de terceros y aceptar una reacción opcional junto a `choiceId`, aplicándola desde el asiento de servidor.
@@ -21,16 +21,20 @@
 
 ## Reclamo y aislamiento
 
-Reclamo completado: #62 se asignó a `pronficilio` y se releyó en el fork; sigue abierta, coincide con este handoff y no hay reclamo incompatible ni PR canónica previa. La branch `issue/62-codex-event-reactions` y el worktree `.worktrees/issue-62-codex-event-reactions` parten de `origin/master@b39f649`. El handoff está en `active/`; el commit de setup registra `claim` y `worktree_confirmed` antes de F0. F0 se cerró como análisis estático, con reporte `docs/plans/codex-event-reactions/report_issue_62_F0.md`; la unidad queda en espera de revisión. No trabajar en `master`, upstream ni en el worktree de otra unidad.
+Reclamo completado: #62 se asignó a `pronficilio` y se releyó en el fork; sigue abierta, coincide con este handoff y no hay reclamo incompatible ni PR canónica previa. La branch `issue/62-codex-event-reactions` y el worktree `.worktrees/issue-62-codex-event-reactions` partieron de `origin/master@b39f649` y se sincronizaron con `origin/master@6b1d54f` tras #64, preservando el contenido de #62 y master. El handoff está en `active/`; F0 quedó cerrado y aprobado con el reporte `docs/plans/codex-event-reactions/report_issue_62_F0.md`; F1 autorizada y en curso. No trabajar en `master`, upstream ni en el worktree de otra unidad.
 
 ## F0 — Contrato antes de producto
 
-F0 pasó por `RETURNED / WAITING_EXECUTOR` a solicitud del Orquestador para un addendum, y se cierra ahora como `CLOSED`. Codex selecciona de forma declarativa: repetir el mismo emoji/evento conserva la selección, otro emoji la reemplaza, y `reaction: null` o ausencia no cambia el estado; no hay toggle Codex. El toggle humano #40 permanece intacto. La salida App Server tiene `choiceId` legal obligatorio y `reaction` presente como `null` o como `{eventId, emoji}` exacto; el parser valida `choiceId` independientemente y descarta candidatos fuera de oportunidad/catálogo sin perderlo. El plan define allowlist exacta de campos y tipos de `event.data` por cada `event.type`. Evidencia y esquema: `docs/plans/codex-event-reactions/report_issue_62_F0.md`. Unidad `WAITING_ORCHESTRATOR`; no comiences F1 sin aprobación explícita.
+F0 pasó por `RETURNED / WAITING_EXECUTOR` a solicitud del Orquestador y se cerró como `CLOSED`; el Orquestador aprobó el contrato el 2026-09-29 y autorizó F1. Codex selecciona de forma declarativa: repetir el mismo emoji/evento conserva la selección, otro emoji la reemplaza, y `reaction: null` o ausencia no cambia el estado; no hay toggle Codex. El toggle humano #40 permanece intacto. La salida App Server tiene `choiceId` legal obligatorio y `reaction` presente como `null` o como `{eventId, emoji}` exacto; el parser valida `choiceId` independientemente y descarta candidatos fuera de oportunidad/catálogo sin perderlo. El plan define allowlist exacta de campos y tipos de `event.data` por cada `event.type`. Evidencia: `docs/plans/codex-event-reactions/report_issue_62_F0.md`.
 
 ## F1/F2 y límites
 
-Con F0 aprobado, integra la reacción en la misma llamada/respuesta Codex con semántica declarativa para Codex y conserva los canales ya usados por clientes y espectadores. Reporta por separado aceptación de `choiceId`, omisión/rechazo de reacción opcional, stale IDs, actor Codex, conteos propios/ajenos y ausencia de filtración. El Verifier FINAL es independiente y read-only. No escribas al upstream, no despliegues y no hagas llamadas reales al modelo.
+F1 `CLOSED`: integra la reacción en la misma llamada/respuesta Codex con semántica declarativa para Codex y conserva los canales ya usados por clientes y espectadores. El reporte cubre validación independiente de `choiceId`, reacción null/inválida, evento/emoji no ofrecido, asiento Codex, conteos de terceros y compatibilidad de la forma del resultado sin reacción. `git diff --check` pasó; no se agregaron ni ejecutaron pruebas automatizadas ni se llamó al runner/modelo. No se escribió al upstream ni se desplegó. La unidad queda `WAITING_ORCHESTRATOR`; F2 permanece `PENDING` para revisión independiente.
 
 ## Addendum de revisión del Orquestador
 
-El Orquestador devolvió F0 para fijar idempotencia Codex, el schema estricto nullable exacto y la allowlist de `event.data`. F0 regresó a `CLOSED` al quedar registrados esos tres puntos en plan/reporte/bitácora. No se inició F1 ni se tocó código. El checkout raíz conserva intacto el trabajo local de #60; no se modificaron sus archivos.
+El Orquestador devolvió F0 para fijar idempotencia Codex, el schema estricto nullable exacto y la allowlist de `event.data`; luego aprobó F0 y autorizó F1. La branch se sincronizó con `origin/master@6b1d54f`, incluyendo #64 y su cierre. El checkout raíz mantiene intacto el trabajo local de #60/#63.
+
+## F1 — Implementación lista para revisión
+
+F1 conserva el mismo request/turno Codex. `reactionOpportunity` contiene solo el último evento público proyectado por allowlist, su catálogo y conteos agregados de asientos distintos al Codex. El schema App Server requiere `{choiceId, reaction}` con `reaction` nullable y forma exacta `{eventId, emoji}`; el parser valida primero `choiceId` y descarta una reacción inválida sin perder una elección legal. Cuando no hay reacción seleccionada, el objeto de éxito interno y la línea JSONL del runner omiten la clave para mantener la interfaz anterior. Tras aceptar la elección, el servidor vuelve a comprobar evento/catálogo y aplica la selección declarativa desde `player.seat`; la ruta humana `reactToEvent()` permanece sin cambios. Evidencia: `docs/plans/codex-event-reactions/report_issue_62_F1.md`.

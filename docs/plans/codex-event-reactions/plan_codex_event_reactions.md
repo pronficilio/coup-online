@@ -1,7 +1,7 @@
 # Plan — reacciones opcionales de Codex en el registro de eventos
 
 **Issue:** [#62 — Permitir que Codex reaccione opcionalmente en el registro de eventos](https://github.com/pronficilio/coup-online/issues/62)  
-**Estado:** `WAITING_ORCHESTRATOR`; F0 `CLOSED`; F1–F2 `PENDING`
+**Estado:** `WAITING_ORCHESTRATOR`; F0 `CLOSED` (aprobado); F1 `CLOSED`; F2 `PENDING`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente  
 **Branch / worktree / integración:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions` / `master`  
 **Handoff:** `docs/plans/active/issue_62_codex_event_reactions.md`  
@@ -147,11 +147,11 @@ Codex no recibe `ownReactions`; la semántica declarativa elimina la ambigüedad
 
 **Pregunta:** ¿Puede Codex acompañar un evento del registro desde la misma respuesta de su turno sin cambiar la acción legal ni la ruta humana?
 
-- **Estado:** `PENDING` hasta la revisión/aprobación del contrato F0 por el Orquestador.
+- **Estado:** `CLOSED`; implementación y revisión estática terminadas el 2026-09-29; lista para revisión del Orquestador. F2 sigue `PENDING`. La branch se sincronizó con `origin/master@6b1d54f`, que incluye el merge y cierre de #60.
 - **Entrada:** contrato F0 aprobado; #40 permanece como implementación base de eventos, catálogos, agregados y presencia.
 - **Tareas:** extender observación/esquema del runner con el contexto agregado acotado; extender salida según el schema estricto F0 con `reaction` nullable; validar `choiceId` independientemente y descartar el candidato cosmético fuera de evento/catálogo sin perder la elección; aplicar selección Codex declarativa desde el asiento server-side con la mutación compartida; preservar intacto el toggle humano #40; mantener guardas de versión y documentar cambios/evidencia estática.
-- **Salida:** integración server/runner y reporte F1 dentro del branch único del issue.
-- **Avance:** criterios 1–7 se cumplen en la revisión del código y no cambian protocolo humano, reglas ni UI.
+- **Salida:** integración server/runner y `report_issue_62_F1.md` dentro del branch único del issue.
+- **Avance:** revisión estática de criterios 1–7; la reacción no altera `choiceId`, el toggle humano, las reglas ni la UI. La respuesta estricta de App Server conserva `reaction` requerido nullable; si es nula/ausente, el cliente y el runner omiten la propiedad en su objeto de éxito para conservar la forma previa.
 - **Pivote:** si la unión al flujo normal acopla la reacción al resultado de la acción o exige una segunda llamada Codex, reducirla a la oportunidad ya presente en la decisión y reportar las limitaciones; no crear turnos/calls paralelos.
 - **Política de commit:** `COMMIT_REQUIRED`; `feat(codex-reactions): issue 62 F1 CLOSED advance_f2`.
 
@@ -180,3 +180,5 @@ Esta delegación no autoriza despliegue, publicación de release, activación de
 - 2026-09-29: #62 reclamada por `pronficilio`; branch `issue/62-codex-event-reactions` y worktree `.worktrees/issue-62-codex-event-reactions` confirmados desde `origin/master@b39f649`. Handoff movido a `active/`; F0 en curso, F1 sigue pendiente de revisión y aprobación del Orquestador.
 - 2026-09-29: F0 `CLOSED`; matriz, conteos, salida opcional, orden de validación/aplicación y límite de autoridad server-side documentados en este plan y `report_issue_62_F0.md`. Unidad `WAITING_ORCHESTRATOR`; no se inició F1.
 - 2026-09-29: el Orquestador devolvió F0 para un addendum. Se cerró de nuevo con selección Codex idempotente/declarativa, salida App Server estricta con `reaction` nullable y forma exacta, parser que preserva `choiceId` legal al descartar un candidato ajeno, y allowlist completa por tipo en `event.data`. El toggle humano #40 permanece intacto. F0 `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F1 no iniciada. El checkout raíz conserva sin cambios el trabajo local de #60.
+- 2026-09-29: el Orquestador aprobó F0 y autorizó F1. Se sincronizó exclusivamente esta branch con `origin/master@6b1d54f` mediante merges `d66d8c9` y `ffa5d28`; se conservaron los commits/contenido de #62 y master, incluida la entrada #60 cerrada por #64. F1 `ACTIVE`; F2 `PENDING`.
+- 2026-09-29: F1 implementada y revisada estáticamente en el worktree canónico. `countsByReaction` cuenta solo a otros asientos; la salida estricta mantiene `reaction` nullable y el parser valida `choiceId` de forma independiente; el runner/cliente omiten `reaction` nula en sus objetos de éxito; el servidor aplica solo tras aceptar la elección y conserva intacta la ruta humana #40. `git diff --check` pasó. No se agregaron ni ejecutaron pruebas ni se llamó al modelo. F1 `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F2 `PENDING`.
