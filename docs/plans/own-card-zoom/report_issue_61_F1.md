@@ -25,6 +25,14 @@ El propietario reportó que el modal se veía demasiado grande, que su altura pa
 - `cd coup-client && npm run build`: **exit 0** después del ajuste. Solo aparecen las advertencias ya registradas de imports sin uso en `App.js`, parseo de `dvh` en `ReferencePanel.css` y `caniuse-lite` desactualizado.
 - El preview está disponible en `http://localhost:4061`; se confirmó HTTP 200 en la página y el bundle de desarrollo. El nuevo visto bueno visual del propietario sigue pendiente.
 
+En la revisión siguiente, el propietario confirmó que la imagen aún se recortaba. La inspección del contenido de `react-modal` mostró que sus estilos inline de posición, insets, padding y overflow podían dejar una caja más grande que la imagen. Se corrigió el sizing para que:
+
+- `style.content` sobrescriba explícitamente esos valores, quite los insets y padding, y use `fit-content` para ancho y alto.
+- La altura de `<img>` sea la dimensión objetivo calculada desde el viewport (`80dvh` como tope, con margen seguro); su ancho queda en `auto` y respeta el ratio intrínseco, limitado además por el ancho disponible y `390px`.
+- La transformación FLIP de apertura y cierre use el mismo ancho derivado y la altura exacta aplicada a la imagen.
+
+La compilación posterior a esta corrección también terminó con **exit 0** y las mismas advertencias preexistentes. El Orquestador reinició por completo el servidor CRA desde el worktree dedicado con `PORT=4061` y `REACT_APP_BACKEND_URL=http://localhost:18000`; CRA reportó `webpack compiled successfully`. Después del reinicio, `http://localhost:4061/` y `/static/js/bundle.js` respondieron HTTP 200, y `/exists/probe` del backend respondió HTTP 200. Se confirmó que el bundle servido incluye `width: auto` y el límite `80dvh`. Sigue pendiente el nuevo visto bueno visual del propietario.
+
 ## Validación alcanzable
 
 - `cd coup-client && npm run build`: **exit 0**, compilación de producción lista.

@@ -23,13 +23,16 @@ function getTargetSize() {
         viewportHeight * CARD_MAX_HEIGHT_RATIO,
         viewportHeight - viewportGutter
     );
-    const width = Math.max(0, Math.min(
+    const maxWidth = Math.max(0, Math.min(
         CARD_MAX_WIDTH,
-        viewportWidth - viewportGutter,
-        maxHeight * CARD_ASPECT_RATIO
+        viewportWidth - viewportGutter
+    ));
+    const height = Math.max(0, Math.min(
+        maxHeight,
+        maxWidth / CARD_ASPECT_RATIO
     ));
 
-    return { width, height: width / CARD_ASPECT_RATIO };
+    return { width: height * CARD_ASPECT_RATIO, height };
 }
 
 function getOriginTransform(originElement, targetSize) {
@@ -335,8 +338,22 @@ export default function OwnCardZoom({
             overlayClassName={overlayClassName}
             contentRef={handleContentRef}
             style={{ content: {
+                position: 'relative',
+                top: 'auto',
+                right: 'auto',
+                bottom: 'auto',
+                left: 'auto',
+                width: 'fit-content',
+                height: 'fit-content',
+                maxWidth: 'none',
+                maxHeight: 'none',
+                margin: 0,
+                padding: 0,
+                border: 0,
+                overflow: 'visible',
+                background: 'transparent',
+                boxSizing: 'border-box',
                 '--own-card-zoom-origin-transform': originTransform,
-                '--own-card-zoom-width': `${targetSize.width}px`
             } }}
             aria={{ modal: true }}
             closeTimeoutMS={0}
@@ -361,6 +378,7 @@ export default function OwnCardZoom({
                     alt={cardName || ''}
                     decoding="async"
                     loading="eager"
+                    style={{ height: `${targetSize.height}px` }}
                 />
             </section>
         </ReactModal>
