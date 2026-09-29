@@ -1,15 +1,14 @@
-# Handoff para Agente Alquimista — issue #42
+# Handoff final — issue #42
 
-- **Issue:** https://github.com/pronficilio/coup-online/issues/42 (abierta, asignada a `pronficilio`).
+- **Issue:** https://github.com/pronficilio/coup-online/issues/42 (`CLOSED`).
 - **Plan exacto:** `docs/plans/home-coin-turn-favicon/plan_home_coin_turn_favicon.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-42.jsonl`.
-- **Estado del plan:** unidad `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS, propietario confirmó que se ve bien en una partida de tres personas)`; F2 `CLOSED (PASS, revisión visual posterior pendiente)`.
+- **Estado del plan:** unidad `COMPLETED`; F1 `CLOSED (PASS, propietario confirmó que se ve bien en una partida de tres personas)`; F2 `CLOSED (PASS, revisión estática/build; cadencia de 100 ms no revalidada visualmente por el propietario)`.
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Pregunta de falsificación:** ¿puede el favicon seguir animado cuando ya no es el turno local, con pausa/final, como espectador o después de desmontar la partida?
-- **Fase entregada:** F1, integración de favicon por turno propio; el propietario confirmó funcionamiento visual en una partida con tres personas y señaló que el giro aún se siente algo lento/tropezado.
-- **Fase entregada:** F2, cargar/decodificar por adelantado los seis fotogramas, elevar la cadencia a 100 ms y aplicar cinco PNG estrictamente equivalentes que reducen el total a 11,890 bytes.
-- **Por qué sigue:** #25 ya dejó un favicon estático pequeño; F1 funciona en juego, y la revisión del propietario pide mejorar la fluidez sin inflar los assets ni dañar bordes/transparencia.
+- **Fases entregadas:** F1 animación por turno propio, validada por el propietario en una partida con tres personas; F2 precarga/decodificación, cadencia de 100 ms y compresión sin pérdida de cinco PNG. Total final: 11,890 bytes.
+- **Cierre:** el propietario pidió integrar la PR; issue #42 se cerró automáticamente al fusionar. La sensación visual del ritmo de 100 ms no se volvió a probar y no se afirma como validada.
 - **Documentos fuente:** issue #42; plan exacto arriba; `docs/agentes/ORQUESTADOR.md`, `ALQUIMISTA.md`, `AGENTE_MENOR.md`, `docs/plans/PROJECT_ORCHESTRATION.yaml`; issue/plan/branch de #40 para coordinación; `Coup.js`, `index.html`, `public/favicon.ico`.
 - **Subtareas ejecutadas:**
   1. El Agente Menor convirtió `fotos/gif/a-coin.png` … `fotos/gif/f-coin.png` a seis PNG RGBA 32×32; total 12,026 bytes, solo derivados versionados en el worktree de #42.
@@ -17,22 +16,22 @@
   3. El Alquimista compiló y documentó evidencia y commit F1; el propietario después confirmó el comportamiento visual con tres personas.
 - **Subtareas F2 ejecutadas:** 1) precarga/decodificación paralela A–F, cadencia de 100 ms, secuencia y cleanup con invalidación de promesas; 2) cinco frames optimizados sin pérdida byte a byte de píxeles; 3) build exitoso y evidencia documentada. No se ejecutaron tests automatizados.
 - **Criterios de aceptación:** rotación solo en turno propio activo; espectadores/pausa/final no animan; derivados ≤32×32 y ≤50 KB total; orden/alfa conservados; limpieza/restauración completa; solo cliente, sin dependencias nuevas, fuentes originales ni tests automatizados; build exitoso.
-- **Coordinación observada:** la issue #40 está `CLOSED`; PR #54 se fusionó con `d1eddb834f35d058159343475789b8df20a173a1`. Tras F2, la rama #42 se rebasó limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`; la base está actualizada.
+- **Coordinación observada:** la issue #40 está `CLOSED`; PR #54 se fusionó con `d1eddb834f35d058159343475789b8df20a173a1`. PR #58 de #42 se rebasó sobre `origin/master@b8df17f` y quedó integrada en `master` mediante `f1bbf1f870baea189a6f445859d00ae224534ddd`.
 - **Política de commits:** `COMMIT_REQUIRED` para cada fase con resultados/evidencia y `phase_verdict` en el mismo commit. F1 quedó en `901d902` tras el rebase; cierre previsto de F2: `perf(favicon): issue 42 F2 CLOSED smoother turn animation`.
 - **Branch destino:** `issue/42-home-coin-turn-favicon`.
 - **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`.
 - **Merge target:** `master` del fork `pronficilio/coup-online`.
 - **Bitácora del issue:** `docs/plans/log/issue-42.jsonl` (append-only; sin helper local).
-- **PR canónica:** [#58](https://github.com/pronficilio/coup-online/pull/58), única PR desde el branch de #42 hacia `master`.
-- **Secuencia de integración:** claim, branch/worktree y F1/F2 están cerrados; el branch se rebasó sobre `origin/master@b8df17f` y PR #58 quedó abierta. El Orquestador mantiene la unidad `WAITING_ORCHESTRATOR` hasta revisar CI y evidencia; no integra ni cierra la issue en este paso.
+- **PR canónica:** [#58](https://github.com/pronficilio/coup-online/pull/58), integrada en `master` con merge commit `f1bbf1f870baea189a6f445859d00ae224534ddd`.
+- **Secuencia de integración:** claim, branch/worktree, F1/F2, revisión del Orquestador y merge están registrados; no hay trabajo técnico pendiente en esta unidad.
 - **Validaciones esperadas:** `cd coup-client && npm run build`; revisión manual de la secuencia, repetición y paradas; medición de las seis salidas; `git diff --check` si se usa como revisión de whitespace. No agregar ni ejecutar tests automatizados.
 - **Contrato de evidencia:** dimensiones/bytes por fotograma y total; paths; estado de build; evidencia/manual o límite exacto; respuesta a falsificación; diff y commit.
 - **Condición para invocar Verifier:** ninguna; `NONE`.
-- **Qué debe revisar el Orquestador:** revisar el diff/evidencia de F2 en PR #58, evaluar CI y observar el resultado manual cuando el propietario pruebe la nueva cadencia. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar la issue.
+- **Cierre del Orquestador:** diff/evidencia F1/F2 revisados, build exitoso, PNG equivalentes y PR #58 integrada. Sin checks CI reportados. El nuevo ritmo no tuvo revisión visual manual; se deja explícito en el plan y bitácora.
 
 **Claim, aislamiento y reanudación:** claim remoto publicado en https://github.com/pronficilio/coup-online/issues/42#issuecomment-5865946026. Branch/worktree canónicos `issue/42-home-coin-turn-favicon` / `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`; rebase y confirmación de aislamiento registrados en la bitácora. Tras el cierre de #40/PR #54, el Orquestador reactivó F1 y se releyeron issue/branch/worktree/diff antes de editar. La integración, build y evidencia quedaron documentados; F1 se cierra en el commit de fase con su `phase_verdict`.
 
-**Reanudación F1/F2:** tras cerrar #40, `TurnFavicon` se integró en `Coup.js`; el propietario validó F1 en una partida de tres y reportó lenta la cadencia de 220 ms. F2 la cambió a 100 ms, precargó A–F y redujo los PNG sin pérdida a 11,890 bytes. La última prueba visual disponible es la de F1; queda pendiente que el propietario observe la nueva cadencia.
+**Cierre F1/F2:** tras cerrar #40, `TurnFavicon` se integró en `Coup.js`; el propietario validó F1 en una partida de tres y reportó lenta la cadencia de 220 ms. F2 la cambió a 100 ms, precargó A–F y redujo los PNG sin pérdida a 11,890 bytes. Por instrucción del propietario se integró PR #58; no se afirma una revisión visual posterior del nuevo ritmo.
 
 ## F2 — Alcance aprobado: fluidez y bytes (2026-09-29)
 
@@ -55,7 +54,7 @@
 - Auditoría Pillow: `compress_level=9`, sin cuantización. A/B/C/E/F tienen píxeles RGBA idénticos a los PNG previos de `901d902` y se reducen a 2,890/2,403/1,665/1,662/2,398 bytes; D queda en 872. Todos son RGBA 32×32; total 11,890 bytes (136 menos). No hay optimizadores externos PNG instalados; la prueba de Pillow encontró y verificó candidatos estrictamente menores.
 - `npm run build` pasó (`Compiled with warnings`, exit 0). Warnings: imports sin uso `logo`/`Link` en `App.js`, precedencia `&&`/`||` en `Coup.js:462`, `dvh` en `ReferencePanel.css:100,106` y `caniuse-lite` desactualizada. JS gzip +438 B, CSS gzip −47 B. No se ejecutaron tests automatizados.
 - F1 fue visto por el propietario en una partida de tres personas y la cadencia anterior se sintió lenta. No hubo browser interactivo disponible para validar visualmente el nuevo ritmo; no se afirma una percepción live de F2 y queda para revisión posterior.
-- F2 queda `CLOSED (PASS)` por revisión estática y build. Unidad `WAITING_ORCHESTRATOR`; el Orquestador revisa el commit y prepara la única PR, sin integración/cierre de issue en esta fase.
+- F2 quedó `CLOSED (PASS)` por revisión estática y build. El Orquestador integró PR #58 tras la solicitud del propietario; la issue está cerrada y la unidad `COMPLETED`. No se volvió a validar visualmente la percepción de fluidez.
 
 ## Checkpoint independiente F1 (2026-09-28)
 

@@ -1,14 +1,14 @@
 # Plan — Favicon de moneda durante el turno propio (#42)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS, validación del propietario con tres participantes)`; F2 `CLOSED (PASS, revisión visual posterior de F2 pendiente)`; issue `OPEN` y asignada a `pronficilio`.
+**Estado:** `COMPLETED`; F1 y F2 `CLOSED (PASS)`; issue `CLOSED` después de la integración solicitada por el propietario. La percepción visual específica del ritmo F2 de 100 ms no se volvió a confirmar manualmente.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/42
-**Handoff:** `docs/plans/active/issue_42_home_coin_turn_favicon.md`
+**Handoff final:** `docs/plans/completed/issue_42_home_coin_turn_favicon.md`
 **Bitácora:** `docs/plans/log/issue-42.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Branch / worktree:** `issue/42-home-coin-turn-favicon` / `.worktrees/issue-42-home-coin-turn-favicon`.
-**Base / destino:** rama rebasada limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7` después de cerrar F2 / `master` de `pronficilio/coup-online`.
-**Integración:** [PR #58](https://github.com/pronficilio/coup-online/pull/58) abierta hacia `master`.
-**Siguiente acción:** el propietario puede confirmar la nueva cadencia en la preview; el Orquestador revisa CI/evidencia y mantiene abierta la unidad hasta integrar.
+**Base / destino:** `master` de `pronficilio/coup-online`.
+**Integración:** [PR #58](https://github.com/pronficilio/coup-online/pull/58) integrada mediante merge commit `f1bbf1f870baea189a6f445859d00ae224534ddd`.
+**Cierre:** issue #42 cerrada automáticamente por GitHub tras el merge. El propietario solicitó la integración sin volver a confirmar visualmente el ritmo F2; esta limitación permanece registrada.
 
 ## Solicitud y definición de éxito
 
@@ -21,7 +21,7 @@ Las seis fuentes locales son `fotos/gif/a-coin.png` hasta `fotos/gif/f-coin.png`
 - Confirmado en `Coup.js`: los props `name` e `isSpectator`, el estado `currentPlayer`, `gamePaused` y `winner` permiten derivar el turno propio sin cambiar el servidor: `currentPlayer === name`, participante activo, partida no pausada ni terminada.
 - Confirmado: el cliente recibe actualizaciones de turno desde el servidor; los controles/reglas no necesitan cambios.
 - La issue #25 y PR #27 están completadas. El icono estático puede restaurarse desde su `href` original.
-- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). Tras F2, #42 se rebasó limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`; PR #58 quedó abierta hacia `master`. GitHub confirma #42 abierta y asignada a `pronficilio`.
+- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). La PR #58 de #42 se integró después de rebasar la rama sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`; merge commit `f1bbf1f870baea189a6f445859d00ae224534ddd`. GitHub cerró issue #42 automáticamente.
 - La issue #24 se cerró al integrar la PR #41 (`2160ada0`); la nota que la muestra abierta en el handoff de #40 está desactualizada.
 - El branch/worktree canónico se creó originalmente desde `f900c0947a0b27ac9c6e0372e3c1871a883be7e6`; se rebasó durante F1 y nuevamente después de F2 sobre `b8df17f`.
 - Supuesto: “tu turno” significa que el nombre local coincide con `currentPlayer`; espectadores, juego pausado y juego terminado no animan.
@@ -97,7 +97,7 @@ El propietario probó la función en una partida de tres personas y confirmó: �
 
 Construir el cliente con `cd coup-client && npm run build`. Verificar manualmente que el tab recorre A–F y repite durante el turno local, y vuelve al favicon original al cambiar a otro jugador, al pausar/terminar y al salir. Revisar que las seis imágenes publicadas no exceden 32×32/50 KB agregados y que el diff no incluye `fotos/`.
 
-**¿Qué demostraría que no cumple?** Que el favicon siga girando después de que `currentPlayer` cambie, durante pausa/final, o tras desmontar `Coup`; que el orden o transparencia no se conserve; que el total exceda el límite; o que se modifiquen reglas del servidor.
+**¿Qué demostraría que no cumple?** Que el favicon siga girando después de que `currentPlayer` cambie, durante pausa/final, o tras desmontar `Coup`; que el orden o transparencia no se conserve; que el total exceda el límite; o que se modifiquen reglas del servidor. El propietario integró la versión F2 antes de aportar una segunda revisión visual de su cadencia; la confirmación dinámica de esa sensación queda sin afirmar.
 
 ## Historial
 
@@ -109,3 +109,4 @@ Construir el cliente con `cd coup-client && npm run build`. Verificar manualment
 - 2026-09-28: por decisión del propietario, unidad `WAITING_ORCHESTRATOR` y F1 `ACTIVE`. Próximo paso: esperar a que F2 de #40 esté cerrada/commiteada y `Coup.js` estable; después releer el estado real antes de integrar.
 - 2026-09-29: #40 cerró por PR #54; el Orquestador rebasó y desbloqueó #42. Issue, branch/worktree y diff fueron releídos; se reanuda integración de F1.
 - 2026-09-29: el propietario validó el favicon en partida de tres personas y reportó el giro lento/tropezado; se prepara F2 para bajar de 220 ms a 100 ms y precargar A–F.
+- 2026-09-29: por solicitud explícita del propietario, PR #58 se integró en `master` con merge commit `f1bbf1f870baea189a6f445859d00ae224534ddd`; GitHub cerró issue #42. La revisión visual del ritmo F2 de 100 ms no se volvió a realizar y queda registrada como límite de evidencia.
