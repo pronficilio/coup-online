@@ -2,6 +2,7 @@
 
 **Resultado:** `WAIVED_BY_OWNER`; no hay veredicto independiente `PASS`.
 **Autorización:** el propietario pidió explícitamente «haz el merge a master y cierre de issue» después de revisar el preview.
+**PR:** [#59](https://github.com/pronficilio/coup-online/pull/59), destino `master`, con `Closes #56`.
 
 ## Estado de los criterios
 

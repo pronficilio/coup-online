@@ -1,6 +1,6 @@
 # Plan — centralizar las decisiones en el panel de acciones (#56)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS: build + aprobación visual del propietario)`; F3 `WAIVED_BY_OWNER` (sin veredicto independiente); issue `OPEN` hasta fusionar la PR.
+**Estado:** `READY_TO_MERGE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS: build + aprobación visual del propietario)`; F3 `WAIVED_BY_OWNER` (sin veredicto independiente); PR #59 abierta; issue `OPEN` hasta fusionar.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/56
 **Handoff:** `docs/plans/inbox/issue_56_centralized_decision_panel.md`
 **Bitácora:** `docs/plans/log/issue-56.jsonl` (append-only).
@@ -91,6 +91,6 @@ F1 confirma el wording contra las traducciones existentes y el manual. Cualquier
 
 Una unidad #56 → `issue/56-centralized-decision-panel` → `.worktrees/issue-56-centralized-decision-panel` → una PR hacia `master` de `pronficilio/coup-online`. La rama se rebasa sobre `origin/master@a421c0e`, que incluye PR #58 además de #55 y #57. No usar `upstream`.
 
-**Siguiente dueño:** Orquestador, abrir y fusionar una PR a `master` que cierre #56. El propietario aprobó el preview y autorizó el merge/cierre sin veredicto independiente F3.
+**Siguiente dueño:** Orquestador, fusionar PR #59 a `master`; `Closes #56` cierra la issue automáticamente. El propietario aprobó el preview y autorizó el merge/cierre sin veredicto independiente F3.
 
 **Falsificación:** ¿puede existir un tipo/estado alcanzable donde falte una opción autorizada, aparezca una no permitida, quede un botón bajo las cartas o el texto prometa un bloqueo/desafío que las reglas no permiten?

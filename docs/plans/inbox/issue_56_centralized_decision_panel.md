@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/56 (`OPEN`, asignada a `pronficilio`).
 - **Plan exacto:** `docs/plans/centralized-decision-panel/plan_centralized_decision_panel.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-56.jsonl`.
-- **Estado:** `WAITING_ORCHESTRATOR` para PR/merge; F1 y F2 `CLOSED (PASS)` según los reportes; F3 `WAIVED_BY_OWNER` sin veredicto independiente.
+- **Estado:** `READY_TO_MERGE`; PR [#59](https://github.com/pronficilio/coup-online/pull/59) abierta hacia `master`; F1/F2 `CLOSED (PASS)`; F3 `WAIVED_BY_OWNER`, sin veredicto independiente.
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente en F3.
 - **Verifier requerido ahora:** dispensado por instrucción explícita del propietario de fusionar y cerrar; no etiquetar el waiver como PASS.
 - **Pregunta de falsificación:** ¿hay estado donde falte/sobre una opción, quede un botón debajo de las cartas o el copy prometa una respuesta que las reglas no permiten?
@@ -11,7 +11,7 @@
 - **Worktree canónico:** `.worktrees/issue-56-centralized-decision-panel`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
 - **PR esperada:** una PR asociada solo a #56.
-- **Fase siguiente:** abrir PR a `master`, fusionar y confirmar cierre automático de #56.
+- **Fase siguiente:** fusionar PR #59 y confirmar que GitHub cerró #56.
 
 ## Reclamo y aislamiento
 
@@ -21,7 +21,7 @@ El worktree canónico se rebasó sobre `origin/master@a421c0e`, que incluye #42/
 
 F1 se cerró con inventario estático. F2 pasó build y el propietario aprobó visualmente el preview `localhost:4056`. F3 registra `WAIVED_BY_OWNER`: el propietario ordenó explícitamente merge y cierre; no hubo recorrido exhaustivo ni veredicto FINAL independiente.
 
-Integra los commits y reportes rebaseados en una PR a `master` con `Closes #56`; tras el merge, verifica que GitHub haya cerrado el issue y archiva este handoff. No afirmar que el Verifier independiente pasó.
+PR #59 incluye los commits y reportes rebaseados, apunta a `master` y lleva `Closes #56`. Tras fusionarla, verifica que GitHub cerró el issue. No afirmar que el Verifier independiente pasó.
 
 ## Criterios y fase posterior
 
