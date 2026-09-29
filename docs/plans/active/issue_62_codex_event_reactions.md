@@ -4,14 +4,14 @@
 - **Plan exacto:** `docs/plans/codex-event-reactions/plan_codex_event_reactions.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-62.jsonl` (append-only).
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente.
-- **Estado actual:** F0 y F1 `CLOSED`; F0 aprobado por el Orquestador; F1 corregida tras devolución P3 y lista para re-revisión; F2 `PENDING`.
+- **Estado actual:** F0 y F1 `CLOSED`; F0 aprobado por el Orquestador; F2 `PASS` en revisión estática AC1–AC8; unidad `WAITING_ORCHESTRATOR` para integración.
 - **Pregunta de falsificación:** ¿una reacción omitida/inválida/obsoleta afecta una elección de juego válida, expone identidad privada o se atribuye a asiento/evento incorrecto?
 - **Dependencias ya integradas:** #14 runner Codex y #40 registro tipado con conteos agregados/presencia. Issue #60 solo anima el panel, no es dependencia funcional; no tocarla.
 - **Alcance:** enlazar oportunidad de reacción a una decisión Codex existente, exponer solo conteos agregados de terceros y aceptar una reacción opcional junto a `choiceId`, aplicándola desde el asiento de servidor.
 - **Supuesto de término:** «contracción» significa respuesta/contraacción a una acción: desafío, bloqueo y decisiones asociadas de esa resolución. F0 documenta el mapa exacto de decisión a evento.
 - **No cambiar:** reglas, opciones legales, ventanas, tiempo de Codex, cantidad de llamadas, UI humana, proveedor/modelo, herramientas, cuentas o acceso. No inventar evento si aún no se emitió uno.
 - **Criterios:** ver AC1–AC8 en el plan. Conteos excluyen el asiento Codex; el parser valida `choiceId` legal independientemente y descarta un candidato de reacción ajeno al evento/catálogo sin perderlo; ID/versión y acción siguen validados por el servidor.
-- **Evidencia:** contrato/matriz F0; reporte F1 de flujo, esquemas, privacidad y rutas del asiento; informe independiente F2 `PASS|FAIL|BLOCKED`.
+- **Evidencia:** contrato/matriz F0; reporte F1 de flujo, esquemas, privacidad y rutas del asiento; F2 `PASS` independiente en `docs/plans/codex-event-reactions/report_issue_62_F2_verifier.md`.
 - **Política de validación:** no agregar ni ejecutar pruebas automatizadas durante esta unidad; revisión estática y Verifier independiente según el plan. No desplegar ni iniciar Codex real.
 - **Política de commit:** `COMMIT_REQUIRED` al cerrar F0 y F1; mantener ambos commits en la branch única. Informe/veredicto F2 se incorpora según revisión y contrato del repositorio.
 - **Branch destino:** `issue/62-codex-event-reactions`.
@@ -29,7 +29,7 @@ F0 pasó por `RETURNED / WAITING_EXECUTOR` a solicitud del Orquestador y se cerr
 
 ## F1/F2 y límites
 
-F1 `CLOSED` tras corrección P3: integra la reacción en la misma llamada/respuesta Codex con semántica declarativa para Codex y conserva los canales ya usados por clientes y espectadores. La revisión F2 preliminar reportó `PASS` para AC1–AC8, pero detectó que `validatePublicEventData()` permitía claves requeridas u opcionales con valor `undefined`; la fase volvió a F1 para corregirlo. Ahora los requeridos deben existir y no ser `undefined`, y los opcionales presentes tampoco pueden valer `undefined`, conservando `exactKeys`. F2 vuelve a `PENDING` para re-revisión independiente. `git diff --check` pasó; no se agregaron ni ejecutaron pruebas automatizadas ni se llamó al runner/modelo. No se escribió al upstream ni se desplegó. La unidad queda `WAITING_ORCHESTRATOR`.
+F1 `CLOSED` tras corrección P3. F2 re-revisó el commit de código `e84abc3` y dio `PASS` estático para AC1–AC8. Confirmó que los required con valor `undefined` y los optional propios con ese valor se rechazan antes de proyectar/serializar, mientras que los optional ausentes siguen válidos. También revisó privacidad (proyección pública y conteos agregados), atribución al asiento Codex del servidor, guardas frente a respuestas concurrentes/obsoletas y que el toggle humano de #40 permanece intacto. No se agregaron ni ejecutaron pruebas ni se llamó al runner/modelo; no se afirma verificación dinámica. La unidad queda `WAITING_ORCHESTRATOR` para integración. Reporte: `docs/plans/codex-event-reactions/report_issue_62_F2_verifier.md`.
 
 ## Addendum de revisión del Orquestador
 
@@ -41,4 +41,4 @@ F1 conserva el mismo request/turno Codex. `reactionOpportunity` contiene solo el
 
 ## Devolución P3 de F2 y corrección
 
-El Orquestador reportó `PASS` para AC1–AC8 junto con este borde P3 y devolvió F1 antes de cerrar F2: el validador de `event.data` aceptaba un required ausente por ser `undefined`, o un optional explícito `undefined`; `JSON.stringify` elimina ambas propiedades. Se corrigió el validador manteniendo `exactKeys`, y F2 queda `PENDING` para re-revisión independiente. El reporte F1 conserva esta observación y evidencia del fix.
+El Orquestador devolvió F1 tras una revisión estática preliminar `PASS` para AC1–AC8 por el borde P3: el validador de `event.data` aceptaba un required con valor `undefined` o un optional propio explícito con ese valor; `JSON.stringify` elimina ambas propiedades. El fix mantuvo `exactKeys`, además exige valor definido en requeridos y rechaza `undefined` en optional presentes. La re-revisión independiente dio `PASS` para AC1–AC8; F2 queda cerrada y la unidad espera decisión de integración del Orquestador.

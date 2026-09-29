@@ -1,7 +1,7 @@
 # Plan — reacciones opcionales de Codex en el registro de eventos
 
 **Issue:** [#62 — Permitir que Codex reaccione opcionalmente en el registro de eventos](https://github.com/pronficilio/coup-online/issues/62)  
-**Estado:** `WAITING_ORCHESTRATOR`; F0 `CLOSED` (aprobado); F1 `CLOSED`; F2 `PENDING`
+**Estado:** `WAITING_ORCHESTRATOR` para integración; F0 `CLOSED` (aprobado); F1 `CLOSED`; F2 `PASS` (revisión estática)
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente  
 **Branch / worktree / integración:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions` / `master`  
 **Handoff:** `docs/plans/active/issue_62_codex_event_reactions.md`  
@@ -147,11 +147,11 @@ Codex no recibe `ownReactions`; la semántica declarativa elimina la ambigüedad
 
 **Pregunta:** ¿Puede Codex acompañar un evento del registro desde la misma respuesta de su turno sin cambiar la acción legal ni la ruta humana?
 
-- **Estado:** `CLOSED`; F1 se reabrió por un hallazgo P3 de F2 y se corrigió el 2026-09-29; lista para re-revisión del Orquestador. F2 está `PENDING`. La branch se resincronizó con `origin/master@9ef5856` antes de la re-revisión, incluyendo #65 y #63.
+- **Estado:** `CLOSED`; F1 se reabrió por un hallazgo P3 de F2 y se corrigió el 2026-09-29. El Verifier cerró F2 con `PASS` estático sobre `e84abc3`; unidad `WAITING_ORCHESTRATOR` para integración. La branch se resincronizó con `origin/master@9ef5856` antes de la revisión, incluyendo #65 y #63.
 - **Entrada:** contrato F0 aprobado; #40 permanece como implementación base de eventos, catálogos, agregados y presencia.
 - **Tareas:** extender observación/esquema del runner con el contexto agregado acotado; extender salida según el schema estricto F0 con `reaction` nullable; validar `choiceId` independientemente y descartar el candidato cosmético fuera de evento/catálogo sin perder la elección; aplicar selección Codex declarativa desde el asiento server-side con la mutación compartida; preservar intacto el toggle humano #40; mantener guardas de versión y documentar cambios/evidencia estática.
 - **Salida:** integración server/runner y `report_issue_62_F1.md` dentro del branch único del issue.
-- **Avance:** revisión estática de criterios 1–7; la reacción no altera `choiceId`, el toggle humano, las reglas ni la UI. La respuesta estricta de App Server conserva `reaction` requerido nullable; si es nula/ausente, el cliente y el runner omiten la propiedad en su objeto de éxito para conservar la forma previa. Tras la devolución P3 de F2, `validatePublicEventData()` exige que los campos requeridos no sean `undefined` y rechaza campos opcionales presentes con ese valor; F2 vuelve a `PENDING` para re-revisión.
+- **Avance:** F1 implementa criterios 1–7; la reacción no altera `choiceId`, el toggle humano, las reglas ni la UI. La respuesta estricta de App Server conserva `reaction` requerido nullable; si es nula/ausente, el cliente y el runner omiten la propiedad en su objeto de éxito para conservar la forma previa. Tras la devolución P3, `validatePublicEventData()` exige que los campos requeridos no sean `undefined` y rechaza campos opcionales presentes con ese valor. El Verifier re-revisó el fix como parte de F2 `PASS` estático.
 - **Pivote:** si la unión al flujo normal acopla la reacción al resultado de la acción o exige una segunda llamada Codex, reducirla a la oportunidad ya presente en la decisión y reportar las limitaciones; no crear turnos/calls paralelos.
 - **Política de commit:** `COMMIT_REQUIRED`; `feat(codex-reactions): issue 62 F1 CLOSED advance_f2`.
 
@@ -159,11 +159,11 @@ Codex no recibe `ownReactions`; la semántica declarativa elimina la ambigüedad
 
 **Pregunta:** ¿Se puede refutar la validación independiente, el límite de privacidad o la independencia de la decisión de juego?
 
-- **Estado:** `PENDING`.
+- **Estado:** `PASS` (solo revisión estática; no hubo pruebas ni ejecución del runner/modelo).
 - **Entrada:** F1 y código candidato en su commit de cierre.
 - **Tareas:** revisión read-only del Verifier sobre AC1–AC8; intentar reacción con ID/evento/emoji no ofrecido, reacción inválida con elección legal, respuesta obsoleta, asiento Codex distinto, dos Codex en ventana común, y conteos con reacciones propias y ajenas; seguir la serialización completa hasta el runner y la difusión pública.
-- **Salida:** informe independiente con veredicto `PASS`, `FAIL` o `BLOCKED`; sin modificaciones por el Verifier.
-- **Avance:** `PASS` de todos los criterios; cualquier fallo devuelve F1 al Ejecutor con el mismo branch y worktree.
+- **Salida:** `report_issue_62_F2_verifier.md`, informe independiente con veredicto `PASS`; sin modificaciones de código por el Verifier.
+- **Avance:** `PASS` para AC1–AC8 en revisión estática; el hallazgo P3 sobre `undefined` quedó corregido antes de esta re-revisión. La unidad espera decisión del Orquestador para integración.
 - **Política:** `COMMIT_AFTER_REVIEW` para incorporar el informe/veredicto al cierre de F2 cuando corresponda.
 
 ## Validación y límites de la sesión
@@ -185,3 +185,4 @@ Esta delegación no autoriza despliegue, publicación de release, activación de
 - 2026-09-29: F2 reportó `PASS` para AC1–AC8 con hallazgo P3: `validatePublicEventData()` aceptaba propiedades requeridas/opcionales con valor `undefined`, que `JSON.stringify` elimina. El Orquestador devolvió F1 para endurecer esa validación; F2 vuelve a `PENDING` para re-revisión.
 - 2026-09-29: F1 reabierta y corregida: la allowlist sigue usando `exactKeys`, además rechaza valores `undefined` en requeridos y opcionales presentes. Revisión estática y `git diff --check` completados, sin tests ni llamada real al runner/modelo. F1 `CLOSED`; unidad `WAITING_ORCHESTRATOR`; F2 `PENDING`.
 - 2026-09-29: el Orquestador solicitó actualizar la base para F2; se integró exclusivamente `origin/master@9ef5856` (incluye #65/#63) en la branch #62 mediante merge `e84abc3`. Se preservaron ambas entradas #62/#63 de README. `origin/master` es ancestro de la branch; F2 permanece `PENDING` para re-revisión.
+- 2026-09-29: el Verifier re-revisó `e84abc3` y dio F2 `PASS` estático para AC1–AC8. Confirmó el fix P3, privacidad agregada, atribución al asiento server-side, guardas/concurrencia y preservación del toggle humano #40; no ejecutó pruebas, runner ni modelo. Unidad `WAITING_ORCHESTRATOR` para integración; evidencia en `report_issue_62_F2_verifier.md`.

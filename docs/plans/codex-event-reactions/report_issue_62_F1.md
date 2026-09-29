@@ -8,7 +8,7 @@
 
 ## Addendum por hallazgo P3 de F2
 
-La revisión estática independiente informó `PASS` para AC1–AC8 y señaló un borde P3 antes de cerrar F2: `exactKeys()` comprobaba la presencia de claves requeridas, pero una propiedad requerida con valor `undefined` pasaba esa verificación y desaparecía al serializar JSON. También podía desaparecer una propiedad opcional explícita con ese valor. F1 se devolvió para corregirlo. `validatePublicEventData()` ahora exige que cada campo requerido tenga valor distinto de `undefined` y rechaza todo campo opcional presente cuyo valor sea `undefined`, sin quitar la comprobación `exactKeys()`. F2 vuelve a `PENDING` para re-revisión independiente.
+La revisión estática preliminar informó `PASS` para AC1–AC8 y señaló un borde P3 antes de cerrar F2: `exactKeys()` comprobaba la presencia de claves requeridas, pero una propiedad requerida con valor `undefined` pasaba esa verificación y desaparecía al serializar JSON. También podía desaparecer una propiedad opcional explícita con ese valor. F1 se devolvió para corregirlo. `validatePublicEventData()` ahora exige que cada campo requerido tenga valor distinto de `undefined` y rechaza todo campo opcional presente cuyo valor sea `undefined`, sin quitar la comprobación `exactKeys()`. El Verifier volvió a revisar el código corregido y emitió F2 `PASS` estático para AC1–AC8; el informe está en `report_issue_62_F2_verifier.md`.
 
 ## Resultado
 
