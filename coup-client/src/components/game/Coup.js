@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import PlayerBoard from './PlayerBoard'
 import './CoupStyles.css'
 import EventLog from './EventLog'
+import TurnFavicon from './TurnFavicon'
 import ReferencePanel from './ReferencePanel'
 import ExchangeDecisionPanel from './ExchangeDecisionPanel'
 import { t } from '../../i18n'
@@ -903,6 +904,16 @@ export default class Coup extends Component {
             !this.props.isSpectator
         )
         const responseAvailable = responseWindowOpen && !this.state.submitted
+        const isMyActiveTurn = Boolean(
+            this.props.name &&
+            !this.props.isSpectator &&
+            this.state.currentPlayer === this.props.name &&
+            !this.state.gamePaused &&
+            !this.state.pauseWaiting &&
+            !this.state.winner &&
+            !this.state.dissolved &&
+            !this.state.disconnected
+        )
         let playAgain = null
         if (this.state.winner && this.state.canPlayAgain && this.props.isLeader) {
             playAgain = <button className="startGameButton" onClick={this.playAgain}>{t('game.playAgain')}</button>
@@ -943,6 +954,7 @@ export default class Coup extends Component {
             : null
 
         return <div className="GameContainer" data-player-count={this.state.players.length}>
+            <TurnFavicon isMyTurn={isMyActiveTurn} />
             <div className="GameHeader">
                 {railDecision && <div
                     ref={this.actionRailAnchorRef}

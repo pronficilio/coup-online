@@ -1,6 +1,6 @@
 # Plan — Favicon de moneda durante el turno propio (#42)
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`; issue `OPEN` y asignada a `pronficilio`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS, limitación de revisión manual documentada)`; issue `OPEN` y asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/42
 **Handoff:** `docs/plans/active/issue_42_home_coin_turn_favicon.md`
 **Bitácora:** `docs/plans/log/issue-42.jsonl` (append-only).
@@ -8,7 +8,7 @@
 **Branch / worktree:** `issue/42-home-coin-turn-favicon` / `.worktrees/issue-42-home-coin-turn-favicon`.
 **Base / destino:** rebase sobre `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a` después de PR #54 / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue; todavía no existe.
-**Siguiente acción:** integrar el helper en `Coup.js`, compilar `coup-client` y documentar evidencia manual de inicio, repetición y paradas; después cerrar F1 en commit y entregar al Orquestador.
+**Siguiente acción:** revisión del Orquestador sobre el commit F1 y sus límites documentados; issue permanece abierta y no hay PR todavía.
 
 ## Solicitud y definición de éxito
 
@@ -40,7 +40,7 @@ Excluye cambios al servidor/reglas/protocolo, la moneda de portada, `favicon.ico
 4. Solo cambia el cliente y se versionan derivados pequeños; no se incluyen fuentes de `fotos/`, no se cambia el protocolo ni se agregan dependencias.
 5. `npm run build` pasa. Se revisan manualmente los estados de inicio, repetición y parada; no agregar ni ejecutar tests automatizados.
 
-## F1 — Animar el favicon durante el turno propio (`READY`)
+## F1 — Animar el favicon durante el turno propio (`CLOSED — PASS con limitación manual documentada`)
 
 **Pregunta única:** ¿el favicon sigue el turno propio con los seis fotogramas optimizados y vuelve al estado estático en cuanto ese turno deja de estar activo?
 
@@ -54,6 +54,15 @@ Excluye cambios al servidor/reglas/protocolo, la moneda de portada, `favicon.ico
 - **Salida/evidencia:** seis derivados con tamaños/bytes, diff revisable, resultado de build, recorrido manual o límite concreto de esa revisión y respuesta a la pregunta de falsificación.
 - **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(favicon): issue 42 animate on own turn`.
 - **Verifier:** ninguno requerido para esta unidad `LIGHT/LOW`.
+
+## Resultado F1 (2026-09-29)
+
+- **Integración:** `Coup.js` monta `TurnFavicon` solo si hay nombre local, la persona no es espectadora, `currentPlayer === name`, y no hay pausa (`gamePaused` o `pauseWaiting`), ganador, disolución ni desconexión. En los estados desconectado/disuelto, `Coup` devuelve otra vista y desmonta el helper.
+- **Ciclo y restauración (revisión estática):** el helper muestra A al comenzar y avanza A→B→C→D→E→F→A cada 220 ms (`frameIndex % 6`). Al cambiar `isMyTurn` o desmontarse, el cleanup limpia el intervalo y restaura el `href` que tenía `link[rel~="icon"]` al entrar al efecto. El HTML conserva el favicon estático `favicon.ico` como valor inicial. No se pudo observar la pestaña en un navegador: este entorno no tiene Chromium, Firefox ni una herramienta de navegador interactivo; por eso no se afirma una comprobación visual en vivo.
+- **Derivados:** `coup-client/public/favicon-turn/frame-{a..f}.png`, todos RGBA 32×32 con alfa 0–255. Bytes A–F: 2,915 / 2,436 / 1,689 / 872 / 1,680 / 2,434; total 12,026 bytes (≤50 KB). Los originales de 1254×1254 permanecen fuera de Git bajo `fotos/`.
+- **Build:** `cd coup-client && npm run build` terminó correctamente (`Compiled with warnings`). Avisos: imports sin uso `logo`/`Link` en `src/App.js`; precedencia `&&`/`||` en `Coup.js:460`; `postcss-calc` no interpreta `dvh` en `ReferencePanel.css:100,106`; base `caniuse-lite` desactualizada. No se ejecutaron tests automatizados.
+- **Falsificación:** la inspección del predicado y cleanup no encontró una ruta que mantenga el timer cuando la prop pasa a `false` o `Coup` desmonta el helper. La comprobación empírica del favicon del navegador queda pendiente por la ausencia de navegador disponible; el Orquestador debe considerar ese límite antes de integrar.
+- **Diff / alcance:** integración de cliente en `Coup.js`, helper y seis derivados pequeños; sin cambios al servidor/protocolo, reglas, touch icons, dependencias de runtime ni fuentes `fotos/`. `git diff --check` pasa.
 
 ## Validación y pregunta de falsificación
 
