@@ -75,17 +75,22 @@ class CodexRunnerClient {
                         || typeof response.error !== 'string') return finish(runnerError('invalid_runner_response'))
                     return finish(runnerError(response.error))
                 }
-                if (Object.keys(response).sort().join(',') !== 'choiceId,decisionId,ok,requestId,rulesVersion,stateVersion'
+                const requiredSuccessKeys = ['choiceId', 'decisionId', 'ok', 'requestId', 'rulesVersion', 'stateVersion']
+                const responseKeys = Object.keys(response)
+                if (requiredSuccessKeys.some(key => !Object.prototype.hasOwnProperty.call(response, key))
+                    || responseKeys.some(key => !requiredSuccessKeys.includes(key) && key !== 'reaction')
                     || response.rulesVersion !== protocol.RULESET_VERSION
                     || typeof response.choiceId !== 'string') return finish(runnerError('invalid_runner_response'))
                 if (!request.observation.options.some(option => option.choiceId === response.choiceId)) {
                     return finish(runnerError('invalid_runner_choice'))
                 }
+                const reaction = protocol.normalizeReactionCandidate(response.reaction, request.observation)
                 finish(null, {
                     decisionId: response.decisionId,
                     stateVersion: response.stateVersion,
                     rulesVersion: response.rulesVersion,
-                    choiceId: response.choiceId
+                    choiceId: response.choiceId,
+                    ...(reaction ? { reaction } : {})
                 })
             })
             socket.once('error', () => finish(runnerError('runner_unavailable')))

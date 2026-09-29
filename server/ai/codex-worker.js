@@ -206,7 +206,7 @@ async function runCodexDecision(request, options = {}) {
     const timeoutMs = options.timeoutMs || codexTimeoutFromEnv(envSource)
     const signal = options.signal
 
-    const choiceId = await new Promise((resolve, reject) => {
+    const selection = await new Promise((resolve, reject) => {
         if (signal && signal.aborted) return reject(abortError(signal.reason && signal.reason.code || 'cancelled'))
         let child
         let settled = false
@@ -364,7 +364,8 @@ async function runCodexDecision(request, options = {}) {
         decisionId: normalized.decisionId,
         stateVersion: normalized.stateVersion,
         rulesVersion: protocol.RULESET_VERSION,
-        choiceId
+        choiceId: selection.choiceId,
+        ...(selection.reaction ? { reaction: selection.reaction } : {})
     }
 }
 
@@ -420,7 +421,8 @@ function createRunnerServer(options = {}) {
                 stateVersion: job.request.stateVersion,
                 rulesVersion: protocol.RULESET_VERSION,
                 ok: true,
-                choiceId: result.choiceId
+                choiceId: result.choiceId,
+                ...(result.reaction ? { reaction: result.reaction } : {})
             }))
         }
     }
