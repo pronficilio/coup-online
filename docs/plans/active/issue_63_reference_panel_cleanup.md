@@ -34,7 +34,7 @@ El Alquimista debe delegar la subtarea ordinaria de código a un Agente Menor se
 - Se eliminaron `CheatSheet.svg`, `CheatSheetModal.js`, sus claves de traducción y los estilos exclusivos del modal. No quedan referencias a `CheatSheet` dentro de `coup-client/src`.
 - `git diff --check` pasó; `translations.json` se parseó como JSON válido. La búsqueda estática confirmó los tres triggers y sus selectores `:hover`/`:focus-visible`, y confirmó que permanecen los destinos de Tarjeta, tabla y Reglas.
 - No se ejecutaron tests, build ni lint. La evidencia es revisión estática; no incluye validación visual en navegador.
-- Desde el aislamiento, `origin/master` avanzó cinco commits; el branch reporta `ahead 1, behind 5`. No se sincronizó en F1; el Orquestador debe actualizar la base y revisar conflictos antes de abrir una PR.
+- Desde el aislamiento, `origin/master` avanzó cinco commits; tras el commit de cierre el branch reporta `ahead 2, behind 5`. No se sincronizó en F1; el Orquestador debe actualizar la base y revisar conflictos antes de abrir una PR.
 
 **Cierre:** `COMMIT_REQUIRED`, `fix(reference-panel): issue 63 F1 CLOSED`.
 
