@@ -1,13 +1,13 @@
 # Plan — Mantener resaltada la respuesta elegida mientras esperan los demás (#45)
 
-**Estado:** F1 `CLOSED`; unidad `WAITING_ORCHESTRATOR`; issue `OPEN`.
+**Estado:** `COMPLETED`; F1 `CLOSED`; issue `CLOSED` tras integración de PR #51.
 **Issue:** https://github.com/pronficilio/coup-online/issues/45
-**Handoff:** `docs/plans/active/issue_45_submitted_response_highlight.md`
+**Cierre:** `docs/plans/completed/issue_45_submitted_response_highlight.md`
 **Bitácora:** `docs/plans/log/issue-45.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Branch / worktree:** `issue/45-persist-submitted-response-highlight` / `.worktrees/issue-45-persist-submitted-response-highlight`.
 **Base / destino:** `origin/master` vigente al reclamar (`f900c09`), sincronizado por merge con `origin/master@db1d22c` (`918e070`) / `master` de `pronficilio/coup-online`.
-**Integración:** PR [#51](https://github.com/pronficilio/coup-online/pull/51) abierta a `master`, referenciada a #45; pendiente de revisión del Orquestador.
+**Integración:** PR [#51](https://github.com/pronficilio/coup-online/pull/51), merge commit `ce0e0797dad13b4b2c4dd4b57f37458f24842a40`.
 
 ## Solicitud y definición de éxito
 
@@ -45,4 +45,4 @@ Fuera de alcance: reglas o protocolo del juego, assets gráficos, rail de accion
 
 Una sola unidad: #45 → `issue/45-persist-submitted-response-highlight` → `.worktrees/issue-45-persist-submitted-response-highlight` → una PR a `master` del fork. Antes de reclamar, verificar el estado remoto de #43/#44 y cualquier trabajo activo sobre el renderer; no editar su branch/worktree ni trabajar en el checkout base.
 
-**Siguiente dueño:** Orquestador, coordinar el walkthrough manual en una partida compartida y mantener #45 separada de cualquier cambio de `Coup.js`. Estado remoto: `OPEN`, asignada a `pronficilio`; unidad `WAITING_ORCHESTRATOR` mientras F1 espera esa evidencia.
+**Cierre:** PR #51 quedó integrada y #45 cerrada. La evidencia dinámica de F1 cubre el walkthrough del propietario con mouse; no se afirma cobertura dinámica de teclado/touch.

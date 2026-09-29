@@ -1,7 +1,8 @@
 # Plan — Coup con 7–9 monedas
 
-- **Issue:** [#49](https://github.com/pronficilio/coup-online/issues/49), `OPEN`.
-- **Estado operativo:** `WAITING_ORCHESTRATOR_REVIEW`; PR #50 abierta a `master`.
+- **Issue:** [#49](https://github.com/pronficilio/coup-online/issues/49), `CLOSED`.
+- **Estado operativo:** `COMPLETED` mediante PR #50; merge commit `db1d22c11fc78dcd91b5f4242b1ae1591f9ba16b`.
+- **Cierre:** `docs/plans/completed/issue_49_coup_seven_coins.md`.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Perfil:** `coup-online`; target `master` del fork `pronficilio/coup-online`; aislamiento `git_worktree`.
 - **Branch / worktree canónicos:** `issue/49-coup-seven-coins` / `.worktrees/issue-49-coup-seven-coins`.
@@ -19,7 +20,7 @@ La rama local `master` estaba seis commits detrás antes de actualizar refs; `or
 
 ## Estado de integración
 
-El propietario confirmó que realizó la verificación y autorizó el merge. El reporte independiente F3 permanece `BLOCKED` por falta de observaciones detalladas por criterio; el Orquestador documentó la excepción autorizada y no presenta ese estado como Verifier PASS. La PR única #50 está abierta a `master`; la integración/cierre quedan en manos del Orquestador.
+El propietario confirmó que realizó la verificación y autorizó el merge. El reporte independiente F3 permanece `BLOCKED` por falta de observaciones detalladas por criterio; el Orquestador documentó la excepción autorizada y no presenta ese estado como Verifier PASS. La PR única #50 se integró a `master` bajo esa excepción explícita.
 
 ## Criterios de aceptación
 

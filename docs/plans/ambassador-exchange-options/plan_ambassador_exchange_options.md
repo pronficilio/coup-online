@@ -1,13 +1,13 @@
 # Plan — opciones visuales para el intercambio del Embajador (#47)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `PASS`, F2 re-verificación focalizada `PASS`; issue `OPEN` asignada a `pronficilio`.
+**Estado:** `COMPLETED`; F1 `PASS`, F2 re-verificación focalizada `PASS`; issue `CLOSED`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/47
-**Handoff:** `docs/plans/active/issue_47_ambassador_exchange_options.md`
+**Cierre:** `docs/plans/completed/issue_47_ambassador_exchange_options.md`
 **Bitácora:** `docs/plans/log/issue-47.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `FINAL` independiente.
 **Branch / worktree:** `issue/47-ambassador-exchange-options` / `.worktrees/issue-47-ambassador-exchange-options`.
 **Base inicial / actual / destino:** `origin/master@f900c094` al reclamar; branch rebasada sobre `origin/master@ce0e079`; merge target `master` de `pronficilio/coup-online`.
-**Integración:** [PR #52](https://github.com/pronficilio/coup-online/pull/52) asociada únicamente a #47, abierta y lista para revisión.
+**Integración:** [PR #52](https://github.com/pronficilio/coup-online/pull/52), merge commit `2ef09de84465889521234951fed934a31dfe1b11`.
 
 ## Solicitud y definición de éxito
 
@@ -65,6 +65,6 @@ No cambiar reglas, cantidad de cartas, distribución privada, timeout, protocolo
 
 Una unidad #47 → `issue/47-ambassador-exchange-options` → `.worktrees/issue-47-ambassador-exchange-options` → una PR a `master` de `pronficilio/coup-online`. Antes de reclamar, leer issue y comprobar branch/worktree/PR candidato; registrar claim en el fork, releer y usar aislamiento desde `origin/master` actualizado. No usar `upstream`.
 
-**Siguiente dueño:** revisión de PR #52. F2 independiente pasó sobre el fix `cc7b568` (rebasado como `e7594b2`); la revisión incluyó la ronda inicial FAIL y su corrección.
+**Cierre:** PR #52 quedó integrada después de F1/F2 `PASS`; la ronda inicial `FAIL` de F2 y su corrección permanecen documentadas en los reportes.
 
 **Falsificación:** ¿hay un pool alcanzable de cartas donde la interfaz ofrece dos opciones con la misma pareja de roles, omite una pareja distinta, muestra una carta diferente a la incluida en el `choiceId`, o envía opciones/datos privados a un asiento no elegible?
