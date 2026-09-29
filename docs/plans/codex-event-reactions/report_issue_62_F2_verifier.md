@@ -24,3 +24,7 @@ La primera revisión estática pasó AC1–AC8, pero devolvió F1 por un borde e
 ## Alcance de la verificación
 
 La revisión fue estática y read-only. El Verifier no cambió archivos y no ejecutó pruebas automatizadas, el runner ni el modelo. Por tanto, este PASS no afirma verificación dinámica ni comportamiento observado en una partida. El worktree estaba limpio y `origin/master` era ancestro de la branch al revisar `e84abc3`.
+
+## Sincronización antes de abrir la PR
+
+Después del `PASS`, la branch integró `origin/master@122d405` mediante merge `8dd8a90` para preparar la PR. Esa sincronización no modificó archivos de #62; el commit F1 revisado y el fix P3 permanecen iguales.
