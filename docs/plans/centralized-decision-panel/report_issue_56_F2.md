@@ -1,7 +1,7 @@
 # Reporte F2 — centralizar decisiones (#56)
 
-**Estado:** implementación terminada; build `PASS`; walkthrough manual `PENDING`.
-**Base:** `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`.
+**Estado:** `CLOSED (PASS)` por build y aprobación visual del propietario.
+**Base:** rebase sobre `origin/master@a421c0e`.
 **Rama/worktree:** `issue/56-centralized-decision-panel` / `.worktrees/issue-56-centralized-decision-panel`.
 
 ## Cambios
@@ -28,9 +28,10 @@ Se eliminaron `ResponseImageButton.js`, sus estilos y los doce WebP de `src/asse
 
 - `npm run build` en `coup-client`: **exit 0**, build de producción generado. CRA reporta advertencias preexistentes de imports sin uso en `src/App.js`, parseo de `dvh` en `ReferencePanel.css` y datos Browserslist desactualizados; no reporta advertencias de los archivos modificados.
 - `git diff --check`: **PASS**.
+- El propietario probó el preview en `localhost:4056` y aprobó visualmente la interfaz («quedó padrísimo»). El backend de la partida se levantó en `8001` porque `8000` ya estaba ocupado por un servicio ajeno.
 - Búsqueda estática: no quedan referencias a `ResponseImageButton`; `.DecisionsSection` conserva solo estados no accionables.
 - No se ejecutaron tests automatizados.
-- Walkthrough visual/funcional desktop, móvil y teclado: **PENDING**. No hay navegador ni herramienta visual disponible en este entorno, por lo que no se afirma que los flujos interactivos estén verificados.
+- No se registró una matriz completa de flujos, teclado y móvil; la aprobación del propietario confirma la presentación visual, no cobertura exhaustiva funcional.
 
 ## Matriz resumida
 
@@ -41,7 +42,8 @@ Se eliminaron `ResponseImageButton.js`, sus estilos y los doce WebP de `src/asse
 | Ningún botón de decisión bajo las dos influencias | `PASS` estático | `.DecisionsSection` solo contiene mensajes de estado |
 | Imágenes complementarias retiradas | `PASS` estático | 12 assets borrados y referencias runtime retiradas |
 | Build de producción | `PASS` | `npm run build`, exit 0 |
-| Recorrido visual/funcional | `PENDING` | Requiere navegador y estados de partida representativos |
-| Verifier FINAL independiente | `PENDING` | F3 aún no inicia |
+| Revisión visual del propietario | `PASS` | Preview del issue #56 aprobado en `localhost:4056` |
+| Cobertura exhaustiva de flujos/teclado/móvil | `NOT_RUN` | No se registró recorrido completo de todos los tipos y estados |
+| Verifier FINAL independiente | `WAIVED_BY_OWNER` | El propietario autorizó explícitamente merge y cierre |
 
-**Decisión de fase:** F2 queda implementada y compilada, sin marcar el walkthrough como cerrado. Completar verificación visual antes de comenzar F3 FINAL.
+**Decisión de fase:** F2 cierra con build exitoso y aprobación visual del propietario. Por instrucción explícita del propietario se integra sin veredicto F3 independiente; la dispensa queda registrada como waiver, nunca como `PASS`.
