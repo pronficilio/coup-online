@@ -1,6 +1,6 @@
 # Plan — centrar y diseñar los mensajes de estado (#67)
 
-**Estado:** `ACTIVE`; F1 `ACTIVE`.
+**Estado:** `COMPLETED` por instrucción explícita del usuario; F1 `CLOSED` con walkthrough visual omitido por esa instrucción.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Issue:** [#67](https://github.com/pronficilio/coup-online/issues/67).
 **Solicitud:** llevar los mensajes existentes al centro de la franja superior, a la altura `top: 15px` del registro de eventos, con ancho medio, separación y diseño visual cuidado. Mantener intacto el registro.
@@ -35,12 +35,22 @@ El tratamiento visual debe ser coherente y legible para espera normal, espera du
 - **Commit de cierre:** `feat(game-ui): issue 67 F1 CLOSED`.
 - **Validaciones:** build cliente, `git diff --check` y revisión visual manual responsive; no agregar ni ejecutar tests automatizados.
 
+### Resultado de ejecución F1 (2026-09-29)
+
+- **Veredicto:** implementación integrada por instrucción explícita del usuario; no se declara `PASS` de revisión visual.
+- Se aplicaron los estilos de `.GameStatusMessage`/`.DecisionsSection` y `margin-top: 50px` al `.PlayerBoardContainer`, preservando su centrado y margen inferior.
+- `npm run build` terminó con código 0 (`Compiled with warnings`): imports sin uso `logo`/`Link` en `App.js`, `dvh` en `ReferencePanel.css` y `caniuse-lite` desactualizado.
+- `git diff --check` terminó con código 0. No se agregaron ni ejecutaron tests.
+- La captura disponible muestra la portada, no una partida. No se recorrieron los tres estados en desktop/móvil; el usuario pidió cerrar el cambio con el margen indicado y autorizó después el merge sin exigir ese walkthrough.
+- La señal anterior de solapamiento en 721–1024 px omitía `translateX(-50%)`; el cálculo corregido deja unos 15.5 px hasta el registro en ese breakpoint. Es una inferencia estática, no una comprobación en navegador.
+- **Autorización de integración:** el usuario pidió explícitamente merge a `master` el 2026-09-29.
+
 ## Topología canónica
 
 - Branch: `issue/67-status-message-layout`.
 - Worktree: `.worktrees/issue-67-status-message-layout`.
 - Merge target: `master` de `pronficilio/coup-online` (`origin`). Una PR para #67.
 - Plan: `docs/plans/status-message-layout/plan_status_message_layout.md`.
-- Handoff: `docs/plans/inbox/issue_67_status_message_layout.md`.
+- Cierre: `docs/plans/completed/issue_67_status_message_layout.md`.
 - Bitácora append-only: `docs/plans/log/issue-67.jsonl`.
 - Reporte de F1: `docs/plans/status-message-layout/report_issue_67_F1.md`.
