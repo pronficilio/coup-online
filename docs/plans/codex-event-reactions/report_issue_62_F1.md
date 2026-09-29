@@ -3,7 +3,12 @@
 - **Estado:** `CLOSED`; listo para revisión del Orquestador. F2 `PENDING` e independiente.
 - **Branch / worktree:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions`
 - **Base sincronizada:** `origin/master@6b1d54f` (merge #64 y cierre documental de #60).
+
 **Alcance:** integración de la reacción opcional a la misma decisión Codex existente, sin pruebas automatizadas, llamada real al modelo, publicación upstream ni despliegue.
+
+## Addendum por hallazgo P3 de F2
+
+La revisión estática independiente informó `PASS` para AC1–AC8 y señaló un borde P3 antes de cerrar F2: `exactKeys()` comprobaba la presencia de claves requeridas, pero una propiedad requerida con valor `undefined` pasaba esa verificación y desaparecía al serializar JSON. También podía desaparecer una propiedad opcional explícita con ese valor. F1 se devolvió para corregirlo. `validatePublicEventData()` ahora exige que cada campo requerido tenga valor distinto de `undefined` y rechaza todo campo opcional presente cuyo valor sea `undefined`, sin quitar la comprobación `exactKeys()`. F2 vuelve a `PENDING` para re-revisión independiente.
 
 ## Resultado
 

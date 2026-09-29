@@ -60,6 +60,8 @@ function validatePublicEventData(type, data, seatCount) {
     if (!Object.prototype.hasOwnProperty.call(EVENT_DATA_SHAPES, type)) return false
     const shape = EVENT_DATA_SHAPES[type]
     if (!shape || !exactKeys(data, shape.required, shape.optional)) return false
+    if (shape.required.some(field => data[field] === undefined)
+        || shape.optional.some(field => Object.prototype.hasOwnProperty.call(data, field) && data[field] === undefined)) return false
     const seatFields = ['actorSeat', 'targetSeat', 'blockerSeat']
     if (!seatFields.every(field => data[field] === undefined || boundedInt(data[field], 0, seatCount - 1))) return false
     if (data.action !== undefined && !ACTIONS.has(data.action)) return false

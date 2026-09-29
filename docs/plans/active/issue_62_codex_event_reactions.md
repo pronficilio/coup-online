@@ -4,7 +4,7 @@
 - **Plan exacto:** `docs/plans/codex-event-reactions/plan_codex_event_reactions.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-62.jsonl` (append-only).
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente.
-- **Estado actual:** F0 y F1 `CLOSED`; F0 aprobado por el Orquestador; F1 lista para revisión del Orquestador; F2 `PENDING`.
+- **Estado actual:** F0 y F1 `CLOSED`; F0 aprobado por el Orquestador; F1 corregida tras devolución P3 y lista para re-revisión; F2 `PENDING`.
 - **Pregunta de falsificación:** ¿una reacción omitida/inválida/obsoleta afecta una elección de juego válida, expone identidad privada o se atribuye a asiento/evento incorrecto?
 - **Dependencias ya integradas:** #14 runner Codex y #40 registro tipado con conteos agregados/presencia. Issue #60 solo anima el panel, no es dependencia funcional; no tocarla.
 - **Alcance:** enlazar oportunidad de reacción a una decisión Codex existente, exponer solo conteos agregados de terceros y aceptar una reacción opcional junto a `choiceId`, aplicándola desde el asiento de servidor.
@@ -29,7 +29,7 @@ F0 pasó por `RETURNED / WAITING_EXECUTOR` a solicitud del Orquestador y se cerr
 
 ## F1/F2 y límites
 
-F1 `CLOSED`: integra la reacción en la misma llamada/respuesta Codex con semántica declarativa para Codex y conserva los canales ya usados por clientes y espectadores. El reporte cubre validación independiente de `choiceId`, reacción null/inválida, evento/emoji no ofrecido, asiento Codex, conteos de terceros y compatibilidad de la forma del resultado sin reacción. `git diff --check` pasó; no se agregaron ni ejecutaron pruebas automatizadas ni se llamó al runner/modelo. No se escribió al upstream ni se desplegó. La unidad queda `WAITING_ORCHESTRATOR`; F2 permanece `PENDING` para revisión independiente.
+F1 `CLOSED` tras corrección P3: integra la reacción en la misma llamada/respuesta Codex con semántica declarativa para Codex y conserva los canales ya usados por clientes y espectadores. La revisión F2 preliminar reportó `PASS` para AC1–AC8, pero detectó que `validatePublicEventData()` permitía claves requeridas u opcionales con valor `undefined`; la fase volvió a F1 para corregirlo. Ahora los requeridos deben existir y no ser `undefined`, y los opcionales presentes tampoco pueden valer `undefined`, conservando `exactKeys`. F2 vuelve a `PENDING` para re-revisión independiente. `git diff --check` pasó; no se agregaron ni ejecutaron pruebas automatizadas ni se llamó al runner/modelo. No se escribió al upstream ni se desplegó. La unidad queda `WAITING_ORCHESTRATOR`.
 
 ## Addendum de revisión del Orquestador
 
@@ -38,3 +38,7 @@ El Orquestador devolvió F0 para fijar idempotencia Codex, el schema estricto nu
 ## F1 — Implementación lista para revisión
 
 F1 conserva el mismo request/turno Codex. `reactionOpportunity` contiene solo el último evento público proyectado por allowlist, su catálogo y conteos agregados de asientos distintos al Codex. El schema App Server requiere `{choiceId, reaction}` con `reaction` nullable y forma exacta `{eventId, emoji}`; el parser valida primero `choiceId` y descarta una reacción inválida sin perder una elección legal. Cuando no hay reacción seleccionada, el objeto de éxito interno y la línea JSONL del runner omiten la clave para mantener la interfaz anterior. Tras aceptar la elección, el servidor vuelve a comprobar evento/catálogo y aplica la selección declarativa desde `player.seat`; la ruta humana `reactToEvent()` permanece sin cambios. Evidencia: `docs/plans/codex-event-reactions/report_issue_62_F1.md`.
+
+## Devolución P3 de F2 y corrección
+
+El Orquestador reportó `PASS` para AC1–AC8 junto con este borde P3 y devolvió F1 antes de cerrar F2: el validador de `event.data` aceptaba un required ausente por ser `undefined`, o un optional explícito `undefined`; `JSON.stringify` elimina ambas propiedades. Se corrigió el validador manteniendo `exactKeys`, y F2 queda `PENDING` para re-revisión independiente. El reporte F1 conserva esta observación y evidencia del fix.
