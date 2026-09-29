@@ -986,6 +986,12 @@ export default class Coup extends Component {
                 />
             </div>
 
+            <div className="DecisionsSection" aria-live="polite">
+                {this.state.pauseWaiting && <p className="GameStatusMessage" role="status">{t('game.pause.generic')}</p>}
+                {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p className="GameStatusMessage">{t('game.waiting')}</p>}
+                {this.state.winner && <p className="GameStatusMessage"><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
+            </div>
+
             {actionDecisionRail}
 
             <PlayerBoard
@@ -999,12 +1005,6 @@ export default class Coup extends Component {
                 reactionPresence={this.state.reactionPresence}
             />
             <ReferencePanel />
-
-            <div className="DecisionsSection" aria-live="polite">
-                {this.state.pauseWaiting && <p className="PauseWaitingStatus" role="status">{t('game.pause.generic')}</p>}
-                {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p>{t('game.waiting')}</p>}
-                {this.state.winner && <p><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
-            </div>
 
             {this.state.gamePaused && <div
                 ref={this.pauseOverlayRef}
