@@ -1518,7 +1518,10 @@
 @media (max-width: 720px) {
     .ActionDecisionRail.ActionDecisionRail--event-log-expanded {
         position: fixed;
-        top: max(150px, calc(40vh + env(safe-area-inset-top, 0px))) !important;
+        top: max(
+            var(--event-log-expanded-top, 0px),
+            max(150px, env(safe-area-inset-top, 0px))
+        ) !important;
         right: 10px;
         left: 10px !important;
         width: auto;

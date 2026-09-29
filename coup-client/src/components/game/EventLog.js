@@ -59,6 +59,7 @@ export default class EventLog extends Component {
             ownReactions: {},
             matchId: null,
             expanded: !isMobileViewport(),
+            animationPhase: null,
             showJumpToLive: false,
             menuEventId: null,
             status: '',
@@ -66,6 +67,7 @@ export default class EventLog extends Component {
         }
         this.scrollRef = createRef()
         this.panelRef = createRef()
+        this.headerRef = createRef()
         this.requestSerial = 0
         this.hasExpandedOnce = !isMobileViewport()
         this.followLatestOnReopen = true
@@ -74,9 +76,12 @@ export default class EventLog extends Component {
         this.longPressTimer = null
         this.longPressOrigin = null
         this.suppressEntryClickEventId = null
+        this.transitionTimer = null
     }
 
     componentDidMount() {
+        this.setBodyInert(!this.state.expanded)
+        if (typeof window !== 'undefined') window.addEventListener('resize', this.handlePanelResize)
         const socket = this.props.socket
         if (typeof this.props.onExpandedChange === 'function') {
             this.props.onExpandedChange(this.state.expanded)
@@ -93,6 +98,8 @@ export default class EventLog extends Component {
 
     componentWillUnmount() {
         this.cancelLongPress()
+        if (typeof window !== 'undefined') window.removeEventListener('resize', this.handlePanelResize)
+        if (this.transitionTimer !== null) clearTimeout(this.transitionTimer)
         const socket = this.props.socket
         if (!socket) return
         const remove = typeof socket.off === 'function' ? socket.off : socket.removeListener
@@ -105,6 +112,14 @@ export default class EventLog extends Component {
             ['g-reactionRejected', this.handleReactionRejected],
             ['connect', this.handleSocketConnect]
         ].forEach(([event, handler]) => remove.call(socket, event, handler))
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const contentChanged = prevState.events !== this.state.events
+        const decisionLimitChanged = prevProps.decisionRailOpen !== this.props.decisionRailOpen
+        if (this.state.animationPhase && (contentChanged || decisionLimitChanged)) {
+            this.handlePanelResize()
+        }
     }
 
     handleSocketConnect = () => {
@@ -218,6 +233,52 @@ export default class EventLog extends Component {
         if (this.state.showJumpToLive === atBottom) {
             this.setState({ showJumpToLive: !atBottom })
         }
+    }
+
+    setBodyInert = inert => {
+        const body = this.scrollRef.current
+        if (!body) return
+        if (inert) body.setAttribute('inert', '')
+        else body.removeAttribute('inert')
+    }
+
+    measurePanelHeight = expanded => {
+        const panel = this.panelRef.current
+        const header = this.headerRef.current
+        const body = this.scrollRef.current
+        if (!panel || !header) return 0
+
+        const headerHeight = header.getBoundingClientRect().height
+        if (!expanded || !body) return headerHeight + 2
+
+        const styles = window.getComputedStyle(panel)
+        const maxHeight = Number.parseFloat(styles.maxHeight)
+        const borderHeight = Number.parseFloat(styles.borderTopWidth)
+            + Number.parseFloat(styles.borderBottomWidth)
+        const naturalHeight = headerHeight + body.scrollHeight + borderHeight
+        return Number.isFinite(maxHeight)
+            ? Math.max(headerHeight + borderHeight, Math.min(naturalHeight, maxHeight))
+            : naturalHeight
+    }
+
+    handlePanelResize = () => {
+        if (!this.state.animationPhase || !this.panelRef.current) return
+        this.panelRef.current.style.height = `${this.measurePanelHeight(this.state.expanded)}px`
+    }
+
+    finishPanelTransition = event => {
+        if (event && (event.target !== this.panelRef.current || event.propertyName !== 'height')) return
+        if (this.transitionTimer !== null) clearTimeout(this.transitionTimer)
+        this.transitionTimer = null
+        if (!this.state.animationPhase) return
+        const wasClosing = this.state.animationPhase === 'close'
+
+        this.setState({ animationPhase: null }, () => {
+            if (this.panelRef.current) this.panelRef.current.style.height = ''
+            if (wasClosing && typeof this.props.onExpandedChange === 'function') {
+                this.props.onExpandedChange(false)
+            }
+        })
     }
 
     jumpToLatest = () => {
@@ -523,26 +584,51 @@ export default class EventLog extends Component {
 
     toggleExpanded = () => {
         const wasExpanded = this.state.expanded
+        const panel = this.panelRef.current
+        const transitionDuration = wasExpanded ? 180 : 220
+        if (panel) {
+            panel.style.height = `${panel.getBoundingClientRect().height}px`
+            panel.getBoundingClientRect()
+        }
+        if (this.transitionTimer !== null) clearTimeout(this.transitionTimer)
+        this.transitionTimer = null
         if (wasExpanded) {
             this.followLatestOnReopen = this.isNearBottom()
             this.savedScrollTop = this.scrollRef.current ? this.scrollRef.current.scrollTop : 0
         }
         const shouldFollowAfterOpening = !wasExpanded
             && (!this.hasExpandedOnce || this.pendingFollowBottom)
-        this.setState(state => ({ expanded: !state.expanded, menuEventId: null }), () => {
-            if (typeof this.props.onExpandedChange === 'function') {
+        this.setState(state => ({
+            expanded: !state.expanded,
+            animationPhase: state.expanded ? 'close' : 'open',
+            menuEventId: null
+        }), () => {
+            this.setBodyInert(!this.state.expanded)
+            if (this.state.expanded && typeof this.props.onExpandedChange === 'function') {
                 this.props.onExpandedChange(this.state.expanded)
             }
-            if (!this.state.expanded) return
-            if (shouldFollowAfterOpening) this.scrollToBottom()
-            else if (this.scrollRef.current) this.scrollRef.current.scrollTop = this.savedScrollTop
-            this.pendingFollowBottom = false
-            this.hasExpandedOnce = true
-            const atBottom = this.isNearBottom()
-            this.followLatestOnReopen = atBottom
-            if (this.scrollRef.current) this.savedScrollTop = this.scrollRef.current.scrollTop
-            if (this.state.showJumpToLive === atBottom) {
-                this.setState({ showJumpToLive: !atBottom })
+            if (panel) panel.style.height = `${this.measurePanelHeight(this.state.expanded)}px`
+
+            const reduceMotion = typeof window !== 'undefined'
+                && typeof window.matchMedia === 'function'
+                && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            if (reduceMotion || !panel) {
+                this.finishPanelTransition()
+            } else {
+                this.transitionTimer = setTimeout(this.finishPanelTransition, transitionDuration + 100)
+            }
+
+            if (this.state.expanded) {
+                if (shouldFollowAfterOpening) this.scrollToBottom()
+                else if (this.scrollRef.current) this.scrollRef.current.scrollTop = this.savedScrollTop
+                this.pendingFollowBottom = false
+                this.hasExpandedOnce = true
+                const atBottom = this.isNearBottom()
+                this.followLatestOnReopen = atBottom
+                if (this.scrollRef.current) this.savedScrollTop = this.scrollRef.current.scrollTop
+                if (this.state.showJumpToLive === atBottom) {
+                    this.setState({ showJumpToLive: !atBottom })
+                }
             }
         })
     }
@@ -651,8 +737,15 @@ export default class EventLog extends Component {
     render() {
         const expanded = this.state.expanded
         const decisionActive = expanded && this.props.decisionRailOpen
-        return <section ref={this.panelRef} className={`EventLogPanel${expanded ? ' EventLogPanel--expanded' : ' EventLogPanel--collapsed'}${decisionActive ? ' EventLogPanel--decision-open' : ''}`}>
-            <header className="EventLogPanelHeader">
+        const animationClass = this.state.animationPhase
+            ? ` EventLogPanel--transitioning-${this.state.animationPhase}`
+            : ''
+        return <section
+            ref={this.panelRef}
+            className={`EventLogPanel${expanded ? ' EventLogPanel--expanded' : ' EventLogPanel--collapsed'}${decisionActive ? ' EventLogPanel--decision-open' : ''}${animationClass}`}
+            onTransitionEnd={this.finishPanelTransition}
+        >
+            <header ref={this.headerRef} className="EventLogPanelHeader">
                 <h2 className="EventLogPanelTitle">{t('game.eventLog.title')}</h2>
                 <span className="EventLogPanelTotal" aria-label={t('game.eventLog.eventCount', { count: this.state.events.length })}>
                     {this.state.events.length}
@@ -666,7 +759,16 @@ export default class EventLog extends Component {
                     onClick={this.toggleExpanded}
                 >{expanded ? '−' : '+'}</button>
             </header>
-            <div className="EventLogPanelBody" id="event-log-content" ref={this.scrollRef} onScroll={this.handleLogScroll} role="log" aria-live="polite" aria-relevant="additions text">
+            <div
+                className="EventLogPanelBody"
+                id="event-log-content"
+                ref={this.scrollRef}
+                onScroll={this.handleLogScroll}
+                role="log"
+                aria-hidden={!expanded}
+                aria-live="polite"
+                aria-relevant="additions text"
+            >
                 {this.state.events.length
                     ? this.renderGroups()
                     : <p className="EventLogEmpty">{t('game.eventLog.empty')}</p>}
