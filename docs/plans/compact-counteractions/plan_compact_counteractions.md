@@ -11,31 +11,32 @@
 
 ## Solicitud y definición de éxito
 
-Agregar `DecisionActionPanel--compact` al panel que muestra las decisiones de respuesta fuera del turno propio. El objetivo es reducir el espacio que ocupa la caja al decidir si desafiar, bloquear o pasar. Las opciones y la lógica de decisiones permanecen iguales; el panel de acciones del turno propio conserva su comportamiento compacto por interacción.
+Agregar `DecisionActionPanel--compact` cuando la decisión sea una contraacción fuera del turno propio: `challenge`, `block` o `block_challenge`. El objetivo es reducir el espacio que ocupa la caja al decidir si desafiar, bloquear o pasar. Las opciones y la lógica de decisiones permanecen iguales; el panel de acciones del turno propio conserva su comportamiento compacto por interacción.
 
-Éxito significa que los paneles de respuesta se presentan compactos y sus opciones siguen visibles, legibles y operables en escritorio y móvil.
+Éxito significa que esas tres ventanas de respuesta se presentan compactas y sus opciones siguen visibles, legibles y operables en escritorio y móvil.
 
 ## Estado confirmado
 
 - La issue #56 centralizó las decisiones en el rail y quedó integrada; este trabajo es un ajuste visual posterior.
 - En `Coup.js`, `renderActionDecision` añade la clase compacta según `actionPanelCompact`.
-- `renderChoiceDecision` monta el panel de opciones para los tipos de respuesta y no añade la clase compacta.
-- Los tipos actuales atendidos por ese renderer incluyen `challenge`, `block`, `block_challenge`, `prove_claim` y `lose_influence`.
+- `RESPONSE_WINDOW_TYPES` identifica `challenge`, `block` y `block_challenge` como ventanas de respuesta fuera del turno propio.
+- `renderChoiceDecision` también monta `prove_claim` y `lose_influence`; esos tipos pueden corresponder a quien inició la acción o al objetivo durante su resolución y quedan fuera del cambio.
 - `CoupStyles.css` ya define el modificador compacto del rail, incluido un ancho de 50%; la revisión visual debe comprobar que las opciones sigan usables en pantallas estrechas.
 - La issue #69 es nueva. No hay branch, worktree ni PR existentes para su topología canónica.
 
 ## Alcance y límites
 
-Incluye añadir el modificador compacto al renderer de respuestas fuera del turno, conservar las opciones recibidas, envío/error, copy, localización y accesibilidad, y revisar su legibilidad/operación en escritorio y móvil. Permite un ajuste CSS pequeño solo si la revisión demuestra que el modificador actual deja controles recortados o inutilizables.
+Incluye añadir el modificador compacto a `challenge`, `block` y `block_challenge` mediante la clasificación existente `RESPONSE_WINDOW_TYPES`, conservar las opciones recibidas, envío/error, copy, localización y accesibilidad, y revisar su legibilidad/operación en escritorio y móvil. Permite un ajuste CSS pequeño solo si la revisión demuestra que el modificador actual deja controles recortados o inutilizables.
 
-No incluye cambiar reglas, tipos u opciones del servidor, copy, traducciones, callbacks, el compactado interactivo del panel de turno propio, `ExchangeDecisionPanel`, ni el rail/tablero. No agregar ni ejecutar pruebas automatizadas.
+No incluye compactar `prove_claim`/`lose_influence`, cambiar reglas, tipos u opciones del servidor, copy, traducciones, callbacks, el compactado interactivo del panel de turno propio, `ExchangeDecisionPanel`, ni el rail/tablero. No agregar ni ejecutar pruebas automatizadas.
 
-## F1 — compactar respuestas fuera del turno (`READY`)
+## F1 — compactar contraacciones (`READY`)
 
-**Pregunta única:** ¿el modificador compacto reduce el tamaño de las decisiones de respuesta y conserva todas sus opciones visibles y operables en escritorio y móvil?
+**Pregunta única:** ¿el modificador compacto reduce el tamaño de `challenge`, `block` y `block_challenge` y conserva todas sus opciones visibles y operables en escritorio y móvil?
 
-- Añadir `DecisionActionPanel--compact` en `renderChoiceDecision` para las decisiones de respuesta actuales, incluidas las decisiones de resolución de reclamos.
+- Añadir `DecisionActionPanel--compact` en `renderChoiceDecision` solo cuando `RESPONSE_WINDOW_TYPES.has(decision.type)` sea verdadero (`challenge`, `block`, `block_challenge`).
 - Conservar intactos el renderer de acciones del turno propio, las decisiones intercambiadas por `ExchangeDecisionPanel`, los controles de envío y los datos de decisión.
+- Confirmar que `prove_claim` y `lose_influence` siguen sin el nuevo modificador.
 - Revisar el comportamiento visual en escritorio y móvil. Si el ancho existente de 50% recorta u oprime opciones, realizar solo el ajuste responsive mínimo para que sigan operables y explicar la evidencia.
 - Ejecutar build del cliente y `git diff --check`; documentar el resultado y los límites de la revisión en `docs/plans/compact-counteractions/report_issue_69_F1.md`.
 

@@ -11,12 +11,12 @@
 
 ## Fase sugerida
 
-**F1 — compactar respuestas fuera del turno.** Agregar `DecisionActionPanel--compact` al panel de `renderChoiceDecision` para que las decisiones de respuesta ocupen menos espacio y sigan siendo legibles y operables.
+**F1 — compactar contraacciones fuera del turno.** Agregar `DecisionActionPanel--compact` al panel de `renderChoiceDecision` solo para `challenge`, `block` y `block_challenge`, tipos incluidos en `RESPONSE_WINDOW_TYPES`.
 
 ## Subtareas listas
 
-1. Confirmar en la base actual que `renderChoiceDecision` presenta `challenge`, `block`, `block_challenge`, `prove_claim` y `lose_influence`; el panel de acción del turno propio usa el estado independiente `actionPanelCompact`.
-2. Aplicar el modificador compacto al panel de respuesta, preservando `data-decision-type`, opciones, envío/error, textos, localización, atributos accesibles y acciones recibidas del servidor.
+1. Confirmar que `RESPONSE_WINDOW_TYPES` enumera `challenge`, `block` y `block_challenge`; el panel de acción del turno propio usa el estado independiente `actionPanelCompact`.
+2. Aplicar el modificador solo a esos tres tipos de respuesta, preservando `prove_claim` y `lose_influence` sin el cambio, además de `data-decision-type`, opciones, envío/error, textos, localización, atributos accesibles y acciones recibidas del servidor.
 3. Revisar visualmente escritorio y móvil. La regla existente hace el panel compacto de 50% del rail; si deja las opciones recortadas o apretadas, limitar el ajuste de CSS a recuperar su usabilidad y explicar por qué.
 4. Ejecutar build del cliente y `git diff --check`; redactar `docs/plans/compact-counteractions/report_issue_69_F1.md` con evidencia y limitaciones. No agregar ni ejecutar tests automatizados.
 
