@@ -2,7 +2,7 @@
 
 **Issue/Ticket:** [#67 — Centrar y diseñar los mensajes de estado sobre el tablero](https://github.com/pronficilio/coup-online/issues/67)
 **Plan:** `docs/plans/status-message-layout/plan_status_message_layout.md`
-**Estado del plan:** `WAITING_EXECUTOR`; F1 `READY`.
+**Estado del plan:** `ACTIVE`; F1 `ACTIVE`.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `LOW`.
 **Política de verificación:** `NONE` (sin Verifier independiente).

@@ -1,6 +1,6 @@
 # Plan — centrar y diseñar los mensajes de estado (#67)
 
-**Estado:** `WAITING_EXECUTOR`; F1 `READY`.
+**Estado:** `ACTIVE`; F1 `ACTIVE`.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Issue:** [#67](https://github.com/pronficilio/coup-online/issues/67).
 **Solicitud:** llevar los mensajes existentes al centro de la franja superior, a la altura `top: 15px` del registro de eventos, con ancho medio, separación y diseño visual cuidado. Mantener intacto el registro.
