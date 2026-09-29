@@ -1,14 +1,14 @@
 # Plan — Favicon de moneda durante el turno propio (#42)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `ACTIVE`; issue `OPEN` y asignada a `pronficilio`.
+**Estado:** `ACTIVE`; F1 `ACTIVE`; issue `OPEN` y asignada a `pronficilio`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/42
 **Handoff:** `docs/plans/active/issue_42_home_coin_turn_favicon.md`
 **Bitácora:** `docs/plans/log/issue-42.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Branch / worktree:** `issue/42-home-coin-turn-favicon` / `.worktrees/issue-42-home-coin-turn-favicon`.
-**Base / destino:** `origin/master@f900c0947a0b27ac9c6e0372e3c1871a883be7e6` al crear el aislamiento / `master` de `pronficilio/coup-online`.
+**Base / destino:** rebase sobre `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a` después de PR #54 / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue; todavía no existe.
-**Siguiente acción:** reactivar la integración solo después de que F2 de #40 esté cerrada y commiteada y `Coup.js` esté estable; releer entonces el estado real de issue, branch, worktree y diff.
+**Siguiente acción:** integrar el helper en `Coup.js`, compilar `coup-client` y documentar evidencia manual de inicio, repetición y paradas; después cerrar F1 en commit y entregar al Orquestador.
 
 ## Solicitud y definición de éxito
 
@@ -21,9 +21,9 @@ Las seis fuentes locales son `fotos/gif/a-coin.png` hasta `fotos/gif/f-coin.png`
 - Confirmado en `Coup.js`: los props `name` e `isSpectator`, el estado `currentPlayer`, `gamePaused` y `winner` permiten derivar el turno propio sin cambiar el servidor: `currentPlayer === name`, participante activo, partida no pausada ni terminada.
 - Confirmado: el cliente recibe actualizaciones de turno desde el servidor; los controles/reglas no necesitan cambios.
 - La issue #25 y PR #27 están completadas. El icono estático puede restaurarse desde su `href` original.
-- La issue #40 sigue abierta con F2 `ACTIVE`; su branch/worktree canónico `issue/40-event-log-reactions` está cuatro commits adelante de `origin/master` y tiene modificaciones sin commit en `Coup.js`, `EventLog.js`, estilos, traducciones y documentos. Por decisión del propietario, #42 queda `WAITING_ORCHESTRATOR`; reactivar solo después del cierre/commit de F2 y confirmar que `Coup.js` está estable. Al reanudar, releer el estado real de issue, branch, worktree y diff antes de integrar; no editar concurrentemente.
+- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). Issue, branch y worktree de #40 se releyeron; su worktree está limpio y `Coup.js` quedó estable en `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a`. El Orquestador rebasó #42 sobre esa base, confirmó el diff y reactivó F1 mediante https://github.com/pronficilio/coup-online/issues/42#issuecomment-5885908403.
 - La issue #24 se cerró al integrar la PR #41 (`2160ada0`); la nota que la muestra abierta en el handoff de #40 está desactualizada.
-- Tras reclamar #42 se actualizó `origin/master` y se creó este branch/worktree canónico desde `f900c0947a0b27ac9c6e0372e3c1871a883be7e6`; no se trabajó en `master` ni en la worktree de otro issue.
+- El branch/worktree canónico se creó originalmente desde `f900c0947a0b27ac9c6e0372e3c1871a883be7e6` y se rebasó el 2026-09-29 sobre `0fa8e7a33319013d0aed8435403a5e8dad35e44a`; al reanudar quedó limpio, tres commits adelante y cero detrás.
 - Supuesto: “tu turno” significa que el nombre local coincide con `currentPlayer`; espectadores, juego pausado y juego terminado no animan.
 
 ## Alcance y exclusiones
@@ -69,3 +69,4 @@ Construir el cliente con `cd coup-client && npm run build`. Verificar manualment
 - 2026-09-28: #42 reclamada; setup copiado al worktree canónico y handoff movido a `active/`. F1 permanece activa mientras se preparan derivados/helper aislado; montaje en `Coup.js` secuenciado por el Orquestador con #40.
 - 2026-09-28: checkpoint independiente F1: `coup-client/public/favicon-turn/frame-a.png` … `frame-f.png` son RGBA 32×32 y pesan 2,915 / 2,436 / 1,689 / 872 / 1,680 / 2,434 bytes (12,026 bytes total). Se generaron con Pillow LANCZOS y PNG optimizado; alfa presente en los seis (`0–255`). `TurnFavicon.js` anima A→F cada 220 ms y restaura el `href` original al cambiar `isMyTurn` o desmontar. `git diff --check` pasó. No se ha conectado el predicado desde `Coup.js`, compilado el cliente ni verificado la animación/parada en navegador; F1 sigue `ACTIVE`, sin `phase_verdict`, a la espera de secuenciar esa edición con #40.
 - 2026-09-28: por decisión del propietario, unidad `WAITING_ORCHESTRATOR` y F1 `ACTIVE`. Próximo paso: esperar a que F2 de #40 esté cerrada/commiteada y `Coup.js` estable; después releer el estado real antes de integrar.
+- 2026-09-29: #40 cerró por PR #54; el Orquestador rebasó y desbloqueó #42. Issue, branch/worktree y diff fueron releídos; se reanuda integración de F1.
