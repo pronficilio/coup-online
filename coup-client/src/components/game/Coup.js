@@ -3,8 +3,6 @@ import { createPortal } from 'react-dom'
 import PlayerBoard from './PlayerBoard'
 import './CoupStyles.css'
 import EventLog from './EventLog'
-import CheatSheetModal from '../CheatSheetModal'
-import RulesModal from '../RulesModal'
 import ReferencePanel from './ReferencePanel'
 import ExchangeDecisionPanel from './ExchangeDecisionPanel'
 import { t } from '../../i18n'
@@ -580,7 +578,7 @@ export default class Coup extends Component {
 
         let anchor = this.actionRailAnchorRef.current
         if (!anchor) {
-            anchor = Array.from(document.querySelectorAll('.CheatSheet')).find(element =>
+            anchor = Array.from(document.querySelectorAll('.ActionDecisionAnchorProbe')).find(element =>
                 !element.closest('.ActionDecisionRail')
             )
         }
@@ -927,7 +925,6 @@ export default class Coup extends Component {
         const actionRailClassName = `ActionDecisionRail${this.state.eventLogExpanded ? ' ActionDecisionRail--event-log-expanded' : ''}`
         const actionDecisionRail = railDecision && typeof document !== 'undefined'
             ? createPortal(<div className={actionRailClassName} style={actionRailStyle} aria-live="polite">
-                <CheatSheetModal />
                 {actionDecision
                     ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
                     : <ExchangeDecisionPanel
@@ -943,15 +940,9 @@ export default class Coup extends Component {
 
         return <div className="GameContainer" data-player-count={this.state.players.length}>
             <div className="GameHeader">
-                <div className="PlayerInfo">
-                    <p>{t('game.player.identity', { playerName: this.props.name })}{this.props.isSpectator ? ` ${t('game.spectator')}` : ''}</p>
-                    {!this.props.isSpectator && <p>{t('game.player.coins', { coins: me ? me.money : 0 })}</p>}
-                </div>
-                <RulesModal />
-                {!railDecision && <CheatSheetModal />}
                 {railDecision && <div
                     ref={this.actionRailAnchorRef}
-                    className="CheatSheet ActionDecisionAnchorProbe"
+                    className="ActionDecisionAnchorProbe"
                     aria-hidden="true"
                 />}
                 <EventLog

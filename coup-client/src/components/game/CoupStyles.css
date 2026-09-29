@@ -1,16 +1,3 @@
-.PlayerInfo {
-    text-align: left;
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    border: 2px solid #707070;
-    border-radius: 5px;
-    line-height: 40%;
-    width: fit-content;
-    padding-left: 10px;
-    padding-right: 20px;
-}
-
 .Rules, .CheatSheet {
   cursor: pointer;
   text-align: left;
@@ -983,15 +970,15 @@
       padding-left: 0px;
       padding-right: 0px;
     }
-    .PlayerInfo {
-      left: 10VW;
-      top: 5VH;
-    }
     .Rules{
       left: 10VW;
       top: 17VH;
     }
     .CheatSheet{
+      left: 10VW;
+      top: 22VH;
+    }
+    .ActionDecisionAnchorProbe {
       left: 10VW;
       top: 22VH;
     }
@@ -1030,13 +1017,6 @@
         align-items: stretch;
     }
 
-    .PlayerInfo {
-        position: relative;
-        top: auto;
-        left: auto;
-        align-self: flex-start;
-        margin: 10px 10px 0;
-    }
 }
 
 .DecisionActionPanel {
@@ -1604,16 +1584,11 @@
 }
 
 .ActionDecisionAnchorProbe {
+    position: absolute;
+    left: 10px;
+    top: 110px;
     visibility: hidden;
     pointer-events: none;
-}
-
-.ActionDecisionRail .CheatSheet {
-    position: static;
-    top: auto;
-    right: auto;
-    left: auto;
-    align-self: flex-start;
 }
 
 .ActionDecisionRail .DecisionActionPanel {
