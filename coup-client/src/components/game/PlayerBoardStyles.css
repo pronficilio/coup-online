@@ -3,7 +3,7 @@
     isolation: isolate;
     width: min(100%, 900px);
     aspect-ratio: 1;
-    margin: 12px auto;
+    margin: 50px auto 12px;
     box-sizing: border-box;
     transform: translateY(min(-40px, calc(108px - 15vh - min(14vw, 126px))));
 }
