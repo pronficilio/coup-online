@@ -1,15 +1,15 @@
 # Plan — Resaltado del turno y de las respuestas pendientes (#43)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS)`; validación visual del propietario `PASS`; issue `OPEN`.
+**Estado:** `COMPLETED`; F1 `CLOSED (PASS)`; validación visual del propietario `PASS`; issue `CLOSED`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/43
-**Handoff:** `docs/plans/active/issue_43_turn_vote_highlights.md`
+**Handoff final:** `docs/plans/completed/issue_43_turn_vote_highlights.md`
 **Bitácora:** `docs/plans/log/issue-43.jsonl` (append-only).
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 **Branch / worktree:** `issue/43-turn-vote-highlights` / `.worktrees/issue-43-turn-vote-highlights`.
 **Base / destino:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a` (incluye PR #54 de #40) / `master` de `pronficilio/coup-online`.
-**Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` hacia `master`, head `issue/43-turn-vote-highlights`.
+**Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), integrada en `master` mediante `4731563a3678bfd23bac5f46c13ad763bd1484d1`.
 
-El propietario revisó el preview y confirmó el comportamiento esperado con mesas de 3 y 4 jugadores. La revisión del Orquestador puede integrar la PR.
+El propietario revisó el preview y confirmó el comportamiento esperado con mesas de 3 y 4 jugadores. El Orquestador revisó e integró la PR; la unidad está completa.
 
 ## Estado operativo al reclamar (histórico)
 
@@ -72,4 +72,4 @@ Recorrer A, B y C: turno de A resalta sus cartas/nombre; al declarar, el nombre 
 
 ## Operación
 
-El claim de #43 y el worktree aislado están confirmados. La rama se rebasó sobre `origin/master@0fa8e7a`, que integra #40. La PR canónica #57 está abierta para revisión del Orquestador. No integrar ni cerrar la issue desde esta unidad. No trabajar en la rama base. El Verifier es independiente del implementador y opera al final. No agregar ni ejecutar tests automatizados salvo que el handoff/proyecto los exija; aquí se pide recorrido manual más las validaciones mínimas apropiadas al cambio.
+El claim de #43 y el worktree aislado están confirmados. La rama se rebasó sobre `origin/master@0fa8e7a`, que integra #40. La PR canónica #57 quedó integrada y la issue se cerró después de la revisión del Orquestador y la aprobación visual del propietario. El Verifier fue independiente del implementador. No se agregaron ni ejecutaron tests automatizados; el build, la verificación de sintaxis, la revisión del diff y el walkthrough visual del propietario completaron la evidencia definida.

@@ -1,7 +1,8 @@
 # Reporte F1 — resaltado de turno y respuestas pendientes (#43)
 
 **Estado:** `CLOSED (PASS)`; Verifier FINAL independiente.
-**Issue:** [#43](https://github.com/pronficilio/coup-online/issues/43) (`OPEN`).
+**Issue:** [#43](https://github.com/pronficilio/coup-online/issues/43) (`CLOSED`).
+**Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), merge commit `4731563a3678bfd23bac5f46c13ad763bd1484d1`.
 **Branch / worktree:** `issue/43-turn-vote-highlights` / `.worktrees/issue-43-turn-vote-highlights`.
 **Base:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a`, que incluye #40 por PR #54.
 **Commit de implementación revisado:** `3406e10fb18ec9d15a85f069c98dd9df4ffc8b4a`.
