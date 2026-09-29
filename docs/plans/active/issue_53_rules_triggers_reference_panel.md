@@ -36,7 +36,7 @@
 - **Branch destino:** `issue/53-rules-triggers-reference-panel`.
 - **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-53-rules-triggers-reference-panel`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **PR esperada:** una PR desde ese branch a `master`; no existe todavía.
+- **PR:** [#55](https://github.com/pronficilio/coup-online/pull/55), abierta desde este branch a `master`.
 - **Secuencia obligatoria:** releer issue #53 y el cierre/merge de #40; confirmar/reclamar la unidad en tracker; crear branch/worktree desde `origin/master` actual; copiar selectivamente este handoff y la bitácora al aislamiento y registrar claim/worktree; mover el handoff `inbox→active`; implementar, validar y cerrar F1 con commit. El checkout raíz contiene modificaciones y documentos ajenos: no copiarlos al worktree; al actualizar `README_plans.md`, transportar solo la fila de #53 y preservar la versión más reciente de master.
 - **Contrato de evidencia:** archivos cambiados, commit de cierre, resultado del build/diff-check y observación de Reglas/Resumen abiertos desde el grupo y desde los contextos que deban conservar acceso.
 - **Condición para invocar Verifier:** ninguna; `NONE`.
@@ -53,4 +53,4 @@ El reclamo inicial ocurrió mientras #40 seguía activa, por lo que no se creó 
 - **Falsificación:** revisión estática de montajes confirma una sola instancia por modal, un disparador de cada tipo en el grupo y ningún disparador interactivo en GameHeader/rail. El resumen continúa disponible desde el grupo durante decisiones. No se hizo walkthrough visual interactivo.
 - **Build:** `cd coup-client && npm run build` — pasó. CRA reportó warnings existentes en `App.js` (imports sin uso), `Coup.js:457` (mezcla `&&`/`||`) y el minificador de `ReferencePanel.css` para `dvh`; no reportó error de compilación ni warnings de ESLint en los archivos modificados.
 - **Diff check:** `git diff --check` — pasó.
-- **Commit de cierre:** `feat(game-ui): issue 53 move rules triggers into reference panel`.
+- **Commit de cierre:** `2b392af90364d3b7e9d2817d74efe29c3212cd7c` (`feat(game-ui): issue 53 move rules triggers into reference panel`).
