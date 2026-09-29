@@ -7,7 +7,7 @@
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 **Branch / worktree:** `issue/43-turn-vote-highlights` / `.worktrees/issue-43-turn-vote-highlights`.
 **Base / destino:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a` (incluye PR #54 de #40) / `master` de `pronficilio/coup-online`.
-**Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` hacia `master`, head `issue/43-turn-vote-highlights` en `7bc10d44285424cae6a889d2501d4fa39e1d6b37`.
+**Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` hacia `master`, head `issue/43-turn-vote-highlights`.
 
 ## Estado operativo al reclamar (histórico)
 

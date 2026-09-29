@@ -7,7 +7,7 @@
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Branch / worktree:** `issue/43-turn-vote-highlights` / `/mnt/e/dev/coup/.worktrees/issue-43-turn-vote-highlights`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR única.
-- **PR canónica:** [#57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` / `CLEAN`, head `7bc10d44285424cae6a889d2501d4fa39e1d6b37`; sin integrar.
+- **PR canónica:** [#57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` hacia `master`, head `issue/43-turn-vote-highlights`; sin integrar.
 - **Pregunta de falsificación:** ¿se apagan las cartas de A o permanece resaltado su nombre después de enviar la acción, queda invisible que C no ha respondido, o sobrevive un indicador pendiente tras responder/cerrar?
 - **Fase cerrada:** F1, separar turno formal del conjunto público de asientos pendientes y mostrar ambas señales en vivo; Verifier FINAL `PASS`.
 - **Coordinación:** #40 cerró mediante PR #54 y ya integra su antigua edición de `Coup.js`; inspeccionar la base rebasada. #44 continúa abierta: su F1 es de solo lectura y F2 deberá secuenciarse después de #43. #45 está cerrada y mantiene alcance separado. Preservar los cambios locales ajenos de la raíz.
