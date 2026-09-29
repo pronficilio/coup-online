@@ -1,6 +1,6 @@
 # Plan — centralizar las decisiones en el panel de acciones (#56)
 
-**Estado:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `IN_PROGRESS`; issue `OPEN`.
+**Estado:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `IMPLEMENTED; BUILD PASS; WALKTHROUGH PENDING`; F3 `PENDING`; issue `OPEN`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/56
 **Handoff:** `docs/plans/inbox/issue_56_centralized_decision_panel.md`
 **Bitácora:** `docs/plans/log/issue-56.jsonl` (append-only).
@@ -17,7 +17,6 @@ Reunir todas las decisiones que el jugador debe tomar en el panel existente de a
 
 ## Estado y hechos confirmados
 
-- #44 (`Reducir el espacio del tablero y auditar opciones de decisión`) queda cerrada como sustituida por #56. Su problema original —el espacio bajo el tablero— desaparece al retirar los controles de debajo de las cartas; no se mantiene como dependencia ni como alcance separado.
 - #45 se integró mediante PR #51 y #47 mediante PR #52. Al reclamar, confirmar que sus commits están en `origin/master` y conservar el estado de respuesta enviada y el selector visual de intercambio ya integrados.
 - #43 se integró mediante PR #57 en la base `b8df17f`; sus cambios de `Coup.js`/`PlayerBoard.js` ya están incluidos.
 - #53 se integró mediante PR #55 en la base `b8df17f`; revisar su implementación al migrar el rail/panel.
@@ -28,7 +27,7 @@ Reunir todas las decisiones que el jugador debe tomar en el panel existente de a
 
 Incluye inventario de tipos de decisión, renderer y recursos complementarios; centralización de opciones en el panel; eliminación de controles bajo las cartas; retiro de los botones con imágenes de estado normal/activo y de sus recursos gráficos solo después de confirmar que ya no tengan referencias; localización de encabezado e instrucciones; accesibilidad y recorrido visual/funcional.
 
-No incluye cambios a reglas, elegibilidad, generación de opciones, `choiceId`, payloads Socket.IO, resolución del servidor, imágenes de personajes, ni rediseño de asientos/tablero. No recrear el issue #44 como diagnóstico de espacio.
+No incluye cambios a reglas, elegibilidad, generación de opciones, `choiceId`, payloads Socket.IO, resolución del servidor, imágenes de personajes, ni rediseño de asientos/tablero.
 
 ## Copy propuesto
 
@@ -54,7 +53,7 @@ F1 confirma el wording contra las traducciones existentes y el manual. Cualquier
 - **Commit:** `COMMIT_REQUIRED`; `docs(decisions): issue 56 F1 inventory and copy`.
 - **Validación:** revisión estática, referencias cruzadas de assets y `git diff --check`; no tests automatizados.
 
-## F2 — centralizar renderers y retirar botones gráficos (`IN_PROGRESS`)
+## F2 — centralizar renderers y retirar botones gráficos (`IMPLEMENTED; BUILD PASS; WALKTHROUGH PENDING`)
 
 **Pregunta única:** ¿pueden todas las opciones elegibles representarse dentro del mismo panel sin duplicados ni cambios al contrato de decisiones?
 
@@ -65,12 +64,12 @@ F1 confirma el wording contra las traducciones existentes y el manual. Cualquier
 - Eliminar solamente assets complementarios que la búsqueda confirme sin referencias posteriores; mantener cualquier arte compartido o de personajes.
 - Añadir/localizar el título y la ayuda contextual aprobada en F1. Seguir derivando acciones de `decision.options` y conservar teclado, foco, deshabilitado, error/reintento, pausa y cierre.
 - **Salida:** implementación y `report_issue_56_F2.md` con matriz de controles antes/después, assets eliminados y evidencia de que no quedan botones debajo de las cartas.
-- **Avanzar:** cada decisión local aparece una sola vez en el panel; ninguna opción ilegal se crea en el cliente; build y `git diff --check` pasan.
+- **Avanzar:** cada decisión local aparece una sola vez en el panel; ninguna opción ilegal se crea en el cliente; build y `git diff --check` pasan; walkthrough manual confirmado.
 - **Pivotar:** si un tipo no cabe en el renderer común sin perder función/accesibilidad, mantenerlo como subpanel dentro del mismo panel, no debajo de las cartas.
 - **Repetir:** un ciclo focalizado por regresión visual o de foco reproducible.
 - **Bloquear:** conflicto de integración no resuelto, control necesario que carece de opción autorizada o pérdida del estado de selección/respuesta.
 - **Commit:** `COMMIT_REQUIRED`; `feat(decisions): issue 56 centralize player choices`.
-- **Validación:** build cliente y recorrido manual de flujos representativos; sin tests automatizados.
+- **Validación:** build cliente y `git diff --check` pasan. El walkthrough manual está pendiente: este entorno no dispone de navegador/automatización visual y no se declara como aprobado. Sin tests automatizados.
 
 ## F3 — recorrido y falsificación independiente (`PENDING`)
 
@@ -92,6 +91,6 @@ F1 confirma el wording contra las traducciones existentes y el manual. Cualquier
 
 Una unidad #56 → `issue/56-centralized-decision-panel` → `.worktrees/issue-56-centralized-decision-panel` → una PR hacia `master` de `pronficilio/coup-online`. La rama parte de `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`, que incluye PR #55 y #57. No usar `upstream`.
 
-**Siguiente dueño:** Alquimista, implementar F2 en el worktree canónico. Verifier independiente requerido en F3.
+**Siguiente dueño:** Orquestador/propietario, ejecutar y documentar el walkthrough visual para cerrar F2; después, Verifier independiente ejecuta F3 FINAL. La compilación de producción está aprobada; no se publicó ni integró una PR.
 
 **Falsificación:** ¿puede existir un tipo/estado alcanzable donde falte una opción autorizada, aparezca una no permitida, quede un botón bajo las cartas o el texto prometa un bloqueo/desafío que las reglas no permiten?

@@ -329,168 +329,6 @@
     }
 }
 
-.DecisionsSection button {
-    min-width: 100px;
-    height: 30px;
-    border-radius: 5px;
-    font-family: 'Muli', sans-serif;
-    background-color: #BCBCBC;
-    border: none;
-    color: white;
-    margin: 20px;
-    margin-bottom: 0px;
-    text-align: left;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
-}
-
-.DecisionsSection button.ResponseImageButton {
-    min-width: 0;
-    min-height: 48px;
-    height: auto;
-    margin: 8px;
-    padding: 4px;
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    border: 0;
-    border-radius: 5px;
-    background: transparent;
-    color: #26343d;
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.ResponseImageButton:focus-visible {
-    outline: 3px solid #efb84c;
-    outline-offset: 2px;
-}
-
-.ResponseImageButton:disabled {
-    cursor: not-allowed;
-}
-
-.ResponseImageButton__art {
-    position: relative;
-    display: block;
-    width: clamp(9rem, 36vw, 13.5rem);
-    max-width: 100%;
-    aspect-ratio: 3 / 1;
-    flex: 0 1 auto;
-}
-
-.ResponseImageButton__art img {
-    position: absolute;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: opacity 160ms ease, transform 160ms ease;
-}
-
-.ResponseImageButton__normal {
-    opacity: 1;
-}
-
-.ResponseImageButton__active {
-    opacity: 0;
-    transform: scale(0.97);
-}
-
-.ResponseImageButton__art--blockAssassination {
-    --response-label-left: 29%;
-    --response-label-right: 7%;
-    --response-label-background: linear-gradient(180deg, #85161d, #8d1118 52%, #761018);
-    --response-label-background-active: linear-gradient(180deg, #ed3023, #d71b1d 52%, #c2181b);
-}
-
-.ResponseImageButton__art--blockForeignAid {
-    --response-label-left: 24%;
-    --response-label-right: 5%;
-    --response-label-background: linear-gradient(180deg, #4b1653, #35103f 52%, #401348);
-    --response-label-background-active: linear-gradient(180deg, #bb19d4, #900bb1 52%, #a310c1);
-}
-
-.ResponseImageButton__art--blockSteal {
-    --response-label-left: 29%;
-    --response-label-right: 6%;
-    --response-label-background: linear-gradient(180deg, #07515a, #06424a 52%, #073942);
-    --response-label-background-active: linear-gradient(180deg, #16b8d0, #07899d 52%, #067b91);
-}
-
-.ResponseImageButton__art--challenge {
-    --response-label-left: 38%;
-    --response-label-right: 20%;
-    --response-label-background: linear-gradient(180deg, #8e1a13, #72110e 52%, #7d1711);
-    --response-label-background-active: linear-gradient(180deg, #ff4334, #ee2119 52%, #f73526);
-}
-
-.ResponseImageButton__art--pass {
-    --response-label-left: 47%;
-    --response-label-right: 25%;
-    --response-label-background: linear-gradient(180deg, #435c2e, #344c24 52%, #3b5229);
-    --response-label-background-active: linear-gradient(180deg, #13b845, #079333 52%, #0ba43b);
-}
-
-.ResponseImageButton__artLabel {
-    position: absolute;
-    z-index: 1;
-    top: 32%;
-    right: var(--response-label-right);
-    bottom: 31%;
-    left: var(--response-label-left);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    padding: 0 2px;
-    border-radius: 2px;
-    background: var(--response-label-background);
-    color: #fff4d7;
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(0.34rem, 1.15vw, 0.62rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.015em;
-    text-align: center;
-    text-shadow: 0 1px 2px #28150e;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.ResponseImageButton:not(:disabled):hover .ResponseImageButton__artLabel,
-.ResponseImageButton:not(:disabled):focus-visible .ResponseImageButton__artLabel,
-.ResponseImageButton:not(:disabled):active .ResponseImageButton__artLabel {
-    background: var(--response-label-background-active);
-}
-
-.ResponseImageButton__art--blockForeignAid .ResponseImageButton__artLabel {
-    font-size: clamp(0.32rem, 0.95vw, 0.54rem);
-}
-
-.ResponseImageButton:not(:disabled):hover .ResponseImageButton__normal,
-.ResponseImageButton:not(:disabled):focus-visible .ResponseImageButton__normal,
-.ResponseImageButton:not(:disabled):active .ResponseImageButton__normal {
-    opacity: 0;
-}
-
-.ResponseImageButton:not(:disabled):hover .ResponseImageButton__active,
-.ResponseImageButton:not(:disabled):focus-visible .ResponseImageButton__active,
-.ResponseImageButton:not(:disabled):active .ResponseImageButton__active {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.ResponseImageButton__supplemental {
-    line-height: 1.2;
-}
-
 #captain {
     background-color: #80C6E5;
 }
@@ -521,11 +359,6 @@
 #ambassador-color {
   color: #B4CA1F;
 }
-.DecisionTitle {
-    text-align: left;
-    margin-left: 22px;
-}
-
 .ActionDecision {
     box-sizing: border-box;
     width: 100%;
@@ -948,13 +781,10 @@
 @media (prefers-reduced-motion: reduce) {
     .ActionButton,
     .TargetButton,
+    .DecisionOption,
     .TurnActionPanel,
     .TurnActionPanel .ActionConfirmButton,
     .TurnActionPanel .ActionCancelButton {
-        transition: none;
-    }
-
-    .ResponseImageButton__art img {
         transition: none;
     }
 
@@ -998,14 +828,6 @@
     .GameHeader {
         height: 15VH;
     }
-    .DecisionTitle {
-        margin-left: 10VW;
-    }
-    .DecisionButtonsContainer  {
-        text-align: center;
-        width: 80%;
-        margin-left: 10%;
-    }
   }
 
 @media only screen and (max-width: 720px) {
@@ -1030,6 +852,92 @@
     box-shadow: 0 7px 20px rgba(51, 35, 19, 0.2);
     color: #211d18;
     text-align: left;
+}
+
+.DecisionPanelSubtitle {
+    margin: 9px 2px 4px;
+    color: #443b30;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.DecisionPanelFollowup {
+    margin: 4px 2px 11px;
+    color: #5a4d40;
+    font-size: 0.88rem;
+    line-height: 1.3;
+}
+
+.DecisionOptions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.DecisionOption {
+    min-width: 100px;
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 1px solid #9b8871;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #352b21;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.DecisionOption:hover:not(:disabled) {
+    border-color: #7e2029;
+    background: #f4e8df;
+}
+
+.DecisionOption:focus-visible {
+    outline: 3px solid #efb84c;
+    outline-offset: 3px;
+}
+
+.DecisionOption:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.DecisionOption--selected,
+.DecisionOption--selected:disabled {
+    border-color: #8c202b;
+    background: #a92a36;
+    color: #fff;
+    opacity: 1;
+}
+
+.DecisionOption--primary {
+    margin-top: 10px;
+}
+
+.GameUtilityControl {
+    position: absolute;
+    z-index: 41;
+    top: 8px;
+    right: 10px;
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid #8d1d27;
+    border-radius: 6px;
+    background: #9e202b;
+    color: #fff;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.GameUtilityControl:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
 }
 
 .ExchangeDecisionPanel .ActionDecisionTitle {
