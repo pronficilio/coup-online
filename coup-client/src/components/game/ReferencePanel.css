@@ -23,6 +23,7 @@
 }
 
 .reference-panel__trigger {
+    position: relative;
     display: inline-flex;
     width: 52px;
     height: 52px;
@@ -32,9 +33,43 @@
     box-shadow: 0 2px 8px rgba(38, 31, 23, 0.2);
 }
 
+.reference-panel__trigger:hover,
+.reference-panel__trigger:focus-visible {
+    z-index: 1;
+}
+
 .reference-panel__trigger:hover {
     background: #fff;
     box-shadow: 0 4px 12px rgba(38, 31, 23, 0.27);
+}
+
+.reference-panel__tooltip {
+    position: absolute;
+    z-index: 2;
+    right: 50%;
+    bottom: calc(100% + 8px);
+    padding: 7px 10px;
+    border: 1px solid rgba(108, 83, 55, 0.16);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 5px 16px rgba(49, 36, 23, 0.13);
+    color: #453a2e;
+    font-size: 0.78rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(50%, 3px);
+    transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+    pointer-events: none;
+}
+
+.reference-panel__trigger:hover .reference-panel__tooltip,
+.reference-panel__trigger:focus-visible .reference-panel__tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(50%, 0);
 }
 
 .reference-panel__icon {
@@ -188,6 +223,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .reference-panel__tooltip {
+        transition: none;
+    }
+
     .reference-panel__overlay,
     .reference-panel__overlay--open,
     .reference-panel__overlay--closing,
