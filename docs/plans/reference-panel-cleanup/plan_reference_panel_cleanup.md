@@ -1,6 +1,6 @@
 # Plan: limpiar y aclarar los accesos de referencia
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
+**Estado:** `COMPLETED`; F1 `CLOSED`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/63
 **Solicitud:** añadir tooltips discretos a los accesos de `reference-panel__triggers`, eliminar el botón de `CheatSheet.svg` y el archivo, y titular «Resumen de reglas» al botón que abre `table-es.webp`.
 **Plan anterior relacionado:** issue #53 está cerrada; esta unidad es un seguimiento independiente.
@@ -18,6 +18,7 @@ El cambio se limita a `ReferencePanel`, los estilos del tooltip, traducciones ne
 - Modo/riesgo/verificación: `LIGHT` / `LOW` / `NONE`.
 - Branch/worktree canónicos: `issue/63-reference-panel-tooltip` / `.worktrees/issue-63-reference-panel-tooltip`.
 - Aislamiento: worktree desde la base canónica `origin/master`; una integración hacia `master`.
+- **Integración:** [PR #65](https://github.com/pronficilio/coup-online/pull/65), merge commit `9ef5856436a65cd3d12008bdb29afe61f2cb3005`.
 
 ## F1 — retirar el resumen SVG y añadir tooltips (`CLOSED`)
 
@@ -41,4 +42,4 @@ El cambio se limita a `ReferencePanel`, los estilos del tooltip, traducciones ne
 
 Pregunta de falsificación: ¿queda algún botón sin tooltip en navegación por teclado, se dispara más de un tooltip, o sobrevive alguna importación/referencia del SVG después de borrar el acceso?
 
-La bitácora append-only es `docs/plans/log/issue-63.jsonl`. El handoff activo es `docs/plans/active/issue_63_reference_panel_cleanup.md`.
+La bitácora append-only es `docs/plans/log/issue-63.jsonl`. El cierre está en `docs/plans/completed/issue_63_reference_panel_cleanup.md`.
