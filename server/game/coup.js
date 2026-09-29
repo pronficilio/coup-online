@@ -1,7 +1,7 @@
 const gameUtils = require('./utils')
 const constants = require('../utilities/constants')
 const crypto = require('node:crypto')
-const { RULESET_VERSION } = require('../ai/codex-protocol')
+const { RULESET_VERSION, projectPublicEvent } = require('../ai/codex-protocol')
 const { actionLabel } = require('../i18n')
 
 const EFFORTS = new Set(['low', 'medium', 'high'])
@@ -693,7 +693,7 @@ class CoupGame {
     }
 
     codexObservation(player, decision) {
-        return {
+        const observation = {
             seat: player.seat,
             decisionType: decision.type,
             publicState: {
@@ -711,6 +711,49 @@ class CoupGame {
             options: Array.from(decision.allowed.get(this.actorKey(player)).values())
                 .map(choice => this.codexOption(choice, decision.type))
         }
+        const event = this.publicLogEvents.at(-1)
+        const projectedEvent = event && event.reactions.length ? projectPublicEvent(event) : null
+        if (event && projectedEvent) {
+            const countsByReaction = Object.fromEntries(event.reactions.map(reaction => [reaction, 0]))
+            const selections = this.reactionsByEvent.get(event.id)
+            if (selections) selections.forEach((reaction, seat) => {
+                if (seat !== player.seat && Object.prototype.hasOwnProperty.call(countsByReaction, reaction)) {
+                    countsByReaction[reaction] += 1
+                }
+            })
+            observation.reactionOpportunity = {
+                eventId: event.id,
+                event: projectedEvent,
+                allowedReactions: event.reactions.slice(),
+                countsByReaction
+            }
+        }
+        return observation
+    }
+
+    applyCodexReaction(player, opportunity, candidate) {
+        if (!player || player.controller !== 'codex' || !opportunity
+            || !candidate || typeof candidate !== 'object' || Array.isArray(candidate)
+            || Object.keys(candidate).length !== 2
+            || !Object.prototype.hasOwnProperty.call(candidate, 'eventId')
+            || !Object.prototype.hasOwnProperty.call(candidate, 'emoji')
+            || candidate.eventId !== opportunity.eventId || typeof candidate.emoji !== 'string'
+            || !opportunity.allowedReactions.includes(candidate.emoji)) return false
+        const event = this.logEventsByID.get(opportunity.eventId)
+        if (!event || !event.reactions.includes(candidate.emoji)) return false
+
+        let selections = this.reactionsByEvent.get(event.id)
+        const current = selections && selections.get(player.seat)
+        if (current === candidate.emoji) return true
+        if (!selections) {
+            selections = new Map()
+            this.reactionsByEvent.set(event.id, selections)
+        }
+        selections.set(player.seat, candidate.emoji)
+        this.reactionPresenceBySeat.set(player.seat, { eventId: event.id, reaction: candidate.emoji })
+        this.publicEmit('g-reactionPresence', { seat: player.seat, reaction: candidate.emoji })
+        this.publicEmit('g-reactionCounts', { eventId: event.id, counts: this.reactionCounts(event.id) })
+        return true
     }
 
     requestCodexDecision(player, decision) {
@@ -722,15 +765,18 @@ class CoupGame {
         const requestKey = `${decision.id}:${player.seat}`
         this.codexRequests.set(requestKey, controller)
         const startedAt = Date.now()
+        const observation = this.codexObservation(player, decision)
+        const reactionOpportunity = observation.reactionOpportunity || null
         Promise.resolve().then(() => this.codexClient.choose({
             decisionId: decision.id,
             stateVersion: decision.stateVersion,
             effort: player.effort,
-            observation: this.codexObservation(player, decision),
+            observation,
             signal: controller.signal
         })).then(result => {
             this.codexRequests.delete(requestKey)
-            if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id) return
+            if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id
+                || this.activeDecision.stateVersion !== decision.stateVersion) return
             if (!result || result.decisionId !== decision.id || result.stateVersion !== decision.stateVersion
                 || result.rulesVersion !== RULESET_VERSION) {
                 return this.pause('Codex returned a stale or invalid decision.')
@@ -741,7 +787,12 @@ class CoupGame {
                 choiceId: result.choiceId
             })
             if (!accepted) this.pause('Codex returned an unavailable choice.')
-            else this.publicEmit('g-codexActivity', { seat: player.seat, effort: player.effort, durationMs: Date.now() - startedAt })
+            else {
+                if (reactionOpportunity && result.reaction) {
+                    this.applyCodexReaction(player, reactionOpportunity, result.reaction)
+                }
+                this.publicEmit('g-codexActivity', { seat: player.seat, effort: player.effort, durationMs: Date.now() - startedAt })
+            }
         }).catch(error => {
             this.codexRequests.delete(requestKey)
             if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id) return

@@ -255,6 +255,9 @@ export default class Coup extends Component {
         }
         this.pauseOverlayRef = createRef()
         this.decisionSectionRef = createRef()
+        this.eventLogRef = createRef()
+        this.eventLogResizeObserver = null
+        this.eventLogRailMotion = null
         this.resumeRequestPending = false
         this.pauseReturnFocus = null
         this.actionSubmissionLock = false
@@ -439,6 +442,12 @@ export default class Coup extends Component {
 
     componentDidMount() {
         if (typeof window !== 'undefined') window.addEventListener('resize', this.handleActionRailResize)
+        const eventLogPanel = this.eventLogRef.current && this.eventLogRef.current.panelRef.current
+        if (eventLogPanel && typeof ResizeObserver !== 'undefined') {
+            this.eventLogResizeObserver = new ResizeObserver(this.updateExpandedEventLogRailTop)
+            this.eventLogResizeObserver.observe(eventLogPanel)
+        }
+        this.updateExpandedEventLogRailTop()
         if ((this.isActionRailDecision(this.state.decision) || this.hasReplayAction()) && !this.state.actionRailPosition) {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
@@ -447,7 +456,42 @@ export default class Coup extends Component {
 
     handleEventLogExpandedChange = expanded => {
         if (this.state.eventLogExpanded === expanded) return
-        this.setState({ eventLogExpanded: expanded })
+        const isMobile = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(max-width: 720px)').matches
+        const rail = isMobile && this.decisionSectionRef.current
+        const previousRailRect = rail ? rail.getBoundingClientRect() : null
+        this.setState({ eventLogExpanded: expanded }, () => {
+            this.animateEventLogRailPosition(previousRailRect)
+        })
+    }
+
+    animateEventLogRailPosition = previousRect => {
+        const rail = this.decisionSectionRef.current
+        if (this.eventLogRailMotion) {
+            this.eventLogRailMotion.cancel()
+            this.eventLogRailMotion = null
+        }
+        if (!rail || !previousRect || typeof rail.animate !== 'function') return
+        const reduceMotion = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (reduceMotion) return
+
+        const nextRect = rail.getBoundingClientRect()
+        const offsetY = previousRect.top - nextRect.top
+        if (Math.abs(offsetY) < 1) return
+        const animation = rail.animate([
+            { transform: `translateY(${offsetY}px)` },
+            { transform: 'translateY(0)' }
+        ], {
+            duration: 140,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        })
+        this.eventLogRailMotion = animation
+        animation.onfinish = () => {
+            if (this.eventLogRailMotion === animation) this.eventLogRailMotion = null
+        }
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -460,10 +504,13 @@ export default class Coup extends Component {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
         }
+        this.updateExpandedEventLogRailTop()
     }
 
     componentWillUnmount() {
         if (typeof window !== 'undefined') window.removeEventListener('resize', this.handleActionRailResize)
+        if (this.eventLogResizeObserver) this.eventLogResizeObserver.disconnect()
+        if (this.eventLogRailMotion) this.eventLogRailMotion.cancel()
         this.clearActionPanelTimers()
         const socket = this.props.socket
         if (typeof socket.off === 'function') socket.off('g-reactionPresence', this.handleReactionPresence)
@@ -550,11 +597,19 @@ export default class Coup extends Component {
         return this.state.actionRailPosition
     }
 
+    updateExpandedEventLogRailTop = () => {
+        const panel = this.eventLogRef.current && this.eventLogRef.current.panelRef.current
+        const rail = this.decisionSectionRef.current
+        if (!panel || !rail) return
+        rail.style.setProperty('--event-log-expanded-top', `${panel.getBoundingClientRect().bottom + 15}px`)
+    }
+
     isActionRailDecision = decision => Boolean(decision)
 
     hasReplayAction = () => Boolean(this.state.winner && this.state.canPlayAgain && this.props.isLeader)
 
     handleActionRailResize = () => {
+        this.updateExpandedEventLogRailTop()
         if (!this.isActionRailDecision(this.state.decision) && !this.hasReplayAction()) return
         this.setState({ actionRailPosition: this.measureActionRailPosition() })
     }
@@ -979,11 +1034,18 @@ export default class Coup extends Component {
                     disabled={this.state.codexDisabled}
                 >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
                 <EventLog
+                    ref={this.eventLogRef}
                     socket={this.props.socket}
                     players={this.state.players}
                     decisionRailOpen={Boolean(railDecision)}
                     onExpandedChange={this.handleEventLogExpandedChange}
                 />
+            </div>
+
+            <div className="DecisionsSection" aria-live="polite">
+                {this.state.pauseWaiting && <p className="GameStatusMessage" role="status">{t('game.pause.generic')}</p>}
+                {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p className="GameStatusMessage">{t('game.waiting')}</p>}
+                {this.state.winner && <p className="GameStatusMessage"><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
             </div>
 
             {actionDecisionRail}
@@ -1000,12 +1062,6 @@ export default class Coup extends Component {
                 reactionPresence={this.state.reactionPresence}
             />
             <ReferencePanel />
-
-            <div className="DecisionsSection" aria-live="polite">
-                {this.state.pauseWaiting && <p className="PauseWaitingStatus" role="status">{t('game.pause.generic')}</p>}
-                {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p>{t('game.waiting')}</p>}
-                {this.state.winner && <p><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
-            </div>
 
             {this.state.gamePaused && <div
                 ref={this.pauseOverlayRef}

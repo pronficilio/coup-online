@@ -2,7 +2,7 @@
 
 - **Issue:** [#61](https://github.com/pronficilio/coup-online/issues/61)
 - **Branch / worktree:** `issue/61-own-card-zoom` / `.worktrees/issue-61-own-card-zoom`
-- **Veredicto F1:** `BLOCKED`
+- **Veredicto F1:** `PASS` — build y aprobación visual del propietario
 - **Fecha:** 2026-09-29
 
 ## Resultado de implementación
@@ -44,12 +44,12 @@ En la siguiente revisión, el propietario notó que la carta ocupaba cerca de la
 - Revisión estática de privacidad, integración de pausa/decisión, rectángulos/tiempos, foco y movimiento reducido: **PASS por inspección de código**, sin afirmar comportamiento dinámico.
 - No se agregaron ni ejecutaron pruebas automatizadas.
 
-## Revisión visual pendiente
+## Aprobación visual del propietario
 
-No fue posible hacer el recorrido visual manual requerido en escritorio y móvil durante la ejecución técnica: esa sesión no tenía navegador instalado o activo, Playwright/Puppeteer ni herramienta de navegador. El preview `http://localhost:4061` ahora queda arriba para que el propietario revise el ajuste de encuadre. Aún no se afirma un nuevo visto bueno visual ni se han validado allí el foco, los gestos de toque o el overlay junto a decisiones/pausa.
+Después de revisar el preview corregido, el propietario respondió «se ve muy bien, queda!» y pidió merge a `master`. Esta confirmación aprueba el resultado visual solicitado: mostrar la carta entera, en vertical y a un tamaño legible. No se recibieron datos de viewport/dispositivo ni un registro separado de teclado, toque, movimiento reducido o coordinación dinámica con decisión/pausa; esos casos no se presentan como walkthrough observado. El código conserva sus cierres, foco y preferencias según la revisión estática, y el build de cliente pasó sobre la base actual.
 
-Casos aún necesarios para desbloquear F1: abrir las dos influencias activas en escritorio y móvil; cerrar con botón, Escape y fondo; navegar y comprobar contención/retorno de foco; activar movimiento reducido; y, durante una partida, provocar una decisión respondible, pausa y pérdida de la influencia de origen. Confirmar que el rail y la pausa aceptan interacción de inmediato.
+La aprobación visual del propietario desbloquea la integración solicitada. La rama se sincronizó con `origin/master@e63c427`; durante la sincronización se resolvió la única divergencia en el índice `README_plans.md` preservando las entradas de ambas ramas.
 
 ## Respuesta a la falsificación
 
-La inspección del código confirma que solo una influencia propia activa expone el control y que se solicita el cierre cuando llega una decisión, pausa o invalidación del origen. No se pudo falsificar visualmente que una secuencia rápida o un viewport estrecho mantengan la carta legible, el foco usable y la decisión disponible en un navegador real. El éxito de F1 queda pendiente de esa revisión.
+La inspección del código confirma que solo una influencia propia activa expone el control y que se solicita el cierre cuando llega una decisión, pausa o invalidación del origen. La revisión del propietario confirmó que la carta completa ya es visible y legible; no se atribuye observación dinámica a las secuencias de foco, teclado/touch o pausa/decisión que no quedaron registradas.
