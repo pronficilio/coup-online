@@ -1,6 +1,6 @@
 # Plan — Resaltado del turno y de las respuestas pendientes (#43)
 
-**Estado:** `ACTIVE`; F1 `READY`; issue `OPEN`.
+**Estado:** `ACTIVE`; F1 `IMPLEMENTED`, pendiente Verifier FINAL; issue `OPEN`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/43
 **Handoff:** `docs/plans/active/issue_43_turn_vote_highlights.md`
 **Bitácora:** `docs/plans/log/issue-43.jsonl` (append-only).
@@ -46,15 +46,15 @@ Incluye la publicación de estado público mínimo para todos los asientos parti
 4. Al terminar o invalidarse la decisión, no quedan nombres pendientes y las cartas siguen el jugador formal actualizado. Se cubren respuestas escalonadas, un solo respondiente y el cierre por una respuesta que resuelve la ventana.
 5. Reglas, elegibilidad, prioridad y resolución de decisiones no cambian. No se exponen identificadores de socket, opciones privadas ni estado distinto al indicador de pendientes necesario.
 
-## F1 — Separar turno formal y respuestas pendientes (`READY`)
+## F1 — Separar turno formal y respuestas pendientes (`IMPLEMENTED; FINAL pending`)
 
 **Pregunta única:** ¿todos los clientes distinguen correctamente el turno formal de cada respuesta todavía pendiente, durante cada transición de una ventana de decisión?
 
 - Inspeccionar el estado post-#40 del servidor/cliente en este worktree antes de editar.
 - Elegir y documentar la proyección pública mínima y sus eventos/instantáneas, incluyendo respuestas aceptadas y cierre de decisión.
 - Implementar el indicador público de asientos pendientes y representarlo de forma independiente de la clase de turno formal y del indicador local de controles disponibles.
-- **Salida/evidencia:** diff, recorrido A/B/C con respuesta escalonada y caso de un único respondiente; validación del cliente/servidor pertinente y resultado de la pregunta de falsificación.
-- **Avanzar:** criterios 1–5 satisfechos sin cambios a reglas ni filtración de estado privado.
+- **Salida/evidencia:** diff, recorrido de flujo A/B/C con respuesta escalonada y caso de un único respondiente; validación de build/sintaxis y resultado de la pregunta de falsificación en `docs/plans/turn-vote-highlights/report_issue_43_F1.md`. El recorrido es estático; no hubo sesión de navegador multipantalla.
+- **Avanzar:** criterios 1–5 satisfechos sin cambios a reglas ni filtración de estado privado, con Verifier FINAL `PASS`.
 - **Pivotar:** mantener el contrato visible intacto y ajustar el transporte/derivación si una instantánea o emisión incremental deja estado obsoleto.
 - **Bloquear:** si la integración de #40 impide una edición segura concurrente, registrar la dependencia y esperar su sincronización; no crear una segunda integración.
 - **Commit:** `COMMIT_REQUIRED`; cierre previsto `feat(turn-vote-highlights): issue 43 F1 CLOSED ready_review`.

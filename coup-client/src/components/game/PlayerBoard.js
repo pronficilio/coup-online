@@ -112,6 +112,9 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
 export default function PlayerBoard(props) {
     const players = Array.isArray(props.players) ? props.players : []
     const seats = getPlayerBoardSeats(players, props.observerName)
+    const pendingDecisionSeats = new Set(Array.isArray(props.pendingDecisionSeats)
+        ? props.pendingDecisionSeats.filter(Number.isInteger)
+        : [])
 
     return (
         <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label={t('game.playerBoard.label')}>
@@ -131,6 +134,7 @@ export default function PlayerBoard(props) {
                 const isCurrentPlayer = player.name === props.currentPlayer
                 const isRespondable = isObserver && props.responseAvailable
                 const serverSeat = players.findIndex(candidate => candidate.name === player.name)
+                const isPendingDecision = pendingDecisionSeats.has(serverSeat)
                 const reactionPresence = serverSeat === -1 ? null : props.reactionPresence?.[serverSeat]
                 const seatEdge = left <= 15
                     ? 'left-far'
@@ -144,7 +148,8 @@ export default function PlayerBoard(props) {
                 const seatClassName = [
                     'PlayerBoardSeat',
                     isObserver ? 'PlayerBoardSeat--observer' : '',
-                    isCurrentPlayer && !props.responseWindowOpen ? 'PlayerBoardSeat--current' : '',
+                    isCurrentPlayer ? 'PlayerBoardSeat--current' : '',
+                    isPendingDecision ? 'PlayerBoardSeat--pending' : '',
                     isRespondable ? 'PlayerBoardSeat--respondable' : ''
                 ].filter(Boolean).join(' ')
 
@@ -164,6 +169,7 @@ export default function PlayerBoard(props) {
                     data-seat-upper-center={top <= 40 && Math.abs(left - 50) < 5 ? 'true' : undefined}
                     data-seat-upper-right={top <= 40 && left >= 60 ? 'true' : undefined}
                     data-current-player={isCurrentPlayer ? 'true' : 'false'}
+                    data-pending-decision={isPendingDecision ? 'true' : 'false'}
                     data-respondable={isRespondable ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
                     style={{
