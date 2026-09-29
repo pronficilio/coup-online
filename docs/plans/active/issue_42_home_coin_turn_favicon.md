@@ -23,12 +23,12 @@
 - **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`.
 - **Merge target:** `master` del fork `pronficilio/coup-online`.
 - **Bitácora del issue:** `docs/plans/log/issue-42.jsonl` (append-only; sin helper local).
-- **PR esperada:** una sola PR desde el branch de #42 hacia `master`, tras la revisión final del Orquestador.
-- **Secuencia de integración:** ya existen claim, branch/worktree y dos fases cerradas. La rama fue rebasada sobre `origin/master@b8df17f`; tras confirmar que no existe otra PR canónica, el Orquestador abrirá una sola PR hacia `master`. No trabajar en la rama base.
+- **PR canónica:** [#58](https://github.com/pronficilio/coup-online/pull/58), única PR desde el branch de #42 hacia `master`.
+- **Secuencia de integración:** claim, branch/worktree y F1/F2 están cerrados; el branch se rebasó sobre `origin/master@b8df17f` y PR #58 quedó abierta. El Orquestador mantiene la unidad `WAITING_ORCHESTRATOR` hasta revisar CI y evidencia; no integra ni cierra la issue en este paso.
 - **Validaciones esperadas:** `cd coup-client && npm run build`; revisión manual de la secuencia, repetición y paradas; medición de las seis salidas; `git diff --check` si se usa como revisión de whitespace. No agregar ni ejecutar tests automatizados.
 - **Contrato de evidencia:** dimensiones/bytes por fotograma y total; paths; estado de build; evidencia/manual o límite exacto; respuesta a falsificación; diff y commit.
 - **Condición para invocar Verifier:** ninguna; `NONE`.
-- **Qué debe revisar el Orquestador:** diff/commit F2, evaluación de compresión, build, ciclo/cleanup y resultado manual disponible; confirmar que no haya una PR concurrente y abrir la única PR hacia master. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar la issue.
+- **Qué debe revisar el Orquestador:** revisar el diff/evidencia de F2 en PR #58, evaluar CI y observar el resultado manual cuando el propietario pruebe la nueva cadencia. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar la issue.
 
 **Claim, aislamiento y reanudación:** claim remoto publicado en https://github.com/pronficilio/coup-online/issues/42#issuecomment-5865946026. Branch/worktree canónicos `issue/42-home-coin-turn-favicon` / `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`; rebase y confirmación de aislamiento registrados en la bitácora. Tras el cierre de #40/PR #54, el Orquestador reactivó F1 y se releyeron issue/branch/worktree/diff antes de editar. La integración, build y evidencia quedaron documentados; F1 se cierra en el commit de fase con su `phase_verdict`.
 

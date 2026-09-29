@@ -7,8 +7,8 @@
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Branch / worktree:** `issue/42-home-coin-turn-favicon` / `.worktrees/issue-42-home-coin-turn-favicon`.
 **Base / destino:** rama rebasada limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7` después de cerrar F2 / `master` de `pronficilio/coup-online`.
-**Integración:** una PR para el issue; GitHub confirma que aún no existe para este branch.
-**Siguiente acción:** el Orquestador revisa el commit/evidencia de F2 y prepara la única PR; el propietario puede confirmar la nueva cadencia visualmente cuando haya preview.
+**Integración:** [PR #58](https://github.com/pronficilio/coup-online/pull/58) abierta hacia `master`.
+**Siguiente acción:** el propietario puede confirmar la nueva cadencia en la preview; el Orquestador revisa CI/evidencia y mantiene abierta la unidad hasta integrar.
 
 ## Solicitud y definición de éxito
 
@@ -21,7 +21,7 @@ Las seis fuentes locales son `fotos/gif/a-coin.png` hasta `fotos/gif/f-coin.png`
 - Confirmado en `Coup.js`: los props `name` e `isSpectator`, el estado `currentPlayer`, `gamePaused` y `winner` permiten derivar el turno propio sin cambiar el servidor: `currentPlayer === name`, participante activo, partida no pausada ni terminada.
 - Confirmado: el cliente recibe actualizaciones de turno desde el servidor; los controles/reglas no necesitan cambios.
 - La issue #25 y PR #27 están completadas. El icono estático puede restaurarse desde su `href` original.
-- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). Tras F2, #42 se rebasó limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`. GitHub confirma #42 abierta y asignada a `pronficilio`; la verificación previa al rebase no encontró una PR para el branch.
+- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). Tras F2, #42 se rebasó limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`; PR #58 quedó abierta hacia `master`. GitHub confirma #42 abierta y asignada a `pronficilio`.
 - La issue #24 se cerró al integrar la PR #41 (`2160ada0`); la nota que la muestra abierta en el handoff de #40 está desactualizada.
 - El branch/worktree canónico se creó originalmente desde `f900c0947a0b27ac9c6e0372e3c1871a883be7e6`; se rebasó durante F1 y nuevamente después de F2 sobre `b8df17f`.
 - Supuesto: “tu turno” significa que el nombre local coincide con `currentPlayer`; espectadores, juego pausado y juego terminado no animan.
