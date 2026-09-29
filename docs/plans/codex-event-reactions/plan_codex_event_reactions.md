@@ -1,10 +1,10 @@
 # Plan — reacciones opcionales de Codex en el registro de eventos
 
-**Issue:** [#62 — Permitir que Codex reaccione opcionalmente en el registro de eventos](https://github.com/pronficilio/coup-online/issues/62)  
-**Estado:** `WAITING_ORCHESTRATOR` para integración; F0 `CLOSED` (aprobado); F1 `CLOSED`; F2 `PASS` (revisión estática)
-**Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente  
-**Branch / worktree / integración:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions` / `master`  
-**Handoff:** `docs/plans/active/issue_62_codex_event_reactions.md`  
+**Issue:** [#62 — Permitir que Codex reaccione opcionalmente en el registro de eventos](https://github.com/pronficilio/coup-online/issues/62)<br>
+**Estado:** `WAITING_ORCHESTRATOR` para integración; F0 `CLOSED` (aprobado); F1 `CLOSED`; F2 `PASS` (revisión estática)<br>
+**Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente<br>
+**Branch / worktree / integración:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions` / `master`<br>
+**Handoff:** `docs/plans/active/issue_62_codex_event_reactions.md`<br>
 **Bitácora:** `docs/plans/log/issue-62.jsonl`
 
 ## Solicitud y objetivo

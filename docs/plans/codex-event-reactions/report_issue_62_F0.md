@@ -1,10 +1,10 @@
 # Reporte F0 — contrato de reacciones de Codex
 
-**Issue:** [#62](https://github.com/pronficilio/coup-online/issues/62)  
-**Fase/veredicto:** `F0 CLOSED` (revisión estática documental; addendum solicitado por el Orquestador completado)
-**Unidad:** `WAITING_ORCHESTRATOR`; F1 no iniciada  
-**Branch/worktree:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions`  
-**Base:** `origin/master@b39f649e42011da07a2d82a27367eddd4e40410c`  
+**Issue:** [#62](https://github.com/pronficilio/coup-online/issues/62)<br>
+**Fase/veredicto:** `F0 CLOSED` (revisión estática documental; addendum solicitado por el Orquestador completado)<br>
+**Unidad:** `WAITING_ORCHESTRATOR`; F1 no iniciada<br>
+**Branch/worktree:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions`<br>
+**Base:** `origin/master@b39f649e42011da07a2d82a27367eddd4e40410c`<br>
 **Alcance:** contrato solamente; sin cambios de código, llamadas al runner/modelo, despliegue ni pruebas automáticas.
 
 ## Resultado
