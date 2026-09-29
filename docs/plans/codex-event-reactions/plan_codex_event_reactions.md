@@ -1,10 +1,10 @@
 # Plan — reacciones opcionales de Codex en el registro de eventos
 
 **Issue:** [#62 — Permitir que Codex reaccione opcionalmente en el registro de eventos](https://github.com/pronficilio/coup-online/issues/62)<br>
-**Estado:** `WAITING_ORCHESTRATOR` para integración; F0 `CLOSED` (aprobado); F1 `CLOSED`; F2 `PASS` (revisión estática)<br>
+**Estado:** `COMPLETED`; issue #62 cerrada al integrar [PR #66](https://github.com/pronficilio/coup-online/pull/66), merge commit `24cbe32152468089fa4747d2c3b73791a6427912`. F0 aprobado; F1 `CLOSED`; F2 `PASS` (revisión estática)<br>
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente<br>
 **Branch / worktree / integración:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions` / `master`<br>
-**Handoff:** `docs/plans/active/issue_62_codex_event_reactions.md`<br>
+**Cierre:** `docs/plans/completed/issue_62_codex_event_reactions.md`<br>
 **Bitácora:** `docs/plans/log/issue-62.jsonl`
 
 ## Solicitud y objetivo
@@ -147,7 +147,7 @@ Codex no recibe `ownReactions`; la semántica declarativa elimina la ambigüedad
 
 **Pregunta:** ¿Puede Codex acompañar un evento del registro desde la misma respuesta de su turno sin cambiar la acción legal ni la ruta humana?
 
-- **Estado:** `CLOSED`; F1 se reabrió por un hallazgo P3 de F2 y se corrigió el 2026-09-29. El Verifier cerró F2 con `PASS` estático sobre `e84abc3`; unidad `WAITING_ORCHESTRATOR` para integración. La branch se resincronizó con `origin/master@9ef5856` antes de la revisión, incluyendo #65 y #63.
+- **Estado:** `CLOSED`; F1 se reabrió por un hallazgo P3 de F2 y se corrigió el 2026-09-29. El Verifier cerró F2 con `PASS` estático sobre `e84abc3`. La branch se resincronizó con `origin/master@9ef5856` antes de la revisión, incluyendo #65 y #63; después se integró mediante PR #66.
 - **Entrada:** contrato F0 aprobado; #40 permanece como implementación base de eventos, catálogos, agregados y presencia.
 - **Tareas:** extender observación/esquema del runner con el contexto agregado acotado; extender salida según el schema estricto F0 con `reaction` nullable; validar `choiceId` independientemente y descartar el candidato cosmético fuera de evento/catálogo sin perder la elección; aplicar selección Codex declarativa desde el asiento server-side con la mutación compartida; preservar intacto el toggle humano #40; mantener guardas de versión y documentar cambios/evidencia estática.
 - **Salida:** integración server/runner y `report_issue_62_F1.md` dentro del branch único del issue.
@@ -163,7 +163,7 @@ Codex no recibe `ownReactions`; la semántica declarativa elimina la ambigüedad
 - **Entrada:** F1 y código candidato en su commit de cierre.
 - **Tareas:** revisión read-only del Verifier sobre AC1–AC8; intentar reacción con ID/evento/emoji no ofrecido, reacción inválida con elección legal, respuesta obsoleta, asiento Codex distinto, dos Codex en ventana común, y conteos con reacciones propias y ajenas; seguir la serialización completa hasta el runner y la difusión pública.
 - **Salida:** `report_issue_62_F2_verifier.md`, informe independiente con veredicto `PASS`; sin modificaciones de código por el Verifier.
-- **Avance:** `PASS` para AC1–AC8 en revisión estática; el hallazgo P3 sobre `undefined` quedó corregido antes de esta re-revisión. La unidad espera decisión del Orquestador para integración.
+- **Avance:** `PASS` para AC1–AC8 en revisión estática; el hallazgo P3 sobre `undefined` quedó corregido antes de esta re-revisión. La integración se completó mediante PR #66 y la issue quedó cerrada.
 - **Política:** `COMMIT_AFTER_REVIEW` para incorporar el informe/veredicto al cierre de F2 cuando corresponda.
 
 ## Validación y límites de la sesión
@@ -187,3 +187,4 @@ Esta delegación no autoriza despliegue, publicación de release, activación de
 - 2026-09-29: F2 `PASS` estático sobre `e84abc3`, incluyendo la re-revisión del fix P3. Antes de abrir la PR, la branch integró `origin/master@122d405` mediante merge `8dd8a90`; no hubo cambios de #62 posteriores al commit revisado. La unidad queda `WAITING_ORCHESTRATOR` para integración.
 - 2026-09-29: el Orquestador solicitó actualizar la base para F2; se integró exclusivamente `origin/master@9ef5856` (incluye #65/#63) en la branch #62 mediante merge `e84abc3`. Se preservaron ambas entradas #62/#63 de README. `origin/master` es ancestro de la branch; F2 permanece `PENDING` para re-revisión.
 - 2026-09-29: el Verifier re-revisó `e84abc3` y dio F2 `PASS` estático para AC1–AC8. Confirmó el fix P3, privacidad agregada, atribución al asiento server-side, guardas/concurrencia y preservación del toggle humano #40; no ejecutó pruebas, runner ni modelo. Unidad `WAITING_ORCHESTRATOR` para integración; evidencia en `report_issue_62_F2_verifier.md`.
+- 2026-09-29: PR #66 se integró en `master` mediante merge commit `24cbe32152468089fa4747d2c3b73791a6427912`; GitHub cerró la issue #62 al integrar. Se completó el cierre documental; no hubo checks de GitHub ni se agregaron/ejecutaron pruebas o runtime.

@@ -3,7 +3,7 @@
 - **Veredicto:** `PASS` para AC1–AC8, revisión estática independiente.
 - **Commit de código revisado:** `e84abc3` (incluye el fix P3 de `5c7edb9` y la sincronización con `origin/master@9ef5856`).
 - **Branch / worktree:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions`.
-- **Estado de la unidad:** `WAITING_ORCHESTRATOR` para decisión de integración.
+- **Estado al emitir el informe:** `WAITING_ORCHESTRATOR` para decisión de integración. La integración posterior se registra al final de este informe.
 
 ## Hallazgo P3 y corrección verificada
 
@@ -28,3 +28,7 @@ La revisión fue estática y read-only. El Verifier no cambió archivos y no eje
 ## Sincronización antes de abrir la PR
 
 Después del `PASS`, la branch integró `origin/master@122d405` mediante merge `8dd8a90` para preparar la PR. Esa sincronización no modificó archivos de #62; el commit F1 revisado y el fix P3 permanecen iguales.
+
+## Integración posterior
+
+La PR [#66](https://github.com/pronficilio/coup-online/pull/66) se integró en `master` el 2026-09-29 mediante merge commit `24cbe32152468089fa4747d2c3b73791a6427912`, y GitHub cerró la issue #62. No se reportaron checks de GitHub; este informe conserva el alcance estático del veredicto y no afirma pruebas ni ejecución de runtime.

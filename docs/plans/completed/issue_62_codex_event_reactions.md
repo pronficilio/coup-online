@@ -1,10 +1,11 @@
-# Handoff para Agente Alquimista — issue #62
+# Cierre de unidad — issue #62
 
-- **Issue:** https://github.com/pronficilio/coup-online/issues/62 (`OPEN`, asignada a `pronficilio`; estado operativo `WAITING_ORCHESTRATOR`).
+- **Issue:** https://github.com/pronficilio/coup-online/issues/62 (`CLOSED`, asignada a `pronficilio`).
+- **PR integrada:** [#66](https://github.com/pronficilio/coup-online/pull/66), merge commit `24cbe32152468089fa4747d2c3b73791a6427912`.
 - **Plan exacto:** `docs/plans/codex-event-reactions/plan_codex_event_reactions.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-62.jsonl` (append-only).
 - **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente.
-- **Estado actual:** F0 y F1 `CLOSED`; F0 aprobado por el Orquestador; F2 `PASS` en revisión estática AC1–AC8; unidad `WAITING_ORCHESTRATOR` para integración.
+- **Estado final:** `COMPLETED`; F0 aprobado, F1 `CLOSED`, F2 `PASS` estático para AC1–AC8; issue cerrada al integrar la PR.
 - **Pregunta de falsificación:** ¿una reacción omitida/inválida/obsoleta afecta una elección de juego válida, expone identidad privada o se atribuye a asiento/evento incorrecto?
 - **Dependencias ya integradas:** #14 runner Codex y #40 registro tipado con conteos agregados/presencia. Issue #60 solo anima el panel, no es dependencia funcional; no tocarla.
 - **Alcance:** enlazar oportunidad de reacción a una decisión Codex existente, exponer solo conteos agregados de terceros y aceptar una reacción opcional junto a `choiceId`, aplicándola desde el asiento de servidor.
@@ -17,11 +18,11 @@
 - **Branch destino:** `issue/62-codex-event-reactions`.
 - **Worktree destino:** `.worktrees/issue-62-codex-event-reactions`.
 - **Merge target:** `master` de `pronficilio/coup-online`.
-- **Única integración esperada:** una PR para #62; antes de abrirla confirma que no exista otra PR canónica.
+- **Integración:** completada mediante PR #66.
 
 ## Reclamo y aislamiento
 
-Reclamo completado: #62 se asignó a `pronficilio` y se releyó en el fork; sigue abierta y coincide con este handoff. La branch `issue/62-codex-event-reactions` y el worktree `.worktrees/issue-62-codex-event-reactions` partieron de `origin/master@b39f649`; luego se sincronizaron con `origin/master@6b1d54f`, `@9ef5856` y finalmente `@122d405` mediante merges en la branch #62, preservando las entradas #62 y #63 del README. F0 está aprobado, F1 corregida y cerrada, y F2 obtuvo `PASS` estático sobre `e84abc3` (informe en `report_issue_62_F2_verifier.md`). No trabajar en `master`, upstream ni en el worktree de otra unidad.
+Reclamo completado: al iniciar el trabajo, #62 se asignó a `pronficilio` y se releyó en el fork, donde entonces seguía abierta. La branch `issue/62-codex-event-reactions` y el worktree `.worktrees/issue-62-codex-event-reactions` partieron de `origin/master@b39f649`; luego se sincronizaron con `origin/master@6b1d54f`, `@9ef5856` y finalmente `@122d405` mediante merges en la branch #62, preservando las entradas #62 y #63 del README. F0 está aprobado, F1 corregida y cerrada, y F2 obtuvo `PASS` estático sobre `e84abc3` (informe en `report_issue_62_F2_verifier.md`). La indicación de aislamiento aplicó durante la implementación; la integración posterior se hizo mediante la PR autorizada.
 
 ## F0 — Contrato antes de producto
 
@@ -29,7 +30,7 @@ F0 pasó por `RETURNED / WAITING_EXECUTOR` a solicitud del Orquestador y se cerr
 
 ## F1/F2 y límites
 
-F1 `CLOSED` tras corrección P3. F2 re-revisó el commit de código `e84abc3` y dio `PASS` estático para AC1–AC8. Confirmó que los required con valor `undefined` y los optional propios con ese valor se rechazan antes de proyectar/serializar, mientras que los optional ausentes siguen válidos. También revisó privacidad (proyección pública y conteos agregados), atribución al asiento Codex del servidor, guardas frente a respuestas concurrentes/obsoletas y que el toggle humano de #40 permanece intacto. No se agregaron ni ejecutaron pruebas ni se llamó al runner/modelo; no se afirma verificación dinámica. La unidad queda `WAITING_ORCHESTRATOR` para integración. Reporte: `docs/plans/codex-event-reactions/report_issue_62_F2_verifier.md`.
+F1 `CLOSED` tras corrección P3. F2 re-revisó el commit de código `e84abc3` y dio `PASS` estático para AC1–AC8. Confirmó que los required con valor `undefined` y los optional propios con ese valor se rechazan antes de proyectar/serializar, mientras que los optional ausentes siguen válidos. También revisó privacidad (proyección pública y conteos agregados), atribución al asiento Codex del servidor, guardas frente a respuestas concurrentes/obsoletas y que el toggle humano de #40 permanece intacto. No se agregaron ni ejecutaron pruebas ni se llamó al runner/modelo; no se afirma verificación dinámica. Reporte: `docs/plans/codex-event-reactions/report_issue_62_F2_verifier.md`.
 
 ## Addendum de revisión del Orquestador
 
@@ -41,4 +42,8 @@ F1 conserva el mismo request/turno Codex. `reactionOpportunity` contiene solo el
 
 ## Devolución P3 de F2 y corrección
 
-El Orquestador devolvió F1 tras una revisión estática preliminar `PASS` para AC1–AC8 por el borde P3: el validador de `event.data` aceptaba un required con valor `undefined` o un optional propio explícito con ese valor; `JSON.stringify` elimina ambas propiedades. El fix mantuvo `exactKeys`, además exige valor definido en requeridos y rechaza `undefined` en optional presentes. La re-revisión independiente dio `PASS` para AC1–AC8; F2 queda cerrada y la unidad espera decisión de integración del Orquestador.
+El Orquestador devolvió F1 tras una revisión estática preliminar `PASS` para AC1–AC8 por el borde P3: el validador de `event.data` aceptaba un required con valor `undefined` o un optional propio explícito con ese valor; `JSON.stringify` elimina ambas propiedades. El fix mantuvo `exactKeys`, además exige valor definido en requeridos y rechaza `undefined` en optional presentes. La re-revisión independiente dio `PASS` para AC1–AC8; F2 quedó cerrada antes de la integración.
+
+## Integración y cierre
+
+El 2026-09-29, el Orquestador integró la PR [#66](https://github.com/pronficilio/coup-online/pull/66) en `master` con merge commit `24cbe32152468089fa4747d2c3b73791a6427912`. GitHub cerró la issue #62 al completar la integración. El PR no reportó checks de GitHub; la verificación de la unidad quedó en revisión estática F2 `PASS`. No se agregaron ni ejecutaron pruebas automatizadas, runtime, runner ni modelo.
