@@ -28,6 +28,12 @@ const REACTION_PRESENCE_REACTIONS = new Set([
     'like', 'bravo', 'laugh', 'skeptical', 'surprise', 'thinking', 'dislike', 'secret'
 ])
 
+function eventLogExpandedByDefault() {
+    return !(typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 720px)').matches)
+}
+
 function responseButtonFor(decision, option, localizedLabel) {
     if (!decision || !RESPONSE_WINDOW_TYPES.has(decision.type)) return null
 
@@ -300,6 +306,7 @@ export default class Coup extends Component {
             actionPanelHasEntered: false,
             actionPanelShowDetails: true,
             actionPanelDetailsExpanded: true,
+            eventLogExpanded: eventLogExpandedByDefault(),
             reactionPresence: {}
         }
         this.pauseOverlayRef = createRef()
@@ -479,6 +486,11 @@ export default class Coup extends Component {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
         }
+    }
+
+    handleEventLogExpandedChange = expanded => {
+        if (this.state.eventLogExpanded === expanded) return
+        this.setState({ eventLogExpanded: expanded })
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -912,8 +924,9 @@ export default class Coup extends Component {
         const actionRailStyle = railPosition
             ? { left: `${railPosition.left}px`, top: `${railPosition.top}px` }
             : undefined
+        const actionRailClassName = `ActionDecisionRail${this.state.eventLogExpanded ? ' ActionDecisionRail--event-log-expanded' : ''}`
         const actionDecisionRail = railDecision && typeof document !== 'undefined'
-            ? createPortal(<div className="ActionDecisionRail" style={actionRailStyle} aria-live="polite">
+            ? createPortal(<div className={actionRailClassName} style={actionRailStyle} aria-live="polite">
                 <CheatSheetModal />
                 {actionDecision
                     ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
@@ -934,9 +947,6 @@ export default class Coup extends Component {
                     <p>{t('game.player.identity', { playerName: this.props.name })}{this.props.isSpectator ? ` ${t('game.spectator')}` : ''}</p>
                     {!this.props.isSpectator && <p>{t('game.player.coins', { coins: me ? me.money : 0 })}</p>}
                 </div>
-                <div className="CurrentPlayer">
-                    {this.state.currentPlayer && <p>{t('game.turn.current', { playerName: this.state.currentPlayer })}</p>}
-                </div>
                 <RulesModal />
                 {!railDecision && <CheatSheetModal />}
                 {railDecision && <div
@@ -944,7 +954,12 @@ export default class Coup extends Component {
                     className="CheatSheet ActionDecisionAnchorProbe"
                     aria-hidden="true"
                 />}
-                <EventLog socket={this.props.socket} players={this.state.players} />
+                <EventLog
+                    socket={this.props.socket}
+                    players={this.state.players}
+                    decisionRailOpen={Boolean(railDecision)}
+                    onExpandedChange={this.handleEventLogExpandedChange}
+                />
             </div>
 
             {actionDecisionRail}

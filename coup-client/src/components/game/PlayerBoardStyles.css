@@ -887,3 +887,10 @@
         animation-duration: 1ms;
     }
 }
+
+@media only screen and (max-width: 720px) {
+    .PlayerBoardContainer {
+        transform: none;
+        translate: none;
+    }
+}

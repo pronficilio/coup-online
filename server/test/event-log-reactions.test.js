@@ -197,7 +197,7 @@ test('every public event context receives its approved reaction catalog', () => 
         ['action_declared', { action: 'income' }, ['like', 'bravo', 'laugh', 'skeptical']],
         ['action_declared', { action: 'coup' }, ['surprise', 'thinking', 'dislike', 'secret']],
         ['action_declared', { action: 'exchange' }, ['thinking', 'secret', 'like']],
-        ['action_result', { action: 'foreign_aid', result: 'blocked' }, ['thinking', 'skeptical', 'surprise', 'dislike']],
+        ['action_result', { action: 'foreign_aid', result: 'blocked' }, ['like', 'bravo', 'skeptical', 'surprise']],
         ['action_result', { action: 'steal', result: 'resolved', amount: 0 }, ['surprise', 'thinking', 'skeptical', 'dislike']],
         ['challenge_started', {}, ['thinking', 'skeptical', 'surprise', 'bravo']],
         ['block_challenge_started', {}, ['thinking', 'skeptical', 'surprise', 'bravo']],

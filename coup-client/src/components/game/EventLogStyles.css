@@ -4,10 +4,11 @@
     --event-log-line: rgba(87, 65, 42, 0.14);
     position: fixed;
     z-index: 40;
-    top: 68px;
-    right: clamp(10px, 2vw, 24px);
+    top: 15px;
+    right: 15px;
+    left: auto;
     display: flex;
-    width: min(340px, calc(100vw - 24px));
+    width: min(340px, calc(100vw - 30px));
     max-height: min(48vh, 500px);
     flex-direction: column;
     overflow: hidden;
@@ -58,6 +59,7 @@
 }
 
 .EventLogPanelToggle,
+.EventLogJumpToLive,
 .EventLogReactButton,
 .EventLogReactionCountButton,
 .EventLogReactionOption {
@@ -90,6 +92,7 @@
 }
 
 .EventLogPanelToggle:focus-visible,
+.EventLogJumpToLive:focus-visible,
 .EventLogReactButton:focus-visible,
 .EventLogReactionCountButton:focus-visible,
 .EventLogReactionOption:focus-visible {
@@ -138,8 +141,22 @@
 
 .EventLogEntry {
     position: relative;
+    z-index: 0;
     padding: 8px 4px 7px;
     border-bottom: 1px solid rgba(87, 65, 42, 0.09);
+    cursor: pointer;
+    touch-action: pan-y;
+    -webkit-touch-callout: none;
+}
+
+.EventLogEntry--menu-open {
+    z-index: 5;
+}
+
+.EventLogEntry:focus-visible {
+    border-radius: 8px;
+    outline: 3px solid rgba(72, 119, 166, 0.72);
+    outline-offset: 1px;
 }
 
 .EventLogEntry:last-child {
@@ -148,31 +165,30 @@
 
 .EventLogEntryMain {
     display: grid;
-    grid-template-columns: 27px minmax(0, 1fr);
+    grid-template-columns: 48px minmax(0, 1fr);
     align-items: start;
     gap: 8px;
 }
 
 .EventLogEntryIcon {
-    display: inline-flex;
-    width: 26px;
-    height: 26px;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(108, 83, 55, 0.1);
-    border-radius: 9px;
-    background: rgba(255, 255, 255, 0.72);
-    font-family: system-ui, sans-serif;
-    font-size: 0.9rem;
-    line-height: 1;
+    display: block;
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
 }
 
 .EventLogEntryMessage {
-    margin: 1px 0 0;
+    align-self: start;
+    margin: 0;
     color: var(--event-log-ink);
     font-size: 0.78rem;
     line-height: 1.38;
     overflow-wrap: anywhere;
+    text-align: left;
+}
+
+.EventLogEntryContent {
+    min-width: 0;
 }
 
 .EventLogPlayerName {
@@ -186,11 +202,10 @@
 
 .EventLogEntryReactions {
     display: flex;
-    min-height: 26px;
     flex-wrap: wrap;
     align-items: center;
     gap: 5px;
-    margin: 5px 0 0 35px;
+    margin: 4px 0 0;
 }
 
 .EventLogReactionCountButton,
@@ -264,19 +279,68 @@
     transform: translate(-50%, -50%) rotate(90deg);
 }
 
+.EventLogJumpToLive {
+    position: absolute;
+    z-index: 12;
+    right: 14px;
+    bottom: 12px;
+    display: inline-flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid rgba(108, 83, 55, 0.25);
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 3px 12px rgba(49, 36, 23, 0.2);
+    color: #453a2e;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 1.55rem;
+    line-height: 1;
+    transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.EventLogJumpToLive:hover {
+    transform: translateY(2px);
+    background: #fff;
+    box-shadow: 0 2px 7px rgba(49, 36, 23, 0.18);
+}
+
 .EventLogReactionTray {
+    position: absolute;
+    z-index: 10;
     display: flex;
     width: fit-content;
-    max-width: calc(100% - 34px);
+    max-width: calc(100% - 60px);
     align-items: center;
+    flex-wrap: nowrap;
     gap: 4px;
-    margin: 6px 0 1px 34px;
+    margin: 0;
     padding: 5px;
+    box-sizing: border-box;
     border: 1px solid rgba(108, 83, 55, 0.16);
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.97);
     box-shadow: 0 5px 16px rgba(49, 36, 23, 0.13);
+    overflow-x: auto;
+    scrollbar-width: none;
     animation: EventLogTrayIn 150ms ease-out both;
+}
+
+.EventLogReactionTray::-webkit-scrollbar {
+    display: none;
+}
+
+.EventLogReactionTray--below {
+    top: calc(100% - 2px);
+    left: 56px;
+}
+
+.EventLogReactionTray--above {
+    bottom: calc(100% - 2px);
+    left: 56px;
 }
 
 .EventLogReactionOption {
@@ -308,8 +372,19 @@
 }
 
 .EventLogReactionEmoji {
+    display: inline-flex;
+    min-width: 23px;
+    height: 23px;
+    align-items: center;
+    justify-content: center;
     font-size: 1.15rem;
     line-height: 1;
+}
+
+.EventLogReactionEmoji--count {
+    min-width: 18px;
+    height: 18px;
+    font-size: 1rem;
 }
 
 .EventLogReactionCount {
@@ -342,13 +417,22 @@
 
 @media (max-width: 720px) {
     .EventLogPanel {
+        position: relative;
         top: auto;
-        right: 10px;
-        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-        left: 10px;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        z-index: 1;
+        align-self: stretch;
+        margin: 0 15px 12px;
+        max-width: none;
         width: auto;
-        max-height: min(62vh, 62dvh, 560px);
+        max-height: min(38vh, 38dvh, 320px);
         border-radius: 18px;
+    }
+
+    .EventLogPanel--decision-open {
+        max-height: min(26vh, 26dvh, 220px);
     }
 
     .EventLogPanel:not(.EventLogPanel--expanded) .EventLogPanelBody {
@@ -371,11 +455,14 @@
     .EventLogPanelTotal { min-width: 20px; height: 20px; }
     .EventLogPanelHeader { gap: 6px; }
     .EventLogEntryMessage { font-size: 0.74rem; }
-    .EventLogReactionTray { max-width: calc(100% - 28px); margin-left: 28px; }
+    .EventLogReactionTray { max-width: calc(100% - 42px); }
+    .EventLogReactionTray--below,
+    .EventLogReactionTray--above { left: 42px; }
 }
 
 @media (max-width: 720px), (pointer: coarse) {
     .EventLogPanelToggle,
+    .EventLogJumpToLive,
     .EventLogReactionCountButton,
     .EventLogReactButton,
     .EventLogReactionOption {
@@ -391,6 +478,14 @@
         flex: 0 0 44px;
     }
 
+    .EventLogJumpToLive {
+        right: 16px;
+        bottom: 12px;
+        width: 44px;
+        height: 44px;
+        flex: 0 0 44px;
+    }
+
     .EventLogReactionOption {
         width: 44px;
         flex: 0 0 44px;
@@ -399,6 +494,7 @@
 
 @media (prefers-reduced-motion: reduce) {
     .EventLogPanelToggle,
+    .EventLogJumpToLive,
     .EventLogReactionCountButton,
     .EventLogReactButton,
     .EventLogReactionOption {

@@ -1,5 +1,6 @@
 import React, { Component, createRef } from 'react'
 import { t } from '../../i18n'
+import { getEventIcon } from './EventLogAssets'
 import './EventLogStyles.css'
 
 const ACTION_TRANSLATION_KEYS = {
@@ -31,18 +32,6 @@ const REACTIONS = {
     secret: { emoji: '🤫', label: 'game.eventLog.reaction.secret' }
 }
 
-const EVENT_ICONS = {
-    action_declared: '🎭',
-    action_result: '🪙',
-    challenge_started: '⚖️',
-    block_declared: '🛡️',
-    block_challenge_started: '⚖️',
-    claim_proved: '🃏',
-    claim_not_proved: '🃏',
-    influence_lost: '💔',
-    player_eliminated: '🚪'
-}
-
 const PLAYER_MARKERS = {
     actorSeat: '\u0001actor\u0001',
     targetSeat: '\u0001target\u0001',
@@ -70,6 +59,7 @@ export default class EventLog extends Component {
             ownReactions: {},
             matchId: null,
             expanded: !isMobileViewport(),
+            showJumpToLive: false,
             menuEventId: null,
             status: '',
             loaded: false
@@ -81,10 +71,16 @@ export default class EventLog extends Component {
         this.followLatestOnReopen = true
         this.pendingFollowBottom = false
         this.savedScrollTop = 0
+        this.longPressTimer = null
+        this.longPressOrigin = null
+        this.suppressEntryClickEventId = null
     }
 
     componentDidMount() {
         const socket = this.props.socket
+        if (typeof this.props.onExpandedChange === 'function') {
+            this.props.onExpandedChange(this.state.expanded)
+        }
         if (!socket) return
         socket.on('g-addLog', this.handleAddLog)
         socket.on('g-reactionCounts', this.handleReactionCounts)
@@ -96,6 +92,7 @@ export default class EventLog extends Component {
     }
 
     componentWillUnmount() {
+        this.cancelLongPress()
         const socket = this.props.socket
         if (!socket) return
         const remove = typeof socket.off === 'function' ? socket.off : socket.removeListener
@@ -123,7 +120,10 @@ export default class EventLog extends Component {
             if (state.events.some(existing => existing.id === event.id)) return null
             return { events: state.events.concat(event) }
         }, () => {
-            if (!shouldFollow) return
+            if (!shouldFollow) {
+                if (wasExpanded && this.state.expanded) this.setState({ showJumpToLive: true })
+                return
+            }
             if (wasExpanded && this.state.expanded) this.scrollToBottom()
             else this.pendingFollowBottom = true
         })
@@ -178,6 +178,7 @@ export default class EventLog extends Component {
             reactionCounts,
             ownReactions,
             matchId: snapshot.matchId || this.state.matchId,
+            showJumpToLive: shouldFollow ? false : this.state.showJumpToLive,
             menuEventId: null,
             status: '',
             loaded: true
@@ -200,7 +201,41 @@ export default class EventLog extends Component {
 
     scrollToBottom() {
         const body = this.scrollRef.current
-        if (body) body.scrollTop = body.scrollHeight
+        if (body) {
+            body.scrollTop = body.scrollHeight
+            this.savedScrollTop = body.scrollTop
+        }
+        this.followLatestOnReopen = true
+        if (this.state.showJumpToLive) this.setState({ showJumpToLive: false })
+    }
+
+    handleLogScroll = () => {
+        const body = this.scrollRef.current
+        if (!body) return
+        const atBottom = this.isNearBottom()
+        this.savedScrollTop = body.scrollTop
+        this.followLatestOnReopen = atBottom
+        if (this.state.showJumpToLive === atBottom) {
+            this.setState({ showJumpToLive: !atBottom })
+        }
+    }
+
+    jumpToLatest = () => {
+        const body = this.scrollRef.current
+        if (!body) return
+        this.followLatestOnReopen = true
+        this.pendingFollowBottom = false
+        const reduceMotion = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (typeof body.scrollTo === 'function') {
+            body.scrollTo({
+                top: body.scrollHeight,
+                behavior: reduceMotion ? 'auto' : 'smooth'
+            })
+        } else {
+            this.scrollToBottom()
+        }
     }
 
     actionLabel(action) {
@@ -326,15 +361,164 @@ export default class EventLog extends Component {
         if (!panel) return
         const entry = Array.from(panel.querySelectorAll('.EventLogEntry'))
             .find(element => element.dataset.eventId === eventId)
-        const trigger = entry && entry.querySelector('.EventLogReactButton')
+        const trigger = entry && (entry.querySelector('.EventLogReactButton') || entry)
         if (trigger) trigger.focus({ preventScroll: true })
     }
 
-    toggleReactionMenu(eventId) {
-        this.setState(state => ({
-            menuEventId: state.menuEventId === eventId ? null : eventId,
+    reactionMenuPlacement(eventId) {
+        const body = this.scrollRef.current
+        const entry = body && Array.from(body.querySelectorAll('.EventLogEntry'))
+            .find(element => element.dataset.eventId === eventId)
+        if (!body || !entry) return 'below'
+        const bodyRect = body.getBoundingClientRect()
+        const entryRect = entry.getBoundingClientRect()
+        const visibleTop = bodyRect.top + body.clientTop
+        const visibleBottom = visibleTop + body.clientHeight
+        const roomAbove = entryRect.top + 2 - visibleTop
+        const roomBelow = visibleBottom - (entryRect.bottom - 2)
+        const needed = (isMobileViewport() ? 60 : 52) + 8
+        if (roomBelow >= needed) return 'below'
+        if (roomAbove >= needed) return 'above'
+        const maxScroll = Math.max(0, body.scrollHeight - body.clientHeight)
+        if (roomBelow >= roomAbove) {
+            body.scrollTop = Math.min(maxScroll, body.scrollTop + needed - roomBelow)
+            return 'below'
+        }
+        body.scrollTop = Math.max(0, body.scrollTop - (needed - roomAbove))
+        return 'above'
+    }
+
+    ensureReactionMenuVisible(eventId, canFlip = true, attempts = 0) {
+        const body = this.scrollRef.current
+        const panel = this.panelRef.current
+        const entry = panel && Array.from(panel.querySelectorAll('.EventLogEntry'))
+            .find(element => element.dataset.eventId === eventId)
+        const tray = entry && entry.querySelector('.EventLogReactionTray')
+        if (!body || !entry || !tray) return
+
+        const bodyRect = body.getBoundingClientRect()
+        const trayRect = tray.getBoundingClientRect()
+        const safeTop = bodyRect.top + body.clientTop + 4
+        const safeBottom = bodyRect.top + body.clientTop + body.clientHeight - 4
+        const clippedAbove = trayRect.top < safeTop
+        const clippedBelow = trayRect.bottom > safeBottom
+        if (!clippedAbove && !clippedBelow) return
+
+        const placement = this.state.menuPlacement || 'below'
+        const otherPlacement = placement === 'below' ? 'above' : 'below'
+        if (canFlip) {
+            const entryRect = entry.getBoundingClientRect()
+            const otherTop = otherPlacement === 'below'
+                ? entryRect.bottom - 2
+                : entryRect.top + 2 - trayRect.height
+            const otherBottom = otherTop + trayRect.height
+            if (otherTop >= safeTop && otherBottom <= safeBottom) {
+                this.setState({ menuPlacement: otherPlacement }, () => {
+                    this.ensureReactionMenuVisible(eventId, false, attempts + 1)
+                })
+                return
+            }
+        }
+
+        const delta = clippedAbove ? trayRect.top - safeTop : trayRect.bottom - safeBottom
+        const maxScroll = Math.max(0, body.scrollHeight - body.clientHeight)
+        const nextScrollTop = Math.max(0, Math.min(maxScroll, body.scrollTop + delta))
+        if (nextScrollTop !== body.scrollTop) {
+            body.scrollTop = nextScrollTop
+            if (attempts < 4 && typeof window !== 'undefined') {
+                window.requestAnimationFrame(() => {
+                    this.ensureReactionMenuVisible(eventId, canFlip, attempts + 1)
+                })
+            }
+            return
+        }
+
+        if (canFlip && attempts < 4) {
+            this.setState({ menuPlacement: otherPlacement }, () => {
+                this.ensureReactionMenuVisible(eventId, false, attempts + 1)
+            })
+        }
+    }
+
+    openReactionMenu(eventId, focusFirstOption = false) {
+        this.setState({
+            menuEventId: eventId,
+            menuPlacement: this.reactionMenuPlacement(eventId),
             status: ''
-        }))
+        }, () => {
+            this.ensureReactionMenuVisible(eventId)
+            if (!focusFirstOption || !this.panelRef.current) return
+            const entry = Array.from(this.panelRef.current.querySelectorAll('.EventLogEntry'))
+                .find(element => element.dataset.eventId === eventId)
+            const firstOption = entry && entry.querySelector('.EventLogReactionOption')
+            if (firstOption) firstOption.focus({ preventScroll: true })
+        })
+    }
+
+    cancelLongPress = () => {
+        if (this.longPressTimer) clearTimeout(this.longPressTimer)
+        this.longPressTimer = null
+        this.longPressOrigin = null
+    }
+
+    handleEntryPointerDown = (event, eventId) => {
+        this.suppressEntryClickEventId = null
+        if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return
+        if (event.target.closest && event.target.closest('button')) return
+        this.cancelLongPress()
+        const entry = event.currentTarget
+        this.longPressOrigin = { x: event.clientX, y: event.clientY }
+        this.longPressTimer = setTimeout(() => {
+            this.longPressTimer = null
+            this.longPressOrigin = null
+            if (!entry.isConnected) return
+            this.suppressEntryClickEventId = eventId
+            entry.focus({ preventScroll: true })
+            this.openReactionMenu(eventId)
+        }, 500)
+    }
+
+    handleEntryClick = (event, eventId) => {
+        if (event.target.closest && event.target.closest('button')) return
+        if (this.suppressEntryClickEventId === eventId) {
+            this.suppressEntryClickEventId = null
+            return
+        }
+        this.toggleReactionMenu(eventId)
+    }
+
+    handleEntryPointerMove = event => {
+        if (!this.longPressOrigin) return
+        const distance = Math.hypot(
+            event.clientX - this.longPressOrigin.x,
+            event.clientY - this.longPressOrigin.y
+        )
+        if (distance > 10) this.cancelLongPress()
+    }
+
+    handleEntryContextMenu = (event, eventId) => {
+        event.preventDefault()
+        this.cancelLongPress()
+        event.currentTarget.focus({ preventScroll: true })
+        this.openReactionMenu(eventId)
+    }
+
+    handleEntryKeyDown = (event, eventId) => {
+        if (event.key === 'Escape' && this.state.menuEventId === eventId) {
+            event.preventDefault()
+            this.setState({ menuEventId: null }, () => this.focusReactionTrigger(eventId))
+            return
+        }
+        if (event.target !== event.currentTarget) return
+        if (event.key !== 'Enter' && event.key !== ' ') return
+        event.preventDefault()
+        if (this.state.menuEventId === eventId) this.setState({ menuEventId: null })
+        else this.openReactionMenu(eventId, true)
+    }
+
+    toggleReactionMenu(eventId) {
+        if (this.state.menuEventId === eventId) this.setState({ menuEventId: null })
+        else this.openReactionMenu(eventId)
     }
 
     toggleExpanded = () => {
@@ -346,13 +530,20 @@ export default class EventLog extends Component {
         const shouldFollowAfterOpening = !wasExpanded
             && (!this.hasExpandedOnce || this.pendingFollowBottom)
         this.setState(state => ({ expanded: !state.expanded, menuEventId: null }), () => {
+            if (typeof this.props.onExpandedChange === 'function') {
+                this.props.onExpandedChange(this.state.expanded)
+            }
             if (!this.state.expanded) return
             if (shouldFollowAfterOpening) this.scrollToBottom()
             else if (this.scrollRef.current) this.scrollRef.current.scrollTop = this.savedScrollTop
             this.pendingFollowBottom = false
             this.hasExpandedOnce = true
-            this.followLatestOnReopen = this.isNearBottom()
+            const atBottom = this.isNearBottom()
+            this.followLatestOnReopen = atBottom
             if (this.scrollRef.current) this.savedScrollTop = this.scrollRef.current.scrollTop
+            if (this.state.showJumpToLive === atBottom) {
+                this.setState({ showJumpToLive: !atBottom })
+            }
         })
     }
 
@@ -361,7 +552,7 @@ export default class EventLog extends Component {
         const own = this.state.ownReactions[event.id]
         const allowed = Array.isArray(event.reactions) ? event.reactions : []
         if (this.state.menuEventId !== event.id || !allowed.length) return null
-        return <div className="EventLogReactionTray" role="group" aria-label={t('game.eventLog.reactionOptions')}>
+        return <div className={`EventLogReactionTray EventLogReactionTray--${this.state.menuPlacement || 'below'}`} role="group" aria-label={t('game.eventLog.reactionOptions')}>
             {allowed.map(reaction => {
                 const option = REACTIONS[reaction]
                 if (!option) return null
@@ -387,38 +578,54 @@ export default class EventLog extends Component {
         const own = this.state.ownReactions[event.id]
         const allowed = Array.isArray(event.reactions) ? event.reactions : []
         const visibleReactions = allowed.filter(reaction => (counts[reaction] || 0) > 0)
-        return <article className="EventLogEntry" key={event.id} data-event-id={event.id}>
+        const menuOpen = this.state.menuEventId === event.id
+        return <article
+            className={`EventLogEntry${menuOpen ? ' EventLogEntry--menu-open' : ''}`}
+            key={event.id}
+            data-event-id={event.id}
+            tabIndex={0}
+            aria-keyshortcuts="Enter Space"
+            onClick={e => this.handleEntryClick(e, event.id)}
+            onKeyDown={e => this.handleEntryKeyDown(e, event.id)}
+            onContextMenu={e => this.handleEntryContextMenu(e, event.id)}
+            onPointerDown={e => this.handleEntryPointerDown(e, event.id)}
+            onPointerMove={this.handleEntryPointerMove}
+            onPointerUp={this.cancelLongPress}
+            onPointerCancel={this.cancelLongPress}
+        >
             <div className="EventLogEntryMain">
-                <span className="EventLogEntryIcon" aria-hidden="true">{EVENT_ICONS[event.type] || '•'}</span>
-                <p className="EventLogEntryMessage">{this.eventMessage(event)}</p>
-            </div>
-            <div className="EventLogEntryReactions">
-                {visibleReactions.map(reaction => {
-                    const option = REACTIONS[reaction]
-                    if (!option) return null
-                    const selected = own === reaction
-                    return <button
-                        className={`EventLogReactionCountButton${selected ? ' EventLogReactionCountButton--selected' : ''}`}
-                        type="button"
-                        key={reaction}
-                        aria-label={t('game.eventLog.addReaction', {
-                            reaction: this.reactionLabel(reaction),
-                            count: counts[reaction]
+                <img className="EventLogEntryIcon" src={getEventIcon(event)} alt="" aria-hidden="true" draggable="false" />
+                <div className="EventLogEntryContent">
+                    <p className="EventLogEntryMessage">{this.eventMessage(event)}</p>
+                    {!!visibleReactions.length && <div className="EventLogEntryReactions">
+                        {visibleReactions.map(reaction => {
+                            const option = REACTIONS[reaction]
+                            if (!option) return null
+                            const selected = own === reaction
+                            return <button
+                                className={`EventLogReactionCountButton${selected ? ' EventLogReactionCountButton--selected' : ''}`}
+                                type="button"
+                                key={reaction}
+                                aria-label={t('game.eventLog.addReaction', {
+                                    reaction: this.reactionLabel(reaction),
+                                    count: counts[reaction]
+                                })}
+                                aria-pressed={selected}
+                                onClick={() => this.react(event, reaction)}
+                            >
+                                <span className="EventLogReactionEmoji" aria-hidden="true">{option.emoji}</span>
+                                <span>{counts[reaction]}</span>
+                            </button>
                         })}
-                        aria-pressed={selected}
-                        onClick={() => this.react(event, reaction)}
-                    >
-                        <span aria-hidden="true">{option.emoji}</span>
-                        <span>{counts[reaction]}</span>
-                    </button>
-                })}
-                {!!allowed.length && <button
-                    className={`EventLogReactButton${this.state.menuEventId === event.id ? ' EventLogReactButton--active' : ''}`}
-                    type="button"
-                    aria-label={t('game.eventLog.reactToEvent')}
-                    aria-expanded={this.state.menuEventId === event.id}
-                    onClick={() => this.toggleReactionMenu(event.id)}
-                ><span className="EventLogPlusIcon" aria-hidden="true" /></button>}
+                        {!!allowed.length && <button
+                            className={`EventLogReactButton${menuOpen ? ' EventLogReactButton--active' : ''}`}
+                            type="button"
+                            aria-label={t('game.eventLog.reactToEvent')}
+                            aria-expanded={menuOpen}
+                            onClick={() => this.toggleReactionMenu(event.id)}
+                        ><span className="EventLogPlusIcon" aria-hidden="true" /></button>}
+                    </div>}
+                </div>
             </div>
             {this.renderReactionMenu(event)}
         </article>
@@ -443,7 +650,8 @@ export default class EventLog extends Component {
 
     render() {
         const expanded = this.state.expanded
-        return <section ref={this.panelRef} className={`EventLogPanel${expanded ? ' EventLogPanel--expanded' : ' EventLogPanel--collapsed'}`}>
+        const decisionActive = expanded && this.props.decisionRailOpen
+        return <section ref={this.panelRef} className={`EventLogPanel${expanded ? ' EventLogPanel--expanded' : ' EventLogPanel--collapsed'}${decisionActive ? ' EventLogPanel--decision-open' : ''}`}>
             <header className="EventLogPanelHeader">
                 <h2 className="EventLogPanelTitle">{t('game.eventLog.title')}</h2>
                 <span className="EventLogPanelTotal" aria-label={t('game.eventLog.eventCount', { count: this.state.events.length })}>
@@ -458,11 +666,17 @@ export default class EventLog extends Component {
                     onClick={this.toggleExpanded}
                 >{expanded ? '−' : '+'}</button>
             </header>
-            <div className="EventLogPanelBody" id="event-log-content" ref={this.scrollRef} role="log" aria-live="polite" aria-relevant="additions text">
+            <div className="EventLogPanelBody" id="event-log-content" ref={this.scrollRef} onScroll={this.handleLogScroll} role="log" aria-live="polite" aria-relevant="additions text">
                 {this.state.events.length
                     ? this.renderGroups()
                     : <p className="EventLogEmpty">{t('game.eventLog.empty')}</p>}
             </div>
+            {expanded && this.state.showJumpToLive && <button
+                className="EventLogJumpToLive"
+                type="button"
+                aria-label={t('game.eventLog.jumpToLatest')}
+                onClick={this.jumpToLatest}
+            ><span aria-hidden="true">↓</span></button>}
             <p className="EventLogStatus" role="status" aria-live="polite">{this.state.status}</p>
         </section>
     }

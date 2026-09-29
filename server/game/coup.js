@@ -40,7 +40,7 @@ const REACTION_OPTIONS = Object.freeze({
     failed: Object.freeze(['surprise', 'laugh', 'skeptical', 'dislike']),
     loss: Object.freeze(['surprise', 'dislike', 'thinking']),
     exchange: Object.freeze(['thinking', 'secret', 'like']),
-    blocked: Object.freeze(['thinking', 'skeptical', 'surprise', 'dislike']),
+    blocked: Object.freeze(['like', 'bravo', 'skeptical', 'surprise']),
     emptySteal: Object.freeze(['surprise', 'thinking', 'skeptical', 'dislike'])
 })
 
