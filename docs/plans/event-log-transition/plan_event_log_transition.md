@@ -2,6 +2,7 @@
 
 **Issue:** [#60 — Animar la expansión y el colapso del registro de eventos](https://github.com/pronficilio/coup-online/issues/60)  
 **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS)`
+**PR canónica:** [#64](https://github.com/pronficilio/coup-online/pull/64) `OPEN` / `MERGEABLE` hacia `master`; issue sigue abierta hasta integrar.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`  
 **Branch / worktree / integración:** `issue/60-event-log-transition` / `.worktrees/issue-60-event-log-transition` / `master`  
 **Handoff:** `docs/plans/active/issue_60_event_log_transition.md`
@@ -67,6 +68,6 @@ Fuera de alcance: rediseño del registro, cambios a filas/reacciones, reglas o p
 
 ## Estado de F1
 
-F1 `CLOSED (PASS)`; la unidad queda pendiente de revisión del Orquestador. El panel conserva borde superior y scroll, abre en 220 ms y cierra en 180 ms; las pulsaciones rápidas revierten sin dejar altura/estado intermedios. El rail móvil sigue el borde del panel con 15 px de separación durante el cierre y hace un FLIP breve al volver al ancla normal; un piso `max(150px, safe-area)` evita valores negativos al recalcular fuera del viewport. Capturas manuales del preview y métricas están referenciadas en `report_issue_60_F1.md`; los iconos del preview `file://` no cargaron, lo que limita la revisión del arte de los iconos pero no de la geometría/transición.
+F1 `CLOSED (PASS)`; el Orquestador revisó el commit y el reporte, y la PR canónica #64 está abierta para revisión e integración. El panel conserva borde superior y scroll, abre en 220 ms y cierra en 180 ms; las pulsaciones rápidas revierten sin dejar altura/estado intermedios. El rail móvil sigue el borde del panel con 15 px de separación durante el cierre y hace un FLIP breve al volver al ancla normal; un piso `max(150px, safe-area)` evita valores negativos al recalcular fuera del viewport. Capturas manuales del preview y métricas están referenciadas en `report_issue_60_F1.md`; los iconos del preview `file://` no cargaron, lo que limita la revisión del arte de los iconos pero no de la geometría/transición.
 
 La compilación final pasa con advertencias preexistentes de `App.js` (imports `logo`/`Link` sin usar), caniuse-lite desactualizado y PostCSS sobre `dvh` en `ReferencePanel.css:100,106`. No se agregaron ni ejecutaron pruebas automatizadas.

@@ -1,7 +1,7 @@
 # Reporte F1 — transición del registro de eventos
 
 **Issue:** #60 — Animar la expansión y el colapso del registro de eventos
-**Resultado:** `CLOSED (PASS)`; la unidad espera revisión del Orquestador.
+**Resultado:** `CLOSED (PASS)`; revisión del Orquestador `PASS`; PR [#64](https://github.com/pronficilio/coup-online/pull/64) abierta hacia `master`.
 **Branch/worktree:** `issue/60-event-log-transition` / `.worktrees/issue-60-event-log-transition`
 
 ## Cambios
@@ -33,4 +33,4 @@ El preview se abrió con `file://`; las rutas absolutas del build no localizaron
 
 La alternancia rápida terminó en el estado solicitado, el scroll se restauró y el rail móvil permaneció separado del panel durante el cierre, al volver al ancla y al recalcular fuera del viewport. No se reprodujo altura intermedia persistente, control cubierto ni solapamiento.
 
-F1 queda `CLOSED (PASS)`; el Orquestador debe revisar el commit antes de decidir la apertura de una PR. No se modificó el issue remoto desde el rol ejecutor.
+F1 queda `CLOSED (PASS)` y el Orquestador aprobó la revisión del commit `3036bb9` tras inspeccionar el diff, el reporte y capturas representativas. La PR canónica #64 está `OPEN` y `MERGEABLE`, con `master` como base y sin checks de GitHub reportados. La issue #60 permanece abierta hasta integrar; no se fusionó ni cerró.

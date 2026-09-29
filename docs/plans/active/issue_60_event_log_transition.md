@@ -1,12 +1,13 @@
 # Handoff para Agente Alquimista — issue #60
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/60 (`OPEN`, asignada a `pronficilio`; estado operativo `WAITING_ORCHESTRATOR`).
+- **PR canónica:** https://github.com/pronficilio/coup-online/pull/64 (`OPEN`, `MERGEABLE`, base `master`; sin status checks reportados).
 - **Plan exacto:** `docs/plans/event-log-transition/plan_event_log_transition.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-60.jsonl` (append-only).
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no; la política predeterminada del proyecto es `NONE` para este tipo de cambio visual.
 - **Pregunta de falsificación:** ¿una secuencia rápida o una vista móvil con decisión activa deja el panel a media altura, pierde scroll, oculta controles o solapa decisiones?
-- **Fase:** F1 `CLOSED (PASS)` — transición implementada y validada; unidad en espera de revisión del Orquestador.
+- **Fase:** F1 `CLOSED (PASS)` — transición implementada y validada; revisión del Orquestador `PASS`; PR #64 abierta para revisión/integración.
 - **Por qué sigue:** issue #40 cerró el rediseño del registro; las capturas muestran los dos estados actuales y no hay una transición entre ellos.
 - **Documentos fuente:** plan anterior y actual del registro: `docs/plans/event-log-reactions/plan_event_log_reactions.md`, issue #40; referencias locales ignoradas por Git: `fotos/log1.png`, `fotos/log2.png`.
 - **Subtareas listas:** medir/animar alto del panel respetando topes; entrada/salida breve del cuerpo; preservar scroll y reversiones rápidas; reducir movimiento; coordinar rail móvil si hace falta; compilar y hacer revisión visual de los casos definidos.
@@ -26,6 +27,6 @@ Antes de trabajo técnico, reclama #60 en el tracker, vuelve a leer la issue y c
 
 ## Validaciones y cierre de fase
 
-F1 mantiene el panel usable en ambos tamaños; build, recorrido visual, pulsaciones rápidas y criterio de falsificación están documentados en el reporte. El commit de fase contiene código, reporte y `phase_verdict`. La rama queda pendiente de revisión del Orquestador; no se abrió PR.
+F1 mantiene el panel usable en ambos tamaños; build, recorrido visual, pulsaciones rápidas y criterio de falsificación están documentados en el reporte. El commit de fase contiene código, reporte y `phase_verdict`. El Orquestador revisó el diff/evidencia y abrió la PR canónica #64; no fusionar ni cerrar la issue antes de la integración verificada.
 
-**Siguiente dueño:** Orquestador para revisar el commit F1 antes de decidir la PR.
+**Siguiente dueño:** Orquestador para atender la revisión e integración final de la PR #64.
