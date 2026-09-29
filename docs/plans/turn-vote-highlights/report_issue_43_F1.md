@@ -1,9 +1,10 @@
 # Reporte F1 — resaltado de turno y respuestas pendientes (#43)
 
-**Estado:** implementación preparada; pendiente revisión FINAL independiente.
+**Estado:** `CLOSED (PASS)`; Verifier FINAL independiente.
 **Issue:** [#43](https://github.com/pronficilio/coup-online/issues/43) (`OPEN`).
 **Branch / worktree:** `issue/43-turn-vote-highlights` / `.worktrees/issue-43-turn-vote-highlights`.
 **Base:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a`, que incluye #40 por PR #54.
+**Commit de implementación revisado:** `3406e10fb18ec9d15a85f069c98dd9df4ffc8b4a`.
 
 ## Cambio
 
@@ -31,7 +32,8 @@ Este es un recorrido de flujo y payload trazado en el código, no una sesión de
 - `npm ci` en `coup-client`: terminó correctamente.
 - `npm run build` en `coup-client`: `Compiled with warnings`; compilación de producción generada. Warnings fuera de los cambios de #43: imports no usados en `App.js`, `no-mixed-operators` en `Coup.js:463` y `postcss-calc` con unidades `dvh` en `ReferencePanel.css`.
 - No se agregaron ni ejecutaron tests automatizados.
+- Verifier FINAL: `PASS` en los criterios 1–5; reporte independiente: `docs/plans/turn-vote-highlights/report_issue_43_F1_verifier.md`.
 
 ## Falsificación y límites
 
-La lista de pendientes procede del mapa de elegibilidad/respuestas vigente en el servidor, y cada respuesta/cierre produce un snapshot nuevo; por ello la UI no infiere pendientes desde el turno formal ni desde las opciones privadas del cliente. La revisión FINAL debe intentar refutar respuestas fuera de orden, respuestas Codex, actor formal elegible en una decisión encadenada, asiento eliminado, cierre y limpieza durante pausa/disolución. La sincronía funcional fue trazada por código y compilada, pero no se verificó con una mesa viva de navegador.
+La lista de pendientes procede del mapa de elegibilidad/respuestas vigente en el servidor, y cada respuesta/cierre produce un snapshot nuevo; por ello la UI no infiere pendientes desde el turno formal ni desde las opciones privadas del cliente. El Verifier FINAL intentó refutar respuestas fuera de orden, respuestas Codex, actor formal elegible en una decisión encadenada, asiento eliminado, cierre y limpieza durante pausa/disolución; emitió `PASS`. La sincronía funcional fue trazada por código y compilada, pero no se verificó con una mesa viva de navegador.
