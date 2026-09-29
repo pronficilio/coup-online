@@ -155,13 +155,6 @@
   stroke: none;
 }
 
-.CurrentPlayer {
-    text-align: right;
-    position: absolute;
-    right: 15px;
-    top: 5px;
-}
-
 .EventLogContainer {
     border-right: 2px solid #707070;
     /* border-left: 0px; */
@@ -994,12 +987,6 @@
       left: 10VW;
       top: 5VH;
     }
-    .CurrentPlayer {
-        text-align: right;
-        position: absolute;
-        right: 10VW;
-        top: 5VH;
-    }
     .Rules{
       left: 10VW;
       top: 17VH;
@@ -1033,6 +1020,24 @@
         margin-left: 10%;
     }
   }
+
+@media only screen and (max-width: 720px) {
+    .GameHeader {
+        display: flex;
+        height: auto;
+        min-height: 22vh;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .PlayerInfo {
+        position: relative;
+        top: auto;
+        left: auto;
+        align-self: flex-start;
+        margin: 10px 10px 0;
+    }
+}
 
 .DecisionActionPanel {
     box-sizing: border-box;
@@ -1625,6 +1630,20 @@
 
 .ActionDecisionRail .DecisionActionPanel.DecisionActionPanel--compact {
     width: 50%;
+}
+
+@media (max-width: 720px) {
+    .ActionDecisionRail.ActionDecisionRail--event-log-expanded {
+        position: fixed;
+        top: max(150px, calc(40vh + env(safe-area-inset-top, 0px))) !important;
+        right: 10px;
+        left: 10px !important;
+        width: auto;
+    }
+
+    .ActionDecisionRail--event-log-expanded .DecisionActionPanel {
+        max-height: min(23vh, 23dvh, 194px);
+    }
 }
 
 @media only screen and (min-width: 1024px) {

@@ -22,6 +22,17 @@ import passImage from '../../assets/action-buttons/pass.webp'
 import passActiveImage from '../../assets/action-buttons/pass-active.webp'
 
 const RESPONSE_WINDOW_TYPES = new Set(['challenge', 'block', 'block_challenge'])
+const REACTION_PRESENCE_MS = 3500
+const REACTION_PRESENCE_FADE_MS = 180
+const REACTION_PRESENCE_REACTIONS = new Set([
+    'like', 'bravo', 'laugh', 'skeptical', 'surprise', 'thinking', 'dislike', 'secret'
+])
+
+function eventLogExpandedByDefault() {
+    return !(typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 720px)').matches)
+}
 
 function responseButtonFor(decision, option, localizedLabel) {
     if (!decision || !RESPONSE_WINDOW_TYPES.has(decision.type)) return null
@@ -288,14 +299,15 @@ export default class Coup extends Component {
             dissolved: false,
             disconnectedPlayer: '',
             canPlayAgain: false,
-            logs: [],
             disconnected: false,
             codexDisabled: Boolean(props.codexDisabled),
             actionRailPosition: null,
             actionPanelCompact: false,
             actionPanelHasEntered: false,
             actionPanelShowDetails: true,
-            actionPanelDetailsExpanded: true
+            actionPanelDetailsExpanded: true,
+            eventLogExpanded: eventLogExpandedByDefault(),
+            reactionPresence: {}
         }
         this.pauseOverlayRef = createRef()
         this.decisionSectionRef = createRef()
@@ -309,8 +321,11 @@ export default class Coup extends Component {
         this.actionPanelDetailsTimer = null
         this.actionPanelExpandFrame = null
         this.actionPanelExpandTimer = null
+        this.reactionPresenceTimers = new Map()
+        this.reactionPresenceSerial = 0
 
         const socket = this.props.socket
+        socket.on('g-reactionPresence', this.handleReactionPresence)
         socket.on('disconnect', () => this.setState({ disconnected: true }))
         socket.on('g-updatePlayers', snapshot => {
             if (!snapshot || !Array.isArray(snapshot.players)) return
@@ -322,7 +337,6 @@ export default class Coup extends Component {
             })
         })
         socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
-        socket.on('g-addLog', message => this.setState(state => ({ logs: state.logs.concat(String(message)) })))
         socket.on('g-decision', decision => {
             if (this.state.dissolved || this.state.winner) return
             this.actionSubmissionLock = false
@@ -474,6 +488,11 @@ export default class Coup extends Component {
         }
     }
 
+    handleEventLogExpandedChange = expanded => {
+        if (this.state.eventLogExpanded === expanded) return
+        this.setState({ eventLogExpanded: expanded })
+    }
+
     componentDidUpdate(prevProps, prevState) {
         const decision = this.state.decision
         const previousDecision = prevState.decision
@@ -491,6 +510,69 @@ export default class Coup extends Component {
     componentWillUnmount() {
         if (typeof window !== 'undefined') window.removeEventListener('resize', this.handleActionRailResize)
         this.clearActionPanelTimers()
+        const socket = this.props.socket
+        if (typeof socket.off === 'function') socket.off('g-reactionPresence', this.handleReactionPresence)
+        else if (typeof socket.removeListener === 'function') socket.removeListener('g-reactionPresence', this.handleReactionPresence)
+        for (const seat of this.reactionPresenceTimers.keys()) this.clearReactionPresenceTimer(seat)
+    }
+
+    clearReactionPresenceTimer = seat => {
+        const timers = this.reactionPresenceTimers.get(seat)
+        if (!timers) return
+        if (timers.expireTimer !== null) clearTimeout(timers.expireTimer)
+        if (timers.removeTimer !== null) clearTimeout(timers.removeTimer)
+        this.reactionPresenceTimers.delete(seat)
+    }
+
+    handleReactionPresence = payload => {
+        if (!payload || !Number.isInteger(payload.seat) || payload.seat < 0 || payload.seat > 5) return
+        const { seat, reaction } = payload
+        if (reaction !== null && (typeof reaction !== 'string' || !REACTION_PRESENCE_REACTIONS.has(reaction))) return
+
+        this.clearReactionPresenceTimer(seat)
+        if (reaction === null) {
+            this.setState(state => {
+                if (!state.reactionPresence[seat]) return null
+                const reactionPresence = { ...state.reactionPresence }
+                delete reactionPresence[seat]
+                return { reactionPresence }
+            })
+            return
+        }
+
+        const token = ++this.reactionPresenceSerial
+        const timers = { expireTimer: null, removeTimer: null, token }
+        this.reactionPresenceTimers.set(seat, timers)
+        this.setState(state => ({
+            reactionPresence: {
+                ...state.reactionPresence,
+                [seat]: { reaction, token, fading: false }
+            }
+        }))
+
+        timers.expireTimer = setTimeout(() => {
+            this.setState(state => {
+                const current = state.reactionPresence[seat]
+                if (!current || current.token !== token) return null
+                return {
+                    reactionPresence: {
+                        ...state.reactionPresence,
+                        [seat]: { ...current, fading: true }
+                    }
+                }
+            })
+            timers.removeTimer = setTimeout(() => {
+                if (this.reactionPresenceTimers.get(seat) !== timers) return
+                this.reactionPresenceTimers.delete(seat)
+                this.setState(state => {
+                    const current = state.reactionPresence[seat]
+                    if (!current || current.token !== token) return null
+                    const reactionPresence = { ...state.reactionPresence }
+                    delete reactionPresence[seat]
+                    return { reactionPresence }
+                })
+            }, REACTION_PRESENCE_FADE_MS)
+        }, REACTION_PRESENCE_MS)
     }
 
     measureActionRailPosition = () => {
@@ -842,8 +924,9 @@ export default class Coup extends Component {
         const actionRailStyle = railPosition
             ? { left: `${railPosition.left}px`, top: `${railPosition.top}px` }
             : undefined
+        const actionRailClassName = `ActionDecisionRail${this.state.eventLogExpanded ? ' ActionDecisionRail--event-log-expanded' : ''}`
         const actionDecisionRail = railDecision && typeof document !== 'undefined'
-            ? createPortal(<div className="ActionDecisionRail" style={actionRailStyle} aria-live="polite">
+            ? createPortal(<div className={actionRailClassName} style={actionRailStyle} aria-live="polite">
                 <CheatSheetModal />
                 {actionDecision
                     ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
@@ -864,9 +947,6 @@ export default class Coup extends Component {
                     <p>{t('game.player.identity', { playerName: this.props.name })}{this.props.isSpectator ? ` ${t('game.spectator')}` : ''}</p>
                     {!this.props.isSpectator && <p>{t('game.player.coins', { coins: me ? me.money : 0 })}</p>}
                 </div>
-                <div className="CurrentPlayer">
-                    {this.state.currentPlayer && <p>{t('game.turn.current', { playerName: this.state.currentPlayer })}</p>}
-                </div>
                 <RulesModal />
                 {!railDecision && <CheatSheetModal />}
                 {railDecision && <div
@@ -874,7 +954,12 @@ export default class Coup extends Component {
                     className="CheatSheet ActionDecisionAnchorProbe"
                     aria-hidden="true"
                 />}
-                <EventLog logs={this.state.logs} />
+                <EventLog
+                    socket={this.props.socket}
+                    players={this.state.players}
+                    decisionRailOpen={Boolean(railDecision)}
+                    onExpandedChange={this.handleEventLogExpandedChange}
+                />
             </div>
 
             {actionDecisionRail}
@@ -887,6 +972,7 @@ export default class Coup extends Component {
                 responseWindowOpen={responseWindowOpen}
                 responseAvailable={responseAvailable}
                 courtCount={this.state.courtCount}
+                reactionPresence={this.state.reactionPresence}
             />
             <ReferencePanel />
 

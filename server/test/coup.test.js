@@ -135,9 +135,11 @@ test('simultaneous challenges resolve by clockwise seat order, independent of ar
     clockwiseSecond.receive('g-submitDecision', envelope(secondWindow, 'challenge'))
     clockwiseFirst.receive('g-submitDecision', envelope(firstWindow, 'challenge'))
 
-    const messages = namespace.outgoing.filter(item => item.event === 'g-addLog').map(item => item.payload)
-    assert.ok(messages.includes('Player 1 challenged Player 0.'))
-    assert.equal(messages.includes('Player 2 challenged Player 0.'), false)
+    const events = namespace.outgoing.filter(item => item.event === 'g-addLog').map(item => item.payload)
+    assert.ok(events.some(event => event.type === 'challenge_started'
+        && event.data.actorSeat === 1 && event.data.targetSeat === 0))
+    assert.equal(events.some(event => event.type === 'challenge_started'
+        && event.data.actorSeat === 2 && event.data.targetSeat === 0), false)
     assert.equal(game.activeDecision.type, 'prove_claim')
 })
 
@@ -158,9 +160,11 @@ test('simultaneous block declarations use the same fixed seat priority', () => {
 
     clockwiseSecond.receive('g-submitDecision', envelope(secondWindow, 'block:duke'))
     clockwiseFirst.receive('g-submitDecision', envelope(firstWindow, 'block:duke'))
-    const messages = namespace.outgoing.filter(item => item.event === 'g-addLog').map(item => item.payload)
-    assert.ok(messages.includes('Player 1 declared a block with duke.'))
-    assert.equal(messages.includes('Player 2 declared a block with duke.'), false)
+    const events = namespace.outgoing.filter(item => item.event === 'g-addLog').map(item => item.payload)
+    assert.ok(events.some(event => event.type === 'block_declared'
+        && event.data.actorSeat === 1 && event.data.targetSeat === 0))
+    assert.equal(events.some(event => event.type === 'block_declared'
+        && event.data.actorSeat === 2 && event.data.targetSeat === 0), false)
     assert.equal(game.activeDecision.type, 'block_challenge')
 })
 
