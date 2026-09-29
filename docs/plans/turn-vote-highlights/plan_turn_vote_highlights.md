@@ -7,7 +7,7 @@
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 **Branch / worktree:** `issue/43-turn-vote-highlights` / `.worktrees/issue-43-turn-vote-highlights`.
 **Base / destino:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a` (incluye PR #54 de #40) / `master` de `pronficilio/coup-online`.
-**Integración:** una PR para el issue; todavía no existe.
+**Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` hacia `master`, head `issue/43-turn-vote-highlights` en `7bc10d44285424cae6a889d2501d4fa39e1d6b37`.
 
 ## Estado operativo al reclamar (histórico)
 
@@ -70,4 +70,4 @@ Recorrer A, B y C: turno de A resalta sus cartas/nombre; al declarar, el nombre 
 
 ## Operación
 
-El claim de #43 y el worktree aislado están confirmados. La rama se rebasó sobre `origin/master@0fa8e7a`, que integra #40; el Alquimista reaudita los diffs antes de continuar F1. Una sola PR hacia `master`. No trabajar en la rama base. El Verifier es independiente del implementador y opera al final. No agregar ni ejecutar tests automatizados salvo que el handoff/proyecto los exija; aquí se pide recorrido manual más las validaciones mínimas apropiadas al cambio.
+El claim de #43 y el worktree aislado están confirmados. La rama se rebasó sobre `origin/master@0fa8e7a`, que integra #40. La PR canónica #57 está abierta para revisión del Orquestador. No integrar ni cerrar la issue desde esta unidad. No trabajar en la rama base. El Verifier es independiente del implementador y opera al final. No agregar ni ejecutar tests automatizados salvo que el handoff/proyecto los exija; aquí se pide recorrido manual más las validaciones mínimas apropiadas al cambio.

@@ -7,6 +7,7 @@
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Branch / worktree:** `issue/43-turn-vote-highlights` / `/mnt/e/dev/coup/.worktrees/issue-43-turn-vote-highlights`.
 - **Merge target:** `master` de `pronficilio/coup-online`; una PR única.
+- **PR canónica:** [#57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` / `CLEAN`, head `7bc10d44285424cae6a889d2501d4fa39e1d6b37`; sin integrar.
 - **Pregunta de falsificación:** ¿se apagan las cartas de A o permanece resaltado su nombre después de enviar la acción, queda invisible que C no ha respondido, o sobrevive un indicador pendiente tras responder/cerrar?
 - **Fase cerrada:** F1, separar turno formal del conjunto público de asientos pendientes y mostrar ambas señales en vivo; Verifier FINAL `PASS`.
 - **Coordinación:** #40 cerró mediante PR #54 y ya integra su antigua edición de `Coup.js`; inspeccionar la base rebasada. #44 continúa abierta: su F1 es de solo lectura y F2 deberá secuenciarse después de #43. #45 está cerrada y mantiene alcance separado. Preservar los cambios locales ajenos de la raíz.
@@ -14,7 +15,7 @@
 - **Commit de cierre F1:** `feat(turn-vote-highlights): issue 43 F1 CLOSED ready_review`.
 - **Verifier:** `PASS` independiente FINAL sobre `3406e10fb18ec9d15a85f069c98dd9df4ffc8b4a`; reporte: `docs/plans/turn-vote-highlights/report_issue_43_F1_verifier.md`.
 - **Verificación solicitada:** walkthrough A/B/C en respuesta múltiple y respuesta única; comprobar sincronía visible en todos los clientes y ausencia de estados obsoletos. Revisiones/build/sintaxis que correspondan a las superficies modificadas; no agregar ni ejecutar tests automatizados por defecto.
-- **Secuencia:** reclamar issue y releerla; registrar claim visible; comprobar topología; crear branch/worktree aislado desde base actual; trasladar allí solo los documentos de #43; registrar claim/worktree; coordinar con #40; implementar y cerrar F1 con evidencia y commit; pedir Verifier FINAL.
+- **Siguiente paso:** revisión del Orquestador sobre la PR #57. No integrar ni cerrar la issue hasta decisión del Orquestador.
 
 ## Ejecución F1
 
