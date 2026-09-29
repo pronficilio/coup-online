@@ -1,12 +1,12 @@
 # Handoff para Agente Alquimista — issue #61
 
-- **Issue:** https://github.com/pronficilio/coup-online/issues/61 (`OPEN`, asignada a `pronficilio`; estado operativo `ACTIVE`).
+- **Issue:** https://github.com/pronficilio/coup-online/issues/61 (`OPEN`, asignada a `pronficilio`; estado operativo `BLOCKED`).
 - **Plan exacto:** `docs/plans/own-card-zoom/plan_own_card_zoom.md`.
 - **Bitácora exacta:** `docs/plans/log/issue-61.jsonl` (append-only).
 - **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `NONE`.
 - **Verifier requerido ahora:** no; la política predeterminada del proyecto es `NONE` para este cambio visual.
 - **Pregunta de falsificación:** ¿abrir/cerrar rápidamente, perder la influencia de origen, recibir decisión o pausa, navegar con teclado o reducir el viewport deja un modal atascado, pierde el foco, expone una identidad rival o bloquea una acción?
-- **Fase activa:** F1 `ACTIVE` — ampliar una influencia propia con transición medida, cierre seguro y revisión visual.
+- **Fase:** F1 `BLOCKED` — implementación y build listos; falta revisión visual manual en un navegador.
 - **Por qué sigue:** la petición del propietario es concreta y la inspección de `PlayerBoard.js`, los assets existentes, `react-modal` y la captura `fotos/pantalla.png` permite delimitar una mejora local.
 - **Documentos fuente:** issue #61; `docs/plans/own-card-zoom/plan_own_card_zoom.md`; reglas locales `../../docs/agentes/ORQUESTADOR.md` y `../../docs/agentes/ALQUIMISTA.md` (ignoradas por Git; leer desde el checkout raíz); `docs/plans/PROJECT_ORCHESTRATION.yaml`; `PlayerBoard.js`, `PlayerBoardStyles.css`, `ReferencePanel.js` y `ReferencePanel.css`; captura local `../../fotos/pantalla.png` en checkout raíz (ignorada por Git).
 - **Subtareas listas:** hacer activables únicamente las influencias propias activas; crear modal/portal con cierre, foco y traducciones; animar desde/hacia rectángulo medido; cerrar ante pausa/decisión/invalidez; revisar movimiento reducido, escritorio, móvil, build y reporte.
@@ -32,11 +32,12 @@
 - Base sincronizada: `origin/master` continúa en `b39f649`; HEAD documental `83d4091`.
 - El checkout raíz conserva sus cambios locales; el trabajo técnico queda en este worktree.
 - `../../fotos/pantalla.png` se usa solo como referencia y no se añadirá al PR.
+- Reporte parcial: `docs/plans/own-card-zoom/report_issue_61_F1.md`; build `PASS`, walkthrough visual pendiente por falta de navegador en la sesión.
 
 No crees otra rama, worktree o PR. Lee las reglas locales ignoradas por Git desde `../../docs/agentes/`. No uses el checkout raíz para editar código ni `upstream`.
 
 ## Validación y cierre
 
-F1 debe responder si la carta puede ampliarse con continuidad y volver al tablero sin afectar privacidad, foco o decisiones. Ejecuta el build y la revisión visual definidos en el plan; registra evidencia y la respuesta a falsificación. Cierra con un commit que incluya implementación, reporte y `phase_verdict`. No marques `PASS` si la coordinación con decisión/pausa o el acceso por teclado/táctil no está resuelta. El Ejecutor no integra ni cierra la issue; espera revisión del Orquestador.
+F1 debe responder si la carta puede ampliarse con continuidad y volver al tablero sin afectar privacidad, foco o decisiones. Build ejecutado y aprobado; falta la revisión visual definida en el plan. El Ejecutor registra evidencia, mantiene el veredicto `BLOCKED` y espera que el Orquestador coordine un walkthrough real en escritorio y móvil. No marques `PASS` hasta validar foco, toque, movimiento reducido y coordinación dinámica con decisión/pausa.
 
-**Dueño actual:** Agente Alquimista ejecutando F1.
+**Siguiente dueño:** Agente Orquestador; coordinar walkthrough visual manual para desbloquear F1.

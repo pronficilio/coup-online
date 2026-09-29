@@ -1,11 +1,12 @@
 # Ampliar una influencia propia desde el tablero — issue #61
 
 - **Issue:** [#61 — Ampliar las influencias propias desde el tablero con una transición fluida](https://github.com/pronficilio/coup-online/issues/61)
-- **Estado:** `ACTIVE`; F1 `ACTIVE`
+- **Estado:** `BLOCKED`; F1 `BLOCKED`
 - **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `NONE`
 - **Branch / worktree / integración:** `issue/61-own-card-zoom` / `.worktrees/issue-61-own-card-zoom` / `master`
 - **Handoff:** `docs/plans/active/issue_61_own_card_zoom.md`
 - **Bitácora:** `docs/plans/log/issue-61.jsonl`
+- **Reporte F1:** `docs/plans/own-card-zoom/report_issue_61_F1.md`
 
 ## Solicitud y objetivo
 

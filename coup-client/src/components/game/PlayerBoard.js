@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import courtDeckImage from '../../assets/deck.webp'
 import dukeImage from '../../assets/characters/duque.webp'
 import captainImage from '../../assets/characters/capitan.webp'
@@ -9,10 +9,12 @@ import cardBackImage from '../../assets/characters/reverso.webp'
 import playerIconImage from '../../assets/player.webp'
 import coinImage from '../../assets/coin.webp'
 import { getPlayerBoardSeats } from './playerBoardLayout'
+import OwnCardZoom from './OwnCardZoom'
 import { t } from '../../i18n'
 import './PlayerBoardStyles.css'
 
 const INFLUENCE_SLOTS = [0, 1]
+const EMPTY_PLAYERS = []
 const INFLUENCE_IMAGES = {
     duke: dukeImage,
     captain: captainImage,
@@ -49,7 +51,7 @@ function getInfluenceImage(influence) {
     return INFLUENCE_IMAGES[String(influence).toLowerCase()] || cardBackImage
 }
 
-function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) {
+function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex, onOpenOwnInfluence, zoomedSlotIndex, zoomDisabled) {
     const revealed = Array.isArray(player.revealedInfluences) ? player.revealedInfluences : []
     const own = isObserver && Array.isArray(observerInfluences) ? observerInfluences : []
     const knownCards = isObserver ? revealed.concat(own) : revealed
@@ -68,25 +70,46 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
 
     if (knownCards[slotIndex]) {
         const influence = knownCards[slotIndex]
+        const isZoomable = isOwnActive && !isLost
+        const roleLabelText = roleLabel(influence)
+        const accessibleLabel = isZoomable
+            ? t('game.playerBoard.zoom.open', { roleLabel: roleLabelText })
+            : isLost
+                ? t('game.playerBoard.influenceLost', { roleLabel: roleLabelText })
+                : t('game.playerBoard.influenceVisible', { roleLabel: roleLabelText })
+        const slotClassName = `PlayerInfluenceSlot PlayerInfluenceSlot--face${isLost ? ' PlayerInfluenceSlot--lost' : ''}${isZoomable ? ' PlayerInfluenceSlot--interactive' : ''}`
+        const image = <img
+            className="PlayerInfluenceImage"
+            src={getInfluenceImage(influence)}
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+        />
+        const lostOverlay = isLost && <span className="PlayerInfluenceLostOverlay" aria-hidden="true">
+            <span className="PlayerInfluenceLostMarker">×</span>
+        </span>
         return <div className="PlayerInfluenceEntry" key={slotIndex}>
-            <span
-                className={`PlayerInfluenceSlot PlayerInfluenceSlot--face${isLost ? ' PlayerInfluenceSlot--lost' : ''}`}
-                role="img"
-                aria-label={isLost
-                    ? t('game.playerBoard.influenceLost', { roleLabel: roleLabel(influence) })
-                    : t('game.playerBoard.influenceVisible', { roleLabel: roleLabel(influence) })}
-            >
-                <img
-                    className="PlayerInfluenceImage"
-                    src={getInfluenceImage(influence)}
-                    alt=""
-                    aria-hidden="true"
-                    draggable="false"
-                />
-                {isLost && <span className="PlayerInfluenceLostOverlay" aria-hidden="true">
-                    <span className="PlayerInfluenceLostMarker">×</span>
+            {isZoomable
+                ? <button
+                    type="button"
+                    className={slotClassName}
+                    aria-label={accessibleLabel}
+                    aria-haspopup="dialog"
+                    aria-expanded={zoomedSlotIndex === slotIndex}
+                    data-own-influence={String(influence).toLowerCase()}
+                    disabled={zoomDisabled}
+                    onClick={event => onOpenOwnInfluence(influence, slotIndex, event.currentTarget)}
+                >
+                    {image}
+                </button>
+                : <span
+                    className={slotClassName}
+                    role="img"
+                    aria-label={accessibleLabel}
+                >
+                    {image}
+                    {lostOverlay}
                 </span>}
-            </span>
             {(isOwnActive || isLost) && <span className="PlayerInfluenceRoleLabel">{roleLabel(influence)}</span>}
         </div>
     }
@@ -110,14 +133,54 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex) 
 }
 
 export default function PlayerBoard(props) {
-    const players = Array.isArray(props.players) ? props.players : []
+    const [zoomedCard, setZoomedCard] = useState(null)
+    const [zoomOpen, setZoomOpen] = useState(false)
+    const boardRef = useRef(null)
+    const zoomedCardRef = useRef(null)
+    const zoomSessionRef = useRef(0)
+    zoomedCardRef.current = zoomedCard
+    const players = Array.isArray(props.players) ? props.players : EMPTY_PLAYERS
     const seats = getPlayerBoardSeats(players, props.observerName)
+    const observerInfluences = Array.isArray(props.observerInfluences) ? props.observerInfluences : []
+    const zoomDisabled = Boolean(props.zoomDisabled)
     const pendingDecisionSeats = new Set(Array.isArray(props.pendingDecisionSeats)
         ? props.pendingDecisionSeats.filter(Number.isInteger)
         : [])
 
+    const openOwnInfluence = (influence, slotIndex, originElement) => {
+        const label = roleLabel(influence)
+        setZoomedCard({
+            sessionId: zoomSessionRef.current + 1,
+            roleKey: String(influence).toLowerCase(),
+            slotIndex,
+            imageSrc: getInfluenceImage(influence),
+            cardName: t('game.playerBoard.zoom.name', { roleLabel: label }),
+            cardLabel: t('game.playerBoard.zoom.close', { roleLabel: label }),
+            originElement
+        })
+        zoomSessionRef.current += 1
+        setZoomOpen(true)
+    }
+
+    useEffect(() => {
+        if (!zoomOpen || !zoomedCard) return
+
+        const originIsActive = zoomedCard.originElement
+            && zoomedCard.originElement.isConnected
+            && zoomedCard.originElement.dataset.ownInfluence === zoomedCard.roleKey
+        if (zoomDisabled || !originIsActive) setZoomOpen(false)
+    }, [players, props.observerInfluences, zoomDisabled, zoomOpen, zoomedCard])
+
+    const finishZoomClose = (closedOriginElement, closedSessionId) => {
+        if (!zoomedCardRef.current
+            || zoomedCardRef.current.originElement !== closedOriginElement
+            || zoomedCardRef.current.sessionId !== closedSessionId) return
+        setZoomOpen(false)
+        setZoomedCard(null)
+    }
+
     return (
-        <div className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label={t('game.playerBoard.label')}>
+        <div ref={boardRef} tabIndex="-1" className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label={t('game.playerBoard.label')}>
             <div className="PlayerBoardCenter" aria-hidden="true" />
             <div className="PlayerBoardCourt">
                 {Number.isFinite(props.courtCount) && <span className="PlayerBoardCourtCount" role="status" aria-live="polite">
@@ -219,11 +282,30 @@ export default function PlayerBoard(props) {
                     </div>
                     <div className="PlayerBoardSeatInfluences">
                         {INFLUENCE_SLOTS.map(slotIndex =>
-                            renderInfluenceSlot(player, isObserver, props.observerInfluences, slotIndex)
+                            renderInfluenceSlot(
+                                player,
+                                isObserver,
+                                observerInfluences,
+                                slotIndex,
+                                openOwnInfluence,
+                                zoomOpen && zoomedCard ? zoomedCard.slotIndex : null,
+                                zoomDisabled
+                            )
                         )}
                     </div>
                 </section>
             })}
+            <OwnCardZoom
+                open={zoomOpen}
+                sessionId={zoomedCard && zoomedCard.sessionId}
+                imageSrc={zoomedCard && zoomedCard.imageSrc}
+                cardName={zoomedCard && zoomedCard.cardName}
+                cardLabel={zoomedCard && zoomedCard.cardLabel}
+                originElement={zoomedCard && zoomedCard.originElement}
+                fallbackFocusElement={boardRef.current}
+                onRequestClose={() => setZoomOpen(false)}
+                onCloseComplete={finishZoomClose}
+            />
         </div>
     )
 }
