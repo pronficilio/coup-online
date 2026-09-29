@@ -6,6 +6,10 @@
 **Base:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a`, que incluye #40 por PR #54.
 **Commit de implementación revisado:** `3406e10fb18ec9d15a85f069c98dd9df4ffc8b4a`.
 
+## Validación visual del propietario
+
+El propietario revisó el preview local de esta rama en una mesa de 3 y otra de 4 jugadores, y confirmó que el resaltado se comporta como esperaba. Esta comprobación visual complementa el recorrido estático del Verifier.
+
 ## Cambio
 
 - `server/game/coup.js` deriva `pendingDecisionSeats` de `activeDecision.allowed` menos `activeDecision.responses`, ignorando asientos eliminados. Los snapshots `g-updatePlayers` incluyen únicamente los índices públicos de los asientos pendientes; no incluyen tipo/ID de decisión, opciones, choice IDs, claves de actor ni socket IDs.
@@ -23,7 +27,7 @@
 5. En una ventana con un solo respondiente, el snapshot inicial contiene su asiento y el cierre publica `[]`. Si Codex responde, usa el mismo `submitChoice` sin socket ID y produce la misma actualización pública; si A sigue elegible en `block_challenge`, su asiento aparece porque se deriva de `allowed`, no del turno formal.
 6. Pausa o disolución borran `activeDecision` antes de llamar a `updatePlayers`; una reanudación vuelve a publicar solo los asientos no respondidos.
 
-Este es un recorrido de flujo y payload trazado en el código, no una sesión de navegador con tres clientes. No hay herramienta de navegador interactiva disponible en esta ejecución; no se inventa evidencia visual dinámica.
+El recorrido enumerado arriba fue inicialmente estático. Después, el propietario comprobó el comportamiento en el preview local con 3 y 4 jugadores.
 
 ## Validaciones
 
@@ -36,4 +40,4 @@ Este es un recorrido de flujo y payload trazado en el código, no una sesión de
 
 ## Falsificación y límites
 
-La lista de pendientes procede del mapa de elegibilidad/respuestas vigente en el servidor, y cada respuesta/cierre produce un snapshot nuevo; por ello la UI no infiere pendientes desde el turno formal ni desde las opciones privadas del cliente. El Verifier FINAL intentó refutar respuestas fuera de orden, respuestas Codex, actor formal elegible en una decisión encadenada, asiento eliminado, cierre y limpieza durante pausa/disolución; emitió `PASS`. La sincronía funcional fue trazada por código y compilada, pero no se verificó con una mesa viva de navegador.
+La lista de pendientes procede del mapa de elegibilidad/respuestas vigente en el servidor, y cada respuesta/cierre produce un snapshot nuevo; por ello la UI no infiere pendientes desde el turno formal ni desde las opciones privadas del cliente. El Verifier FINAL intentó refutar respuestas fuera de orden, respuestas Codex, actor formal elegible en una decisión encadenada, asiento eliminado, cierre y limpieza durante pausa/disolución; emitió `PASS`. El Verifier hizo una revisión estática; además, el propietario confirmó la sincronía visual en mesas vivas con 3 y 4 jugadores.

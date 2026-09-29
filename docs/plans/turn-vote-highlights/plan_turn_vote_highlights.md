@@ -1,6 +1,6 @@
 # Plan — Resaltado del turno y de las respuestas pendientes (#43)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS)`; issue `OPEN`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS)`; validación visual del propietario `PASS`; issue `OPEN`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/43
 **Handoff:** `docs/plans/active/issue_43_turn_vote_highlights.md`
 **Bitácora:** `docs/plans/log/issue-43.jsonl` (append-only).
@@ -8,6 +8,8 @@
 **Branch / worktree:** `issue/43-turn-vote-highlights` / `.worktrees/issue-43-turn-vote-highlights`.
 **Base / destino:** `origin/master@0fa8e7a33319013d0aed8435403a5e8dad35e44a` (incluye PR #54 de #40) / `master` de `pronficilio/coup-online`.
 **Integración:** [PR #57](https://github.com/pronficilio/coup-online/pull/57), `OPEN` hacia `master`, head `issue/43-turn-vote-highlights`.
+
+El propietario revisó el preview y confirmó el comportamiento esperado con mesas de 3 y 4 jugadores. La revisión del Orquestador puede integrar la PR.
 
 ## Estado operativo al reclamar (histórico)
 

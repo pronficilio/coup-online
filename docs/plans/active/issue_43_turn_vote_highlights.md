@@ -17,6 +17,8 @@
 - **Verificación solicitada:** walkthrough A/B/C en respuesta múltiple y respuesta única; comprobar sincronía visible en todos los clientes y ausencia de estados obsoletos. Revisiones/build/sintaxis que correspondan a las superficies modificadas; no agregar ni ejecutar tests automatizados por defecto.
 - **Siguiente paso:** revisión del Orquestador sobre la PR #57. No integrar ni cerrar la issue hasta decisión del Orquestador.
 
+- **Validación del propietario (2026-09-29):** probó el preview con 3 y 4 jugadores y aprobó el comportamiento visual esperado. La PR permanece abierta para integración del Orquestador.
+
 ## Ejecución F1
 
 - Evidencia: `docs/plans/turn-vote-highlights/report_issue_43_F1.md`.
