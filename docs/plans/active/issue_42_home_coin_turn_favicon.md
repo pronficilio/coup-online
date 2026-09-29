@@ -17,22 +17,22 @@
   3. El Alquimista compiló y documentó evidencia y commit F1; el propietario después confirmó el comportamiento visual con tres personas.
 - **Subtareas F2 ejecutadas:** 1) precarga/decodificación paralela A–F, cadencia de 100 ms, secuencia y cleanup con invalidación de promesas; 2) cinco frames optimizados sin pérdida byte a byte de píxeles; 3) build exitoso y evidencia documentada. No se ejecutaron tests automatizados.
 - **Criterios de aceptación:** rotación solo en turno propio activo; espectadores/pausa/final no animan; derivados ≤32×32 y ≤50 KB total; orden/alfa conservados; limpieza/restauración completa; solo cliente, sin dependencias nuevas, fuentes originales ni tests automatizados; build exitoso.
-- **Coordinación observada:** la issue #40 está `CLOSED`; PR #54 se fusionó con `d1eddb834f35d058159343475789b8df20a173a1`. La rama #42 se basa en `f950420`; `origin/master` avanzó a `b8df17f` mientras corría F2 y el branch quedó seis commits adelante/uno detrás. El Orquestador registró `sync_base` y actualizará la rama antes de abrir el PR.
+- **Coordinación observada:** la issue #40 está `CLOSED`; PR #54 se fusionó con `d1eddb834f35d058159343475789b8df20a173a1`. Tras F2, la rama #42 se rebasó limpiamente sobre `origin/master@b8df17fd71ad5024228fe7021f8ebb6d3973cff7`; la base está actualizada.
 - **Política de commits:** `COMMIT_REQUIRED` para cada fase con resultados/evidencia y `phase_verdict` en el mismo commit. F1 quedó en `901d902` tras el rebase; cierre previsto de F2: `perf(favicon): issue 42 F2 CLOSED smoother turn animation`.
 - **Branch destino:** `issue/42-home-coin-turn-favicon`.
 - **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`.
 - **Merge target:** `master` del fork `pronficilio/coup-online`.
 - **Bitácora del issue:** `docs/plans/log/issue-42.jsonl` (append-only; sin helper local).
-- **PR esperada:** una sola PR desde el branch de #42 hacia `master`, después de cerrar F2. La consulta actual al fork confirma que todavía no existe una PR para este branch.
-- **Secuencia de integración:** ya existen claim, branch/worktree y dos fases cerradas. Tras rebasear el branch sobre el `origin/master` actual, revisar docs/diff y compilar si el conflicto afecta código; confirmar que no haya una PR concurrente; el Orquestador abrirá una sola PR hacia `master`. No trabajar en la rama base.
+- **PR esperada:** una sola PR desde el branch de #42 hacia `master`, tras la revisión final del Orquestador.
+- **Secuencia de integración:** ya existen claim, branch/worktree y dos fases cerradas. La rama fue rebasada sobre `origin/master@b8df17f`; tras confirmar que no existe otra PR canónica, el Orquestador abrirá una sola PR hacia `master`. No trabajar en la rama base.
 - **Validaciones esperadas:** `cd coup-client && npm run build`; revisión manual de la secuencia, repetición y paradas; medición de las seis salidas; `git diff --check` si se usa como revisión de whitespace. No agregar ni ejecutar tests automatizados.
 - **Contrato de evidencia:** dimensiones/bytes por fotograma y total; paths; estado de build; evidencia/manual o límite exacto; respuesta a falsificación; diff y commit.
 - **Condición para invocar Verifier:** ninguna; `NONE`.
-- **Qué debe revisar el Orquestador:** diff/commit F2, evaluación de compresión, build, ciclo/cleanup y resultado manual disponible; rebasar sobre `origin/master@b8df17f`, confirmar que no haya una PR concurrente y abrir la única PR hacia master. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar la issue.
+- **Qué debe revisar el Orquestador:** diff/commit F2, evaluación de compresión, build, ciclo/cleanup y resultado manual disponible; confirmar que no haya una PR concurrente y abrir la única PR hacia master. Dejar la unidad `WAITING_ORCHESTRATOR`; no integrar ni cerrar la issue.
 
 **Claim, aislamiento y reanudación:** claim remoto publicado en https://github.com/pronficilio/coup-online/issues/42#issuecomment-5865946026. Branch/worktree canónicos `issue/42-home-coin-turn-favicon` / `/mnt/e/dev/coup/.worktrees/issue-42-home-coin-turn-favicon`; rebase y confirmación de aislamiento registrados en la bitácora. Tras el cierre de #40/PR #54, el Orquestador reactivó F1 y se releyeron issue/branch/worktree/diff antes de editar. La integración, build y evidencia quedaron documentados; F1 se cierra en el commit de fase con su `phase_verdict`.
 
-**Reanudación F1/F2:** tras cerrar #40, `TurnFavicon` se integró en `Coup.js`; el propietario validó F1 en una partida de tres y reportó lenta la cadencia de 220 ms. F2 ya la cambió a 100 ms, precargó A–F y redujo los PNG sin pérdida a 11,890 bytes. La última prueba visual disponible es la de F1; queda pendiente que el propietario observe la nueva cadencia.
+**Reanudación F1/F2:** tras cerrar #40, `TurnFavicon` se integró en `Coup.js`; el propietario validó F1 en una partida de tres y reportó lenta la cadencia de 220 ms. F2 la cambió a 100 ms, precargó A–F y redujo los PNG sin pérdida a 11,890 bytes. La última prueba visual disponible es la de F1; queda pendiente que el propietario observe la nueva cadencia.
 
 ## F2 — Alcance aprobado: fluidez y bytes (2026-09-29)
 
