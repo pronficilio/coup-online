@@ -1,7 +1,7 @@
 # Plan — reacciones opcionales de Codex en el registro de eventos
 
 **Issue:** [#62 — Permitir que Codex reaccione opcionalmente en el registro de eventos](https://github.com/pronficilio/coup-online/issues/62)  
-**Estado:** `ACTIVE`; F0 `ACTIVE`; F1–F2 `PENDING`  
+**Estado:** `WAITING_ORCHESTRATOR`; F0 `CLOSED`; F1–F2 `PENDING`
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente  
 **Branch / worktree / integración:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions` / `master`  
 **Handoff:** `docs/plans/active/issue_62_codex_event_reactions.md`  
@@ -43,19 +43,67 @@ Interpretación operativa de «acción o contracción»: decisiones del turno de
 
 **Pregunta:** ¿Puede cada decisión Codex elegible quedar enlazada a un evento público concreto, con conteos de terceros, y devolver una reacción estructurada sin ampliar autoridad ni datos privados?
 
-- **Estado:** `READY`.
+- **Estado:** `CLOSED`; revisión estática completada y entregada al Orquestador.
 - **Entrada:** `server/game/coup.js`, `server/ai/codex-protocol.js`, `server/ai/codex-client.js`, `server/ai/codex-worker.js`, `server/test/event-log-reactions.test.js` y contrato vigente de #14.
-- **Tareas:** reconstruir el orden entre `addLog()`, apertura de cada tipo de decisión y llamada Codex; fijar el evento ofrecido o la ausencia de oportunidad en cada ventana; definir forma exacta de observación/salida y validación estricta; determinar cómo contar excluyendo al asiento Codex y cómo compartir la mutación de reacción sin socket; documentar orden de aplicación ante salida válida, omitida, inválida y obsoleta.
-- **Salida:** sección de contrato y matriz decisión→evento/eligibilidad en este plan, con ejemplos estructurados que respeten el límite de observación existente.
-- **Avance:** cada oportunidad referencia únicamente un evento ya emitido y actual; los agregados excluyen de forma demostrable al asiento Codex; ninguna salida del modelo decide actor ni amplía catálogo.
-- **Pivote:** si una decisión abre antes de que exista un evento pertinente, no inventar un ID: mantenerla sin oportunidad de reacción y ofrecer contexto únicamente en decisiones posteriores que sí tengan un evento.
+- **Tareas:** completadas según `report_issue_62_F0.md`.
+- **Salida:** contrato y matriz siguientes; evidencia de lectura estática en `report_issue_62_F0.md`.
+- **Avance:** se ofrece como máximo el evento público más reciente que ya existe cuando se construye la observación; el contexto conserva solo campos públicos tipados; los conteos excluyen el asiento Codex; la respuesta opcional no decide actor ni amplía el catálogo.
+- **Pivote aplicado:** en la primera decisión de acción, si todavía no existe ningún evento público, se omite el contexto de reacción. No se genera un evento artificial.
 - **Política de commit:** `COMMIT_REQUIRED`; el cierre documental incluye plan/reporte F0 y evento `phase_verdict`.
+
+### Orden observado y matriz de elegibilidad
+
+`playTurn()` abre `action`; `openDecision()` fija opciones del servidor; `activateDecision()` publica la decisión humana y después llama `requestCodexDecision()` para cada asiento Codex pendiente. `codexObservation()` se arma inmediatamente antes de `codexClient.choose()`. Por tanto, la elegibilidad consulta solo el registro público que ya existe en ese instante. `addLog()` guarda el evento, su catálogo y lo emite con `g-addLog` sincrónicamente antes de abrir las decisiones de respuesta.
+
+| Decisión Codex | Evento vigente disponible al construir su observación |
+| --- | --- |
+| `action` | Evento público más reciente del turno anterior, si existe; en la apertura inicial no existe ninguno y se omite la oportunidad. |
+| `challenge` | `action_declared` de la acción que se está respondiendo. |
+| `block` | Evento más reciente de la acción todavía no resuelta: normalmente `action_declared`; si la reclamación pasó por desafío, el último evento de esa resolución pública. |
+| `block_challenge` | `block_declared` recién emitido para el bloqueo actual. |
+| `prove_claim` | `challenge_started` o `block_challenge_started`, según la reclamación que se debe demostrar. |
+| `lose_influence` | Evento público más reciente que conduce a la pérdida, como `claim_proved`, `claim_not_proved`, `action_declared` o una pérdida anterior de la misma resolución. `influence_lost` y `player_eliminated` de esta elección aún no existen. |
+| `exchange` | `action_declared` de la acción actual; `action_result` se crea después de elegir las cartas. |
+
+Regla uniforme: el servidor captura `publicLogEvents.at(-1)` al preparar la solicitud. La oportunidad se omite si no hay evento o si el evento no sigue presente en `logEventsByID` / su `reactions` está vacío. La respuesta solo puede referirse al ID capturado, nunca a otro evento histórico.
+
+### Contrato exacto de observación
+
+Se añade el campo opcional `observation.reactionOpportunity`; el resto del contrato vigente queda intacto. Si existe, sus claves exactas son `eventId`, `event`, `allowedReactions` y `countsByReaction`. `event` contiene `type` del enum público de #40 y una proyección de `data` con lista permitida por tipo (asientos, acciones, resultado, rol público, cantidad); no incluye `translation`, nombres, texto libre ni datos privados. `allowedReactions` copia el catálogo ya asociado al evento. `countsByReaction` tiene exactamente esos emojis como claves, incluye ceros y cuenta selecciones de asientos distintos al que decide. Cada valor es entero entre 0 y `playerCount - 1`. No incluye mapa de asientos ni `ownReactions`.
+
+```json
+{
+  "reactionOpportunity": {
+    "eventId": "a1b2c3-event-7",
+    "event": { "type": "action_declared", "data": { "actorSeat": 2, "action": "tax", "claimRole": "duke" } },
+    "allowedReactions": ["like", "bravo", "laugh", "skeptical"],
+    "countsByReaction": { "like": 2, "bravo": 0, "laugh": 1, "skeptical": 0 }
+  }
+}
+```
+
+El conteo se deriva de `reactionsByEvent[eventId]`, recorriendo selecciones cuyo asiento sea distinto de `player.seat`. Solo se envían agregados; los conteos reflejan la fotografía de la solicitud y pueden cambiar por reacciones concurrentes mientras Codex decide.
+
+### Contrato exacto de salida y aplicación
+
+`choiceId` continúa siendo obligatorio y debe pertenecer a `observation.options`. `reaction` es opcional y, cuando es válida, tiene exactamente `{ "eventId": string, "emoji": string }`. El esquema de salida declara solo `choiceId` y `reaction` en la raíz (`additionalProperties: false`); el valor opcional de `reaction` se parsea como candidato y se valida después contra la oportunidad capturada. Así un candidato cosmético mal formado o con ID/emoji no ofrecido se descarta sin invalidar la elección. Las claves extra del objeto raíz, un JSON ilegible, un `choiceId` ausente/ilegal o metadata obligatoria incorrecta conservan el error actual.
+
+```json
+{
+  "choiceId": "tax",
+  "reaction": { "eventId": "a1b2c3-event-7", "emoji": "bravo" }
+}
+```
+
+La aplicación queda ordenada así: (1) validar solicitud pendiente, `decisionId`, `stateVersion`, `RULESET_VERSION` y `choiceId` como hoy; (2) enviar la elección al `submitChoice(player.seat, ...)`, usando el asiento del objeto de jugador del servidor; (3) solo si esa elección fue aceptada, validar de nuevo que el candidato coincide con el ID/catálogo capturados y el evento sigue vigente; (4) aplicar la reacción por una función compartida con la ruta humana, usando la semántica de reemplazo/retiro de un asiento por evento y publicando `g-reactionPresence` / `g-reactionCounts`. La ruta interna Codex no finge socket ni lee asiento desde la salida. Un candidato omitido, inválido, ajeno a la oportunidad u obsoleto no pausa ni retrasa la partida. Una decisión de juego inválida conserva el manejo actual.
+
+Si Codex devuelve la misma reacción que ya tenía para ese evento, la semántica humana actual la retira. Como la observación no revela `ownReactions`, Codex no recibe estado propio para distinguir ese caso; el Orquestador debe aprobar expresamente conservar esa semántica antes de F1.
 
 ## F1 — Integrar reacción opcional a la decisión Codex
 
 **Pregunta:** ¿Puede Codex acompañar un evento del registro desde la misma respuesta de su turno sin cambiar la acción legal ni la ruta humana?
 
-- **Estado:** `PENDING` hasta el cierre F0 y autorización de avance del Orquestador.
+- **Estado:** `PENDING` hasta la revisión/aprobación del contrato F0 por el Orquestador.
 - **Entrada:** contrato F0 aprobado; #40 permanece como implementación base de eventos, catálogos, agregados y presencia.
 - **Tareas:** extender observación/esquema del runner con el contexto agregado acotado; extender salida para aceptar solo una reacción opcional del evento ofrecido; aplicar la selección desde el asiento Codex en el servidor a través de lógica compartida y segura; mantener la respuesta normal `choiceId` y las guardas de versión; descartar la parte cosmética inválida sin perder una elección de juego válida; documentar cambios y evidencia estática.
 - **Salida:** integración server/runner y reporte F1 dentro del branch único del issue.
@@ -86,3 +134,4 @@ Esta delegación no autoriza despliegue, publicación de release, activación de
 
 - 2026-09-29: unidad creada como seguimiento distinto de #14 y #40; interpretación de «contracción» fijada como respuesta/desafío a una acción. Sin cambios de producto.
 - 2026-09-29: #62 reclamada por `pronficilio`; branch `issue/62-codex-event-reactions` y worktree `.worktrees/issue-62-codex-event-reactions` confirmados desde `origin/master@b39f649`. Handoff movido a `active/`; F0 en curso, F1 sigue pendiente de revisión y aprobación del Orquestador.
+- 2026-09-29: F0 `CLOSED`; matriz, conteos, salida opcional, orden de validación/aplicación y límite de autoridad server-side documentados en este plan y `report_issue_62_F0.md`. Unidad `WAITING_ORCHESTRATOR`; no se inició F1.
