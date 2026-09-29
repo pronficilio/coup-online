@@ -23,6 +23,14 @@
     -webkit-backdrop-filter: blur(16px);
 }
 
+.EventLogPanel--transitioning-open {
+    transition: height 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.EventLogPanel--transitioning-close {
+    transition: height 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .EventLogPanelHeader {
     display: flex;
     min-height: 46px;
@@ -109,10 +117,29 @@
     padding: 2px 10px 10px;
     scrollbar-color: rgba(108, 83, 55, 0.38) transparent;
     scrollbar-width: thin;
+    transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .EventLogPanel--collapsed .EventLogPanelBody {
+    flex: 0 0 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+}
+
+.EventLogPanel--collapsed:not(.EventLogPanel--transitioning-close) .EventLogPanelBody {
     display: none;
+    visibility: hidden;
+}
+
+.EventLogPanel--transitioning-close .EventLogPanelBody {
+    flex: 1 1 auto;
+    padding-top: 2px;
+    padding-bottom: 10px;
+    visibility: visible;
+    transition-duration: 180ms;
 }
 
 .EventLogTurnGroup + .EventLogTurnGroup {
@@ -435,10 +462,6 @@
         max-height: min(26vh, 26dvh, 220px);
     }
 
-    .EventLogPanel:not(.EventLogPanel--expanded) .EventLogPanelBody {
-        display: none;
-    }
-
     .EventLogPanelHeader {
         min-height: 48px;
         padding-left: 15px;
@@ -493,6 +516,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .EventLogPanel--transitioning-open,
+    .EventLogPanel--transitioning-close,
+    .EventLogPanelBody {
+        transition: none;
+    }
+
     .EventLogPanelToggle,
     .EventLogJumpToLive,
     .EventLogReactionCountButton,

@@ -1,10 +1,10 @@
 # Plan — transición del registro de eventos
 
 **Issue:** [#60 — Animar la expansión y el colapso del registro de eventos](https://github.com/pronficilio/coup-online/issues/60)  
-**Estado:** `ACTIVE`; F1 `ACTIVE`  
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS)`
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`  
 **Branch / worktree / integración:** `issue/60-event-log-transition` / `.worktrees/issue-60-event-log-transition` / `master`  
-**Handoff:** `docs/plans/active/issue_60_event_log_transition.md`  
+**Handoff:** `docs/plans/active/issue_60_event_log_transition.md`
 **Bitácora:** `docs/plans/log/issue-60.jsonl`
 
 ## Solicitud y objetivo
@@ -19,8 +19,8 @@ La animación debe sentirse rápida y clara: alrededor de 220 ms al abrir y 180 
 - Animar el cuerpo como una pieza, con movimiento y opacidad discretos; mantener encabezado y ancho visualmente estables.
 - Conservar límites de pantalla en escritorio y móvil, y el límite reducido con decisión activa.
 - Soportar inversión de la animación mediante pulsaciones rápidas, `prefers-reduced-motion` y contenido colapsado inaccesible al foco/interacción.
-- Cuando el registro esté expandido en móvil, posicionar `.ActionDecisionRail.ActionDecisionRail--event-log-expanded` con `top: 15px` y `left: 15px`, alineado al margen superior y lateral de 15 px del registro de eventos.
-- Mantener el rail y el registro utilizables durante la transición, sin saltos ni solapamientos que oculten controles.
+- En móvil, mantener coherente el movimiento del panel de decisiones cuando el estado expandido del registro cambie su posición.
+- Coordinar el desplazamiento del panel de decisiones móvil solo donde su regla actual responda al estado expandido; mantener el rail debajo del registro durante el movimiento, sin solapamiento.
 
 Fuera de alcance: rediseño del registro, cambios a filas/reacciones, reglas o protocolo del juego, animaciones de otros paneles y dependencias de animación.
 
@@ -31,7 +31,7 @@ Fuera de alcance: rediseño del registro, cambios a filas/reacciones, reglas o p
 3. Se respetan topes de altura existentes en escritorio, móvil y decisión activa; un cambio durante la transición no deja altura o estado visual incorrectos.
 4. Reabrir conserva la posición de lectura prevista; durante el estado colapsado el contenido no recibe foco ni interacción y `aria-expanded`/`aria-controls` corresponden al panel.
 5. `prefers-reduced-motion` convierte la transición en un cambio inmediato o equivalente de movimiento reducido.
-6. En móvil, con el registro expandido, el rail de decisiones usa `top: 15px` y `left: 15px`; registro y decisiones permanecen utilizables, sin salto abrupto ni solapamiento que oculte controles.
+6. En móvil, la expansión del registro y el panel de decisiones no causan un salto abrupto o solapamiento; la partida sigue siendo usable.
 7. No se añaden bibliotecas ni se altera el contenido, lógica del juego o comportamiento de reacciones.
 8. `cd coup-client && npm run build` pasa y se revisan manualmente ambos estados, expansión/colapso rápidos y movimiento reducido en escritorio y móvil. No se agregan pruebas automatizadas para este ajuste visual.
 
@@ -47,13 +47,13 @@ Fuera de alcance: rediseño del registro, cambios a filas/reacciones, reglas o p
 **Pregunta:** ¿Puede el panel cambiar de estado con movimiento fluido y rápido, respetando límites, lectura y controles en escritorio y móvil?
 
 - **Entrada:** componentes actuales `EventLog.js`, `EventLogStyles.css`; reglas vinculadas del rail en `CoupStyles.css`; capturas locales `fotos/log1.png` y `fotos/log2.png`.
-- **Tareas:** implementar transición de altura medida y entrada/salida breve del cuerpo; preservar el alto máximo y scroll; gestionar interrupción/reversión y movimiento reducido; cambiar el rail expandido móvil a `top: 15px; left: 15px`; verificar build y recorrido visual descrito en aceptación.
+- **Tareas:** implementar transición de altura medida y entrada/salida breve del cuerpo; preservar el alto máximo y scroll; gestionar interrupción/reversión y movimiento reducido; coordinar el movimiento del rail móvil debajo del panel con una medición de su borde durante la transición; verificar build y recorrido visual descrito en aceptación.
 - **Salida/evidencia:** código y reporte corto con resultado de build, tamaños/estados revisados, comportamiento al pulsar rápido y límites observados.
 - **Avance:** criterios de aceptación satisfechos; la transición termina en el estado solicitado y no tapa contenido/decisiones.
 - **Pivote:** si la técnica inicial afecta el scroll o el layout móvil, cambiar la medición/animación limitada al panel y volver a verificar los mismos casos.
 - **Bloqueo:** solo si el panel de decisiones impide coordinar el estado móvil sin ampliar la decisión de producto.
 - **Política de commit:** `COMMIT_REQUIRED`; incluir cambio, reporte y evento `phase_verdict` en el commit de cierre.
-- **Commit previsto:** `fix(event-log): issue 60 F1 CLOSED`.
+- **Commit de fase:** `fix(event-log): issue 60 F1 CLOSED`.
 
 ## Pregunta de falsificación
 
@@ -63,3 +63,10 @@ Fuera de alcance: rediseño del registro, cambios a filas/reacciones, reglas o p
 
 - 2026-09-29: issue #60 creada en el fork; se fijan como referencia `fotos/log1.png` y `fotos/log2.png` y la cadencia objetivo inicial 220/180 ms.
 - 2026-09-29: unidad clasificada `LIGHT` / `LOW` / `NONE`; una fase F1 implementa y valida la transición.
+- 2026-09-29: el Orquestador confirma que la coordinación móvil debe conservar el rail debajo del registro y evitar saltos/solapamientos, sin nuevas coordenadas fijas.
+
+## Estado de F1
+
+F1 `CLOSED (PASS)`; la unidad queda pendiente de revisión del Orquestador. El panel conserva borde superior y scroll, abre en 220 ms y cierra en 180 ms; las pulsaciones rápidas revierten sin dejar altura/estado intermedios. El rail móvil sigue el borde del panel con 15 px de separación durante el cierre y hace un FLIP breve al volver al ancla normal; un piso `max(150px, safe-area)` evita valores negativos al recalcular fuera del viewport. Capturas manuales del preview y métricas están referenciadas en `report_issue_60_F1.md`; los iconos del preview `file://` no cargaron, lo que limita la revisión del arte de los iconos pero no de la geometría/transición.
+
+La compilación final pasa con advertencias preexistentes de `App.js` (imports `logo`/`Link` sin usar), caniuse-lite desactualizado y PostCSS sobre `dvh` en `ReferencePanel.css:100,106`. No se agregaron ni ejecutaron pruebas automatizadas.
