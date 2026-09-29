@@ -90,7 +90,10 @@ export default class RulesModal extends Component {
         }
         return (
             <>
-            <div className="Rules" onClick={this.handleOpenRulesModal}>
+            {this.props.triggerRenderer ? this.props.triggerRenderer({
+                isOpen: this.state.showRulesModal,
+                open: this.handleOpenRulesModal
+            }) : <div className="Rules" onClick={this.handleOpenRulesModal}>
                 <p>{t('common.rules')}</p>
                 <svg className="InfoIcon"xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 21 22">
                     <g id="more_info" data-name="more info" transform="translate(-39 -377)">
@@ -101,7 +104,7 @@ export default class RulesModal extends Component {
                         <text id="i" className="cls-2" transform="translate(48 393)"><tspan x="0" y="0">i</tspan></text>
                     </g>
                 </svg>
-            </div>
+            </div>}
             {modal}
             </>
         )

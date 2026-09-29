@@ -3,7 +3,7 @@
 - **Issue:** https://github.com/pronficilio/coup-online/issues/53 (abierta y asignada a `pronficilio`).
 - **Plan exacto:** este handoff compacto (`docs/plans/active/issue_53_rules_triggers_reference_panel.md`); unidad `LIGHT`.
 - **Bitácora exacta:** `docs/plans/log/issue-53.jsonl`.
-- **Estado:** `ACTIVE`; F1 `ACTIVE`.
+- **Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
 - **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 - **Verifier requerido ahora:** no.
 - **Pregunta de falsificación:** ¿pueden quedar accesos duplicados o dos instancias de un modal, o desaparecer/duplicarse el nombre y saldo visibles, tras mover los controles y retirar `.PlayerInfo`?
@@ -45,3 +45,12 @@
 ## Resolución del bloqueo anterior
 
 El reclamo inicial ocurrió mientras #40 seguía activa, por lo que no se creó aislamiento ni se editaron archivos de producto. El propietario amplió el alcance para retirar `.PlayerInfo`, que también requiere editar `Coup.js`. #40 ya cerró mediante PR #54; se desbloquea F1 desde la base actualizada `origin/master@0fa8e7a`.
+
+## Resultado F1 — CLOSED
+
+- **Archivos:** `ReferencePanel.js`, `RulesModal.js`, `CheatSheetModal.js`, `Coup.js`, `CoupStyles.css`, y esta evidencia, README y bitácora.
+- **Resultado funcional revisado:** el grupo de referencias renderiza Carta, Tabla, Reglas y Resumen con `reference-panel__trigger`; los dos últimos son botones con `type="button"`, etiqueta localizada, `aria-haspopup="dialog"` y `aria-expanded`. Reglas y resumen conservan sus instancias/modal actuales; la ruta Home sigue montando `RulesModal home`. El portal de decisión ya no crea un segundo disparador ni instancia del resumen; `ReferencePanel` permanece montado mientras el portal está activo. La caja `.PlayerInfo` se retiró y PlayerBoard sigue renderizando nombre y saldo de cada asiento.
+- **Falsificación:** revisión estática de montajes confirma una sola instancia por modal, un disparador de cada tipo en el grupo y ningún disparador interactivo en GameHeader/rail. El resumen continúa disponible desde el grupo durante decisiones. No se hizo walkthrough visual interactivo.
+- **Build:** `cd coup-client && npm run build` — pasó. CRA reportó warnings existentes en `App.js` (imports sin uso), `Coup.js:457` (mezcla `&&`/`||`) y el minificador de `ReferencePanel.css` para `dvh`; no reportó error de compilación ni warnings de ESLint en los archivos modificados.
+- **Diff check:** `git diff --check` — pasó.
+- **Commit de cierre:** `feat(game-ui): issue 53 move rules triggers into reference panel`.
