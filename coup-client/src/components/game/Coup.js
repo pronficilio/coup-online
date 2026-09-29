@@ -8,17 +8,6 @@ import ReferencePanel from './ReferencePanel'
 import ExchangeDecisionPanel from './ExchangeDecisionPanel'
 import { t } from '../../i18n'
 import { lobbyError } from '../../i18n/lobby'
-import ResponseImageButton from './ResponseImageButton'
-import blockAssassinationImage from '../../assets/action-buttons/ba.webp'
-import blockAssassinationActiveImage from '../../assets/action-buttons/ba-active.webp'
-import blockForeignAidImage from '../../assets/action-buttons/bfa.webp'
-import blockForeignAidActiveImage from '../../assets/action-buttons/bfa-active.webp'
-import blockStealImage from '../../assets/action-buttons/bs.webp'
-import blockStealActiveImage from '../../assets/action-buttons/bs-active.webp'
-import challengeImage from '../../assets/action-buttons/c.webp'
-import challengeActiveImage from '../../assets/action-buttons/c-active.webp'
-import passImage from '../../assets/action-buttons/pass.webp'
-import passActiveImage from '../../assets/action-buttons/pass-active.webp'
 
 const RESPONSE_WINDOW_TYPES = new Set(['challenge', 'block', 'block_challenge'])
 const REACTION_PRESENCE_MS = 3500
@@ -31,65 +20,6 @@ function eventLogExpandedByDefault() {
     return !(typeof window !== 'undefined'
         && typeof window.matchMedia === 'function'
         && window.matchMedia('(max-width: 720px)').matches)
-}
-
-function responseButtonFor(decision, option, localizedLabel) {
-    if (!decision || !RESPONSE_WINDOW_TYPES.has(decision.type)) return null
-
-    if (option.choiceId === 'pass') {
-        return {
-            normalImage: passImage,
-            activeImage: passActiveImage,
-            accessibleLabel: localizedLabel,
-            imageLabel: t('game.common.pass'),
-            imageLabelStyle: 'pass'
-        }
-    }
-
-    if ((decision.type === 'challenge' || decision.type === 'block_challenge') && option.choiceId === 'challenge') {
-        return {
-            normalImage: challengeImage,
-            activeImage: challengeActiveImage,
-            accessibleLabel: localizedLabel,
-            imageLabel: t('game.challenge.button'),
-            imageLabelStyle: 'challenge'
-        }
-    }
-
-    if (decision.type !== 'block') return null
-
-    if (option.choiceId === 'block:duke') {
-        return {
-            normalImage: blockForeignAidImage,
-            activeImage: blockForeignAidActiveImage,
-            accessibleLabel: localizedLabel,
-            imageLabel: t('game.block.foreignAid.button'),
-            imageLabelStyle: 'blockForeignAid'
-        }
-    }
-
-    if (option.choiceId === 'block:contessa') {
-        return {
-            normalImage: blockAssassinationImage,
-            activeImage: blockAssassinationActiveImage,
-            accessibleLabel: localizedLabel,
-            imageLabel: t('game.block.assassination.button'),
-            imageLabelStyle: 'blockAssassination'
-        }
-    }
-
-    if (option.choiceId === 'block:captain' || option.choiceId === 'block:ambassador') {
-        return {
-            normalImage: blockStealImage,
-            activeImage: blockStealActiveImage,
-            accessibleLabel: localizedLabel,
-            supplementalLabel: localizedLabel,
-            imageLabel: t('game.block.steal.button'),
-            imageLabelStyle: 'blockSteal'
-        }
-    }
-
-    return null
 }
 
 const ACTION_KEYS = {
@@ -183,6 +113,19 @@ function decisionDescription(decision, currentPlayer, ownInfluenceCount) {
     if (decision.type === 'lose_influence') return t('game.decision.description.loseInfluence')
     if (decision.type === 'exchange') return t('game.decision.description.exchange', { count: ownInfluenceCount })
     return t('game.decision.description.generic')
+}
+
+function decisionFollowup(decision) {
+    if (!decision) return ''
+    const key = {
+        action: 'action',
+        challenge: 'challenge',
+        block: 'block',
+        block_challenge: 'blockChallenge',
+        prove_claim: 'proveClaim',
+        lose_influence: 'loseInfluence'
+    }[decision.type]
+    return key ? t(`game.decision.followup.${key}`) : ''
 }
 
 function actionOptionLabel(action) {
@@ -290,6 +233,7 @@ export default class Coup extends Component {
             decision: null,
             actionTarget: null,
             submitted: false,
+            submittedChoiceId: null,
             decisionError: '',
             gamePaused: false,
             canResume: false,
@@ -344,18 +288,20 @@ export default class Coup extends Component {
             if (this.state.dissolved || this.state.winner) return
             this.actionSubmissionLock = false
             this.clearActionPanelTimers()
-            const railDecision = decision && (decision.type === 'action' || decision.type === 'exchange')
             this.setState(state => ({
                 decision,
                 actionTarget: null,
                 submitted: false,
+                submittedChoiceId: null,
                 decisionError: state.gamePaused ? state.decisionError : '',
-                actionRailPosition: railDecision ? this.measureActionRailPosition() : null,
+                actionRailPosition: null,
                 actionPanelCompact: false,
                 actionPanelHasEntered: false,
                 actionPanelShowDetails: true,
                 actionPanelDetailsExpanded: true
-            }))
+            }), () => {
+                if (this.decisionSectionRef.current) this.decisionSectionRef.current.focus({ preventScroll: true })
+            })
         })
         socket.on('g-decisionClosed', closed => {
             if (this.state.decision && closed.decisionId === this.state.decision.decisionId) {
@@ -365,6 +311,7 @@ export default class Coup extends Component {
                     decision: null,
                     actionTarget: null,
                     submitted: false,
+                    submittedChoiceId: null,
                     actionRailPosition: null,
                     actionPanelCompact: false,
                     actionPanelHasEntered: false,
@@ -384,6 +331,7 @@ export default class Coup extends Component {
             if (rejectedResume) this.resumeRequestPending = false
             this.setState(state => ({
                 submitted: false,
+                submittedChoiceId: null,
                 decisionError: decisionError(rejection && rejection.reason ? rejection.reason : ''),
                 resumePending: rejectedResume ? false : state.resumePending
             }))
@@ -401,6 +349,7 @@ export default class Coup extends Component {
                 decision: null,
                 actionTarget: null,
                 submitted: false,
+                submittedChoiceId: null,
                 gamePaused: showOverlay,
                 canResume: showOverlay && Boolean(paused && paused.canResume),
                 resumePending: false,
@@ -437,10 +386,14 @@ export default class Coup extends Component {
         })
         socket.on('g-gameOver', winner => {
             if (this.state.dissolved) return
+            this.actionSubmissionLock = false
             this.clearActionPanelTimers()
             this.setState({
                 winner: String(winner || ''),
                 decision: null,
+                actionTarget: null,
+                submitted: false,
+                submittedChoiceId: null,
                 gamePaused: false,
                 canResume: false,
                 resumePending: false,
@@ -459,10 +412,11 @@ export default class Coup extends Component {
             this.clearActionPanelTimers()
             this.setState({
                 dissolved: true,
-                disconnectedPlayer: String(result && result.playerName || ''),
+                disconnectedPlayer: String((result && result.playerName) || ''),
                 decision: null,
                 actionTarget: null,
                 submitted: false,
+                submittedChoiceId: null,
                 decisionError: '',
                 gamePaused: false,
                 canResume: false,
@@ -485,7 +439,7 @@ export default class Coup extends Component {
 
     componentDidMount() {
         if (typeof window !== 'undefined') window.addEventListener('resize', this.handleActionRailResize)
-        if (this.isActionRailDecision(this.state.decision) && !this.state.actionRailPosition) {
+        if ((this.isActionRailDecision(this.state.decision) || this.hasReplayAction()) && !this.state.actionRailPosition) {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
         }
@@ -499,12 +453,10 @@ export default class Coup extends Component {
     componentDidUpdate(prevProps, prevState) {
         const decision = this.state.decision
         const previousDecision = prevState.decision
-        const isSameRailDecision = previousDecision
-            && this.isActionRailDecision(previousDecision)
-            && previousDecision.decisionId === decision?.decisionId
-        const newActionDecision = this.isActionRailDecision(decision)
-            && !isSameRailDecision
-        if (newActionDecision && !this.state.actionRailPosition) {
+        const railVisible = this.isActionRailDecision(decision) || this.hasReplayAction()
+        const previousRailVisible = this.isActionRailDecision(previousDecision)
+            || Boolean(prevState.winner && prevState.canPlayAgain && this.props.isLeader)
+        if (railVisible && (!previousRailVisible || !this.state.actionRailPosition)) {
             const position = this.measureActionRailPosition()
             if (position) this.setState({ actionRailPosition: position })
         }
@@ -598,10 +550,12 @@ export default class Coup extends Component {
         return this.state.actionRailPosition
     }
 
-    isActionRailDecision = decision => Boolean(decision && (decision.type === 'action' || decision.type === 'exchange'))
+    isActionRailDecision = decision => Boolean(decision)
+
+    hasReplayAction = () => Boolean(this.state.winner && this.state.canPlayAgain && this.props.isLeader)
 
     handleActionRailResize = () => {
-        if (!this.isActionRailDecision(this.state.decision)) return
+        if (!this.isActionRailDecision(this.state.decision) && !this.hasReplayAction()) return
         this.setState({ actionRailPosition: this.measureActionRailPosition() })
     }
 
@@ -690,7 +644,7 @@ export default class Coup extends Component {
             stateVersion: decision.stateVersion,
             choiceId: option.choiceId
         })
-        this.setState({ submitted: true, decisionError: '' })
+        this.setState({ submitted: true, submittedChoiceId: option.choiceId, decisionError: '' })
     }
 
     submitActionChoice = option => {
@@ -745,9 +699,11 @@ export default class Coup extends Component {
             onMouseLeave={this.handleActionPanelMouseLeave}
             aria-labelledby="action-decision-title"
         >
-            <h2 id="action-decision-title" className="ActionDecisionTitle">
-                {targetAction ? t('game.actions.chooseTarget') : t('game.actions.turnTitle')}
-            </h2>
+            <h2 id="action-decision-title" className="ActionDecisionTitle">{t('game.decision.panelTitle')}</h2>
+            <p className="DecisionPanelSubtitle">
+                {targetAction ? t('game.actions.chooseTarget') : t('game.decision.title.action')}
+            </p>
+            <p className="DecisionPanelFollowup">{decisionFollowup(decision)}</p>
             <div
                 className={`${detailsClassName} DecisionActionDetails--prompt`}
                 aria-hidden={compact || !detailsExpanded ? 'true' : undefined}
@@ -845,6 +801,53 @@ export default class Coup extends Component {
         </section>
     }
 
+    renderChoiceDecision(decision) {
+        const submitted = this.state.submitted || this.state.gamePaused
+        const titleKey = DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic'
+        const title = t(titleKey, {
+            count: this.state.ownInfluences.length,
+            influenceLabel: this.state.ownInfluences.length === 1
+                ? t('game.influence.singular')
+                : t('game.influence.plural')
+        })
+
+        return <section
+            className="ActionDecision DecisionActionPanel ResponseDecisionPanel"
+            data-decision-type={decision.type}
+            aria-labelledby="choice-decision-panel-title"
+        >
+            <h2 id="choice-decision-panel-title" className="ActionDecisionTitle">{t('game.decision.panelTitle')}</h2>
+            <p className="DecisionPanelSubtitle">{title}</p>
+            <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>
+            {decisionFollowup(decision) && <p className="DecisionPanelFollowup">{decisionFollowup(decision)}</p>}
+            <div className="DecisionOptions" role="group" aria-label={title}>
+                {(Array.isArray(decision.options) ? decision.options : []).map(option => {
+                    const selected = this.state.submittedChoiceId === option.choiceId
+                    return <button
+                        key={option.choiceId}
+                        className={`DecisionOption${selected ? ' DecisionOption--selected' : ''}`}
+                        type="button"
+                        disabled={submitted}
+                        aria-pressed={selected}
+                        onClick={() => this.submitChoice(option)}
+                    >{localizeOptionLabel(option, decision)}</button>
+                })}
+            </div>
+            {this.state.submitted && <p className="ExchangeDecisionStatus" role="status">{t('game.decision.sent')}</p>}
+            {this.state.decisionError && <p className="ActionError" role="alert">{this.state.decisionError}</p>}
+        </section>
+    }
+
+    renderGameOverDecision() {
+        return <section className="ActionDecision DecisionActionPanel GameOverDecisionPanel" aria-labelledby="game-over-panel-title">
+            <h2 id="game-over-panel-title" className="ActionDecisionTitle">{t('game.decision.panelTitle')}</h2>
+            <p className="DecisionPanelSubtitle">{t('game.result.winner', { playerName: this.state.winner })}</p>
+            <button className="DecisionOption DecisionOption--primary" type="button" onClick={this.playAgain}>
+                {t('game.playAgain')}
+            </button>
+        </section>
+    }
+
     playAgain = () => {
         if (this.state.canPlayAgain && this.props.isLeader) {
             this.setState({ canPlayAgain: false, winner: '' })
@@ -893,7 +896,9 @@ export default class Coup extends Component {
         const decision = this.state.decision
         const actionDecision = decision && decision.type === 'action'
         const exchangeDecision = decision && decision.type === 'exchange'
-        const railDecision = Boolean(actionDecision || exchangeDecision)
+        const railDecision = Boolean(decision)
+        const canPlayAgain = Boolean(this.state.winner && this.state.canPlayAgain && this.props.isLeader)
+        const actionRailVisible = railDecision || canPlayAgain
         const ownInfluences = this.state.ownInfluences
         const responseWindowOpen = Boolean(
             decision &&
@@ -914,11 +919,6 @@ export default class Coup extends Component {
             !this.state.dissolved &&
             !this.state.disconnected
         )
-        let playAgain = null
-        if (this.state.winner && this.state.canPlayAgain && this.props.isLeader) {
-            playAgain = <button className="startGameButton" onClick={this.playAgain}>{t('game.playAgain')}</button>
-        }
-
         if (this.state.disconnected) {
             return <div className="GameContainer">
                 <div className="GameHeader"><p>{t('game.player.identity', { playerName: this.props.name })}</p></div>
@@ -938,29 +938,46 @@ export default class Coup extends Component {
             ? { left: `${railPosition.left}px`, top: `${railPosition.top}px` }
             : undefined
         const actionRailClassName = `ActionDecisionRail${this.state.eventLogExpanded ? ' ActionDecisionRail--event-log-expanded' : ''}`
-        const actionDecisionRail = railDecision && typeof document !== 'undefined'
-            ? createPortal(<div className={actionRailClassName} style={actionRailStyle} aria-live="polite">
-                {actionDecision
-                    ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
-                    : <ExchangeDecisionPanel
-                        decision={decision}
-                        keepCount={ownInfluences.length}
-                        submitted={this.state.submitted}
-                        paused={this.state.gamePaused}
-                        error={this.state.decisionError}
-                        onChoose={this.submitChoice}
-                    />}
+        const actionDecisionRail = actionRailVisible && typeof document !== 'undefined'
+            ? createPortal(<div
+                ref={this.decisionSectionRef}
+                tabIndex="-1"
+                className={actionRailClassName}
+                style={actionRailStyle}
+                aria-live="polite"
+            >
+                {decision
+                    ? actionDecision
+                        ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
+                        : exchangeDecision
+                            ? <ExchangeDecisionPanel
+                                decision={decision}
+                                keepCount={ownInfluences.length}
+                                submitted={this.state.submitted}
+                                paused={this.state.gamePaused}
+                                error={this.state.decisionError}
+                                onChoose={this.submitChoice}
+                                panelTitle={t('game.decision.panelTitle')}
+                            />
+                            : this.renderChoiceDecision(decision)
+                    : this.renderGameOverDecision()}
             </div>, document.body)
             : null
 
         return <div className="GameContainer" data-player-count={this.state.players.length}>
             <TurnFavicon isMyTurn={isMyActiveTurn} />
             <div className="GameHeader">
-                {railDecision && <div
+                {actionRailVisible && <div
                     ref={this.actionRailAnchorRef}
                     className="ActionDecisionAnchorProbe"
                     aria-hidden="true"
                 />}
+                {this.props.isCodexAuthorized && <button
+                    type="button"
+                    className="GameUtilityControl"
+                    onClick={this.emergencyStopCodex}
+                    disabled={this.state.codexDisabled}
+                >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
                 <EventLog
                     socket={this.props.socket}
                     players={this.state.players}
@@ -983,50 +1000,10 @@ export default class Coup extends Component {
             />
             <ReferencePanel />
 
-            <div ref={this.decisionSectionRef} tabIndex="-1" className="DecisionsSection" aria-live="polite">
-                {this.props.isCodexAuthorized && <button
-                    type="button"
-                    onClick={this.emergencyStopCodex}
-                    disabled={this.state.codexDisabled}
-                    style={{ backgroundColor: '#b00020', color: 'white', fontWeight: 'bold', marginBottom: 12 }}
-                >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
-                {decision && decision.type !== 'action' && decision.type !== 'exchange' && <>
-                    <p className="DecisionTitle">{t(DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic', {
-                        count: ownInfluences.length,
-                        influenceLabel: ownInfluences.length === 1 ? t('game.influence.singular') : t('game.influence.plural')
-                    })}</p>
-                    <p>{decisionDescription(decision, this.state.currentPlayer, ownInfluences.length)}</p>
-                    <div className="DecisionButtonsContainer">
-                        {decision.options.map(option => {
-                            const optionLabel = localizeOptionLabel(option, decision)
-                            const imageButton = responseButtonFor(decision, option, optionLabel)
-                            const disabled = this.state.submitted || this.state.gamePaused
-                            const onClick = () => this.submitChoice(option)
-
-                            if (imageButton) {
-                                return <ResponseImageButton
-                                    key={option.choiceId}
-                                    {...imageButton}
-                                    disabled={disabled}
-                                    onClick={onClick}
-                                />
-                            }
-
-                            return <button
-                                key={option.choiceId}
-                                type="button"
-                                disabled={disabled}
-                                onClick={onClick}
-                            >{optionLabel}</button>
-                        })}
-                    </div>
-                    {this.state.submitted && <p>{t('game.decision.sent')}</p>}
-                    {this.state.decisionError && <p role="alert">{this.state.decisionError}</p>}
-                </>}
+            <div className="DecisionsSection" aria-live="polite">
                 {this.state.pauseWaiting && <p className="PauseWaitingStatus" role="status">{t('game.pause.generic')}</p>}
                 {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p>{t('game.waiting')}</p>}
                 {this.state.winner && <p><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
-                {playAgain}
             </div>
 
             {this.state.gamePaused && <div
