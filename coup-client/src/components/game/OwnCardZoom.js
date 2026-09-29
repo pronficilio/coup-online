@@ -5,7 +5,6 @@ import './OwnCardZoom.css';
 const OPEN_DURATION_MS = 220;
 const RETURN_DURATION_MS = 170;
 const INTERRUPT_DURATION_MS = 120;
-const CARD_MAX_WIDTH = 390;
 const CARD_ASPECT_RATIO = 840 / 1220;
 const CARD_MAX_HEIGHT_RATIO = 0.8;
 
@@ -23,10 +22,7 @@ function getTargetSize() {
         viewportHeight * CARD_MAX_HEIGHT_RATIO,
         viewportHeight - viewportGutter
     );
-    const maxWidth = Math.max(0, Math.min(
-        CARD_MAX_WIDTH,
-        viewportWidth - viewportGutter
-    ));
+    const maxWidth = Math.max(0, viewportWidth - viewportGutter);
     const height = Math.max(0, Math.min(
         maxHeight,
         maxWidth / CARD_ASPECT_RATIO
@@ -85,8 +81,8 @@ export default function OwnCardZoom({
     const [phase, setPhase] = useState('closed');
     const [originTransform, setOriginTransform] = useState('none');
     const [targetSize, setTargetSize] = useState({
-        width: CARD_MAX_WIDTH,
-        height: CARD_MAX_WIDTH / CARD_ASPECT_RATIO
+        width: 0,
+        height: 0
     });
     const closeTimerRef = useRef(null);
     const openingTimerRef = useRef(null);

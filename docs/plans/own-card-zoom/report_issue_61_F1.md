@@ -20,7 +20,7 @@ Se añadieron etiquetas de ampliación, cierre y nombre de carta a los diccionar
 El propietario reportó que el modal se veía demasiado grande, que su altura parecía crecer de golpe y que no siempre se alcanzaba a ver la carta completa. Solicitó limitar primero la altura visible y derivar el ancho conservando la proporción, con un tope adicional para pantallas estrechas.
 
 - Los assets de personaje fueron inspeccionados: todos miden `840 × 1220`.
-- El destino del modal limita la altura a `80dvh` como máximo y conserva un margen mínimo según el viewport; el ancho se calcula desde esa altura y la proporción `840:1220`, con topes de `390px` y del ancho disponible.
+- El destino del modal limita la altura a `80dvh` como máximo y conserva un margen mínimo según el viewport; el ancho se calcula desde esa altura y la proporción `840:1220`, limitado solo por el ancho disponible.
 - La transformación FLIP de apertura y retorno usa las mismas dimensiones destino del modal. Se mantienen los tiempos rápidos de `220 ms` al abrir y `170 ms` al volver al tablero.
 - `cd coup-client && npm run build`: **exit 0** después del ajuste. Solo aparecen las advertencias ya registradas de imports sin uso en `App.js`, parseo de `dvh` en `ReferencePanel.css` y `caniuse-lite` desactualizado.
 - El preview está disponible en `http://localhost:4061`; se confirmó HTTP 200 en la página y el bundle de desarrollo. El nuevo visto bueno visual del propietario sigue pendiente.
@@ -32,6 +32,8 @@ En la revisión siguiente, el propietario confirmó que la imagen aún se recort
 - La transformación FLIP de apertura y cierre use el mismo ancho derivado y la altura exacta aplicada a la imagen.
 
 La compilación posterior a esta corrección también terminó con **exit 0** y las mismas advertencias preexistentes. El Orquestador reinició por completo el servidor CRA desde el worktree dedicado con `PORT=4061` y `REACT_APP_BACKEND_URL=http://localhost:18000`; CRA reportó `webpack compiled successfully`. Después del reinicio, `http://localhost:4061/` y `/static/js/bundle.js` respondieron HTTP 200, y `/exists/probe` del backend respondió HTTP 200. Se confirmó que el bundle servido incluye `width: auto` y el límite `80dvh`. Sigue pendiente el nuevo visto bueno visual del propietario.
+
+En la siguiente revisión, el propietario notó que la carta ocupaba cerca de la mitad de la pantalla en alto. La causa fue el tope fijo de ancho `390px`: con el ratio `840:1220`, ese ancho limitaba la altura a unos `567px` incluso en pantallas más altas. Se quitó el máximo fijo; ahora la altura del asset manda y el ancho solo se reduce cuando la ventana es estrecha. El build terminó con **exit 0**, se reinició CRA y el preview volvió a compilar correctamente en `4061`.
 
 ## Validación alcanzable
 

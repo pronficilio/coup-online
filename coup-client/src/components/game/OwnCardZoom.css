@@ -82,7 +82,7 @@
     display: block;
     width: auto;
     height: auto;
-    max-width: min(390px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
     max-height: min(80vh, calc(100vh - 32px));
     max-height: min(80dvh, calc(100dvh - 32px));
     object-fit: contain;
