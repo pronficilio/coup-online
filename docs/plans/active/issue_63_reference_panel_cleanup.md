@@ -34,7 +34,13 @@ El Alquimista debe delegar la subtarea ordinaria de código a un Agente Menor se
 - Se eliminaron `CheatSheet.svg`, `CheatSheetModal.js`, sus claves de traducción y los estilos exclusivos del modal. No quedan referencias a `CheatSheet` dentro de `coup-client/src`.
 - `git diff --check` pasó; `translations.json` se parseó como JSON válido. La búsqueda estática confirmó los tres triggers y sus selectores `:hover`/`:focus-visible`, y confirmó que permanecen los destinos de Tarjeta, tabla y Reglas.
 - No se ejecutaron tests, build ni lint. La evidencia es revisión estática; no incluye validación visual en navegador.
-- Desde la base usada para F1, `origin/master` avanzó; el branch se dejó sin sincronizar. No se sincronizó en F1; el Orquestador debe actualizar la base y revisar conflictos antes de abrir una PR.
+- Antes de la revisión del Orquestador, la rama se rebasó sobre `origin/master@6b1d54f`; el rebase terminó sin conflictos. La revisión estática posterior confirmó `git diff --check` limpio y ninguna referencia a `CheatSheet` dentro de `coup-client/src`.
+
+## Revisión del Orquestador
+
+- **Veredicto:** `PASS` para preparar la integración. El diff conserva los accesos de Tarjeta, tabla y Reglas; elimina el SVG, su modal y consumidores, y mantiene el título localizado «Resumen de reglas» / “Rules summary” para `table-es.webp`.
+- Se revisaron los cambios de UI, estilos y traducciones después de sincronizar la base. No se ejecutaron tests, build ni lint, conforme al alcance de F1.
+- La rama está lista para una PR hacia `master`; la issue permanece abierta hasta verificar la integración.
 
 **Cierre:** `COMMIT_REQUIRED`, `fix(reference-panel): issue 63 F1 CLOSED`.
 
