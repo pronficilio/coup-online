@@ -29,16 +29,15 @@
     position: relative;
     display: grid;
     place-items: center;
-    width: min(390px, calc(100vw - 32px), calc((100vh - 32px) * 2 / 3));
-    width: min(390px, calc(100vw - 32px), calc((100dvh - 32px) * 2 / 3));
+    width: var(--own-card-zoom-width, min(390px, calc(100vw - 32px)));
     max-width: calc(100vw - 32px);
-    max-height: calc(100vh - 32px);
-    max-height: calc(100dvh - 32px);
+    max-height: min(80vh, calc(100vh - 32px));
+    max-height: min(80dvh, calc(100dvh - 32px));
     min-width: 0;
     min-height: 0;
     overflow: hidden;
     box-sizing: border-box;
-    aspect-ratio: 2 / 3;
+    aspect-ratio: 840 / 1220;
     border: 0;
     border-radius: 12px;
     outline: none;
@@ -129,11 +128,9 @@
     }
 
     .own-card-zoom__content {
-        width: min(390px, calc(100vw - 24px), calc((100vh - 24px) * 2 / 3));
-        width: min(390px, calc(100vw - 24px), calc((100dvh - 24px) * 2 / 3));
         max-width: calc(100vw - 24px);
-        max-height: calc(100vh - 24px);
-        max-height: calc(100dvh - 24px);
+        max-height: min(80vh, calc(100vh - 24px));
+        max-height: min(80dvh, calc(100dvh - 24px));
         border-radius: 10px;
     }
 

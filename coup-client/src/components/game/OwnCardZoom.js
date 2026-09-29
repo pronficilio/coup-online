@@ -6,6 +6,8 @@ const OPEN_DURATION_MS = 220;
 const RETURN_DURATION_MS = 170;
 const INTERRUPT_DURATION_MS = 120;
 const CARD_MAX_WIDTH = 390;
+const CARD_ASPECT_RATIO = 840 / 1220;
+const CARD_MAX_HEIGHT_RATIO = 0.8;
 
 function getReducedMotionPreference() {
     return typeof window !== 'undefined'
@@ -13,7 +15,24 @@ function getReducedMotionPreference() {
         && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function getOriginTransform(originElement) {
+function getTargetSize() {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const viewportGutter = viewportWidth <= 620 ? 24 : 32;
+    const maxHeight = Math.min(
+        viewportHeight * CARD_MAX_HEIGHT_RATIO,
+        viewportHeight - viewportGutter
+    );
+    const width = Math.max(0, Math.min(
+        CARD_MAX_WIDTH,
+        viewportWidth - viewportGutter,
+        maxHeight * CARD_ASPECT_RATIO
+    ));
+
+    return { width, height: width / CARD_ASPECT_RATIO };
+}
+
+function getOriginTransform(originElement, targetSize) {
     if (!originElement || !originElement.isConnected || getReducedMotionPreference()) {
         return 'none';
     }
@@ -21,18 +40,12 @@ function getOriginTransform(originElement) {
     const originRect = originElement.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const viewportGutter = viewportWidth <= 620 ? 24 : 32;
-    const targetWidth = Math.min(
-        CARD_MAX_WIDTH,
-        viewportWidth - viewportGutter,
-        ((viewportHeight - viewportGutter) * 2) / 3
-    );
+    const { width: targetWidth, height: targetHeight } = targetSize;
 
     if (targetWidth <= 0 || originRect.width <= 0 || originRect.height <= 0) {
         return 'none';
     }
 
-    const targetHeight = targetWidth * 1.5;
     const targetCenterX = viewportWidth / 2;
     const targetCenterY = viewportHeight / 2;
     const originCenterX = originRect.left + originRect.width / 2;
@@ -68,6 +81,10 @@ export default function OwnCardZoom({
     const [isPresent, setIsPresent] = useState(false);
     const [phase, setPhase] = useState('closed');
     const [originTransform, setOriginTransform] = useState('none');
+    const [targetSize, setTargetSize] = useState({
+        width: CARD_MAX_WIDTH,
+        height: CARD_MAX_WIDTH / CARD_ASPECT_RATIO
+    });
     const closeTimerRef = useRef(null);
     const openingTimerRef = useRef(null);
     const openingFrameRef = useRef(null);
@@ -81,6 +98,7 @@ export default function OwnCardZoom({
     const pendingCloseLifecycleRef = useRef(null);
     const sessionOriginRef = useRef(null);
     const sessionFallbackRef = useRef(null);
+    const targetSizeRef = useRef(targetSize);
     const activeSessionIdRef = useRef(undefined);
     const generatedSessionIdRef = useRef(0);
     const openRef = useRef(Boolean(open));
@@ -142,7 +160,7 @@ export default function OwnCardZoom({
         stopWatchingOrigin();
 
         if (kind === 'return' && sessionOriginRef.current && sessionOriginRef.current.isConnected) {
-            setOriginTransform(getOriginTransform(sessionOriginRef.current));
+            setOriginTransform(getOriginTransform(sessionOriginRef.current, targetSizeRef.current));
         }
 
         const closingPhase = kind === 'return' ? 'closing-return' : 'closing-fade';
@@ -195,6 +213,9 @@ export default function OwnCardZoom({
             closeReasonRef.current = null;
             sessionOriginRef.current = originElement || null;
             sessionFallbackRef.current = fallbackFocusElement || null;
+            const nextTargetSize = getTargetSize();
+            targetSizeRef.current = nextTargetSize;
+            setTargetSize(nextTargetSize);
             if (sessionId === undefined) {
                 generatedSessionIdRef.current += 1;
                 activeSessionIdRef.current = generatedSessionIdRef.current;
@@ -202,7 +223,7 @@ export default function OwnCardZoom({
                 activeSessionIdRef.current = sessionId;
             }
 
-            setOriginTransform(getOriginTransform(originElement));
+            setOriginTransform(getOriginTransform(originElement, nextTargetSize));
             setPhase('opening');
             setIsPresent(true);
 
@@ -313,7 +334,10 @@ export default function OwnCardZoom({
             className={contentClassName}
             overlayClassName={overlayClassName}
             contentRef={handleContentRef}
-            style={{ content: { '--own-card-zoom-origin-transform': originTransform } }}
+            style={{ content: {
+                '--own-card-zoom-origin-transform': originTransform,
+                '--own-card-zoom-width': `${targetSize.width}px`
+            } }}
             aria={{ modal: true }}
             closeTimeoutMS={0}
             shouldCloseOnOverlayClick
