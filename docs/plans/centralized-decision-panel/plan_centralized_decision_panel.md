@@ -1,13 +1,13 @@
 # Plan — centralizar las decisiones en el panel de acciones (#56)
 
-**Estado:** `READY_TO_MERGE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS: build + aprobación visual del propietario)`; F3 `WAIVED_BY_OWNER` (sin veredicto independiente); PR #59 abierta; issue `OPEN` hasta fusionar.
+**Estado:** `COMPLETED`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS: build + aprobación visual del propietario)`; F3 `WAIVED_BY_OWNER` (sin veredicto independiente); issue `CLOSED`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/56
-**Handoff:** `docs/plans/inbox/issue_56_centralized_decision_panel.md`
+**Cierre:** `docs/plans/completed/issue_56_centralized_decision_panel.md`
 **Bitácora:** `docs/plans/log/issue-56.jsonl` (append-only).
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente.
 **Branch / worktree:** `issue/56-centralized-decision-panel` / `.worktrees/issue-56-centralized-decision-panel`.
 **Base / destino:** rebase sobre `origin/master@a421c0e` / `master` de `pronficilio/coup-online`.
-**Integración:** una PR asociada a #56.
+**Integración:** [PR #59](https://github.com/pronficilio/coup-online/pull/59), merge commit `6e1f91bb90ce484fe5f5829d62978337f225a130`.
 
 ## Solicitud y definición de éxito
 
@@ -91,6 +91,6 @@ F1 confirma el wording contra las traducciones existentes y el manual. Cualquier
 
 Una unidad #56 → `issue/56-centralized-decision-panel` → `.worktrees/issue-56-centralized-decision-panel` → una PR hacia `master` de `pronficilio/coup-online`. La rama se rebasa sobre `origin/master@a421c0e`, que incluye PR #58 además de #55 y #57. No usar `upstream`.
 
-**Siguiente dueño:** Orquestador, fusionar PR #59 a `master`; `Closes #56` cierra la issue automáticamente. El propietario aprobó el preview y autorizó el merge/cierre sin veredicto independiente F3.
+**Cierre:** PR #59 quedó integrada y GitHub cerró #56 como `COMPLETED`. El propietario aprobó el preview y autorizó el merge/cierre sin veredicto independiente F3.
 
 **Falsificación:** ¿puede existir un tipo/estado alcanzable donde falte una opción autorizada, aparezca una no permitida, quede un botón bajo las cartas o el texto prometa un bloqueo/desafío que las reglas no permiten?
