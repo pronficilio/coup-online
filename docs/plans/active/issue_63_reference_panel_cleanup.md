@@ -2,7 +2,7 @@
 
 **Issue/Ticket:** https://github.com/pronficilio/coup-online/issues/63 (`OPEN`).
 **Plan:** `docs/plans/reference-panel-cleanup/plan_reference_panel_cleanup.md`.
-**Estado del plan:** F1 `ACTIVE`; unidad `ACTIVE`.
+**Estado del plan:** F1 `CLOSED`; unidad `WAITING_ORCHESTRATOR`.
 **Modo / riesgo / política de verificación:** `LIGHT` / `LOW` / `NONE`.
 **Verifier requerido ahora:** no.
 **Pregunta de falsificación:** ¿queda algún botón sin tooltip en navegación por teclado, se dispara más de un tooltip, o sobrevive alguna importación/referencia de `CheatSheet.svg` después de quitar el acceso?
@@ -24,6 +24,19 @@ Elimina por completo el botón que abre `CheatSheet.svg`, el archivo `coup-clien
 **Archivos probables:** `ReferencePanel.js`, `ReferencePanel.css`, `coup-client/src/components/CheatSheetModal.js`, `coup-client/src/assets/CheatSheet.svg`, traducciones en `coup-client/src/i18n/translations.json` y estilos viejos del modal en `CoupStyles.css` si son exclusivos de esa ruta.
 
 El Alquimista debe delegar la subtarea ordinaria de código a un Agente Menor según `docs/agentes/ALQUIMISTA.md`; conserva para sí el claim, el aislamiento, la coordinación de documentos, la revisión de evidencia y el veredicto de fase.
+
+## Resultado F1
+
+**Veredicto:** `CLOSED`; F1 queda lista para revisión del Orquestador. La issue continúa `OPEN` y no se abrió PR.
+
+- Permanecen tres accesos: Tarjeta, Resumen de reglas y Reglas. Cada uno conserva su acción y muestra un tooltip cálido, discreto, con sombra ligera, al usar hover o foco de teclado.
+- `table-es.webp` conserva su destino. Su `title`, tooltip y nombre accesible son «Resumen de reglas» en español y “Rules summary” en inglés. El atributo `title` permanece en reposo y se retira durante hover/foco para evitar un globo nativo duplicado; se restaura al salir.
+- Se eliminaron `CheatSheet.svg`, `CheatSheetModal.js`, sus claves de traducción y los estilos exclusivos del modal. No quedan referencias a `CheatSheet` dentro de `coup-client/src`.
+- `git diff --check` pasó; `translations.json` se parseó como JSON válido. La búsqueda estática confirmó los tres triggers y sus selectores `:hover`/`:focus-visible`, y confirmó que permanecen los destinos de Tarjeta, tabla y Reglas.
+- No se ejecutaron tests, build ni lint. La evidencia es revisión estática; no incluye validación visual en navegador.
+- Desde el aislamiento, `origin/master` avanzó cinco commits; el branch reporta `ahead 1, behind 5`. No se sincronizó en F1; el Orquestador debe actualizar la base y revisar conflictos antes de abrir una PR.
+
+**Cierre:** `COMMIT_REQUIRED`, `fix(reference-panel): issue 63 F1 CLOSED`.
 
 ## Topología y protocolo
 

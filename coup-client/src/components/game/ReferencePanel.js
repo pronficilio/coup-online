@@ -4,7 +4,6 @@ import { t } from '../../i18n';
 import cardSpanish from '../../assets/references/card-es.webp';
 import tableSpanish from '../../assets/references/table-es.webp';
 import RulesModal from '../RulesModal';
-import CheatSheetModal from '../CheatSheetModal';
 import './ReferencePanel.css';
 
 const references = [
@@ -51,6 +50,18 @@ export default class ReferencePanel extends Component {
         this.setState({ openReference: null });
     }
 
+    hideNativeTooltip = (event) => {
+        event.currentTarget.removeAttribute('title');
+    }
+
+    restoreNativeTooltip = (event) => {
+        const { currentTarget } = event;
+        if (currentTarget.matches(':hover, :focus')) return;
+
+        const title = currentTarget.dataset.tooltipTitle;
+        if (title) currentTarget.setAttribute('title', title);
+    }
+
     render() {
         const { openReference } = this.state;
         const prefersReducedMotion = typeof window !== 'undefined'
@@ -70,10 +81,17 @@ export default class ReferencePanel extends Component {
                                 type="button"
                                 className="reference-panel__trigger"
                                 onClick={() => this.openReference(reference.key)}
-                                aria-label={t('referencePanel.trigger.open', { referenceName })}
+                                onMouseEnter={this.hideNativeTooltip}
+                                onMouseLeave={this.restoreNativeTooltip}
+                                onFocus={this.hideNativeTooltip}
+                                onBlur={this.restoreNativeTooltip}
+                                title={label}
+                                data-tooltip-title={label}
+                                aria-label={reference.key === 'table'
+                                    ? label
+                                    : t('referencePanel.trigger.open', { referenceName })}
                                 aria-haspopup="dialog"
                                 aria-expanded={isOpen}
-                                title={label}
                             >
                                 <svg className="reference-panel__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                     {reference.key === 'card' ? (
@@ -88,6 +106,7 @@ export default class ReferencePanel extends Component {
                                         </>
                                     )}
                                 </svg>
+                                <span className="reference-panel__tooltip" aria-hidden="true">{label}</span>
                             </button>
 
                             <ReactModal
@@ -139,34 +158,21 @@ export default class ReferencePanel extends Component {
                             type="button"
                             className="reference-panel__trigger"
                             onClick={open}
+                            onMouseEnter={this.hideNativeTooltip}
+                            onMouseLeave={this.restoreNativeTooltip}
+                            onFocus={this.hideNativeTooltip}
+                            onBlur={this.restoreNativeTooltip}
+                            title={label}
+                            data-tooltip-title={label}
                             aria-label={t('referencePanel.trigger.open', { referenceName: label.toLowerCase() })}
                             aria-haspopup="dialog"
                             aria-expanded={isOpen}
-                            title={label}
                         >
                             <svg className="reference-panel__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                                 <path d="M4 5.5c2.8-1.1 5.5-.8 8 1v13c-2.5-1.8-5.2-2.1-8-1zM20 5.5c-2.8-1.1-5.5-.8-8 1v13c2.5-1.8 5.2-2.1 8-1z" />
                                 <path d="M12 6.5v13" />
                             </svg>
-                        </button>
-                    );
-                }} />
-                <CheatSheetModal triggerRenderer={({ isOpen, open }) => {
-                    const label = t('help.open');
-                    return (
-                        <button
-                            type="button"
-                            className="reference-panel__trigger"
-                            onClick={open}
-                            aria-label={t('referencePanel.trigger.open', { referenceName: label.toLowerCase() })}
-                            aria-haspopup="dialog"
-                            aria-expanded={isOpen}
-                            title={label}
-                        >
-                            <svg className="reference-panel__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <rect x="4" y="4" width="16" height="16" rx="2" />
-                                <path d="M8 8h8M8 12h8M8 16h5" />
-                            </svg>
+                            <span className="reference-panel__tooltip" aria-hidden="true">{label}</span>
                         </button>
                     );
                 }} />
