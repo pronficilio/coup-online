@@ -6,7 +6,7 @@
 **Bitácora:** `docs/plans/log/issue-42.jsonl` (append-only).
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Branch / worktree:** `issue/42-home-coin-turn-favicon` / `.worktrees/issue-42-home-coin-turn-favicon`.
-**Base / destino:** rebase actual sobre `origin/master@f950420891dd0a349b125ec5468c45868e60cc04` después de integrar PR #54 y los cambios posteriores de master / `master` de `pronficilio/coup-online`.
+**Base / destino:** F2 se cerró sobre `origin/master@f950420891dd0a349b125ec5468c45868e60cc04`; `origin/master` avanzó luego a `b8df17f`. Se registró `sync_base`; el Orquestador rebasará la rama antes del PR / `master` de `pronficilio/coup-online`.
 **Integración:** una PR para el issue; GitHub confirma que aún no existe para este branch.
 **Siguiente acción:** el Orquestador revisa el commit/evidencia de F2 y prepara la única PR; el propietario puede confirmar la nueva cadencia visualmente cuando haya preview.
 
@@ -21,9 +21,9 @@ Las seis fuentes locales son `fotos/gif/a-coin.png` hasta `fotos/gif/f-coin.png`
 - Confirmado en `Coup.js`: los props `name` e `isSpectator`, el estado `currentPlayer`, `gamePaused` y `winner` permiten derivar el turno propio sin cambiar el servidor: `currentPlayer === name`, participante activo, partida no pausada ni terminada.
 - Confirmado: el cliente recibe actualizaciones de turno desde el servidor; los controles/reglas no necesitan cambios.
 - La issue #25 y PR #27 están completadas. El icono estático puede restaurarse desde su `href` original.
-- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). #42 se rebasó y volvió a actualizar sobre master; su base actual es `f950420891dd0a349b125ec5468c45868e60cc04`, cinco commits adelante y cero detrás en el último chequeo. La consulta actual a GitHub confirma #42 abierta y asignada a `pronficilio`, sin PR existente.
+- La issue #40 cerró mediante PR #54 (`d1eddb834f35d058159343475789b8df20a173a1`). #42 se rebasó sobre `f950420891dd0a349b125ec5468c45868e60cc04`; mientras se ejecutaba F2, `origin/master` avanzó a `b8df17f` con reconciliación documental. La rama feature quedó seis commits adelante y uno detrás y requiere actualización antes del PR. GitHub confirma #42 abierta, asignada a `pronficilio`, sin PR existente.
 - La issue #24 se cerró al integrar la PR #41 (`2160ada0`); la nota que la muestra abierta en el handoff de #40 está desactualizada.
-- El branch/worktree canónico se creó originalmente desde `f900c0947a0b27ac9c6e0372e3c1871a883be7e6`; luego se rebasó y sincronizó el 2026-09-29, quedando en cinco commits adelante y cero detrás de la base actual `f950420`.
+- El branch/worktree canónico se creó originalmente desde `f900c0947a0b27ac9c6e0372e3c1871a883be7e6`; se rebasó durante F1 y F2 quedó sobre `f950420`. Antes de la sincronización registrada, `origin/master` estaba en `b8df17f`.
 - Supuesto: “tu turno” significa que el nombre local coincide con `currentPlayer`; espectadores, juego pausado y juego terminado no animan.
 
 ## Alcance y exclusiones
