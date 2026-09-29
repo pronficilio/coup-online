@@ -53,3 +53,7 @@ La aprobación visual del propietario desbloquea la integración solicitada. La 
 ## Respuesta a la falsificación
 
 La inspección del código confirma que solo una influencia propia activa expone el control y que se solicita el cierre cuando llega una decisión, pausa o invalidación del origen. La revisión del propietario confirmó que la carta completa ya es visible y legible; no se atribuye observación dinámica a las secuencias de foco, teclado/touch o pausa/decisión que no quedaron registradas.
+
+## Integración
+
+La PR [#68](https://github.com/pronficilio/coup-online/pull/68) quedó integrada en `master` el 2026-09-29 mediante `cf9342b95b24ec5f6f390571b2fb2d62973d99be`. GitHub cerró la issue #61. El handoff final está en `docs/plans/completed/issue_61_own_card_zoom.md`.

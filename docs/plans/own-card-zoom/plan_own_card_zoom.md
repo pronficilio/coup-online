@@ -1,10 +1,10 @@
 # Ampliar una influencia propia desde el tablero — issue #61
 
 - **Issue:** [#61 — Ampliar las influencias propias desde el tablero con una transición fluida](https://github.com/pronficilio/coup-online/issues/61)
-- **Estado:** `ACTIVE`, en integración; F1 `PASS` tras la aprobación visual del propietario
+- **Estado:** `COMPLETED`; F1 `PASS` e integrada a `master` mediante PR #68
 - **Modo / riesgo / verificación:** `LIGHT` / `MEDIUM` / `NONE`
 - **Branch / worktree / integración:** `issue/61-own-card-zoom` / `.worktrees/issue-61-own-card-zoom` / `master`
-- **Handoff:** `docs/plans/active/issue_61_own_card_zoom.md`
+- **Cierre:** `docs/plans/completed/issue_61_own_card_zoom.md`
 - **Bitácora:** `docs/plans/log/issue-61.jsonl`
 - **Reporte F1:** `docs/plans/own-card-zoom/report_issue_61_F1.md`
 
@@ -86,3 +86,4 @@ Fuera de alcance: revelar cartas rivales, permitir abrir cartas ocultas/eliminad
 ## Historial
 
 - 2026-09-29: intake autorizado; issue #61 abierta en el fork. Se acuerdan alcance inicial solo para cartas propias activas, transición medida desde/hacia el tablero y cierre seguro al cambiar el estado de la partida.
+- 2026-09-29: el propietario aprobó el resultado visual; la PR #68 se integró en `master` mediante `cf9342b95b24ec5f6f390571b2fb2d62973d99be` y GitHub cerró la issue #61.
