@@ -21,7 +21,7 @@
 
 ## Reclamo y aislamiento
 
-Reclamo completado: #62 se asignó a `pronficilio` y se releyó en el fork; sigue abierta, coincide con este handoff y no hay reclamo incompatible ni PR canónica previa. La branch `issue/62-codex-event-reactions` y el worktree `.worktrees/issue-62-codex-event-reactions` partieron de `origin/master@b39f649` y se sincronizaron con `origin/master@6b1d54f` tras #64, preservando el contenido de #62 y master. El handoff está en `active/`; F0 quedó cerrado y aprobado con el reporte `docs/plans/codex-event-reactions/report_issue_62_F0.md`; F1 autorizada y en curso. No trabajar en `master`, upstream ni en el worktree de otra unidad.
+Reclamo completado: #62 se asignó a `pronficilio` y se releyó en el fork; sigue abierta, coincide con este handoff y no hay reclamo incompatible ni PR canónica previa. La branch `issue/62-codex-event-reactions` y el worktree `.worktrees/issue-62-codex-event-reactions` partieron de `origin/master@b39f649` y se sincronizaron primero con `origin/master@6b1d54f` tras #64. Después de corregir el hallazgo P3 de F2, el Orquestador pidió sincronizar el `origin/master@9ef5856` actual, que incluye #65/#63; el merge `e84abc3` se hizo solo en la branch #62 y preserva las entradas #62 y #63 del README. F0 quedó cerrado y aprobado con el reporte `docs/plans/codex-event-reactions/report_issue_62_F0.md`; F1 corregida espera re-revisión. No trabajar en `master`, upstream ni en el worktree de otra unidad.
 
 ## F0 — Contrato antes de producto
 
@@ -33,7 +33,7 @@ F1 `CLOSED` tras corrección P3: integra la reacción en la misma llamada/respue
 
 ## Addendum de revisión del Orquestador
 
-El Orquestador devolvió F0 para fijar idempotencia Codex, el schema estricto nullable exacto y la allowlist de `event.data`; luego aprobó F0 y autorizó F1. La branch se sincronizó con `origin/master@6b1d54f`, incluyendo #64 y su cierre. El checkout raíz mantiene intacto el trabajo local de #60/#63.
+El Orquestador devolvió F0 para fijar idempotencia Codex, el schema estricto nullable exacto y la allowlist de `event.data`; luego aprobó F0 y autorizó F1. La branch se sincronizó con `origin/master@6b1d54f`, incluyendo #64 y su cierre. Tras la devolución P3 se integró `origin/master@9ef5856` en la branch #62, conservando #62/#63 en README. El checkout raíz no fue modificado por esta unidad.
 
 ## F1 — Implementación lista para revisión
 

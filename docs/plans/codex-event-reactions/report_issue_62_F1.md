@@ -2,7 +2,7 @@
 
 - **Estado:** `CLOSED`; listo para revisión del Orquestador. F2 `PENDING` e independiente.
 - **Branch / worktree:** `issue/62-codex-event-reactions` / `.worktrees/issue-62-codex-event-reactions`
-- **Base sincronizada:** `origin/master@6b1d54f` (merge #64 y cierre documental de #60).
+- **Base para re-revisión:** `origin/master@9ef5856` (incluye #64/#65 y los cambios de #63); merge `e84abc3` aplicado solo a la branch #62.
 
 **Alcance:** integración de la reacción opcional a la misma decisión Codex existente, sin pruebas automatizadas, llamada real al modelo, publicación upstream ni despliegue.
 
