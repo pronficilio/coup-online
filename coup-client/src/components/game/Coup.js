@@ -1054,6 +1054,7 @@ export default class Coup extends Component {
                 players={this.state.players}
                 observerName={this.props.name}
                 observerInfluences={ownInfluences}
+                zoomDisabled={Boolean(this.state.gamePaused || this.state.pauseWaiting || decision || this.state.winner)}
                 currentPlayer={this.state.currentPlayer}
                 pendingDecisionSeats={this.state.pendingDecisionSeats}
                 responseAvailable={responseAvailable}

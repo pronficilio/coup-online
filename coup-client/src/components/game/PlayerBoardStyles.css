@@ -496,6 +496,38 @@
     text-transform: capitalize;
 }
 
+.PlayerInfluenceSlot--interactive {
+    padding: 0;
+    font: inherit;
+    cursor: zoom-in;
+    transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .PlayerInfluenceSlot--interactive:hover {
+        z-index: 4;
+        transform: translateY(-2px);
+        border-color: #554128;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.38);
+    }
+}
+
+.PlayerInfluenceSlot--interactive:focus-visible {
+    z-index: 5;
+    outline: 3px solid #1976d2;
+    outline-offset: 3px;
+}
+
+.PlayerInfluenceSlot--interactive:disabled {
+    cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .PlayerInfluenceSlot--interactive {
+        transition: none;
+    }
+}
+
 .PlayerInfluenceImage {
     display: block;
     width: 100%;
