@@ -207,6 +207,7 @@ class CoupGame {
     }
 
     updatePlayers() {
+        const pendingDecisionSeats = this.unansweredDecisionSeats(this.activeDecision)
         const publicPlayers = this.players.map(player => ({
             name: player.name,
             controller: player.controller,
@@ -223,6 +224,7 @@ class CoupGame {
                 ownInfluences: player.influences.slice(),
                 courtCount: this.deck.length,
                 currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
+                pendingDecisionSeats,
                 phase: this.phase,
                 stateVersion: this.stateVersion
             })
@@ -232,6 +234,7 @@ class CoupGame {
             ownInfluences: [],
             courtCount: this.deck.length,
             currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
+            pendingDecisionSeats,
             phase: this.phase,
             stateVersion: this.stateVersion,
             spectator: true
@@ -436,6 +439,17 @@ class CoupGame {
         return true
     }
 
+    unansweredDecisionSeats(decision) {
+        if (!decision || !(decision.allowed instanceof Map) || !(decision.responses instanceof Map)) return []
+        const seats = []
+        decision.allowed.forEach((_, actorKey) => {
+            if (decision.responses.has(actorKey)) return
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (player && !player.isDead) seats.push(player.seat)
+        })
+        return seats
+    }
+
     unansweredHumanSeats(decision) {
         if (!decision || !(decision.allowed instanceof Map) || !(decision.responses instanceof Map)) return []
         const seats = []
@@ -565,6 +579,7 @@ class CoupGame {
         decision.responses.set(actorKey, { choiceId: envelope.choiceId, choice, seat })
         if (socketID) this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
         if (decision.responses.size === decision.allowed.size) this.closeDecision()
+        else this.updatePlayers()
         return true
     }
 
@@ -610,6 +625,7 @@ class CoupGame {
             priorityFrom: template.priorityFrom,
             resolve: template.resolve
         }
+        this.updatePlayers()
         template.allowed.forEach((choices, actorKey) => {
             if (this.activeDecision.responses.has(actorKey)) return
             const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
@@ -788,6 +804,7 @@ class CoupGame {
                 stateVersion: this.stateVersion
             })
         })
+        this.updatePlayers()
         const responses = Array.from(decision.responses.values())
         decision.resolve(responses)
     }

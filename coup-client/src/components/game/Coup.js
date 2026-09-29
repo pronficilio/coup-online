@@ -285,6 +285,7 @@ export default class Coup extends Component {
             ownInfluences: [],
             courtCount: null,
             currentPlayer: '',
+            pendingDecisionSeats: [],
             decision: null,
             actionTarget: null,
             submitted: false,
@@ -331,7 +332,10 @@ export default class Coup extends Component {
                 players: snapshot.players,
                 ownInfluences: Array.isArray(snapshot.ownInfluences) ? snapshot.ownInfluences : [],
                 courtCount: Number.isFinite(snapshot.courtCount) ? snapshot.courtCount : null,
-                currentPlayer: snapshot.currentPlayer || this.state.currentPlayer
+                currentPlayer: snapshot.currentPlayer || this.state.currentPlayer,
+                pendingDecisionSeats: Array.isArray(snapshot.pendingDecisionSeats)
+                    ? snapshot.pendingDecisionSeats.filter(Number.isInteger)
+                    : []
             })
         })
         socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
@@ -960,7 +964,7 @@ export default class Coup extends Component {
                 observerName={this.props.name}
                 observerInfluences={ownInfluences}
                 currentPlayer={this.state.currentPlayer}
-                responseWindowOpen={responseWindowOpen}
+                pendingDecisionSeats={this.state.pendingDecisionSeats}
                 responseAvailable={responseAvailable}
                 courtCount={this.state.courtCount}
                 reactionPresence={this.state.reactionPresence}
