@@ -1,7 +1,7 @@
 # Reporte F4 — Falsificación y entrega
 
 **Issue:** #40 — rediseñar el registro de eventos y añadir reacciones efímeras
-**Estado:** `ACTIVE`; dos revisiones independientes devolvieron `FAIL`; los defectos reproducibles se corrigieron y el E2E live pasó. Tercera revisión independiente `FINAL` pendiente. La publicación/integración de la PR de AC12 requiere autorización del propietario.
+**Estado:** `CLOSED_WAIVED_BY_OWNER`; dos revisiones independientes devolvieron `FAIL`; los defectos reproducibles se corrigieron y el E2E live pasó. La tercera revisión independiente `FINAL` no se ejecutó: el propietario autorizó explícitamente la integración mediante PR #54. No se declara `PASS` independiente de F4.
 **Branch/worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`
 **Base:** `origin/master@2ef09de84465889521234951fed934a31dfe1b11`
 
@@ -58,4 +58,4 @@ Capturas del E2E live:
 - [Dos reacciones concurrentes en escritorio](evidence_issue_40_F4/desktop-live-two-player-concurrent.jpg).
 - [Retiro de la reacción de Alicia](evidence_issue_40_F4/desktop-live-withdrawal.jpg) y [expiración de las burbujas](evidence_issue_40_F4/desktop-live-expiration.jpg).
 
-La partida live satisface la evidencia funcional pendiente de AC12. La PR única hacia `master` y su integración siguen pendientes; no se publicarán sin autorización del propietario. La tercera revisión independiente debe comparar AC1–AC12 contra el issue actualizado, código, reportes y capturas; no modificar archivos ni ejecutar tests. Registrar aquí su dictamen y defectos reproducibles antes de cerrar F4.
+La partida live satisface la evidencia funcional pendiente de AC12. El 2026-09-29, el propietario autorizó integrar #40 sin ejecutar la tercera revisión independiente. La PR [#54](https://github.com/pronficilio/coup-online/pull/54) se integró a `master` con el merge commit `d1eddb834f35d058159343475789b8df20a173a1`; GitHub cerró la issue. El cliente recompiló en desarrollo después del último ajuste con una advertencia ESLint preexistente en `Coup.js:459`. El Orquestador no ejecutó pruebas automatizadas ni comprobaciones visuales; esas comprobaciones quedaron a cargo del propietario. Esta autorización cierra operativamente F4 sin convertirla en un veredicto independiente `PASS`.

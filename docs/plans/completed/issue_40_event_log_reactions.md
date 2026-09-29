@@ -1,22 +1,22 @@
-# Handoff activo — issue #40
+# Cierre de unidad — issue #40
 
 **Issue:** https://github.com/pronficilio/coup-online/issues/40
 **Plan exacto:** `docs/plans/event-log-reactions/plan_event_log_reactions.md`
 **Bitácora exacta:** `docs/plans/log/issue-40.jsonl`
-**Estado del plan:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F2 se reabrió y volvió a `PASS` tras el segundo `FAIL`; F4 `ACTIVE`, tercer veredicto independiente pendiente.
+**Estado del plan:** `COMPLETED`; F1–F3 `CLOSED / PASS`; F2 se reabrió y volvió a `PASS` tras el segundo `FAIL`; F4 `CLOSED_WAIVED_BY_OWNER`, sin tercer veredicto independiente.
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`
-**Verifier requerido ahora:** sí; revisión independiente `FINAL`, de solo lectura, sobre las correcciones de foco/scroll y el E2E live antes de cerrar F4.
+**Verifier requerido ahora:** no; el propietario autorizó la integración sin ejecutar la tercera revisión independiente. F4 no se marca como `PASS` independiente.
 **Pregunta de falsificación:** ¿alguna secuencia de cliente rompe los doce criterios de aceptación, filtra una carta o vínculo persistente jugador→evento/reacción, duplica conteos o deja globos/timers obsoletos?
 **Checkpoint F1:** `docs/plans/event-log-reactions/checkpoint_issue_40_F1.md` — F1 aprobada por el Orquestador; la suite general conserva cuatro fallos de expectativas antiguas de pausa/reanudación, fuera del alcance F1.
 **Reporte F1:** `docs/plans/event-log-reactions/report_issue_40_F1.md`.
 **Branch destino:** `issue/40-event-log-reactions`
 **Worktree destino:** `/mnt/e/dev/coup/.worktrees/issue-40-event-log-reactions`
 **Merge target:** `master` de `pronficilio/coup-online`
-**PR esperada:** una PR desde el branch canónico a `master`; todavía no existe.
+**PR integrada:** [#54](https://github.com/pronficilio/coup-online/pull/54), merge commit `d1eddb834f35d058159343475789b8df20a173a1`.
 
-## Fase activa: F4 — Falsificación y entrega
+## Cierre F4 — Integración autorizada por el propietario
 
-F1–F3 están cerradas con `PASS`. El segundo Verifier independiente encontró pérdida de foco después de seleccionar una reacción (AC9) y salto al final al reabrir el registro móvil (AC10). F2 se reabrió y corrigió ambos defectos. Un walkthrough real con dos clientes confirmó evento de servidor, reemplazo/reset, concurrencia, retiro, expiración y foco restaurado sin errores de página; el fixture móvil con 30 eventos confirmó continuidad de `scrollTop`. `npm run build` pasó con avisos preexistentes. Las capturas están en `evidence_issue_40_F4/`. F4 necesita una tercera revisión independiente sobre AC1–AC12. La PR a `master` y la integración de AC12 siguen pendientes de autorización del propietario.
+F1–F3 están cerradas con `PASS`. El segundo Verifier independiente encontró pérdida de foco después de seleccionar una reacción (AC9) y salto al final al reabrir el registro móvil (AC10); F2 corrigió ambos defectos. El E2E live con dos clientes confirmó evento real, reemplazo/reset, concurrencia, retiro, expiración y foco restaurado. El fixture móvil con 30 eventos confirmó continuidad de `scrollTop`. La tercera revisión independiente `FINAL` no se ejecutó: el propietario autorizó explícitamente el merge de la PR #54. La PR se integró a `master` y GitHub cerró el issue #40. La recompilación final de desarrollo pasó con una advertencia ESLint preexistente en `Coup.js:459`; el Orquestador no ejecutó pruebas automatizadas ni comprobaciones visuales, que quedaron a cargo del propietario. Capturas previas: `docs/plans/event-log-reactions/evidence_issue_40_F4/`.
 
 ## Dependencia de F1
 
@@ -24,7 +24,7 @@ F1 ya cerró el contrato tipado, los resultados públicos y el estado autoritati
 
 ## Reclamo, rama y aislamiento
 
-Issue #40 permanece `OPEN` y está asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` está rebasado sobre `origin/master@2ef09de` tras la integración de #51 y #52, preservando #24/PR #41, #46/PR #48, #49/PR #50, #45/PR #51 y #47/PR #52. No se creó otro worktree ni se integró la rama de #24 como dependencia.
+Issue #40 está `CLOSED` y permanece asignada a `pronficilio`. El claim inicial quedó publicado y releído en [el issue](https://github.com/pronficilio/coup-online/issues/40#issuecomment-5865134787). El branch único `issue/40-event-log-reactions` se integró mediante PR #54; conservó #24/PR #41, #46/PR #48, #49/PR #50, #45/PR #51 y #47/PR #52. No se integró la rama de #24 como dependencia. Para registrar el cierre se usó un checkout temporal detached después del merge; no se alteró el checkout raíz compartido.
 
 F1 se ejecutó directamente en el worktree por falta de delegación disponible en ese contexto. F2 y F3 continúan bajo dirección del Orquestador tras cerrar el hilo del Alquimista que no inició trabajo después de su reanudación.
 
@@ -89,12 +89,18 @@ El Orquestador aprobó F1. Se completaron las pruebas específicas de payload, e
 
 `Coup.js` pasa `reactionPresence` al `PlayerBoard` real. La presencia pública por asiento tiene como máximo un globo efímero, sin `eventId` ni asociación persistente. Reemplazo con timer reiniciado, retiro, expiración, limpieza de listeners/timers, traducciones y `prefers-reduced-motion` están implementados. El build pasó; el recorrido integrado cubrió temporizadores, dos asientos simultáneos, targets móviles de 44×44 px y layouts desktop/móvil para 2–6 jugadores.
 
-## Alcance activo F4
+## Disposición de F4
 
-Tercera revisión independiente de solo lectura frente a issue #40 y su plan aprobado tras corregir AC9/AC10 y probar una partida live multi-cliente. Falsificar concurrencia/unicidad, agregados, reacciones propias, privacidad, presencia/timers, traducciones, ausencia de horas, legibilidad móvil y regresiones del rail #24. Devolver `PASS`, `FAIL` o `BLOCKED` con criterios cubiertos, comandos/evidencia y defectos reproducibles; no modificar la implementación.
+El tercer Verifier independiente no produjo dictamen. La autorización del propietario permitió integrar con la evidencia ya registrada. Este cierre no atribuye un `PASS` independiente a F4 ni afirma pruebas visuales ejecutadas por el Orquestador.
 
 ## Política para todo el issue
 
 - Commits de fase dentro del branch único; no crear ramas/worktrees por fase.
-- Build cliente, pruebas aplicables, revisión manual y evidencia final según issue #40; Verifier independiente `FINAL` antes de integración.
+- Build cliente, pruebas aplicables, revisión manual y evidencia final según issue #40; Verifier independiente `FINAL` antes de integración salvo excepción explícita del propietario.
 - El Alquimista no integra a `master`, no cierra issue #40 y no aprueba su propia integración.
+
+## Resultado
+
+- PR #54 quedó integrada en `master` con merge commit `d1eddb834f35d058159343475789b8df20a173a1`; GitHub cerró issue #40.
+- El propietario autorizó integrar sin la tercera revisión independiente F4. F4 se registra como `CLOSED_WAIVED_BY_OWNER`, no como `PASS`.
+- El Orquestador preservó el checkout raíz y sus cambios locales de otros issues.

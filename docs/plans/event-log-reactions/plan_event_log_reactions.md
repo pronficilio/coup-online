@@ -1,14 +1,14 @@
 # Plan — Registro de eventos y reacciones (#40)
 
-**Estado:** `ACTIVE`; F1–F3 `CLOSED / PASS`; F4 `ACTIVE`, segundo veredicto independiente tras primer `FAIL`; issue `OPEN`, asignada a `pronficilio`.
+**Estado:** `COMPLETED`; F1–F3 `CLOSED / PASS`; F4 `CLOSED_WAIVED_BY_OWNER` sin tercer veredicto independiente; issue `CLOSED` mediante PR #54.
 
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/40
-**Handoff:** `docs/plans/active/issue_40_event_log_reactions.md`
+**Handoff:** `docs/plans/completed/issue_40_event_log_reactions.md`
 **Bitácora:** `docs/plans/log/issue-40.jsonl`
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 **Branch / worktree:** `issue/40-event-log-reactions` / `.worktrees/issue-40-event-log-reactions`.
 **Base / destino:** `origin/master` (`2ef09de84465889521234951fed934a31dfe1b11`) / `master` de `pronficilio/coup-online`.
-**Integración:** una PR para el issue completo; aún no existe.
+**Integración:** [PR #54](https://github.com/pronficilio/coup-online/pull/54), merge commit `d1eddb834f35d058159343475789b8df20a173a1`.
 
 ## Solicitud y resultado esperado
 
@@ -88,14 +88,14 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 
 ### F4 — Falsificación y entrega
 
-**Estado:** `ACTIVE`; los dos primeros veredictos independientes fueron `FAIL`. Se corrigieron las fallas de cableado/targets, foco de teclado y scroll móvil. Un E2E live de dos clientes confirmó replacement/reset, concurrencia, retiro y expiración. La tercera revisión independiente `FINAL` está pendiente; AC12 además requiere la PR e integración aprobadas por el propietario.
+**Estado:** `CLOSED_WAIVED_BY_OWNER`; los dos primeros veredictos independientes fueron `FAIL` y sus defectos se corrigieron. El propietario autorizó explícitamente integrar mediante PR #54 sin ejecutar la tercera revisión independiente `FINAL`. No se registra un `PASS` independiente para F4. La PR se integró y cerró el issue.
 
 **Pregunta única:** ¿Puede una ruta cliente o secuencia concurrente refutar unicidad, conteos, privacidad, caducidad o presentación sin horas?
 
 - **Entrada:** F1–F3 cerradas en el mismo branch; F2 se puede reabrir para corregir regresiones encontradas en falsificación.
 - **Trabajo/evidencia:** build y verificaciones pertinentes, revisión visual/funcional de escritorio y móvil, resultados de escenarios críticos y evidencia para AC1–AC12.
-- **Verifier:** revisión independiente `FINAL`, sin modificar la implementación. Debe intentar refutar unicidad bajo concurrencia, exactitud de agregados, privacidad, borde/temporizador y ausencia de horas.
-- **Avance:** evidencia local cubre los criterios funcionales, el Verifier da `PASS` y el único branch queda listo para la PR; abrirla e integrarla requiere la autorización correspondiente del propietario.
+- **Verifier:** la tercera revisión independiente `FINAL` no se ejecutó por autorización explícita del propietario para integrar. Los reportes anteriores y la evidencia existente permanecen disponibles; no se convierte la excepción en un veredicto `PASS`.
+- **Avance:** el propietario autorizó la integración; PR #54 se integró a `master` y cerró #40. El build de desarrollo recompiló el ajuste final con una advertencia ESLint preexistente. El Orquestador no ejecutó pruebas automatizadas ni comprobaciones visuales.
 - **Repetir:** si hay un defecto, regresar a la fase dueña del criterio, corregir en el mismo branch y repetir solo la evidencia afectada más el checkpoint Verifier.
 - **Bloquear/cancelar:** no integrar ante `FAIL`/`BLOCKED` no resuelto ni relajar criterios; cancelar solo por decisión explícita del propietario.
 - **Commit:** `docs(event-reactions): issue 40 F4 CLOSED ready_review` (`COMMIT_REQUIRED`).
@@ -107,6 +107,8 @@ El issue #40 es la fuente canónica de los doce criterios de aceptación, catál
 - Cada fase con artefactos persistentes termina en commit que contiene reporte/actualización de fase y evento JSONL de veredicto.
 - El Alquimista debe seguir `docs/agentes/ALQUIMISTA.md`, reclamar/releer issue #40 y verificar este worktree antes de trabajo técnico. No tocar `master` ni el checkout raíz.
 - No declarar la unidad completa ni integrar/cerrar: entregar al Orquestador para revisión independiente de la integración.
+
+La restricción de integración anterior se exceptuó por instrucción explícita del propietario el 2026-09-29. La excepción autorizó el merge, pero no altera los resultados de verificación ni afirma que F4 haya recibido un `PASS` independiente.
 
 ## Historial de decisiones
 
