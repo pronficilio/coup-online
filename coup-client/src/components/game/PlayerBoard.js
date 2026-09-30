@@ -216,7 +216,7 @@ export default function PlayerBoard(props) {
                     isRespondable ? 'PlayerBoardSeat--respondable' : ''
                 ].filter(Boolean).join(' ')
 
-                return <section
+                const seat = <section
                     className={seatClassName}
                     key={player.name}
                     data-seat-index={seatIndex}
@@ -236,8 +236,8 @@ export default function PlayerBoard(props) {
                     data-respondable={isRespondable ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
                     style={{
-                        left: `${left}%`,
-                        top: `${top}%`,
+                        left: isObserver ? undefined : `${left}%`,
+                        top: isObserver ? undefined : `${top}%`,
                         '--player-color': player.color
                     }}
                 >
@@ -293,8 +293,21 @@ export default function PlayerBoard(props) {
                             )
                         )}
                     </div>
-                    {isObserver && props.referencePanel}
                 </section>
+
+                if (!isObserver) return seat
+
+                return <div
+                    className="PlayerBoardSeatAnchor PlayerBoardSeatAnchor--observer"
+                    key={player.name}
+                    style={{
+                        left: `${left}%`,
+                        top: `${top}%`
+                    }}
+                >
+                    {seat}
+                    {props.referencePanel}
+                </div>
             })}
             <OwnCardZoom
                 open={zoomOpen}

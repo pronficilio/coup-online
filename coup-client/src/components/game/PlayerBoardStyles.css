@@ -254,12 +254,23 @@
 }
 
 /* The references anchor to the exact two-card row and its section bottom. */
-.PlayerBoardSeat--observer {
+.PlayerBoardSeatAnchor--observer {
     --player-board-observer-card-width: clamp(76px, 10.4vw, 134px);
     --player-board-observer-row-width: calc(var(--player-board-observer-card-width) + var(--player-board-observer-card-width) + 5px);
     z-index: 30;
     width: var(--player-board-observer-row-width);
     max-width: none;
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.PlayerBoardSeat--observer {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: var(--player-board-observer-row-width);
+    max-width: none;
+    transform: none;
 }
 
 .PlayerBoardSeatHeader {
@@ -655,7 +666,7 @@
         width: clamp(58px, 15.5vw, 82px);
     }
 
-    .PlayerBoardSeat--observer {
+    .PlayerBoardSeatAnchor--observer {
         --player-board-observer-card-width: clamp(58px, 15.5vw, 82px);
     }
 
