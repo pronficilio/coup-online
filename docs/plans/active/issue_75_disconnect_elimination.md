@@ -2,13 +2,13 @@
 
 **Issue/Ticket:** [#75 — continuar la partida si se desconecta un jugador con 3 o más participantes](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
 **Plan:** `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-**Estado del plan:** `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`. F3 fue `PASS` estático independiente sobre `17864e8`; falta revisión de integración y PR.
+**Estado del plan:** `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`. F3 fue `PASS` estático independiente sobre `17864e8`; PR [#81](https://github.com/pronficilio/coup-online/pull/81) está abierta a `master`.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH`.
 **Política de verificación:** `FINAL` independiente.
 **Verifier requerido ahora:** no; F3 independiente cerrada `PASS` estático.
 **Pregunta de falsificación:** ¿puede una intercalación entre desconexión, timeout, resume, respuesta humana/Codex y avance de turno dejar a los conectados sin una decisión válida, resolver una acción dos veces o reactivar una partida terminal?
-**Fases completadas:** F1, F2 y F3. Siguiente dueño: Orquestador para revisar el diff completo, abrir la PR canónica e integrar.
+**Fases completadas:** F1, F2 y F3. Siguiente dueño: Orquestador para terminar de revisar los checks e integrar la PR #81.
 **Resultado F1:** matriz y decisión estática en `docs/plans/disconnect-elimination/report_issue_75_F1.md`. #46 implementó disolución terminal para el jugador vivo que se desconecta; #75 conserva esa regla para dos asientos.
 
 **Resultado F2:** implementación y matriz estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. F2 invalida inmediatamente un `block_challenge` cuyo blocker se desconecta; conserva la pérdida ya determinada de otro asiento si muere el actor; y `resume()` prioriza actor, blocker y objetivo, luego procesa los demás humanos sin socket aunque la primera baja haya pasado el juego a `running`. La pausa previa no reanudable con `pausedDecision === null` sigue intacta. Las dos devoluciones de F3 y sus fixes están registradas en `report_issue_75_F3_checkpoint.md`.
@@ -44,7 +44,7 @@
 **Reclamo confirmado:** issue asignado a `pronficilio`; ejecutor Agente Alquimista; estado `ACTIVE`.
 **Límite de pausa:** la recuperación aplica a `pausedDecision` presente. Si `pausedDecision === null` por una pausa no reanudable preexistente de #26, se elimina y proyecta al jugador, pero no se reinicia ni reasigna la decisión ni se cambia la regla de reanudación; el issue registra esta decisión en [un comentario](https://github.com/pronficilio/coup-online/issues/75#issuecomment-5905691402).
 **Bitácora del issue:** `docs/plans/log/issue-75.jsonl`.
-**PR/MR esperado:** una PR hacia `master`, asociada únicamente a #75; comprobar que no exista otra antes de abrirla.
+**PR/MR canónica:** [#81](https://github.com/pronficilio/coup-online/pull/81), una PR hacia `master` asociada únicamente a #75.
 
 ## Secuencia obligatoria de reclamo/aislamiento
 

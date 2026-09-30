@@ -3,11 +3,11 @@
 ## Estado vigente
 
 - Issue: [#75](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
-- Estado operativo: `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`; F3 fue `PASS` estático independiente sobre `17864e8`. Falta revisión de integración y PR.
+- Estado operativo: `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`; F3 fue `PASS` estático independiente sobre `17864e8`. PR [#81](https://github.com/pronficilio/coup-online/pull/81) abierta a `master`; falta completar revisión e integración.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Verifier requerido: F3 `PASS` estático; no quedan checkpoints independientes pendientes.
 - Branch / worktree únicos: `issue/75-disconnect-elimination` / `.worktrees/issue-75-disconnect-elimination`.
-- Destino: `master` de `pronficilio/coup-online`; PR única esperada para #75.
+- Destino: `master` de `pronficilio/coup-online`; PR única #81.
 - Plan: `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
 - Handoff: `docs/plans/active/issue_75_disconnect_elimination.md`.
 - Bitácora append-only: `docs/plans/log/issue-75.jsonl`.
@@ -106,7 +106,7 @@
 - Una unidad, un branch, un worktree y una PR: `issue/75-disconnect-elimination` → `master`.
 - Worktree esperado: `.worktrees/issue-75-disconnect-elimination`.
 - No se observó branch local/remoto ni worktree con este nombre al preparar la unidad; el Ejecutor debe volver a comprobar el tracker y refs antes de reclamar/crear.
-- PR esperada: una PR hacia `master`, asociada solo a #75; al cierre de F3 no existe una PR candidata conocida.
+- PR única: [#81](https://github.com/pronficilio/coup-online/pull/81), abierta hacia `master` y asociada solo a #75.
 - No se ejecutarán ni añadirán pruebas automatizadas porque el usuario pidió el cambio de comportamiento, no pruebas/verificación. Los reportes deben identificar esta limitación y no afirmar validación dinámica.
 
 ## Riesgos y preguntas
@@ -124,3 +124,4 @@
 - 2026-09-30: el primer F3 mostró que un blocker muerto no pertenece a `block_challenge.allowed`; F2 invalidó y descartó esa ventana al morir el blocker, y continúa sin bloqueo.
 - 2026-09-30: el Verifier reportó `FAIL` en `d9fad75` por un segundo hallazgo: resume multi-socket resolvía foreign aid antes de procesar al actor offline. Ambos hallazgos están en `report_issue_75_F3_checkpoint.md`; el commit `17864e8` prioriza `currentAction.actor`, `pendingBlock.blocker`, luego `currentAction.target`, y limpia ausentes tras el paso a `running`.
 - 2026-09-30: F3 se repitió independientemente sobre `17864e8` y obtuvo `PASS` estático. El Verifier no encontró otra refutación en blocker/actor/challenger/target offline, drenaje multi-socket, retorno de `resume()` ni terminalidad. El informe aclara que no hubo pruebas, build o runtime. Siguiente dueño: Orquestador para revisión del diff y PR.
+- 2026-09-30: el Orquestador abrió la PR única [#81](https://github.com/pronficilio/coup-online/pull/81) desde `issue/75-disconnect-elimination` a `master`; queda pendiente revisar sus checks y completar integración.
