@@ -293,6 +293,7 @@ export default function PlayerBoard(props) {
                             )
                         )}
                     </div>
+                    {isObserver && props.referencePanel}
                 </section>
             })}
             <OwnCardZoom
