@@ -858,6 +858,7 @@ export default class Coup extends Component {
 
     renderChoiceDecision(decision) {
         const submitted = this.state.submitted || this.state.gamePaused
+        const compact = RESPONSE_WINDOW_TYPES.has(decision.type)
         const titleKey = DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic'
         const title = t(titleKey, {
             count: this.state.ownInfluences.length,
@@ -867,7 +868,7 @@ export default class Coup extends Component {
         })
 
         return <section
-            className="ActionDecision DecisionActionPanel ResponseDecisionPanel"
+            className={`ActionDecision DecisionActionPanel ResponseDecisionPanel${compact ? ' DecisionActionPanel--compact' : ''}`}
             data-decision-type={decision.type}
             aria-labelledby="choice-decision-panel-title"
         >
