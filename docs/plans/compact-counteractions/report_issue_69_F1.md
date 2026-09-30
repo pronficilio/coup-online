@@ -1,9 +1,13 @@
 # Reporte F1 — issue #69
 
-**Veredicto:** `BLOCKED` por falta de evidencia de revisión visual responsive.
+**Veredicto:** `CLOSED_WAIVED_BY_OWNER`; integración autorizada por el propietario, sin PASS visual.
 **Issue:** [#69 — Compactar el panel de contraacciones fuera del turno](https://github.com/pronficilio/coup-online/issues/69)
 **Branch / worktree:** `issue/69-compact-counteractions` / `.worktrees/issue-69-compact-counteractions`
 **Base:** `origin/master` en `3783edeeb14164163e665727ff2a610a6f080930`.
+
+## Autorización del propietario
+
+El 2026-09-29, el propietario indicó: «Con fé, vamos a hacer merge a master». El Orquestador registra esta instrucción como autorización explícita para integrar la unidad aunque no haya capturas de escritorio/móvil. La ausencia de revisión visual permanece sin resolver y no se registra como `PASS`.
 
 ## Cambio
 
@@ -22,4 +26,4 @@ Intenté renderizar capturas con Chromium headless desde un fixture temporal que
 
 La inspección del CSS fuente confirma que el modificador existente pone el panel al 50% del rail; `DecisionOptions` permite envolver opciones, cada botón tiene un mínimo de 100 px de ancho y 42 px de alto, y el rail permite scroll vertical. Esto sugiere que las opciones pueden apilarse en móvil, pero no demuestra que el copy siga legible ni que todos los controles sean operables en pantalla real. No añadí ajuste CSS porque el plan lo permite solo si una revisión visual demuestra que el modificador deja controles inutilizables.
 
-**Siguiente paso:** el Orquestador debe completar la revisión visual en escritorio y móvil y decidir si F1 puede cerrarse. La issue sigue abierta; no se abrió PR ni se integró el branch.
+**Siguiente paso:** el Orquestador debe revisar la PR e integrar a `master` bajo el waiver del propietario. La issue sigue abierta hasta que esa integración canónica se verifique.

@@ -1,6 +1,6 @@
 # Plan — compactar el panel de contraacciones fuera del turno (#69)
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `BLOCKED` por falta de revisión visual ejecutable; issue `OPEN`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED_WAIVED_BY_OWNER`; issue `OPEN` hasta integrar la PR canónica.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/69
 **Handoff:** `docs/plans/active/issue_69_compact_counteractions.md`.
 **Bitácora:** `docs/plans/log/issue-69.jsonl` (append-only).
@@ -30,7 +30,7 @@ Incluye añadir el modificador compacto a `challenge`, `block` y `block_challeng
 
 No incluye compactar `prove_claim`/`lose_influence`, cambiar reglas, tipos u opciones del servidor, copy, traducciones, callbacks, el compactado interactivo del panel de turno propio, `ExchangeDecisionPanel`, ni el rail/tablero. No agregar ni ejecutar pruebas automatizadas.
 
-## F1 — compactar contraacciones (`BLOCKED`)
+## F1 — compactar contraacciones (`CLOSED_WAIVED_BY_OWNER`)
 
 **Pregunta única:** ¿el modificador compacto reduce el tamaño de `challenge`, `block` y `block_challenge` y conserva todas sus opciones visibles y operables en escritorio y móvil?
 
@@ -45,12 +45,12 @@ No incluye compactar `prove_claim`/`lose_influence`, cambiar reglas, tipos u opc
 **Repetir:** un ciclo visual acotado si se reproduce recorte o solapamiento.
 **Bloquear:** una regresión de decisión/opciones o un problema de layout que requiera rediseñar el rail o cambiar el contrato.
 **Artefactos:** `Coup.js`, potencialmente `CoupStyles.css` por la condición anterior, y el reporte F1.
-**Commit:** `COMMIT_REQUIRED`; cierre previsto: `feat(game-ui): issue 69 F1 CLOSED`.
+**Commit:** `COMMIT_REQUIRED`; implementación/reporte: `da1552a feat(game-ui): issue 69 F1 BLOCKED`; waiver del propietario registrado por el Orquestador. La ausencia de evidencia visual no se convierte en `PASS`.
 **Verificación:** `NONE`; el ejecutor registra la validación local y walkthrough visual, sin Verifier independiente.
 
 ## Siguiente dueño y topología
 
-El siguiente dueño es el Orquestador para revisar la limitación de validación. Una unidad: issue #69 → branch `issue/69-compact-counteractions` → worktree `.worktrees/issue-69-compact-counteractions` → una PR hacia `master` de `pronficilio/coup-online`. No trabajar desde la rama base.
+El siguiente dueño es el Orquestador para revisar e integrar la PR bajo el waiver explícito del propietario. Una unidad: issue #69 → branch `issue/69-compact-counteractions` → worktree `.worktrees/issue-69-compact-counteractions` → una PR hacia `master` de `pronficilio/coup-online`. No trabajar desde la rama base.
 
 **Pregunta de falsificación:** ¿alguna opción de respuesta queda recortada, solapada o difícil de activar después de compactar el panel, especialmente en móvil?
 
@@ -58,5 +58,5 @@ El siguiente dueño es el Orquestador para revisar la limitación de validación
 
 - Implementado `DecisionActionPanel--compact` solo para `challenge`, `block` y `block_challenge` mediante `RESPONSE_WINDOW_TYPES` en `renderChoiceDecision`.
 - Build del cliente y `git diff --check` completados; ver [reporte F1](report_issue_69_F1.md).
-- La revisión visual desktop/móvil quedó bloqueada por el entorno: Chromium headless no produjo capturas dentro del sandbox ni en el intento escalado acotado. No se afirma legibilidad visual sin esa evidencia.
-- No hay ajuste CSS porque el criterio permite cambiarlo solo con evidencia visual de controles inutilizables. Siguiente paso: revisión visual del Orquestador y veredicto de fase.
+- La revisión visual desktop/móvil no se pudo ejecutar: Chromium headless no produjo capturas dentro del sandbox ni en el intento escalado acotado. El propietario autorizó explícitamente el merge pese a esa ausencia; no se afirma legibilidad visual ni F1 `PASS`.
+- No hay ajuste CSS porque el criterio permite cambiarlo solo con evidencia visual de controles inutilizables. Siguiente paso: revisión e integración de la PR por el Orquestador, bajo el waiver registrado.
