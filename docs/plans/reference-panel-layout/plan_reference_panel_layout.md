@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `WAITING_EXECUTOR`; F1 `READY`.
+**Estado:** `IN_PROGRESS`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `IN_PROGRESS`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -33,7 +33,7 @@ Incluir el layout de `.PlayerBoardContainer`, el contenedor compartido que pueda
 
 No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportamiento de los modales, imágenes, destinos ni traducciones. No ampliar la auditoría de decisiones de #44 ni reabrir #44; reutilizar su diagnóstico solo como evidencia causal.
 
-## F1 — atribución geométrica por breakpoint (`READY`)
+## F1 — atribución geométrica por breakpoint (`CLOSED — PASS limitado`)
 
 **Pregunta única:** ¿qué cajas y desplazamientos explican la altura del documento y qué ubicación de triggers cabe sin solaparse?
 
@@ -43,7 +43,8 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
   2. Medir o calcular el efecto de `.reference-panel__triggers` para 390, 720, 1024, 1199 y 1200+ px; cubrir orientación/alto corto y flex-wrap.
   3. Identificar la franja lateral disponible frente a las cartas propias y al Event Log, incluidos tamaños donde no cabe un rail lateral.
   4. Registrar separadamente evidencia dinámica, cálculos derivados y observaciones del propietario en `report_issue_72_F1.md`.
-- **Salida:** atribución causal con coordenadas comparables de viewport/documento y una propuesta de layout responsive que no dependa de “último nodo DOM”.
+- **Salida:** `docs/plans/reference-panel-layout/report_issue_72_F1.md`. Reutiliza la medición aportada en #44 y evalúa aritméticamente las fórmulas CSS para breakpoints inferiores a 1200 px; no hay rectángulos dinámicos nuevos ni navegador local.
+- **Veredicto:** la caja cuadrada y sus desplazamientos explican el hueco desktop; los triggers `static` aportan nominalmente 72 px bajo 1200 px. La propuesta responsive queda en el reporte; posibles solapamientos de la cuadrícula estrecha se verifican en F3/propietario.
 - **Avanzar:** cada contribución está aislada, y existe una opción de layout para desktop/tablet y otra segura para pantallas estrechas.
 - **Pivotar:** si compensar el flujo con márgenes dependientes de transform recorta el tablero o genera overflow, preferir un wrapper/layout que modele la caja visible.
 - **Repetición acotada:** repetir una medición solo para el breakpoint cuyo valor cambie la decisión del layout.
@@ -51,7 +52,7 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 - **Commit:** requerido; `docs(plans): close issue 72 F1 layout diagnosis`.
 - **Validación:** revisión estática de selectores/cálculos; no añadir ni ejecutar tests.
 
-## F2 — compactar el flujo y acoplar accesos (`READY AFTER F1`)
+## F2 — compactar el flujo y acoplar accesos (`IN_PROGRESS`)
 
 **Pregunta única:** ¿puede el layout final seguir las cajas visibles y mantener accesibles las referencias sin cubrir contenido?
 
