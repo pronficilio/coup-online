@@ -154,7 +154,7 @@
     }
 }
 
-@media (max-width: 521px) {
+@media (max-width: 540px) {
     .reference-panel__trigger:first-child .reference-panel__tooltip {
         right: auto;
         left: 0;
@@ -167,6 +167,10 @@
     .reference-panel__trigger:first-child:hover .reference-panel__tooltip,
     .reference-panel__trigger:first-child:focus-visible .reference-panel__tooltip {
         transform: translate(0, 0);
+    }
+
+    .reference-panel__trigger:focus-visible {
+        outline-offset: -3px;
     }
 }
 
