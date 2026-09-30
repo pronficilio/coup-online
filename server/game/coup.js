@@ -486,6 +486,24 @@ class CoupGame {
         return true
     }
 
+    continueWithoutDeadBlock(decision, block) {
+        const wasPaused = this.phase === 'paused'
+        block.historyEntry.result = 'cancelled'
+        block.action.pendingBlock = null
+        this.discardDecision(decision)
+        this.phase = 'running'
+        if (wasPaused) this.publicEmit('g-gameResumed', { stateVersion: this.stateVersion })
+        this.updatePlayers()
+        const actor = this.players[block.action.actor]
+        if (!actor || actor.isDead) {
+            block.action.historyEntry.result = 'cancelled'
+            this.currentAction = null
+            return this.advanceTurn()
+        }
+        this.resolveAction(block.action)
+        return true
+    }
+
     finishAfterDisconnect(decision) {
         this.clearDecisionTimer()
         this.cancelCodexRequests('cancelled')
@@ -529,6 +547,12 @@ class CoupGame {
         if (phaseBeforeDisconnect === 'paused' && !decision) {
             this.updatePlayers()
             return true
+        }
+
+        const pendingBlock = this.currentAction && this.currentAction.pendingBlock
+        if (decision && decision.type === 'block_challenge' && pendingBlock
+            && pendingBlock.blocker === player.seat) {
+            return this.continueWithoutDeadBlock(decision, pendingBlock)
         }
 
         const disconnectedActionActor = this.currentAction && this.currentAction.actor === player.seat
@@ -1238,6 +1262,7 @@ class CoupGame {
     }
 
     challengeBlock(block) {
+        block.action.pendingBlock = block
         const challengers = this.players.filter(player => !player.isDead && player.seat !== block.blocker).map(player => player.seat)
         this.openWindow({
             type: 'block_challenge',
@@ -1247,6 +1272,12 @@ class CoupGame {
             anchor: block.blocker,
             optionForSeat: () => [this.createChoice('challenge', 'Challenge', { kind: 'challenge' })],
             resolve: selected => {
+                if (block.action.pendingBlock === block) block.action.pendingBlock = null
+                const blocker = this.players[block.blocker]
+                if (!blocker || blocker.isDead) {
+                    block.historyEntry.result = 'cancelled'
+                    return this.resolveAction(block.action)
+                }
                 if (!selected) {
                     block.historyEntry.result = 'resolved'
                     block.action.historyEntry.result = 'blocked'
@@ -1289,6 +1320,15 @@ class CoupGame {
 
     openProofDecision({ claimant, challenger, roles, historyEntry, description, onProved, onConceded }) {
         const player = this.players[claimant]
+        if (!player || player.isDead) {
+            if (historyEntry) historyEntry.result = 'failed'
+            this.addLog('claim_not_proved', {
+                actorSeat: claimant,
+                ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
+                ...(historyEntry && historyEntry.claimRole ? { claimRole: historyEntry.claimRole } : {})
+            }, { key: 'game.log.claimNotProved' })
+            return onConceded()
+        }
         const heldRoles = player.influences.filter(card => roles.includes(card))
         const choices = heldRoles.map((card, index) => this.createChoice(
             `prove:${card}:${index}`,

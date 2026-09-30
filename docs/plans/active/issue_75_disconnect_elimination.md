@@ -2,16 +2,16 @@
 
 **Issue/Ticket:** [#75 — continuar la partida si se desconecta un jugador con 3 o más participantes](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
 **Plan:** `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático; F3 pendiente de Verifier independiente.
+**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático tras una corrección al contraejemplo provisional de F3; F3 pendiente de repetición independiente.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH`.
 **Política de verificación:** `FINAL` independiente.
-**Verifier requerido ahora:** sí; ejecutar F3 tras identificar el commit F2.
+**Verifier requerido ahora:** sí; repetir F3 sobre el commit correctivo F2.
 **Pregunta de falsificación:** ¿puede una intercalación entre desconexión, timeout, resume, respuesta humana/Codex y avance de turno dejar a los conectados sin una decisión válida, resolver una acción dos veces o reactivar una partida terminal?
 **Fase completada:** F2 — eliminar al jugador y continuar la partida según el contrato F1. Siguiente: F3 — Verifier independiente.
 **Resultado F1:** matriz y decisión estática en `docs/plans/disconnect-elimination/report_issue_75_F1.md`. #46 implementó disolución terminal para el jugador vivo que se desconecta; #75 conserva esa regla para dos asientos.
 
-**Resultado F2:** implementación y matriz de evidencia estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. La pérdida de influencia ya determinada de otro asiento se conserva si muere el actor de la acción; el callback cancela esa acción sin continuarla. `resume()` procesa repetidamente todos los humanos sin socket antes de reactivar una pausa recuperable. La pausa previa no reanudable con `pausedDecision === null` sigue intacta.
+**Resultado F2:** implementación y matriz de evidencia estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. Además de conservar la pérdida de influencia ya determinada de otro asiento si muere el actor de la acción, F2 invalida inmediatamente un `block_challenge` cuyo blocker se desconecta; continúa la acción sin bloqueo y no intenta probar al muerto. `resume()` procesa repetidamente todos los humanos sin socket antes de reactivar una pausa recuperable. La pausa previa no reanudable con `pausedDecision === null` sigue intacta. El Verifier comunicó un contraejemplo provisional de F3 y debe repetir esa fase tras el commit correctivo.
 
 ## Documentos fuente
 
