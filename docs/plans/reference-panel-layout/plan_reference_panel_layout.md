@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (remediación estática/build; walkthrough visual pendiente)`; F3 `IN_PROGRESS_VERIFIER`.
+**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build y geometría estática; walkthrough visual pendiente)`; F3 `CLOSED (PASS_LIMITED estático para anchos evaluados ≥263 px; visual/DOM pendiente)`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -25,7 +25,7 @@ El alto desplazable del documento debe seguir el borde visual inferior del table
 - Base confirmada: `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`.
 - Topología: una rama, un worktree y una PR hacia `master`.
 - Bitácora append-only: `docs/plans/log/issue-72.jsonl`.
-- Plan: esta ruta. Handoff: `docs/plans/inbox/issue_72_reference_panel_layout.md`.
+- Plan: esta ruta. Handoff activo: `docs/plans/active/issue_72_reference_panel_layout.md`.
 
 ## Alcance y exclusiones
 
@@ -76,8 +76,8 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 **Pregunta única:** ¿existe un viewport o conteo de jugadores donde el cambio vuelva a alargar la página, tape una carta/control o deje una referencia inaccesible?
 
 - **Verifier:** agente independiente del implementador. Debe intentar refutar la alineación, el alto de documento y la accesibilidad en 2, 3, 5 y 6 jugadores; desktop amplio, 1024 px y móvil (incluido alto corto); navegación por teclado, hover y apertura/cierre de cada referencia.
-- **Salida:** `report_issue_72_F3_verifier.md` con `PASS`, `FAIL` o `BLOCKED`, evidencia y límites. El implementador resuelve cada FAIL antes de re-verificación.
-- **Verificación propietaria:** solicitar walkthrough visual del preview si no hay navegador/runtime disponible en el entorno. No declarar cobertura dinámica sin observación.
+- **Salida:** `report_issue_72_F3_verifier.md`. El resultado es `PASS_LIMITED` estático para los anchos evaluados ≥263 px; no hay FAIL estático pendiente dentro de ese límite. Bajo 263 px no se aprueba la geometría.
+- **Verificación propietaria pendiente:** no hay navegador/runtime disponible; solicitar walkthrough visual del preview y mediciones DOM antes de cerrar. No declarar cobertura dinámica ni el criterio de ≤16 px como verificados.
 - **Commit:** requerido para el reporte/veredicto; `docs(plans): record issue 72 final verification`.
 
 ## Evidencia y pregunta de falsificación
@@ -90,3 +90,4 @@ Guardar F1–F3 y capturas verificables en `docs/plans/reference-panel-layout/`.
 - El diagnóstico desktop de #44 se reutiliza: allí los triggers ya eran `fixed`; el espacio principal venía del `transform` del tablero.
 - El comportamiento bajo 1200 px debe medirse aparte: los triggers pasan a `static` y sí añaden altura de flujo.
 - El Verifier F3 halló extensión vertical en 361–438 px, cruce horizontal a 300 px y riesgo de tooltip sobre asientos bajos; F2 compacta a 90×90 px el dock en 361–438 px manteniendo `top:87%`, reduce el ancho a 82 px a 300–320 px, compensa el margen inferior y suprime la burbuja visual bajo 521 px manteniendo `aria-label`. Revalidar independientemente; el modelo deja ≈10 px verticales a 361 px, ≈18 px entre rail/carta baja a 300 px y 7.5 px horizontales a 300 px; bajo 263 px el margen cae de 5 px. Validar dock frente a cartas bajas de 5/6 jugadores, labels accesibles, tooltip a 521 px y decisiones, sin PASS visual previo.
+- F3 halló y cerró estáticamente el clipping del foco y el riesgo de tooltip en 522–532 px: en `5e3369f` el anillo queda dentro del botón hasta 540 px y el primer tooltip queda limitado al viewport hasta ese ancho. F3 da `PASS_LIMITED` para los anchos evaluados ≥263 px; bajo 263 px la separación decrece y bajo 253 px las cajas se cruzan. Sigue pendiente el walkthrough del propietario: no hay DOMRects ni prueba del espacio final ≤16 px.

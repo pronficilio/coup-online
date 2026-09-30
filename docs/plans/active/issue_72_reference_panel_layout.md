@@ -3,15 +3,15 @@
 **Issue/Ticket:** https://github.com/pronficilio/coup-online/issues/72 (OPEN)
 **Plan:** `docs/plans/reference-panel-layout/plan_reference_panel_layout.md`
 **Bitácora:** `docs/plans/log/issue-72.jsonl`
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (remediación estática/build; revalidación visual independiente pendiente)`; F3 `IN_PROGRESS_VERIFIER`.
+**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + revisión estática)`; F3 `CLOSED (PASS_LIMITED estático ≥263 px; walkthrough visual/DOM pendiente)`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente en F3.
-**Verifier requerido ahora:** sí; revalidación independiente en curso, sin cerrar F3.
+**Verifier requerido ahora:** no; el informe independiente F3 está cerrado. Falta walkthrough del propietario antes de cerrar la unidad.
 **Pregunta de falsificación:** ¿alguna combinación de ancho/alto y jugadores deja espacio de flujo por los transforms, triggers estáticos bajo 1200 px, solapamiento con contenido o acceso perdido a un trigger?
 
 ## Estado de fases
 
 - F1 está documentada en `docs/plans/reference-panel-layout/report_issue_72_F1.md`. Reutiliza la medición desktop de #44 y evalúa aritméticamente las expresiones CSS por breakpoint. No hay navegador local ni rectángulos dinámicos <1200 px; no se afirman métricas de DOM para esos tamaños.
-- F2 implementa wrapper compartido, compensa los transforms en flujo y saca triggers del flujo; la revisión F3 compactó a 90×90 px el dock de 361–438 px y añadió targets adaptativos a ≤320 px, manteniendo el margen base de flujo. Reporte y validaciones están en `docs/plans/reference-panel-layout/report_issue_72_F2.md`. F3 debe revalidar estas correcciones y completar el walkthrough; no se declara aprobado visual.
+- F2 implementa wrapper compartido, compensa los transforms en flujo y saca triggers del flujo; revisiones F3 compactaron el dock de 361–438 px, adaptaron los targets ≤320 px, metieron el foco dentro del botón en ≤540 px y extendieron el anclaje del tooltip. Reportes: `docs/plans/reference-panel-layout/report_issue_72_F2.md` y `report_issue_72_F3_verifier.md`. La geometría estática pasa de forma limitada desde 263 px; el walkthrough visual/DOM del propietario sigue pendiente.
 
 ## Documentos fuente
 
@@ -30,6 +30,7 @@
 4. F1 cerrada con evidencia estática y medición desktop heredada de #44; no se inventaron métricas dinámicas menores a 1200 px.
 5. F2 terminó en este branch/worktree; el reporte documenta el wrapper, las fórmulas del rail, build y `git diff --check`. No se añadieron ni ejecutaron pruebas automatizadas.
 6. Entrega a `WAITING_ORCHESTRATOR` para revisión; el Verifier independiente se invoca por separado en F3. No abrir PR, hacer merge ni cerrar issue desde el Ejecutor.
+7. F3 independiente sobre `5e3369f8de047f3883d116333ab8c9bfa3d9e609`: `PASS_LIMITED` estático para los anchos evaluados ≥263 px. Sin navegador, rectángulos DOM ni aprobación visual; se solicita walkthrough del propietario antes del cierre.
 
 ## Criterios de aceptación
 
@@ -39,7 +40,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 - F1: `docs/plans/reference-panel-layout/report_issue_72_F1.md` con geometría/causas por breakpoint.
 - F2: `docs/plans/reference-panel-layout/report_issue_72_F2.md`; build del cliente, `git diff --check`, visual walkthrough en 2, 3, 5 y 6 jugadores en desktop y móvil o límites reproducibles documentados.
-- F3: `docs/plans/reference-panel-layout/report_issue_72_F3_verifier.md` independiente.
+- F3: `docs/plans/reference-panel-layout/report_issue_72_F3_verifier.md` independiente; resultado `PASS_LIMITED` estático, walkthrough del propietario pendiente.
 - No agregar ni ejecutar pruebas automatizadas. No declarar aprobación visual si solo hay revisión estática.
 
 ## Topología y commits
@@ -52,7 +53,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 ## Riesgos y bloqueo
 
-Riesgo medio: el Verifier señaló y F2 compactó la grilla en 361–438 px, bajó el dock estrecho para despejar asientos 6p, ajustó la caja de flujo y suprimió tooltips visuales bajo 521 px. F3 debe revalidar estos cambios, confirmar outline/sombra y separación vertical real en mesas 5/6p (el modelo deja ≈10px a 361px y ≈18px a 300px), revisar aria-labels y el tooltip a 521 px, y comprobar que el alto final de scroll queda a ≤16 px. El cálculo deja 7.5 px de caja horizontal en 300/320 px; bajo 263 px baja de 5 px y luego cruza, rango que no debe aprobarse sin ajuste/validación. No hay navegador local ni captura para validar estas afirmaciones; no se declaran `PASS` visuales.
+Riesgo medio: el Verifier estático cerró colisiones y clipping para los anchos evaluados ≥263 px. A 321–360 px quedan 9 px entre dock y siguiente contenido; el mínimo estático es 5 px. Bajo 263 px la separación con cartas cae y bajo 253 px las cajas se cruzan; esos tamaños no están aprobados. No hay navegador local ni captura para confirmar foco visible, sombras, labels, asientos bajos 5/6p ni `scrollHeight` ≤16 px; el walkthrough del propietario queda pendiente.
 
 ## Actualizaciones del ejecutor
 

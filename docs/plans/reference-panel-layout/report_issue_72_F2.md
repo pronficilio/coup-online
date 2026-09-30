@@ -4,6 +4,10 @@
 **Branch:** `issue/72-reference-panel-layout`
 **Base:** `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`
 
+## Actualización después de F3
+
+El remate del commit `5e3369f8de047f3883d116333ab8c9bfa3d9e609` mete el anillo de foco dentro del botón hasta 540 px y prolonga hasta ese ancho el anclaje del primer tooltip al borde izquierdo, limitado a `100vw - 12px`. El Verifier independiente cerró ambos hallazgos estáticamente y dio `PASS_LIMITED` para los anchos evaluados ≥263 px. Bajo 263 px no se aprueba la geometría. El walkthrough del propietario y las medidas DOM/scroll siguen pendientes; no se declara aprobación visual.
+
 ## Cambios
 
 - `coup-client/src/components/game/Coup.js`: `PlayerBoard` y `ReferencePanel` ahora comparten `.PlayerBoardLayout`. Los modales siguen portalizados en `document.body` por `ReactModal`; los diálogos no heredan el transform del tablero.
@@ -22,6 +26,7 @@ El grupo horizontal mide 52 px de alto y se alinea a 89% del wrapper más los tr
 
 - `npm ci` en `coup-client/`: completó usando `package-lock.json`; creó `node_modules` ignorado por Git.
 - `npm run build` en `coup-client/`: exit 0, `Compiled with warnings`. Advierte `logo` y `Link` sin usar en `src/App.js`, Browserslist desactualizado, Node `fs.F_OK` deprecated y errores de parseo `postcss-calc` para `66.6667dvh` y `133.3333dvh` en las reglas preexistentes de tamaño de los modales de `ReferencePanel.css` (este diff no modifica esas declaraciones). La salida incluye artefactos optimizados.
+- Rebuild del Orquestador después de `5e3369f`: exit 0, `Compiled with warnings`, con los mismos avisos preexistentes. No se ejecutaron tests.
 - `git diff --check`: sin errores.
 - No se añadieron ni ejecutaron tests automatizados. No hay navegador instalado localmente; no se declara walkthrough, medición DOM, cobertura de 2–6 jugadores, hover/touch/teclado ni aprobación visual.
 
