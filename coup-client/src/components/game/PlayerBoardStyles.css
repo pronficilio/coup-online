@@ -427,7 +427,7 @@
     width: 100%;
     box-sizing: border-box;
     color: #28231e;
-    font-size: 0.7rem;
+    font-size: 1.1rem;
     font-weight: 700;
     line-height: 1.1;
     overflow-wrap: anywhere;
@@ -682,7 +682,7 @@
     }
 
     .PlayerInfluenceRoleLabel {
-        font-size: 0.58rem;
+        font-size: 1.1rem;
     }
 
     .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardSeatHeader {

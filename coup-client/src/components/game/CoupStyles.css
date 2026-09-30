@@ -1499,10 +1499,6 @@
     gap: 10px;
 }
 
-.ActionDecisionRail.ActionDecisionRail--event-log-expanded {
-    top: 15px !important;
-}
-
 .ActionDecisionAnchorProbe {
     position: absolute;
     left: 10px;
@@ -1526,7 +1522,10 @@
 @media (max-width: 720px) {
     .ActionDecisionRail.ActionDecisionRail--event-log-expanded {
         position: fixed;
-        top: 15px !important;
+        top: max(
+            var(--event-log-expanded-top, 0px),
+            max(150px, env(safe-area-inset-top, 0px))
+        ) !important;
         right: 10px;
         left: 10px !important;
         width: auto;
