@@ -2,16 +2,18 @@
 
 **Issue/Ticket:** [#75 — continuar la partida si se desconecta un jugador con 3 o más participantes](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
 **Plan:** `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático tras las correcciones reportadas; F3 `FAIL` en `d9fad75`, repetición independiente pendiente.
+**Estado del plan:** `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`. F3 fue `PASS` estático independiente sobre `17864e8`; falta revisión de integración y PR.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH`.
 **Política de verificación:** `FINAL` independiente.
-**Verifier requerido ahora:** sí; repetir F3 sobre el commit correctivo F2.
+**Verifier requerido ahora:** no; F3 independiente cerrada `PASS` estático.
 **Pregunta de falsificación:** ¿puede una intercalación entre desconexión, timeout, resume, respuesta humana/Codex y avance de turno dejar a los conectados sin una decisión válida, resolver una acción dos veces o reactivar una partida terminal?
-**Fase completada:** F2 — eliminar al jugador y continuar la partida según el contrato F1. Siguiente: F3 — Verifier independiente.
+**Fases completadas:** F1, F2 y F3. Siguiente dueño: Orquestador para revisar el diff completo, abrir la PR canónica e integrar.
 **Resultado F1:** matriz y decisión estática en `docs/plans/disconnect-elimination/report_issue_75_F1.md`. #46 implementó disolución terminal para el jugador vivo que se desconecta; #75 conserva esa regla para dos asientos.
 
-**Resultado F2:** implementación y matriz estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. F2 invalida inmediatamente un `block_challenge` cuyo blocker se desconecta; conserva la pérdida ya determinada de otro asiento si muere el actor; y `resume()` prioriza actor, blocker y objetivo, luego procesa los demás humanos sin socket aunque la primera baja haya pasado el juego a `running`. La pausa previa no reanudable con `pausedDecision === null` sigue intacta. El Verifier reportó F3 `FAIL` en `d9fad75` por dos intercalaciones, registradas en `report_issue_75_F3_checkpoint.md`; el commit correctivo actual requiere una nueva F3.
+**Resultado F2:** implementación y matriz estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. F2 invalida inmediatamente un `block_challenge` cuyo blocker se desconecta; conserva la pérdida ya determinada de otro asiento si muere el actor; y `resume()` prioriza actor, blocker y objetivo, luego procesa los demás humanos sin socket aunque la primera baja haya pasado el juego a `running`. La pausa previa no reanudable con `pausedDecision === null` sigue intacta. Las dos devoluciones de F3 y sus fixes están registradas en `report_issue_75_F3_checkpoint.md`.
+
+**Resultado F3:** el Verifier independiente dio `PASS` estático sobre `17864e899597f768fffd08dfc7acdde3f3fe8075`; el informe y sus límites están en `docs/plans/disconnect-elimination/report_issue_75_F3_verifier.md`. No hubo pruebas, build ni runtime.
 
 ## Documentos fuente
 
@@ -24,10 +26,10 @@
 
 1. **F1:** construir y documentar la matriz de desconexión por fase y rol de asiento; cerrar recuperación/cancelación de la decisión sin cambiar las reglas de reanudación de #26.
 2. **F2 — completada:** eliminar el asiento vivo desconectado para partidas con `players.length >= 3` y continuar la partida conforme a F1; preservar disolución para dos asientos.
-3. **F3:** pedir Verifier independiente después del commit F2 para intentar refutar criterios 1–7.
+3. **F3 — completada:** Verifier independiente intentó refutar criterios 1–7 y emitió `PASS` estático sobre el commit correctivo.
 
 **Criterios de aceptación:** los numerados 1–8 en el plan canónico. El umbral cuenta asientos de jugador (incluidos los ya eliminados), no espectadores. La desconexión de un asiento muerto no altera la partida.
-**Evidencia requerida:** matriz y reporte F1; reporte F2 con revisión estática del estado, decisión y eventos; reporte F3 del Verifier con veredicto y límites de evidencia explícitos.
+**Evidencia requerida:** matriz y reporte F1; reporte F2 con revisión estática del estado, decisión y eventos; reporte F3 independiente con veredicto y límites de evidencia explícitos.
 **Riesgos/Bloqueos:** actor, respondedor u objetivo puede desconectarse durante `running` o `paused`; evitar decisiones/timers/respuestas tardías colgados o duplicados. Si hace falta cambiar una regla fuera de alcance, detener y escalar al Orquestador.
 **Política de commits:** `COMMIT_REQUIRED` al cerrar F1, F2 y F3; commits de todas las fases dentro del mismo branch/worktree.
 **Commit de cierre por fase:**

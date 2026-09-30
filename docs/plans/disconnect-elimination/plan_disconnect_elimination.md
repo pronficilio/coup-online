@@ -3,9 +3,9 @@
 ## Estado vigente
 
 - Issue: [#75](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
-- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático tras la corrección actual; el Verifier informó F3 `FAIL` sobre `d9fad75`, y debe repetir F3 sobre el commit correctivo vigente.
+- Estado operativo: `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`; F3 fue `PASS` estático independiente sobre `17864e8`. Falta revisión de integración y PR.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
-- Verifier requerido: F3, después de F2.
+- Verifier requerido: F3 `PASS` estático; no quedan checkpoints independientes pendientes.
 - Branch / worktree únicos: `issue/75-disconnect-elimination` / `.worktrees/issue-75-disconnect-elimination`.
 - Destino: `master` de `pronficilio/coup-online`; PR única esperada para #75.
 - Plan: `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
@@ -89,24 +89,24 @@
 
 ### F3 — revisión independiente FINAL
 
-- **Estado:** el Verifier informó `FAIL` sobre `d9fad75`; repetición `PENDING` después de la corrección F2 actual. Este estado reproduce el informe recibido y no es un veredicto del Ejecutor.
+- **Estado:** `CLOSED (PASS)` por revisión estática independiente del commit `17864e899597f768fffd08dfc7acdde3f3fe8075`.
 - **Pregunta única:** ¿puede una desconexión durante una acción, una pausa/timeout o una respuesta tardía bloquear a los conectados, duplicar resolución o reactivar un estado inválido?
-- **Entrada:** commit F2 correctivo y diff completo de #75; checkpoint de hallazgos recibidos en `docs/plans/disconnect-elimination/report_issue_75_F3_checkpoint.md`.
+- **Entrada:** commit F2 correctivo y diff completo de #75; checkpoint de hallazgos en `docs/plans/disconnect-elimination/report_issue_75_F3_checkpoint.md`.
 - **Salida:** reporte independiente `docs/plans/disconnect-elimination/report_issue_75_F3_verifier.md` con veredicto `PASS`, `FAIL` o `BLOCKED` y evidencia estática/dinámica claramente separada.
-- **Avance:** Verifier intenta refutar criterios 1–7; `PASS` permite revisión de integración, `FAIL` devuelve F2 con contraejemplo concreto.
+- **Avance:** criterios 1–7 se intentaron refutar; F3 `PASS` estático permite revisión de integración. Las dos devoluciones previas fueron corregidas en F2 y reexaminadas.
 - **Pivote:** si una afirmación exige ejecución dinámica no disponible, marcar la limitación; no declarar cobertura dinámica.
 - **Repetición acotada:** una ronda de corrección y relectura del hallazgo.
 - **Bloqueo:** fallo no resoluble en una ronda o falta de Verifier independiente; `WAITING_ORCHESTRATOR`.
-- **Política de commit:** `COMMIT_REQUIRED` para el reporte y el veredicto.
+- **Política de commit:** `COMMIT_REQUIRED`; el reporte/veredicto y el evento de cierre F3 se registran en el branch del issue.
 - **Cierre previsto:** `fix(disconnect-elimination): issue 75 F3 CLOSED advance_review`.
-- **Validación:** revisión independiente del diff; no agregar ni ejecutar pruebas automatizadas en esta unidad.
+- **Validación:** revisión independiente estática del diff; no se ejecutaron pruebas, build ni runtime, por lo que la entrega de eventos/callbacks Socket.IO no tiene evidencia dinámica.
 
 ## Branch, integración y validación
 
 - Una unidad, un branch, un worktree y una PR: `issue/75-disconnect-elimination` → `master`.
 - Worktree esperado: `.worktrees/issue-75-disconnect-elimination`.
 - No se observó branch local/remoto ni worktree con este nombre al preparar la unidad; el Ejecutor debe volver a comprobar el tracker y refs antes de reclamar/crear.
-- PR esperada: una PR hacia `master`, asociada solo a #75; no existe una PR candidata conocida.
+- PR esperada: una PR hacia `master`, asociada solo a #75; al cierre de F3 no existe una PR candidata conocida.
 - No se ejecutarán ni añadirán pruebas automatizadas porque el usuario pidió el cambio de comportamiento, no pruebas/verificación. Los reportes deben identificar esta limitación y no afirmar validación dinámica.
 
 ## Riesgos y preguntas
@@ -121,5 +121,6 @@
 - 2026-09-30: se registra como cambio nuevo #75; el contrato previo #46 sigue vigente para partidas de dos asientos y para la historia de su integración.
 - 2026-09-30: el umbral de tres cuenta asientos de jugador de la partida, incluyendo asientos eliminados, y excluye espectadores.
 - 2026-09-30: F1 limita la recuperación pausada a `pausedDecision` presente; si ya era `null`, #75 conserva la pausa no reanudable de #26 y no reinicia ni reasigna esa decisión.
-- 2026-09-30: el contraejemplo provisional de F3 mostró que un blocker muerto no pertenece a `block_challenge.allowed`; F2 ahora invalida y descarta esa ventana al morir el blocker, y continúa sin bloqueo. El Verifier debe repetir F3; esta nota no es un veredicto F3.
-- 2026-09-30: el Verifier reportó `FAIL` en `d9fad75` por dos hallazgos: blocker offline fuera de `allowed` y resume multi-socket que resolvía foreign aid antes de procesar al actor offline. Ambos constan en `report_issue_75_F3_checkpoint.md`; el último fix prioriza `currentAction.actor`, `pendingBlock.blocker`, luego `currentAction.target`, y limpia ausentes tras el paso a `running`. La repetición independiente sigue pendiente.
+- 2026-09-30: el primer F3 mostró que un blocker muerto no pertenece a `block_challenge.allowed`; F2 invalidó y descartó esa ventana al morir el blocker, y continúa sin bloqueo.
+- 2026-09-30: el Verifier reportó `FAIL` en `d9fad75` por un segundo hallazgo: resume multi-socket resolvía foreign aid antes de procesar al actor offline. Ambos hallazgos están en `report_issue_75_F3_checkpoint.md`; el commit `17864e8` prioriza `currentAction.actor`, `pendingBlock.blocker`, luego `currentAction.target`, y limpia ausentes tras el paso a `running`.
+- 2026-09-30: F3 se repitió independientemente sobre `17864e8` y obtuvo `PASS` estático. El Verifier no encontró otra refutación en blocker/actor/challenger/target offline, drenaje multi-socket, retorno de `resume()` ni terminalidad. El informe aclara que no hubo pruebas, build o runtime. Siguiente dueño: Orquestador para revisión del diff y PR.
