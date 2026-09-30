@@ -2,14 +2,14 @@
 
 **Issue/Ticket:** [#75 — continuar la partida si se desconecta un jugador con 3 o más participantes](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
 **Plan:** `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-**Estado del plan:** `ACTIVE`; F1 `ACTIVE`.
+**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `READY`.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH`.
 **Política de verificación:** `FINAL` independiente.
 **Verifier requerido ahora:** no; requerido en F3 después del commit F2.
 **Pregunta de falsificación:** ¿puede una intercalación entre desconexión, timeout, resume, respuesta humana/Codex y avance de turno dejar a los conectados sin una decisión válida, resolver una acción dos veces o reactivar una partida terminal?
-**Fase sugerida:** F1 — definir la recuperación de la acción afectada.
-**Por qué esta fase sigue:** #46 implementó disolución terminal para el jugador vivo que se desconecta. #75 cambia el contrato para partidas con tres o más asientos y necesita definir cómo continuar decisiones activas/pausadas antes de tocar código.
+**Fase siguiente:** F2 — eliminar al jugador y continuar la partida según el contrato F1.
+**Resultado F1:** matriz y decisión estática en `docs/plans/disconnect-elimination/report_issue_75_F1.md`. #46 implementó disolución terminal para el jugador vivo que se desconecta; #75 conserva esa regla para dos asientos.
 
 ## Documentos fuente
 
@@ -38,6 +38,7 @@
 **Worktree destino del issue:** `.worktrees/issue-75-disconnect-elimination`.
 **Merge target:** `master`.
 **Reclamo confirmado:** issue asignado a `pronficilio`; ejecutor Agente Alquimista; estado `ACTIVE`.
+**Límite de pausa:** la recuperación aplica a `pausedDecision` presente. Si `pausedDecision === null` por una pausa no reanudable preexistente de #26, se elimina y proyecta al jugador, pero no se reinicia ni reasigna la decisión ni se cambia la regla de reanudación; el issue registra esta decisión en [un comentario](https://github.com/pronficilio/coup-online/issues/75#issuecomment-5905691402).
 **Bitácora del issue:** `docs/plans/log/issue-75.jsonl`.
 **PR/MR esperado:** una PR hacia `master`, asociada únicamente a #75; comprobar que no exista otra antes de abrirla.
 

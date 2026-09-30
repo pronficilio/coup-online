@@ -3,7 +3,7 @@
 ## Estado vigente
 
 - Issue: [#75](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
-- Estado operativo: `ACTIVE`; F1 `ACTIVE`; dueño: Ejecutor (Agente Alquimista), con reclamo registrado en el fork.
+- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`; F2 `READY`; dueño: Ejecutor (Agente Alquimista), con reclamo registrado en el fork.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Verifier requerido: F3, después de F2.
 - Branch / worktree únicos: `issue/75-disconnect-elimination` / `.worktrees/issue-75-disconnect-elimination`.
@@ -26,6 +26,7 @@
 - `CoupGame` representa eliminación con `isDead`, influencias, dinero y eventos de juego; `checkEliminated()` y `advanceTurn()` contienen la ruta existente de eliminación y victoria.
 - Las decisiones activas y pausadas, timers y solicitudes Codex pueden quedar pendientes al ocurrir una desconexión. El cambio toca transiciones compartidas y requiere falsificación independiente.
 - El contrato del proyecto exige Verifier FINAL para concurrencia/consistencia. No se ejecutaron pruebas en esta preparación.
+- Decisión de alcance F1: solo se recuperan pausas con `pausedDecision` presente. Si la partida ya estaba en `paused` con `pausedDecision === null` por una causa no reanudable de #26, la desconexión elimina y proyecta al asiento, pero conserva esa pausa; no reinicia ni reasigna decisiones ni cambia quién puede reanudar. La misma frontera se registró en el [issue #75](https://github.com/pronficilio/coup-online/issues/75#issuecomment-5905691402).
 
 ## Alcance
 
@@ -46,7 +47,7 @@
 1. En una partida con tres o más asientos, un jugador vivo que se desconecta queda eliminado; una desconexión de asiento ya eliminado no cambia la partida.
 2. La eliminación usa el estado y la proyección/eventos existentes, no devuelve influencias perdidas a la Corte y actualiza a los jugadores conectados sin recarga.
 3. En `running`, el turno o decisión afectada se resuelve o cancela según una ruta válida del juego. El jugador desconectado no puede responder ni volver a actuar.
-4. En `paused`, no se disuelve una partida de tres o más asientos por esta desconexión. Los jugadores restantes pueden continuar mediante una decisión válida y las reglas actuales de reanudación.
+4. En una pausa recuperable (`pausedDecision` presente), no se disuelve una partida de tres o más asientos por esta desconexión; se conserva el camino de reanudación actual para los asientos elegibles o se cancela la decisión afectada de forma segura. Una pausa preexistente no reanudable (`pausedDecision === null`, por ejemplo fallo/deshabilitación Codex) permanece pausada conforme a #26.
 5. No quedan decisiones, timers, solicitudes Codex ni respuestas tardías que bloqueen, dupliquen o reactiven el flujo tras eliminar al jugador.
 6. Si la eliminación deja un único jugador vivo, se declara ganador con el evento y estado normal de `gameover`.
 7. Una partida de dos asientos conserva la disolución actual establecida por #46. No hay cambios a reconexión ni a espectadores.
@@ -56,10 +57,10 @@
 
 ### F1 — definir la recuperación de la acción afectada
 
-- **Estado:** `READY`.
+- **Estado:** `CLOSED (PASS)`.
 - **Pregunta única:** ¿cómo se elimina el asiento y se recupera cada tipo de acción/decisión activa o pausada sin dejar al resto en un estado inválido?
 - **Entrada:** issue #75; `server/game/coup.js` (`onDisconnect`, `dissolve`, `pause`, `resume`, decisiones, `checkEliminated`, `advanceTurn`); cliente `Coup.js`; plan e informes de #46.
-- **Salida:** matriz de rutas `running`/`paused`, jugador actor/respondedor/objetivo, e invariantes para estado, eventos y continuación; reporte `docs/plans/disconnect-elimination/report_issue_75_F1.md`.
+- **Salida:** matriz de rutas `running`/`paused`/`gameover`, jugador actor/respondedor/objetivo, e invariantes para estado, eventos y continuación; reporte `docs/plans/disconnect-elimination/report_issue_75_F1.md`.
 - **Avance:** cada combinación alcanzable tiene un resultado definido; no se cambia la disolución de dos asientos ni la autorización de reanudar.
 - **Pivote:** si una decisión no se puede retomar con las respuestas existentes, definir una cancelación explícita que reabra la acción de forma segura.
 - **Repetición acotada:** una relectura de emisores/consumidores y callbacks afectados.
@@ -67,10 +68,11 @@
 - **Política de commit:** `COMMIT_REQUIRED`; plan y reporte F1 juntos.
 - **Cierre previsto:** `docs(plans): issue 75 F1 CLOSED advance_f2`.
 - **Validación:** inspección estática de la matriz y rutas afectadas.
+- **Veredicto:** `CLOSED (PASS)` estático; sin evidencia dinámica ni pruebas automatizadas.
 
 ### F2 — eliminar al jugador y continuar la partida
 
-- **Estado:** `PENDING`, lista después de F1.
+- **Estado:** `READY`.
 - **Pregunta única:** ¿la implementación elimina el asiento desconectado y deja al resto con una partida válida en todos los contextos alcanzables?
 - **Entrada:** contrato cerrado en F1.
 - **Salida:** cambio server-side y actualización de proyección cliente si hace falta; reporte `docs/plans/disconnect-elimination/report_issue_75_F2.md`.
@@ -82,6 +84,8 @@
 - **Política de commit:** `COMMIT_REQUIRED`.
 - **Cierre previsto:** `fix(disconnect-elimination): issue 75 F2 CLOSED advance_f3`.
 - **Validación:** revisión estática del flujo y diff. No agregar ni ejecutar pruebas automatizadas en esta unidad.
+
+**Contrato F1 para decisiones afectadas:** en `running`, una desconexión del actor cancela su acción pendiente, invalida la decisión y avanza el turno; una desconexión de respondedor se quita de `allowed` y de `responses`, y la ventana continúa con los vivos. En una decisión `lose_influence`, nunca se llama al resolver con respuestas vacías: si se desconecta `currentAction.actor`, se cancela esa acción/turno; si se desconecta el retador u objetivo, la eliminación satisface la pérdida e invoca la continuación existente. Si un objetivo se desconecta en otra ventana, se quita su respuesta y su efecto se omite al resolver. En `paused` recuperable se quita al desconectado de `allowed`, `responses` y `resumeOwnerSeats`; los propietarios restantes conservan la autorización existente. Si ya no queda un propietario, se resuelve inmediatamente una ventana solo cuando todas las respuestas vivas ya están completas; en otro caso se cancela la acción actual y se avanza el turno. Una desconexión que deja un solo vivo usa el `gameover` y `g-gameOver` normal. Las pausas `pausedDecision === null` conservan su estado no reanudable previo.
 
 ### F3 — revisión independiente FINAL
 
@@ -116,3 +120,4 @@
 
 - 2026-09-30: se registra como cambio nuevo #75; el contrato previo #46 sigue vigente para partidas de dos asientos y para la historia de su integración.
 - 2026-09-30: el umbral de tres cuenta asientos de jugador de la partida, incluyendo asientos eliminados, y excluye espectadores.
+- 2026-09-30: F1 limita la recuperación pausada a `pausedDecision` presente; si ya era `null`, #75 conserva la pausa no reanudable de #26 y no reinicia ni reasigna esa decisión.
