@@ -2,7 +2,7 @@
 
 **Issue/Ticket:** [#75 — continuar la partida si se desconecta un jugador con 3 o más participantes](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
 **Plan:** `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático tras una corrección al contraejemplo provisional de F3; F3 pendiente de repetición independiente.
+**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático tras las correcciones reportadas; F3 `FAIL` en `d9fad75`, repetición independiente pendiente.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH`.
 **Política de verificación:** `FINAL` independiente.
@@ -11,7 +11,7 @@
 **Fase completada:** F2 — eliminar al jugador y continuar la partida según el contrato F1. Siguiente: F3 — Verifier independiente.
 **Resultado F1:** matriz y decisión estática en `docs/plans/disconnect-elimination/report_issue_75_F1.md`. #46 implementó disolución terminal para el jugador vivo que se desconecta; #75 conserva esa regla para dos asientos.
 
-**Resultado F2:** implementación y matriz de evidencia estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. Además de conservar la pérdida de influencia ya determinada de otro asiento si muere el actor de la acción, F2 invalida inmediatamente un `block_challenge` cuyo blocker se desconecta; continúa la acción sin bloqueo y no intenta probar al muerto. `resume()` procesa repetidamente todos los humanos sin socket antes de reactivar una pausa recuperable. La pausa previa no reanudable con `pausedDecision === null` sigue intacta. El Verifier comunicó un contraejemplo provisional de F3 y debe repetir esa fase tras el commit correctivo.
+**Resultado F2:** implementación y matriz estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. F2 invalida inmediatamente un `block_challenge` cuyo blocker se desconecta; conserva la pérdida ya determinada de otro asiento si muere el actor; y `resume()` prioriza actor, blocker y objetivo, luego procesa los demás humanos sin socket aunque la primera baja haya pasado el juego a `running`. La pausa previa no reanudable con `pausedDecision === null` sigue intacta. El Verifier reportó F3 `FAIL` en `d9fad75` por dos intercalaciones, registradas en `report_issue_75_F3_checkpoint.md`; el commit correctivo actual requiere una nueva F3.
 
 ## Documentos fuente
 

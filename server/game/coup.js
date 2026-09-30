@@ -1010,20 +1010,32 @@ class CoupGame {
             this.rejectDecision(socketID, 'Only a player who did not answer this decision can resume it.')
             return false
         }
-        while (true) {
-            const disconnected = this.players.find(player => !player.isDead && player.controller === 'human'
+        while (['paused', 'running'].includes(this.phase)) {
+            const disconnectedHumans = this.players.filter(player => !player.isDead && player.controller === 'human'
                 && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
-            if (!disconnected) break
+            if (!disconnectedHumans.length) break
+            const action = this.currentAction
+            const prioritySeats = [
+                action && this.players[action.actor],
+                action && action.pendingBlock && this.players[action.pendingBlock.blocker],
+                action && Number.isInteger(action.target) ? this.players[action.target] : null
+            ]
+            const disconnected = prioritySeats.find(player => player && disconnectedHumans.includes(player))
+                || disconnectedHumans[0]
             if (this.players.length < 3) {
                 this.rejectDecision(socketID, 'Every seat must still be connected to resume.')
                 this.dissolve(disconnected.name)
                 return false
             }
             this.onDisconnect(disconnected.socketID)
-            if (this.phase !== 'paused' || !this.pausedDecision) {
-                this.rejectDecision(socketID, 'There is no timed-out decision to resume.')
-                return false
-            }
+        }
+        // A disconnect may have resolved or cancelled the paused decision and
+        // moved the game to running. Keep pruning the actor, pending blocker,
+        // target, and other offline seats above before returning success.
+        if (this.phase !== 'paused') return true
+        if (!this.pausedDecision) {
+            this.rejectDecision(socketID, 'There is no timed-out decision to resume.')
+            return false
         }
         const decision = this.pausedDecision
         this.pausedDecision = null
