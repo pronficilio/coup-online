@@ -1,6 +1,6 @@
 # Plan — resolver ventanas al quedar determinado el resultado (#77)
 
-**Estado:** `PLANNED`; F1 `READY`; unidad `WAITING_EXECUTOR`.
+**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `READY`; unidad `ACTIVE`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/77
 **Solicitud:** reducir la espera en desafíos/bloqueos en partidas sin IA.
 **Objetivo operativo:** cerrar una ventana tan pronto como las respuestas recibidas ya determinan la misma opción ganadora por prioridad de asiento que la implementación actual.
@@ -31,7 +31,7 @@ Incluye analizar el prefijo de respuestas suficiente, cerrar decision/envíos ex
 
 No incluye cambiar los 120 segundos predeterminados, pasar jugadores en automático, cambiar #26/#75, exponer datos privados ni modificar los controles del cliente si el mecanismo vigente de asientos pendientes ya cubre la comunicación necesaria.
 
-## F1 — formalizar el punto de cierre anticipado (`READY`)
+## F1 — formalizar el punto de cierre anticipado (`CLOSED`)
 
 **Pregunta única:** ¿qué conjunto mínimo de respuestas basta para conocer el mismo resultado que el resolver actual?
 
@@ -44,8 +44,9 @@ No incluye cambiar los 120 segundos predeterminados, pasar jugadores en automát
 - **Bloquear:** el cierre depende de cambiar regla de prioridad o timeout; escalar al usuario.
 - **Commit:** `COMMIT_REQUIRED`; incluir plan, reporte y bitácora.
 - **Validación:** inspección de estado/transiciones; no cambiar código en F1.
+- **Evidencia/veredicto:** `docs/plans/decision-window-performance/report_issue_77_F1.md`; matriz cubre todas las llamadas vigentes y fija el prefijo por prioridad. Se registra una divergencia estática entre la prueba existente y la preservación/autorización de reanudación del código para corregir cobertura en F2.
 
-## F2 — implementar y comparar el resultado (`PENDING`)
+## F2 — implementar y comparar el resultado (`READY`)
 
 **Pregunta única:** ¿las decisiones se cierran antes sin modificar el ganador, duplicar resolución ni permitir respuestas tardías?
 

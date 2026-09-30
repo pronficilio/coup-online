@@ -9,9 +9,11 @@
 **Bitácora:** `docs/plans/log/issue-77.jsonl`.
 **Dueño actual:** Agente Alquimista.
 
-## F1 activo
+## Estado de fase
 
 Formalizar el prefijo suficiente de respuestas en orden de prioridad y contrastarlo con cada llamada vigente a `openWindow()`. Incluir desafío, bloqueo de Ayuda Extranjera, bloqueo del objetivo y desafío al bloqueo; respuesta tardía, timeout/reanudación y todos pasan. Entregar matriz y regla exacta en `docs/plans/decision-window-performance/report_issue_77_F1.md`. F1 es análisis/documentación; no implementar aún.
+
+F1 está `CLOSED`; reporte y matriz en `docs/plans/decision-window-performance/report_issue_77_F1.md`. F2 está `READY`: implementar el cierre anticipado con el prefijo probado, añadir cobertura de regresión y comparar el ganador anticipado con el resolver completo. La revisión estática encontró una divergencia previa entre la prueba de timeout/reanudación y la política de preservación/owner del código; verificarla en F2 antes de declarar esa cobertura.
 
 ## Contrato que no se negocia en F2
 
