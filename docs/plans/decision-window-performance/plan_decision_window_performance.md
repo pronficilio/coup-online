@@ -1,6 +1,6 @@
 # Plan — resolver ventanas al quedar determinado el resultado (#77)
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `READY`; unidad `ACTIVE`.
+**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 `READY`; unidad `ACTIVE`.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/77
 **Solicitud:** reducir la espera en desafíos/bloqueos en partidas sin IA.
 **Objetivo operativo:** cerrar una ventana tan pronto como las respuestas recibidas ya determinan la misma opción ganadora por prioridad de asiento que la implementación actual.
@@ -46,7 +46,7 @@ No incluye cambiar los 120 segundos predeterminados, pasar jugadores en automát
 - **Validación:** inspección de estado/transiciones; no cambiar código en F1.
 - **Evidencia/veredicto:** `docs/plans/decision-window-performance/report_issue_77_F1.md`; matriz cubre todas las llamadas vigentes y fija el prefijo por prioridad. Se registra una divergencia estática entre la prueba existente y la preservación/autorización de reanudación del código para corregir cobertura en F2.
 
-## F2 — implementar y comparar el resultado (`READY`)
+## F2 — implementar y comparar el resultado (`CLOSED`)
 
 **Pregunta única:** ¿las decisiones se cierran antes sin modificar el ganador, duplicar resolución ni permitir respuestas tardías?
 
@@ -60,8 +60,9 @@ No incluye cambiar los 120 segundos predeterminados, pasar jugadores en automát
 - **Bloquear:** no puede invalidarse una respuesta tardía con los envelopes vigentes sin rediseñar protocolo; escalar.
 - **Commit:** `COMMIT_REQUIRED`; `perf(game-decisions): issue 77 F2 CLOSED advance_f3`.
 - **Validación:** agregar cobertura de regresión al servidor para las ventanas que cambian; ejecutar el subconjunto relevante y registrar resultados.
+- **Evidencia/veredicto:** `docs/plans/decision-window-performance/report_issue_77_F2.md`; prefijo diferencial cubierto en 144 combinaciones/permutaciones. Las pruebas relevantes pasan; la corrida de `coup.test.js` conserva tres fallas ajenas documentadas en el reporte.
 
-## F3 — falsificación independiente FINAL (`PENDING`)
+## F3 — falsificación independiente FINAL (`READY`)
 
 **Pregunta única:** ¿algún orden de llegada, prioridad, timeout o respuesta tardía produce un ganador distinto, doble resolución o bloqueo?
 

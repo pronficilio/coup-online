@@ -496,6 +496,7 @@ class CoupGame {
             allowed: decision.allowed,
             responses: new Map(decision.responses),
             priorityFrom: decision.priorityFrom,
+            closeWhenDetermined: decision.closeWhenDetermined,
             resumeOwnerSeats,
             resolve: decision.resolve
         } : null
@@ -578,7 +579,10 @@ class CoupGame {
         }
         decision.responses.set(actorKey, { choiceId: envelope.choiceId, choice, seat })
         if (socketID) this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
-        if (decision.responses.size === decision.allowed.size) this.closeDecision()
+        const complete = decision.responses.size === decision.allowed.size
+        const determined = decision.closeWhenDetermined
+            && decision.closeWhenDetermined(decision.responses)
+        if (complete || determined) this.closeDecision()
         else this.updatePlayers()
         return true
     }
@@ -591,7 +595,7 @@ class CoupGame {
         return { choiceId, label, value }
     }
 
-    openDecision({ type, title, description, seats, optionsFor, priorityFrom, resolve }) {
+    openDecision({ type, title, description, seats, optionsFor, priorityFrom, closeWhenDetermined, resolve }) {
         if (this.phase !== 'running') return
         this.clearDecisionTimer()
         const allowed = new Map()
@@ -607,7 +611,7 @@ class CoupGame {
             resolve([])
             return
         }
-        this.activateDecision({ type, title, description, allowed, priorityFrom, resolve })
+        this.activateDecision({ type, title, description, allowed, priorityFrom, closeWhenDetermined, resolve })
     }
 
     activateDecision(template) {
@@ -623,6 +627,7 @@ class CoupGame {
             allowed: template.allowed,
             responses: template.responses instanceof Map ? new Map(template.responses) : new Map(),
             priorityFrom: template.priorityFrom,
+            closeWhenDetermined: template.closeWhenDetermined,
             resolve: template.resolve
         }
         this.updatePlayers()
@@ -870,6 +875,16 @@ class CoupGame {
         return result
     }
 
+    windowIsDetermined(anchor, eligibleSeats, responses) {
+        const bySeat = new Map(Array.from(responses.values(), response => [response.seat, response]))
+        for (const seat of this.nextInPriorityOrder(anchor, eligibleSeats)) {
+            const response = bySeat.get(seat)
+            if (!response) return false
+            if (response.choice.value.kind !== 'pass') return true
+        }
+        return false
+    }
+
     openWindow({ type, title, description, seats, anchor, optionForSeat, resolve }) {
         const eligibleSeats = seats.filter(seat => !this.players[seat].isDead)
         this.openDecision({
@@ -878,6 +893,7 @@ class CoupGame {
             description,
             seats: eligibleSeats,
             priorityFrom: anchor,
+            closeWhenDetermined: responses => this.windowIsDetermined(anchor, eligibleSeats, responses),
             optionsFor: seat => [
                 this.createChoice('pass', 'Pass', { kind: 'pass' }),
                 ...optionForSeat(seat)

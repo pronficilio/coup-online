@@ -15,6 +15,8 @@ Formalizar el prefijo suficiente de respuestas en orden de prioridad y contrasta
 
 F1 está `CLOSED`; reporte y matriz en `docs/plans/decision-window-performance/report_issue_77_F1.md`. F2 está `READY`: implementar el cierre anticipado con el prefijo probado, añadir cobertura de regresión y comparar el ganador anticipado con el resolver completo. La revisión estática encontró una divergencia previa entre la prueba de timeout/reanudación y la política de preservación/owner del código; verificarla en F2 antes de declarar esa cobertura.
 
+F2 está `CLOSED`; implementación y validación en `docs/plans/decision-window-performance/report_issue_77_F2.md`. 144 escenarios cubren las permutaciones del prefijo; las pruebas de ventanas y timeout pasan. La corrida de `coup.test.js` tiene una falla no relacionada en la prueba de Exchange, registrada en el reporte. F3 `READY`: Verifier independiente debe falsificar AC1–AC8 y emitir PASS/FAIL/BLOCKED. No abrir integración antes de ese veredicto.
+
 ## Contrato que no se negocia en F2
 
 - La prioridad por asiento y el anchor vigentes determinan ganador; la llegada cronológica no.

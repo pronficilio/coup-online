@@ -143,6 +143,137 @@ test('simultaneous challenges resolve by clockwise seat order, independent of ar
     assert.equal(game.activeDecision.type, 'prove_claim')
 })
 
+test('decision windows close on the settled priority prefix for every response and arrival permutation', () => {
+    const permutations = values => values.length < 2
+        ? [values]
+        : values.flatMap((value, index) => permutations(values.filter((_, candidate) => candidate !== index))
+            .map(permutation => [value, ...permutation]))
+    const seatOrders = permutations([1, 2, 3])
+
+    for (const type of ['challenge', 'block', 'block_challenge']) {
+        for (let mask = 0; mask < 8; mask += 1) {
+            const choicesBySeat = new Map([1, 2, 3].map((seat, index) => [seat,
+                (mask & (1 << index))
+                    ? { choiceId: type === 'block' ? 'block:duke' : 'challenge', kind: type === 'block' ? 'block' : 'challenge' }
+                    : { choiceId: 'pass', kind: 'pass' }
+            ]))
+
+            for (const arrivalOrder of seatOrders) {
+                const { game, sockets } = makeGame({ playerCount: 4 })
+                game.clearDecisionTimer()
+                game.activeDecision = null
+                const eligibleSeats = [1, 2, 3]
+                const orderedSeats = game.nextInPriorityOrder(0, eligibleSeats)
+                const reference = orderedSeats
+                    .map(seat => ({ seat, ...choicesBySeat.get(seat) }))
+                    .find(response => response.kind !== 'pass') || null
+                const prefix = reference
+                    ? orderedSeats.slice(0, orderedSeats.indexOf(reference.seat) + 1)
+                    : orderedSeats
+                const closeAfter = Math.max(...prefix.map(seat => arrivalOrder.indexOf(seat))) + 1
+                let resolveCount = 0
+                let selected = undefined
+                game.openWindow({
+                    type,
+                    title: 'Test window',
+                    description: 'Test priority prefix.',
+                    seats: eligibleSeats,
+                    anchor: 0,
+                    optionForSeat: () => [game.createChoice(
+                        type === 'block' ? 'block:duke' : 'challenge',
+                        'Non-pass',
+                        { kind: type === 'block' ? 'block' : 'challenge' }
+                    )],
+                    resolve: response => {
+                        resolveCount += 1
+                        selected = response
+                    }
+                })
+                const decision = game.activeDecision
+                const payload = sockets[1].last('g-decision').payload
+
+                arrivalOrder.slice(0, closeAfter).forEach(seat => {
+                    const choice = choicesBySeat.get(seat)
+                    assert.equal(game.submitChoice(seat, {
+                        decisionId: payload.decisionId,
+                        stateVersion: payload.stateVersion,
+                        choiceId: choice.choiceId
+                    }), true)
+                })
+
+                assert.equal(game.activeDecision, null, `${type} mask=${mask} arrival=${arrivalOrder}`)
+                assert.equal(resolveCount, 1, `${type} mask=${mask} arrival=${arrivalOrder}`)
+                assert.equal(selected && selected.seat, reference && reference.seat,
+                    `${type} mask=${mask} arrival=${arrivalOrder}`)
+                assert.equal(sockets.slice(1).reduce((total, socket) => total
+                    + socket.outgoing.filter(item => item.event === 'g-decisionClosed'
+                        && item.payload.decisionId === decision.id).length, 0), 3)
+                assert.equal(game.decisionTimer, null)
+
+                const lateSeat = arrivalOrder[0]
+                assert.equal(game.submitChoice(lateSeat, {
+                    decisionId: payload.decisionId,
+                    stateVersion: payload.stateVersion,
+                    choiceId: choicesBySeat.get(lateSeat).choiceId
+                }), false)
+                assert.equal(resolveCount, 1)
+            }
+        }
+    }
+})
+
+test('challenge by a later seat waits for earlier passes, then advances without later votes', () => {
+    const { game, sockets, namespace } = makeGame({ playerCount: 3 })
+    const [actor, clockwiseFirst, clockwiseSecond] = sockets
+    const action = actor.last('g-decision').payload
+    const envelope = (decision, choiceId) => ({
+        decisionId: decision.decisionId,
+        stateVersion: decision.stateVersion,
+        choiceId
+    })
+    actor.receive('g-submitDecision', envelope(action, 'tax'))
+    const window = clockwiseFirst.last('g-decision').payload
+
+    clockwiseSecond.receive('g-submitDecision', envelope(window, 'challenge'))
+    assert.equal(game.activeDecision.type, 'challenge')
+    clockwiseFirst.receive('g-submitDecision', envelope(window, 'pass'))
+
+    assert.equal(game.activeDecision.type, 'prove_claim')
+    const events = namespace.outgoing.filter(item => item.event === 'g-addLog').map(item => item.payload)
+    assert.equal(events.filter(event => event.type === 'challenge_started').length, 1)
+    assert.ok(events.some(event => event.type === 'challenge_started'
+        && event.data.actorSeat === 2 && event.data.targetSeat === 0))
+    clockwiseFirst.receive('g-submitDecision', envelope(window, 'challenge'))
+    assert.equal(events.filter(event => event.type === 'challenge_started').length, 1)
+})
+
+test('dead seats are skipped when checking the priority prefix', () => {
+    const { game, sockets } = makeGame({ playerCount: 4 })
+    game.clearDecisionTimer()
+    game.activeDecision = null
+    game.players[1].isDead = true
+    let selected
+    game.openWindow({
+        type: 'challenge',
+        title: 'Test window',
+        description: 'Dead seats are ineligible.',
+        seats: [1, 2, 3],
+        anchor: 0,
+        optionForSeat: () => [game.createChoice('challenge', 'Challenge', { kind: 'challenge' })],
+        resolve: response => { selected = response }
+    })
+    const decision = game.activeDecision
+    const envelope = { decisionId: decision.id, stateVersion: decision.stateVersion }
+
+    assert.equal(sockets[1].last('g-decision'), undefined)
+    sockets[3].receive('g-submitDecision', { ...envelope, choiceId: 'challenge' })
+    assert.equal(game.activeDecision, decision)
+    sockets[2].receive('g-submitDecision', { ...envelope, choiceId: 'pass' })
+
+    assert.equal(game.activeDecision, null)
+    assert.equal(selected.seat, 3)
+})
+
 test('simultaneous block declarations use the same fixed seat priority', () => {
     const { game, namespace, sockets } = makeGame({ playerCount: 3 })
     const [actor, clockwiseFirst, clockwiseSecond] = sockets
@@ -168,6 +299,34 @@ test('simultaneous block declarations use the same fixed seat priority', () => {
     assert.equal(game.activeDecision.type, 'block_challenge')
 })
 
+test('foreign-aid block and block challenge wait only for earlier eligible seats', () => {
+    const { game, namespace, sockets } = makeGame({ playerCount: 3 })
+    const [actor, clockwiseFirst, clockwiseSecond] = sockets
+    const envelope = (decision, choiceId) => ({
+        decisionId: decision.decisionId,
+        stateVersion: decision.stateVersion,
+        choiceId
+    })
+    actor.receive('g-submitDecision', envelope(actor.last('g-decision').payload, 'foreign_aid'))
+    const blockWindow = clockwiseFirst.last('g-decision').payload
+
+    clockwiseSecond.receive('g-submitDecision', envelope(blockWindow, 'block:duke'))
+    assert.equal(game.activeDecision.type, 'block')
+    clockwiseFirst.receive('g-submitDecision', envelope(blockWindow, 'pass'))
+    assert.equal(game.activeDecision.type, 'block_challenge')
+    assert.ok(namespace.outgoing.some(item => item.event === 'g-addLog'
+        && item.payload.type === 'block_declared' && item.payload.data.actorSeat === 2))
+
+    const challengeWindow = sockets[0].last('g-decision').payload
+    clockwiseFirst.receive('g-submitDecision', envelope(challengeWindow, 'challenge'))
+    assert.equal(game.activeDecision.type, 'block_challenge')
+    actor.receive('g-submitDecision', envelope(challengeWindow, 'pass'))
+    assert.equal(game.activeDecision.type, 'prove_claim')
+    assert.ok(namespace.outgoing.some(item => item.event === 'g-addLog'
+        && item.payload.type === 'block_challenge_started' && item.payload.data.actorSeat === 1
+        && item.payload.data.targetSeat === 2))
+})
+
 test('a seat response is idempotent, while a conflicting repeat is rejected', () => {
     const { game, sockets } = makeGame({ playerCount: 3 })
     const [actor, first, second] = sockets
@@ -182,6 +341,7 @@ test('a seat response is idempotent, while a conflicting repeat is rejected', ()
     const firstPass = envelope(window, 'pass')
     first.receive('g-submitDecision', firstPass)
     const responseCount = game.activeDecision.responses.size
+    assert.equal(game.activeDecision.type, 'challenge')
     first.receive('g-submitDecision', firstPass)
     assert.equal(game.activeDecision.responses.size, responseCount)
 
@@ -327,13 +487,14 @@ test('an incomplete shared window times out by pausing without defaulting unansw
 
     assert.equal(game.phase, 'paused')
     assert.equal(game.players[0].money, moneyBefore)
-    assert.match(namespace.outgoing.find(item => item.event === 'g-gamePaused').payload.cause, /timed out/)
-    assert.equal(namespace.outgoing.find(item => item.event === 'g-gamePaused').payload.canResume, true)
+    assert.match(second.last('g-gamePaused').payload.cause, /timed out/)
+    assert.equal(second.last('g-gamePaused').payload.canResume, true)
+    assert.equal(first.last('g-gamePaused').payload.waitingForOwner, true)
     second.receive('g-submitDecision', envelope(window, 'challenge'))
     assert.equal(second.last('g-decisionRejected').payload.reason, 'There is no active decision.')
 })
 
-test('only the leader resumes a timed-out decision, with a fresh id and empty response set', async () => {
+test('an unanswered seat resumes a timed-out decision with preserved responses and a fresh envelope', async () => {
     const { game, sockets } = makeGame({ playerCount: 3, timeoutMs: 25 })
     const [leader, first, second] = sockets
     const action = leader.last('g-decision').payload
@@ -349,18 +510,18 @@ test('only the leader resumes a timed-out decision, with a fresh id and empty re
     assert.equal(game.phase, 'paused')
 
     first.receive('g-resume')
-    assert.equal(first.last('g-decisionRejected').payload.reason, 'Only the lobby leader can resume a timed-out decision.')
-    leader.receive('g-resume')
-    const newWindow = first.last('g-decision').payload
+    assert.equal(first.last('g-decisionRejected').payload.reason, 'Only a player who did not answer this decision can resume it.')
+    second.receive('g-resume')
+    const newWindow = second.last('g-decision').payload
     assert.equal(game.phase, 'running')
     assert.notEqual(newWindow.decisionId, oldWindow.decisionId)
     assert.notEqual(newWindow.stateVersion, oldWindow.stateVersion)
-    assert.equal(game.activeDecision.responses.size, 0)
+    assert.equal(game.activeDecision.responses.size, 1)
+    assert.equal(game.activeDecision.responses.has(game.actorKey(game.players[1])), true)
 
     second.receive('g-submitDecision', envelope(oldWindow, 'challenge'))
     assert.equal(second.last('g-decisionRejected').payload.reason, 'Decision is stale or belongs to another phase.')
-    first.receive('g-submitDecision', envelope(newWindow, 'pass'))
-    second.receive('g-submitDecision', envelope(second.last('g-decision').payload, 'pass'))
+    second.receive('g-submitDecision', envelope(newWindow, 'pass'))
     assert.equal(game.players[0].money, 5)
 })
 
