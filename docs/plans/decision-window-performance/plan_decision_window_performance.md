@@ -1,0 +1,81 @@
+# Plan — resolver ventanas al quedar determinado el resultado (#77)
+
+**Estado:** `PLANNED`; F1 `READY`; unidad `WAITING_EXECUTOR`.
+**Issue canónico:** https://github.com/pronficilio/coup-online/issues/77
+**Solicitud:** reducir la espera en desafíos/bloqueos en partidas sin IA.
+**Objetivo operativo:** cerrar una ventana tan pronto como las respuestas recibidas ya determinan la misma opción ganadora por prioridad de asiento que la implementación actual.
+**Definición de éxito:** menos asientos posteriores al ganador de prioridad deben esperar y el ganador/transición es idéntico para toda combinación y orden de llegada.
+**Plan:** `docs/plans/decision-window-performance/plan_decision_window_performance.md`.
+**Handoff:** `docs/plans/inbox/issue_77_decision_window_performance.md`.
+**Bitácora append-only:** `docs/plans/log/issue-77.jsonl`.
+**Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
+**Verifier requerido:** F3, por transición concurrente y regla de juego.
+**Branch / worktree / destino:** `issue/77-decision-window-performance` / `.worktrees/issue-77-decision-window-performance` / `master`.
+**Integración:** una PR para #77.
+**Siguiente dueño:** Agente Alquimista después de reclamar #77.
+
+## Hechos, incógnitas y contrato conservado
+
+- `openWindow()` hace que `openDecision()` abra una elección a los asientos elegibles.
+- `closeDecision()` solo resuelve una ventana cuando `responses.size === allowed.size`.
+- El resolver obtiene el primer voto que no sea `pass` en `nextInPriorityOrder(anchor, eligibleSeats)`; la llegada temporal no determina el ganador.
+- **Hipótesis:** una vez respondieron con `pass` todos los asientos anteriores al primer voto no `pass`, sus respuestas determinan el ganador y esperar asientos posteriores no puede cambiarlo.
+- La pausa de timeout recuperable preserva el mapa `responses`; un cierre anticipado no debe descartar ninguna respuesta de mayor prioridad.
+- Desconocido: beneficio temporal en partidas reales; medir ventanas en lugar de suponer un ahorro fijo.
+
+La prioridad, el anchor, los asientos elegibles y el resultado actual son el contrato. No implementar "gana quien contesta primero".
+
+## Alcance y límites
+
+Incluye analizar el prefijo de respuestas suficiente, cerrar decision/envíos existentes una sola vez, y validar la equivalencia del ganador con el resolver de referencia que espera todas las respuestas. Se limita a `challenge`, `block`, `block_challenge` y las rutas de respuesta que las componen.
+
+No incluye cambiar los 120 segundos predeterminados, pasar jugadores en automático, cambiar #26/#75, exponer datos privados ni modificar los controles del cliente si el mecanismo vigente de asientos pendientes ya cubre la comunicación necesaria.
+
+## F1 — formalizar el punto de cierre anticipado (`READY`)
+
+**Pregunta única:** ¿qué conjunto mínimo de respuestas basta para conocer el mismo resultado que el resolver actual?
+
+- **Entrada:** issue #77; `openWindow`, `openDecision`, `submitChoice`, `closeDecision`, `nextInPriorityOrder`, `pause`, `resume`; tests existentes del servidor.
+- **Trabajo:** expresar el orden de prioridad como prefijo determinista; enumerar casos con primer voto no `pass`, pases previos, un asiento anterior sin responder, todos pasan y varios votos no `pass`; incluir bloqueos con un solo elegible y foreign aid con varios.
+- **Salida:** `docs/plans/decision-window-performance/report_issue_77_F1.md` con regla formal, matriz y punto(s) seguro(s) de cierre.
+- **Avanzar:** cada caso demuestra equivalencia con el resultado final del resolver actual y define qué evento inicia después.
+- **Pivotar:** si ninguna ventana permite reducir espera bajo el contrato vigente, aportar un contraejemplo y detener implementación.
+- **Repetir:** una revisión de la matriz contra todas las llamadas actuales a `openWindow()`.
+- **Bloquear:** el cierre depende de cambiar regla de prioridad o timeout; escalar al usuario.
+- **Commit:** `COMMIT_REQUIRED`; incluir plan, reporte y bitácora.
+- **Validación:** inspección de estado/transiciones; no cambiar código en F1.
+
+## F2 — implementar y comparar el resultado (`PENDING`)
+
+**Pregunta única:** ¿las decisiones se cierran antes sin modificar el ganador, duplicar resolución ni permitir respuestas tardías?
+
+- **Entrada:** matriz de casos aprobada/cerrada en F1.
+- **Trabajo:** implementar un criterio pequeño reutilizable que examine respuestas en prioridad; `closeDecision()` cancela timer, invalida decisionId/version y distribuye un único cierre; el resolver recibe solo el prefijo suficiente con el ganador correcto.
+- **Validación exigida:** comparar la selección anticipada con la selección de referencia tras respuestas completas para todas las permutaciones relevantes, en las tres ventanas. Revisar timeout y resume entre respuestas, IDs/versiones viejas, avance de fase único y sockets humanos.
+- **Salida:** cambio de servidor y `report_issue_77_F2.md` con tabla de comparación y cobertura.
+- **Avanzar:** mismos resultados observables del cierre completo, y al menos un escenario válido no espera a los asientos posteriores al ganador; no hay callbacks duplicados ni una segunda respuesta aceptada.
+- **Pivotar:** cualquier divergencia devuelve a una regla/matriz F1 acotada; no arreglarla cambiando la prioridad.
+- **Repetir:** una ronda sobre un contraejemplo determinista.
+- **Bloquear:** no puede invalidarse una respuesta tardía con los envelopes vigentes sin rediseñar protocolo; escalar.
+- **Commit:** `COMMIT_REQUIRED`; `perf(game-decisions): issue 77 F2 CLOSED advance_f3`.
+- **Validación:** agregar cobertura de regresión al servidor para las ventanas que cambian; ejecutar el subconjunto relevante y registrar resultados.
+
+## F3 — falsificación independiente FINAL (`PENDING`)
+
+**Pregunta única:** ¿algún orden de llegada, prioridad, timeout o respuesta tardía produce un ganador distinto, doble resolución o bloqueo?
+
+- **Entrada:** commit F2, diff y matriz F1.
+- **Salida:** `report_issue_77_F3_verifier.md`, `PASS` / `FAIL` / `BLOCKED`.
+- **Avanzar:** Verifier intenta refutar AC1–AC8 del issue; `PASS` habilita revisión de integración.
+- **Pivotar:** corregir un contraejemplo reproduciéndolo con la permutación exacta.
+- **Repetir:** una ronda de refutación después del fix.
+- **Bloquear:** falta Verifier independiente o evidencia de equivalencia.
+- **Commit:** `COMMIT_REQUIRED`; `perf(game-decisions): issue 77 F3 CLOSED advance_review`.
+
+## Riesgo y pregunta de falsificación
+
+Riesgo `HIGH` por la transición de decisiones y sus timers. Falsificación: dejar pendiente el asiento de prioridad inmediatamente anterior al voto elegido y entregar después una respuesta `challenge`/`block`; ese asiento debe seguir ganando. Además, cerrar con un ganador debe cancelar el timer y hacer inocuas las respuestas subsiguientes.
+
+## Topología única
+
+Issue #77 → `issue/77-decision-window-performance` → `.worktrees/issue-77-decision-window-performance` → una PR hacia `master`. No trabajar en el checkout raíz ni crear branch por fase.
