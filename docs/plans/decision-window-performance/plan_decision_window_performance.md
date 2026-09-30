@@ -1,6 +1,6 @@
 # Plan — resolver ventanas al quedar determinado el resultado (#77)
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED` tras recheck AC8; F3 `READY` para repetición; unidad `ACTIVE`.
+**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 recheck `PASS` AC1–AC8; unidad `ACTIVE`, pendiente de revisión de integración.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/77
 **Solicitud:** reducir la espera en desafíos/bloqueos en partidas sin IA.
 **Objetivo operativo:** cerrar una ventana tan pronto como las respuestas recibidas ya determinan la misma opción ganadora por prioridad de asiento que la implementación actual.
@@ -65,7 +65,7 @@ F2 se cerró en `7aea6e4` con la cobertura registrada abajo. F3 la devolvió ún
 - **Evidencia/veredicto:** `docs/plans/decision-window-performance/report_issue_77_F2.md`; prefijo diferencial cubierto en 144 combinaciones/permutaciones. Las pruebas relevantes pasan; la corrida de `coup.test.js` conserva tres fallas ajenas documentadas en el reporte.
 - **Recheck de AC8:** F3 devolvió la fase por falta de prueba Codex diferida; `docs/plans/decision-window-performance/report_issue_77_F2_recheck.md` agrega y valida la respuesta Codex con envelope viejo después del cierre humano anticipado. El caso pasa; quedan tres fallas ajenas no modificadas.
 
-## F3 — falsificación independiente FINAL (`READY`; repetir después del retorno`)
+## F3 — falsificación independiente FINAL (`PASS` tras recheck)
 
 **Pregunta única:** ¿algún orden de llegada, prioridad, timeout o respuesta tardía produce un ganador distinto, doble resolución o bloqueo?
 
@@ -74,11 +74,11 @@ F2 se cerró en `7aea6e4` con la cobertura registrada abajo. F3 la devolvió ún
 - **Veredicto independiente (2026-09-30):** `FAIL` en AC8. No existe regresión que cubra una respuesta Codex pendiente cuando una ventana cierra anticipadamente, aunque la guarda de ID/versión sí aparece en producción. Ver `docs/plans/decision-window-performance/report_issue_77_F3_verifier.md`.
 - **Avanzar:** Verifier intenta refutar AC1–AC8 del issue; `PASS` habilita revisión de integración.
 - **Pivotar:** corregir un contraejemplo reproduciéndolo con la permutación exacta.
-- **Retorno actual:** F2 debe cubrir y ejecutar la secuencia Codex pendiente → cierre humano por prefijo → resultado Codex obsoleto. F3 requiere nueva revisión independiente después del commit de cobertura.
-- **Recheck F2 listo:** `report_issue_77_F2_recheck.md` cubre la secuencia y pasa; repetir ahora F3 sobre el commit más reciente. El primer `FAIL` AC8 se conserva como historial en `report_issue_77_F3_verifier.md`.
+- **Retorno anterior:** F2 cubrió y ejecutó la secuencia Codex pendiente → cierre humano por prefijo → resultado Codex obsoleto tras el `FAIL` inicial de AC8.
+- **Recheck independiente:** `report_issue_77_F3_recheck_verifier.md` emite `PASS` AC1–AC8 sobre `4d8be42`. El primer `FAIL` se conserva en `report_issue_77_F3_verifier.md`; no se repitió la corrida porque F2 recheck ya registra la regresión pasando y las tres fallas ajenas.
 - **Repetir:** una ronda de refutación después del fix.
 - **Bloquear:** falta Verifier independiente o evidencia de equivalencia.
-- **Commit:** `COMMIT_REQUIRED`; registrar el resultado F3, incluido FAIL, en el reporte, bitácora y plan/handoff. `PASS` permitiría `advance_review`; `FAIL` devuelve el caso indicado a F2.
+- **Commit:** `COMMIT_REQUIRED`; resultado registrado en el reporte de recheck, bitácora, plan y handoff. F3 `PASS` habilita revisión de integración por Orquestación; no abre PR automáticamente. Un nuevo `FAIL` devolvería el caso correspondiente a F2.
 
 ## Riesgo y pregunta de falsificación
 
