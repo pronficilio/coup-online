@@ -213,7 +213,8 @@
 .GameStatusMessage {
     box-sizing: border-box;
     width: 100%;
-    margin: 0;
+    max-width: 35rem;
+    margin: 0 auto;
     padding: 14px 20px;
     border: 1px solid rgba(126, 91, 45, 0.3);
     border-left: 4px solid #c29443;

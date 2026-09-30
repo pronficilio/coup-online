@@ -1023,6 +1023,11 @@ export default class Coup extends Component {
         return <div className="GameContainer" data-player-count={this.state.players.length}>
             <TurnFavicon isMyTurn={isMyActiveTurn} />
             <div className="GameHeader">
+                <div className="DecisionsSection" aria-live="polite">
+                    {this.state.pauseWaiting && <p className="GameStatusMessage" role="status">{t('game.pause.generic')}</p>}
+                    {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p className="GameStatusMessage">{t('game.waiting')}</p>}
+                    {this.state.winner && <p className="GameStatusMessage"><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
+                </div>
                 {actionRailVisible && <div
                     ref={this.actionRailAnchorRef}
                     className="ActionDecisionAnchorProbe"
@@ -1041,12 +1046,6 @@ export default class Coup extends Component {
                     decisionRailOpen={Boolean(railDecision)}
                     onExpandedChange={this.handleEventLogExpandedChange}
                 />
-            </div>
-
-            <div className="DecisionsSection" aria-live="polite">
-                {this.state.pauseWaiting && <p className="GameStatusMessage" role="status">{t('game.pause.generic')}</p>}
-                {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p className="GameStatusMessage">{t('game.waiting')}</p>}
-                {this.state.winner && <p className="GameStatusMessage"><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
             </div>
 
             {actionDecisionRail}
