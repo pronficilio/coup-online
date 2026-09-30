@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + cota estática; walkthrough pendiente)`; F3 debe revalidar el hash corregido.
+**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + cota estática)`; F3 `PASS_LIMITED` estático en `dcef853` para anchos ≥259 px; walkthrough visual/DOM pendiente.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -72,12 +72,12 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 - **Commit:** requerido; `fix(game-ui): reclaim space under board and dock reference controls`.
 - **Validación:** build del cliente, `git diff --check` y walkthrough manual solicitado en F3. No agregar/ejecutar pruebas automatizadas.
 
-## F3 — refutación final independiente (`FINAL`; anterior veredicto supersedido por el preview corregido)
+## F3 — refutación final independiente (`FINAL`; `PASS_LIMITED` estático, walkthrough pendiente)
 
 **Pregunta única:** ¿existe un viewport o conteo de jugadores donde el cambio vuelva a alargar la página, tape una carta/control o deje una referencia inaccesible?
 
 - **Verifier:** agente independiente del implementador. Debe intentar refutar la alineación, el alto de documento y la accesibilidad en 2, 3, 5 y 6 jugadores; desktop amplio, 1024 px y móvil (incluido alto corto); navegación por teclado, hover y apertura/cierre de cada referencia.
-- **Salida:** `report_issue_72_F3_verifier.md`. El anterior `PASS_LIMITED` cubría el anclaje anterior y no esta estructura/dock; el verificador debe revisar el hash final. Bajo 259 px no se conserva el margen lateral estático calculado.
+- **Salida:** `report_issue_72_F3_verifier.md`. El verificador revisó `dcef853f221eec2f723bfb3593d46d441fb82419` y dio `PASS_LIMITED` estático desde 259 px con roles actuales es/en. Bajo 259 px no se conserva el margen lateral estático calculado.
 - **Verificación propietaria pendiente:** no hay navegador/runtime disponible; solicitar walkthrough visual del preview y mediciones DOM antes de cerrar. No declarar cobertura dinámica ni el criterio de ≤16 px como verificados.
 - **Commit:** requerido para el reporte/veredicto; `docs(plans): record issue 72 final verification`.
 
@@ -91,5 +91,6 @@ Guardar F1–F3 y capturas verificables en `docs/plans/reference-panel-layout/`.
 - El diagnóstico desktop de #44 se reutiliza: allí los triggers ya eran `fixed`; el espacio principal venía del `transform` del tablero.
 - El comportamiento bajo 1200 px debe medirse aparte: los triggers pasan a `static` y sí añaden altura de flujo.
 - El Verifier F3 halló extensión vertical en 361–438 px, cruce horizontal a 300 px y riesgo de tooltip sobre asientos bajos; F2 compacta a 90×90 px el dock en 361–438 px manteniendo `top:87%`, reduce el ancho a 82 px a 300–320 px, compensa el margen inferior y suprime la burbuja visual bajo 521 px manteniendo `aria-label`. Revalidar independientemente; el modelo deja ≈10 px verticales a 361 px, ≈18 px entre rail/carta baja a 300 px y 7.5 px horizontales a 300 px; bajo 263 px el margen cae de 5 px. Validar dock frente a cartas bajas de 5/6 jugadores, labels accesibles, tooltip a 521 px y decisiones, sin PASS visual previo.
-- F3 halló y cerró estáticamente el clipping del foco y el riesgo de tooltip en 522–532 px: en `5e3369f` el anillo queda dentro del botón hasta 540 px y el primer tooltip queda limitado al viewport hasta ese ancho. F3 da `PASS_LIMITED` para los anchos evaluados ≥263 px; bajo 263 px la separación decrece y bajo 253 px las cajas se cruzan. Sigue pendiente el walkthrough del propietario: no hay DOMRects ni prueba del espacio final ≤16 px.
+- F3 inicial (`5e3369f`) halló y cerró estáticamente el clipping del foco y el riesgo de tooltip en 522–532 px: el anillo queda dentro del botón hasta 540 px y el primer tooltip queda limitado al viewport hasta ese ancho. Su `PASS_LIMITED` ≥263 px se supersedió cuando el preview cambió la estructura del layout.
 - El preview del propietario detectó tail residual porque el wrapper cuadrado seguía en su top de flujo mientras el hijo se trasladaba. La variante posterior desplaza el `margin-top` por los dos offsets, elimina el transform del hijo y ancla el rail como hijo absoluto del asiento observer, a la derecha de la fila calculada y alineado con su borde inferior. Este cambio deja obsoleto el anterior F3 `PASS_LIMITED` hasta una revalidación independiente; no hay aprobación visual/DOM.
+- La revalidación F3 de `dcef853` confirma estáticamente el clearance inferior de 12 px para roles actuales de hasta dos líneas, el encaje lateral desde 259 px y ausencia de cruce estático con asientos laterales bajos 5p/6p. Una etiqueta fallback o traducción más larga puede exceder la cota. No hay DOMRects ni walkthrough; verificar `scrollHeight` ≤16 px y controles en navegador con el propietario.
