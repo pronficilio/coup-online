@@ -38,7 +38,7 @@ function initialSelection(poolSlots) {
     }, [])
 }
 
-export default function ExchangeDecisionPanel({ decision, keepCount, submitted, paused, error, onChoose, panelTitle }) {
+export default function ExchangeDecisionPanel({ decision, keepCount, submitted, paused, error, onChoose, panelHeader, panelExpanded }) {
     const poolSlots = Array.isArray(decision.poolSlots) ? decision.poolSlots : []
     const [selectionState, setSelectionState] = useState(null)
     const currentSelection = selectionState && selectionState.decisionId === decision.decisionId
@@ -70,8 +70,9 @@ export default function ExchangeDecisionPanel({ decision, keepCount, submitted, 
         })
     }
 
-    return <section className="ActionDecision DecisionActionPanel ExchangeDecisionPanel" aria-labelledby="exchange-decision-title">
-        <h2 id="exchange-decision-title" className="ActionDecisionTitle">{panelTitle}</h2>
+    return <section className={`ActionDecision DecisionActionPanel ExchangeDecisionPanel${panelExpanded ? '' : ' DecisionActionPanel--collapsed'}`} aria-labelledby="exchange-decision-title">
+        {panelHeader}
+        <div id="exchange-decision-panel-body" className="DecisionActionPanelBody" aria-hidden={!panelExpanded}>
         <p className="DecisionPanelSubtitle">
             {t('game.decision.title.exchange', {
                 count: keepCount,
@@ -119,5 +120,6 @@ export default function ExchangeDecisionPanel({ decision, keepCount, submitted, 
         >{caption}</button>
         {submitted && <p className="ExchangeDecisionStatus" role="status">{t('game.decision.exchange.sent')}</p>}
         {error && <p className="ActionError" role="alert">{error}</p>}
+        </div>
     </section>
 }

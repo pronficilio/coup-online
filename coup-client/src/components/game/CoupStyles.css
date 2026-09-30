@@ -1107,13 +1107,58 @@
 }
 
 .DecisionActionPanel .ActionDecisionTitle {
+    min-width: 0;
+    flex: 1 1 auto;
     margin: 0;
-    padding: 0 0 10px;
-    border-bottom: 1px solid #d8c9b1;
+    padding: 0;
+    border-bottom: 0;
     color: #211d18;
     font-size: 1.38rem;
     line-height: 1.15;
     text-align: left;
+}
+
+.DecisionActionPanelHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d8c9b1;
+}
+
+.DecisionPanelToggle {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: #211d18;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.DecisionPanelToggle:hover {
+    transform: scale(1.04);
+    border-color: #d8c9b1;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.DecisionPanelToggle:focus-visible {
+    outline: 3px solid #a96819;
+    outline-offset: 2px;
+}
+
+.DecisionActionPanel--collapsed .DecisionActionPanelBody {
+    display: none;
 }
 
 .DecisionActionPrompt {
@@ -1125,46 +1170,12 @@
     text-align: left;
 }
 
-.DecisionActionDetails {
-    box-sizing: border-box;
-    max-height: 140px;
-    overflow: hidden;
-    opacity: 1;
-    transition: max-height 160ms ease, opacity 130ms ease;
-}
-
-.DecisionActionDetails--collapsed {
-    max-height: 0;
-    opacity: 0;
-}
-
-.DecisionActionDetails--prompt {
-    display: block;
-    max-height: 84px;
-}
-
-.DecisionActionDetails--prompt.DecisionActionDetails--collapsed {
-    max-height: 0;
-}
-
-.DecisionActionDetails--row {
+.DecisionActionMetaGroup {
     display: flex;
     width: 100%;
     flex-direction: column;
     align-items: flex-start;
     gap: 3px;
-}
-
-.DecisionActionDetails--inline {
-    display: inline-flex;
-    max-width: 180px;
-    align-items: center;
-    vertical-align: middle;
-    transition: max-width 160ms ease, opacity 130ms ease;
-}
-
-.DecisionActionDetails--inline.DecisionActionDetails--collapsed {
-    max-width: 0;
 }
 
 .DecisionActionRows {
@@ -1243,10 +1254,6 @@
     line-height: 1.15;
     text-transform: uppercase;
     transition: font-size 120ms ease;
-}
-
-.DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
-    font-size: 0.812rem;
 }
 
 .DecisionActionDescription {
@@ -1445,10 +1452,6 @@
         font-size: 1.04rem;
     }
 
-    .DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
-        font-size: 0.728rem;
-    }
-
     .DecisionActionDescription {
         font-size: 0.91rem;
     }
@@ -1477,10 +1480,9 @@
     .DecisionActionPanel .DecisionActionLabel,
     .DecisionActionPanel .DecisionActionTarget,
     .DecisionActionPanel .DecisionActionCancel,
+    .DecisionPanelToggle,
     .DecisionActionHint,
-    .ActionDecisionRail .DecisionActionPanel,
-    .DecisionActionDetails,
-    .DecisionActionDetails--inline {
+    .ActionDecisionRail .DecisionActionPanel {
         transition: none;
     }
 }
@@ -1495,6 +1497,10 @@
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
+}
+
+.ActionDecisionRail.ActionDecisionRail--event-log-expanded {
+    top: 15px !important;
 }
 
 .ActionDecisionAnchorProbe {
@@ -1517,17 +1523,10 @@
     transition: width 160ms ease;
 }
 
-.ActionDecisionRail .DecisionActionPanel.DecisionActionPanel--compact {
-    width: 50%;
-}
-
 @media (max-width: 720px) {
     .ActionDecisionRail.ActionDecisionRail--event-log-expanded {
         position: fixed;
-        top: max(
-            var(--event-log-expanded-top, 0px),
-            max(150px, env(safe-area-inset-top, 0px))
-        ) !important;
+        top: 15px !important;
         right: 10px;
         left: 10px !important;
         width: auto;
@@ -1535,6 +1534,16 @@
 
     .ActionDecisionRail--event-log-expanded .DecisionActionPanel {
         max-height: min(23vh, 23dvh, 194px);
+    }
+}
+
+@media only screen and (min-width: 721px) {
+    .DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
+        font-size: 0.812rem;
+    }
+
+    .ActionDecisionRail .DecisionActionPanel.DecisionActionPanel--compact {
+        width: 50%;
     }
 }
 
