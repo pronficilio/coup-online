@@ -961,8 +961,8 @@ export default class Coup extends Component {
                     responseAvailable={responseAvailable}
                     courtCount={this.state.courtCount}
                     reactionPresence={this.state.reactionPresence}
+                    referencePanel={<ReferencePanel />}
                 />
-                <ReferencePanel />
             </div>
 
             {this.state.gamePaused && <div

@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build y geometría estática; walkthrough visual pendiente)`; F3 `CLOSED (PASS_LIMITED estático para anchos evaluados ≥263 px; visual/DOM pendiente)`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + cota estática; walkthrough pendiente)`; F3 debe revalidar el hash corregido.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -53,31 +53,31 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 - **Commit:** requerido; `docs(plans): close issue 72 F1 layout diagnosis`.
 - **Validación:** revisión estática de selectores/cálculos; no añadir ni ejecutar tests.
 
-## F2 — compactar el flujo y acoplar accesos (`CLOSED — estático/build; visual pendiente`)
+## F2 — compactar el flujo y acoplar accesos (`corrección del preview en curso`)
 
 **Pregunta única:** ¿puede el layout final seguir las cajas visibles y mantener accesibles las referencias sin cubrir contenido?
 
 - **Entrada:** veredicto F1 y propuesta de geometría.
-- **Tareas:** implementar la estrategia elegida; conservar tres destinos y modales; hacer que los triggers no agreguen altura bajo 1200 px; colocar el grupo a la altura de las cartas en el lateral cuando quepa; definir una alternativa corta y alcanzable para móvil; conservar tooltip en pantallas amplias, foco visible y safe areas. Bajo 521 px se puede suprimir solo la burbuja visual si se superpone, manteniendo `aria-label`.
+- **Tareas:** implementar la estrategia elegida; conservar tres destinos y modales; hacer que los triggers no agreguen altura bajo 1200 px; colocar el grupo a la derecha de las cartas propias con su borde inferior alineado a la fila; definir una alternativa compacta para móvil; conservar foco visible y safe areas. El ancho lateral usa la fila real del observer (`2 * clamp(...) + 5px`) y la altura se ancla a ese section para seguir las labels de su contenido.
 - **Criterios:**
-  1. El final de scroll deja solo una separación breve (máximo 16 px) después del contenido visual inferior del tablero, fuera de overlays/rails activos.
-  2. Compensar la caja de flujo considera todos los desplazamientos responsive, incluido el asiento de cinco jugadores, sin recortar cartas ni crear scroll horizontal.
+  1. El final de flujo reserva solo el exceso positivo del section observer sobre el cuadrado y 12 px más; no suma desplazamientos invisibles ni una fila para el rail.
+  2. Compensar la caja de flujo considera los offsets responsive base/5p en `margin-top`, sin mantener el transform en el hijo ni recortar el tablero.
   3. En anchos con carril lateral suficiente, los tres triggers se alinean con la fila de cartas propias y no invaden asientos/Event Log/decisiones.
   4. En anchos estrechos no hay fila estática debajo del tablero; todos los triggers permanecen visibles y operables con touch y teclado.
   5. Los modales, destinos y retorno de foco siguen funcionando; tooltip visible en pantallas amplias, `aria-label` siempre y burbuja narrow suprimida si se solapa.
-- **Avanzar:** todos los criterios pasan en la matriz acordada en F1; documentar el diff en `report_issue_72_F2.md`.
+- **Avanzar:** documentar el diff en `report_issue_72_F2.md`, ejecutar build y diff-check y pedir revalidación independiente F3 del preview corregido. La medición DOM/scroll y el walkthrough visual deben confirmar ≤16 px tras el contenido pintado.
 - **Pivotar:** si la rail junto a cartas colisiona, usar el siguiente borde libre documentado; no ocultar controles ni reservar una fila de página.
 - **Repetir:** una variante por breakpoint que falle, con diff/commit atribuible.
 - **Bloquear/cancelar:** bloquear si el viewport crítico no permite conservar controles alcanzables sin tapar contenido; cancelar solo con evidencia de que no hace falta un cambio.
 - **Commit:** requerido; `fix(game-ui): reclaim space under board and dock reference controls`.
 - **Validación:** build del cliente, `git diff --check` y walkthrough manual solicitado en F3. No agregar/ejecutar pruebas automatizadas.
 
-## F3 — refutación final independiente (`FINAL`)
+## F3 — refutación final independiente (`FINAL`; anterior veredicto supersedido por el preview corregido)
 
 **Pregunta única:** ¿existe un viewport o conteo de jugadores donde el cambio vuelva a alargar la página, tape una carta/control o deje una referencia inaccesible?
 
 - **Verifier:** agente independiente del implementador. Debe intentar refutar la alineación, el alto de documento y la accesibilidad en 2, 3, 5 y 6 jugadores; desktop amplio, 1024 px y móvil (incluido alto corto); navegación por teclado, hover y apertura/cierre de cada referencia.
-- **Salida:** `report_issue_72_F3_verifier.md`. El resultado es `PASS_LIMITED` estático para los anchos evaluados ≥263 px; no hay FAIL estático pendiente dentro de ese límite. Bajo 263 px no se aprueba la geometría.
+- **Salida:** `report_issue_72_F3_verifier.md`. El anterior `PASS_LIMITED` cubría el anclaje anterior y no esta estructura/dock; el verificador debe revisar el hash final. Bajo 259 px no se conserva el margen lateral estático calculado.
 - **Verificación propietaria pendiente:** no hay navegador/runtime disponible; solicitar walkthrough visual del preview y mediciones DOM antes de cerrar. No declarar cobertura dinámica ni el criterio de ≤16 px como verificados.
 - **Commit:** requerido para el reporte/veredicto; `docs(plans): record issue 72 final verification`.
 
@@ -92,3 +92,4 @@ Guardar F1–F3 y capturas verificables en `docs/plans/reference-panel-layout/`.
 - El comportamiento bajo 1200 px debe medirse aparte: los triggers pasan a `static` y sí añaden altura de flujo.
 - El Verifier F3 halló extensión vertical en 361–438 px, cruce horizontal a 300 px y riesgo de tooltip sobre asientos bajos; F2 compacta a 90×90 px el dock en 361–438 px manteniendo `top:87%`, reduce el ancho a 82 px a 300–320 px, compensa el margen inferior y suprime la burbuja visual bajo 521 px manteniendo `aria-label`. Revalidar independientemente; el modelo deja ≈10 px verticales a 361 px, ≈18 px entre rail/carta baja a 300 px y 7.5 px horizontales a 300 px; bajo 263 px el margen cae de 5 px. Validar dock frente a cartas bajas de 5/6 jugadores, labels accesibles, tooltip a 521 px y decisiones, sin PASS visual previo.
 - F3 halló y cerró estáticamente el clipping del foco y el riesgo de tooltip en 522–532 px: en `5e3369f` el anillo queda dentro del botón hasta 540 px y el primer tooltip queda limitado al viewport hasta ese ancho. F3 da `PASS_LIMITED` para los anchos evaluados ≥263 px; bajo 263 px la separación decrece y bajo 253 px las cajas se cruzan. Sigue pendiente el walkthrough del propietario: no hay DOMRects ni prueba del espacio final ≤16 px.
+- El preview del propietario detectó tail residual porque el wrapper cuadrado seguía en su top de flujo mientras el hijo se trasladaba. La variante posterior desplaza el `margin-top` por los dos offsets, elimina el transform del hijo y ancla el rail como hijo absoluto del asiento observer, a la derecha de la fila calculada y alineado con su borde inferior. Este cambio deja obsoleto el anterior F3 `PASS_LIMITED` hasta una revalidación independiente; no hay aprobación visual/DOM.
