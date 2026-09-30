@@ -1,10 +1,11 @@
 .PlayerBoardLayout {
     --player-board-transform-y: min(-40px, calc(108px - 15vh - min(14vw, 126px)));
     --player-board-five-seat-y: 0px;
+    --reference-panel-flow-clearance: 0px;
     position: relative;
     width: min(100%, 900px);
     aspect-ratio: 1;
-    margin: 50px auto calc(12px + var(--player-board-transform-y) + var(--player-board-five-seat-y));
+    margin: 50px auto calc(12px + var(--player-board-transform-y) + var(--player-board-five-seat-y) + var(--reference-panel-flow-clearance));
     box-sizing: border-box;
 }
 
@@ -935,11 +936,17 @@
     .PlayerBoardLayout {
         --player-board-transform-y: 0px;
         --player-board-five-seat-y: 0px;
-        margin-bottom: 12px;
+        margin-bottom: calc(12px + var(--reference-panel-flow-clearance));
     }
 
     .PlayerBoardContainer {
         transform: none;
         translate: none;
+    }
+}
+
+@media only screen and (max-width: 320px) {
+    .PlayerBoardLayout {
+        --reference-panel-flow-clearance: max(2px, min(18px, calc(50vw - 132px)));
     }
 }

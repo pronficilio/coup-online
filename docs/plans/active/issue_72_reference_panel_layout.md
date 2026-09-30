@@ -3,15 +3,15 @@
 **Issue/Ticket:** https://github.com/pronficilio/coup-online/issues/72 (OPEN)
 **Plan:** `docs/plans/reference-panel-layout/plan_reference_panel_layout.md`
 **Bitácora:** `docs/plans/log/issue-72.jsonl`
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build/static; visual pendiente)`; F3 `WAITING_VERIFIER`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (remediación estática/build; revalidación visual independiente pendiente)`; F3 `IN_PROGRESS_VERIFIER`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente en F3.
-**Verifier requerido ahora:** no; en F3 debe ser independiente del implementador.
+**Verifier requerido ahora:** sí; revalidación independiente en curso, sin cerrar F3.
 **Pregunta de falsificación:** ¿alguna combinación de ancho/alto y jugadores deja espacio de flujo por los transforms, triggers estáticos bajo 1200 px, solapamiento con contenido o acceso perdido a un trigger?
 
 ## Estado de fases
 
 - F1 está documentada en `docs/plans/reference-panel-layout/report_issue_72_F1.md`. Reutiliza la medición desktop de #44 y evalúa aritméticamente las expresiones CSS por breakpoint. No hay navegador local ni rectángulos dinámicos <1200 px; no se afirman métricas de DOM para esos tamaños.
-- F2 implementa wrapper compartido, compensa los transforms en flujo y saca triggers del flujo; reporte y validaciones están en `docs/plans/reference-panel-layout/report_issue_72_F2.md`. Build exit 0 con warnings y `git diff --check` limpio. La posible colisión del dock estrecho en mesas de 5/6 jugadores y el walkthrough quedan para F3/propietario.
+- F2 implementa wrapper compartido, compensa los transforms en flujo y saca triggers del flujo; la revisión F3 compactó a 90×90 px el dock de 361–438 px y añadió targets adaptativos a ≤320 px, manteniendo el margen base de flujo. Reporte y validaciones están en `docs/plans/reference-panel-layout/report_issue_72_F2.md`. F3 debe revalidar estas correcciones y completar el walkthrough; no se declara aprobado visual.
 
 ## Documentos fuente
 
@@ -52,7 +52,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 ## Riesgos y bloqueo
 
-Riesgo medio: F3 debe comprobar que el rail narrow no cruza influencias/labels en mesas de 5/6 jugadores, que los tooltips no tapan controles y que el alto final de scroll queda a ≤16 px. A 320 px la separación horizontal calculada es 9.5 px, con riesgo vertical aún por validar; bajo 301 px se predice cruce horizontal y el rango no debe aprobarse hasta ajustarlo/validarlo. No hay navegador local ni captura para validar estas afirmaciones; no se declaran `PASS` visuales.
+Riesgo medio: el Verifier señaló y F2 compactó la grilla en 361–438 px, bajó el dock estrecho para despejar asientos 6p, ajustó la caja de flujo y suprimió tooltips visuales bajo 521 px. F3 debe revalidar estos cambios, confirmar outline/sombra y separación vertical real en mesas 5/6p (el modelo deja ≈10px a 361px y ≈18px a 300px), revisar aria-labels y el tooltip a 521 px, y comprobar que el alto final de scroll queda a ≤16 px. El cálculo deja 7.5 px de caja horizontal en 300/320 px; bajo 263 px baja de 5 px y luego cruza, rango que no debe aprobarse sin ajuste/validación. No hay navegador local ni captura para validar estas afirmaciones; no se declaran `PASS` visuales.
 
 ## Actualizaciones del ejecutor
 

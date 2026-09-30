@@ -101,6 +101,21 @@
     }
 }
 
+@media (min-width: 361px) and (max-width: 438px) {
+    .reference-panel__triggers {
+        grid-template-columns: repeat(2, 44px);
+        gap: 2px;
+        left: calc(50% - clamp(58px, 15.5vw, 82px) - 100.5px);
+    }
+
+    .reference-panel__trigger {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
 @media (max-width: 360px) {
     .reference-panel__triggers {
         grid-template-columns: repeat(2, 44px);
@@ -114,6 +129,50 @@
         height: 44px;
         min-width: 44px;
         min-height: 44px;
+    }
+}
+
+@media (max-width: 320px) {
+    .reference-panel__triggers {
+        --reference-panel-compact-trigger-size: clamp(32px, calc(25vw - 35px), 40px);
+        grid-template-columns: repeat(2, var(--reference-panel-compact-trigger-size));
+        top: calc(100% - 63px + var(--reference-panel-compact-trigger-size) + var(--player-board-transform-y) + var(--player-board-five-seat-y));
+        left: max(
+            0px,
+            calc(
+                50% - var(--reference-panel-compact-trigger-size) - var(--reference-panel-compact-trigger-size)
+                - 2px - clamp(58px, 15.5vw, 82px) - 10px
+            )
+        );
+    }
+
+    .reference-panel__trigger {
+        width: var(--reference-panel-compact-trigger-size);
+        height: var(--reference-panel-compact-trigger-size);
+        min-width: var(--reference-panel-compact-trigger-size);
+        min-height: var(--reference-panel-compact-trigger-size);
+    }
+}
+
+@media (max-width: 521px) {
+    .reference-panel__trigger:first-child .reference-panel__tooltip {
+        right: auto;
+        left: 0;
+        max-width: calc(100vw - 12px);
+        box-sizing: border-box;
+        white-space: normal;
+        transform: translate(0, 3px);
+    }
+
+    .reference-panel__trigger:first-child:hover .reference-panel__tooltip,
+    .reference-panel__trigger:first-child:focus-visible .reference-panel__tooltip {
+        transform: translate(0, 0);
+    }
+}
+
+@media (max-width: 520px) {
+    .reference-panel__tooltip {
+        display: none;
     }
 }
 

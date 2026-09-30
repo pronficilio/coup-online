@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (implementación y build; walkthrough visual pendiente)`; F3 `WAITING_VERIFIER`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (remediación estática/build; walkthrough visual pendiente)`; F3 `IN_PROGRESS_VERIFIER`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -57,13 +57,13 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 **Pregunta única:** ¿puede el layout final seguir las cajas visibles y mantener accesibles las referencias sin cubrir contenido?
 
 - **Entrada:** veredicto F1 y propuesta de geometría.
-- **Tareas:** implementar la estrategia elegida; conservar tres destinos y modales; hacer que los triggers no agreguen altura bajo 1200 px; colocar el grupo a la altura de las cartas en el lateral cuando quepa; definir una alternativa corta y alcanzable para móvil; conservar tooltip, foco visible y safe areas.
+- **Tareas:** implementar la estrategia elegida; conservar tres destinos y modales; hacer que los triggers no agreguen altura bajo 1200 px; colocar el grupo a la altura de las cartas en el lateral cuando quepa; definir una alternativa corta y alcanzable para móvil; conservar tooltip en pantallas amplias, foco visible y safe areas. Bajo 521 px se puede suprimir solo la burbuja visual si se superpone, manteniendo `aria-label`.
 - **Criterios:**
   1. El final de scroll deja solo una separación breve (máximo 16 px) después del contenido visual inferior del tablero, fuera de overlays/rails activos.
   2. Compensar la caja de flujo considera todos los desplazamientos responsive, incluido el asiento de cinco jugadores, sin recortar cartas ni crear scroll horizontal.
   3. En anchos con carril lateral suficiente, los tres triggers se alinean con la fila de cartas propias y no invaden asientos/Event Log/decisiones.
   4. En anchos estrechos no hay fila estática debajo del tablero; todos los triggers permanecen visibles y operables con touch y teclado.
-  5. Los modales, destinos, tooltips y retorno de foco siguen funcionando según el contrato actual.
+  5. Los modales, destinos y retorno de foco siguen funcionando; tooltip visible en pantallas amplias, `aria-label` siempre y burbuja narrow suprimida si se solapa.
 - **Avanzar:** todos los criterios pasan en la matriz acordada en F1; documentar el diff en `report_issue_72_F2.md`.
 - **Pivotar:** si la rail junto a cartas colisiona, usar el siguiente borde libre documentado; no ocultar controles ni reservar una fila de página.
 - **Repetir:** una variante por breakpoint que falle, con diff/commit atribuible.
@@ -89,4 +89,4 @@ Guardar F1–F3 y capturas verificables en `docs/plans/reference-panel-layout/`.
 - La inspección de solo código no considera que “último hijo en DOM” equivale a “elemento que determina el final visual”.
 - El diagnóstico desktop de #44 se reutiliza: allí los triggers ya eran `fixed`; el espacio principal venía del `transform` del tablero.
 - El comportamiento bajo 1200 px debe medirse aparte: los triggers pasan a `static` y sí añaden altura de flujo.
-- F2 deja 9.5 px horizontales calculados a 320 px; bajo 301 px predice cruce horizontal. F3 debe validar el dock frente a cartas bajas de 5/6 jugadores y decisiones, sin PASS visual previo.
+- El Verifier F3 halló extensión vertical en 361–438 px, cruce horizontal a 300 px y riesgo de tooltip sobre asientos bajos; F2 compacta a 90×90 px el dock en 361–438 px manteniendo `top:87%`, reduce el ancho a 82 px a 300–320 px, compensa el margen inferior y suprime la burbuja visual bajo 521 px manteniendo `aria-label`. Revalidar independientemente; el modelo deja ≈10 px verticales a 361 px, ≈18 px entre rail/carta baja a 300 px y 7.5 px horizontales a 300 px; bajo 263 px el margen cae de 5 px. Validar dock frente a cartas bajas de 5/6 jugadores, labels accesibles, tooltip a 521 px y decisiones, sin PASS visual previo.
