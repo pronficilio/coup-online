@@ -690,6 +690,67 @@ test('emergency Codex shutdown aborts an AI challenge and pauses without applyin
     assert.match(namespace.outgoing.find(item => item.event === 'g-gamePaused').payload.cause, /disabled by a player/)
 })
 
+test('a Codex answer arriving after a human closes the priority prefix is ignored', async () => {
+    const actor = new FakeSocket('actor-socket')
+    const challenger = new FakeSocket('challenger-socket')
+    const namespace = new FakeNamespace([actor, challenger])
+    let reportCodexRequest
+    const codexStarted = new Promise(resolve => { reportCodexRequest = resolve })
+    let finishCodexDecision
+    const codexClient = {
+        choose(input) {
+            reportCodexRequest(input)
+            return new Promise(resolve => { finishCodexDecision = resolve })
+        }
+    }
+    const game = new CoupGame([
+        { name: 'Actor', socketID: actor.id, controller: 'human' },
+        { name: 'Human challenger', socketID: challenger.id, controller: 'human' },
+        { name: 'Codex challenger', controller: 'codex', effort: 'low' }
+    ], namespace, { rng: () => 0, codexClient, decisionTimeoutMs: 1000, leaderSocketID: actor.id })
+    assert.equal(game.start(), true)
+    const action = actor.last('g-decision').payload
+    actor.receive('g-submitDecision', {
+        decisionId: action.decisionId,
+        stateVersion: action.stateVersion,
+        choiceId: 'tax'
+    })
+    const oldWindow = challenger.last('g-decision').payload
+    const request = await codexStarted
+    assert.equal(request.decisionId, oldWindow.decisionId)
+    assert.equal(game.activeDecision.type, 'challenge')
+
+    challenger.receive('g-submitDecision', {
+        decisionId: oldWindow.decisionId,
+        stateVersion: oldWindow.stateVersion,
+        choiceId: 'challenge'
+    })
+    assert.equal(game.activeDecision.type, 'prove_claim')
+    const challengeEventsBeforeLateCodex = namespace.outgoing.filter(item => item.event === 'g-addLog'
+        && item.payload.type === 'challenge_started').length
+    finishCodexDecision({
+        decisionId: request.decisionId,
+        stateVersion: request.stateVersion,
+        rulesVersion: protocol.RULESET_VERSION,
+        choiceId: 'challenge'
+    })
+    await new Promise(resolve => setImmediate(resolve))
+
+    assert.equal(game.phase, 'running')
+    assert.equal(game.activeDecision.type, 'prove_claim')
+    assert.notEqual(game.activeDecision.id, request.decisionId)
+    assert.notEqual(game.activeDecision.stateVersion, request.stateVersion)
+    assert.equal(namespace.outgoing.filter(item => item.event === 'g-addLog'
+        && item.payload.type === 'challenge_started').length, challengeEventsBeforeLateCodex)
+    assert.equal(namespace.outgoing.some(item => item.event === 'g-gamePaused'), false)
+    assert.equal(game.codexRequests.size, 0)
+    assert.equal(actor.outgoing.filter(item => item.event === 'g-decisionClosed'
+        && item.payload.decisionId === oldWindow.decisionId).length, 0)
+    assert.equal(challenger.outgoing.filter(item => item.event === 'g-decisionClosed'
+        && item.payload.decisionId === oldWindow.decisionId).length, 1)
+    game.clearDecisionTimer()
+})
+
 test('AI-versus-AI can be watched without sending either hidden hand to the spectator', async () => {
     const spectator = new FakeSocket('spectator-socket')
     const namespace = new FakeNamespace([spectator])
