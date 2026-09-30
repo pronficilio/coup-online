@@ -2,7 +2,7 @@
 
 **Issue/Ticket:** [#69 — Compactar el panel de contraacciones fuera del turno](https://github.com/pronficilio/coup-online/issues/69)
 **Plan:** `docs/plans/compact-counteractions/plan_compact_counteractions.md`
-**Estado del plan:** `WAITING_EXECUTOR`; F1 `READY`.
+**Estado del plan:** `WAITING_ORCHESTRATOR`; F1 `CLOSED_WAIVED_BY_OWNER`; integración autorizada sin declarar PASS visual.
 **Modo de ejecución:** `LIGHT`.
 **Nivel de riesgo:** `LOW`.
 **Política de verificación:** `NONE` (sin Verifier independiente).
@@ -39,3 +39,10 @@
 Antes de trabajo técnico, reclama #69 en el tracker, vuelve a leerla y confirma que no existe un reclamo incompatible. Después crea/confirma el único branch y worktree desde la última `origin/master`; dentro del worktree registra `claim` y `worktree_confirmed` en la bitácora y mueve este handoff de `inbox/` a `active/`. No registres el reclamo con un commit directo a `master`.
 
 No se requiere Verifier. Actualiza la issue, el plan, la bitácora y este handoff con el resultado F1. Delegar subtareas ordinarias solo según la política de agentes/modelos del proyecto; no inventar agentes si el entorno no ofrece jerarquía.
+
+## Resultado actual de F1
+
+- Cambio implementado y build del cliente completado; `git diff --check` pasa.
+- La aplicación conserva la clase compacta solo en `challenge`, `block` y `block_challenge`; `prove_claim` y `lose_influence` quedan fuera.
+- La revisión visual solicitada no se pudo ejecutar: Chromium headless no produjo capturas en sandbox ni en el intento escalado. El panel usa el ancho compacto existente de 50%; sus opciones usan `flex-wrap`, un mínimo de 100 px de ancho y 42 px de alto, y el rail permite scroll vertical. La operabilidad en pantalla real sigue sin verificarse.
+- Veredicto: `CLOSED_WAIVED_BY_OWNER`; el propietario autorizó integrar a `master` pese a la falta de captura visual. Esta autorización no declara la verificación visual como `PASS`. Siguiente dueño: Orquestador para revisar e integrar la PR. Ver [reporte F1](../compact-counteractions/report_issue_69_F1.md).
