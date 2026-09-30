@@ -3,14 +3,15 @@
 **Issue/Ticket:** https://github.com/pronficilio/coup-online/issues/72 (OPEN)
 **Plan:** `docs/plans/reference-panel-layout/plan_reference_panel_layout.md`
 **Bitácora:** `docs/plans/log/issue-72.jsonl`
-**Estado:** `WAITING_EXECUTOR`; F1 `READY`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build/static; visual pendiente)`; F3 `WAITING_VERIFIER`.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente en F3.
 **Verifier requerido ahora:** no; en F3 debe ser independiente del implementador.
 **Pregunta de falsificación:** ¿alguna combinación de ancho/alto y jugadores deja espacio de flujo por los transforms, triggers estáticos bajo 1200 px, solapamiento con contenido o acceso perdido a un trigger?
 
-## Fase sugerida
+## Estado de fases
 
-F1: atribuir el alto a cajas de flujo y posiciones pintadas, reutilizar el diagnóstico desktop de #44 y medir los breakpoints menores de 1200 px. Esta fase sigue porque el último nodo del DOM no determina su posición visual y el código usa posicionamiento distinto por breakpoint.
+- F1 está documentada en `docs/plans/reference-panel-layout/report_issue_72_F1.md`. Reutiliza la medición desktop de #44 y evalúa aritméticamente las expresiones CSS por breakpoint. No hay navegador local ni rectángulos dinámicos <1200 px; no se afirman métricas de DOM para esos tamaños.
+- F2 implementa wrapper compartido, compensa los transforms en flujo y saca triggers del flujo; reporte y validaciones están en `docs/plans/reference-panel-layout/report_issue_72_F2.md`. Build exit 0 con warnings y `git diff --check` limpio. La posible colisión del dock estrecho en mesas de 5/6 jugadores y el walkthrough quedan para F3/propietario.
 
 ## Documentos fuente
 
@@ -21,14 +22,14 @@ F1: atribuir el alto a cajas de flujo y posiciones pintadas, reutilizar el diagn
 - `coup-client/src/components/game/Coup.js`
 - `docs/plans/log/issue-72.jsonl`
 
-## Subtareas listas
+## Registro de ejecución
 
-1. Leer y reclamar la issue #72 en el fork; asignar al ejecutor o dejar comentario de claim con fase, branch, worktree y `master` como target. Volver a leer issue #72 y comprobar que sigue abierta y sin reclamo incompatible.
-2. Confirmar después del claim la rama/worktree ya reservados por el Orquestador: `issue/72-reference-panel-layout` / `/mnt/e/dev/coup/.worktrees/issue-72-reference-panel-layout`. Base esperada `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`; deben estar limpios. Si la base remota cambió, actualizar antes del trabajo y registrar la nueva SHA. El branch/worktree se preparó durante intake, antes del claim, sin cambios de producto; registrar esta desviación de secuencia en bitácora.
-3. Mover este handoff de `inbox/` a `active/` y registrar `claim`, `worktree_confirmed`, `phase_start` en el JSONL de #72. El primer trabajo de producto comienza solo después del claim.
-4. Ejecutar F1 y documentar qué aporta cada caja responsive. Distinguir cálculos, métricas dinámicas y observaciones del propietario. Si el entorno carece de navegador, no inventar rectángulos: dejar el límite explícito y pedir revisión del propietario solo para el punto no observable.
-5. Tras cierre F1, implementar F2 en el mismo branch/worktree; commitear con el mensaje acordado. Crear `report_issue_72_F2.md` con paths del diff y resultados de build/diff-check.
-6. Entregar para revisión del Orquestador. El Verifier se invoca por separado en F3.
+1. Claim publicado en https://github.com/pronficilio/coup-online/issues/72#issuecomment-5902164311; relectura posterior confirmó `OPEN`, solo comentario propio y sin reclamo incompatible.
+2. Worktree limpio en `issue/72-reference-panel-layout`, base `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`. El Orquestador reservó branch/worktree durante intake antes del claim; `git ls-remote` falló por DNS y el Orquestador confirmó `master` por GitHub API.
+3. Handoff movido de `inbox/` a `active/`; claim, worktree e inicio/cierre de fase están en la bitácora JSONL.
+4. F1 cerrada con evidencia estática y medición desktop heredada de #44; no se inventaron métricas dinámicas menores a 1200 px.
+5. F2 terminó en este branch/worktree; el reporte documenta el wrapper, las fórmulas del rail, build y `git diff --check`. No se añadieron ni ejecutaron pruebas automatizadas.
+6. Entrega a `WAITING_ORCHESTRATOR` para revisión; el Verifier independiente se invoca por separado en F3. No abrir PR, hacer merge ni cerrar issue desde el Ejecutor.
 
 ## Criterios de aceptación
 
@@ -51,7 +52,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 ## Riesgos y bloqueo
 
-Riesgo medio: compensar el flujo con valores distintos al desplazamiento visual puede recortar el último asiento, especialmente con 5 jugadores; un rail lateral puede chocar con el Event Log a la derecha. Si una cobertura visual necesaria no puede observarse localmente, reportar `BLOCKED` para esa afirmación y dejar el cambio revisable, sin elevar una inferencia estática a PASS visual.
+Riesgo medio: F3 debe comprobar que el rail narrow no cruza influencias/labels en mesas de 5/6 jugadores, que los tooltips no tapan controles y que el alto final de scroll queda a ≤16 px. A 320 px la separación horizontal calculada es 9.5 px, con riesgo vertical aún por validar; bajo 301 px se predice cruce horizontal y el rango no debe aprobarse hasta ajustarlo/validarlo. No hay navegador local ni captura para validar estas afirmaciones; no se declaran `PASS` visuales.
 
 ## Actualizaciones del ejecutor
 

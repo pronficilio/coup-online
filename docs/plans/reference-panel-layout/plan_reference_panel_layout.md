@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `IN_PROGRESS`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `IN_PROGRESS`.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (implementación y build; walkthrough visual pendiente)`; F3 `WAITING_VERIFIER`.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -52,7 +52,7 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 - **Commit:** requerido; `docs(plans): close issue 72 F1 layout diagnosis`.
 - **Validación:** revisión estática de selectores/cálculos; no añadir ni ejecutar tests.
 
-## F2 — compactar el flujo y acoplar accesos (`IN_PROGRESS`)
+## F2 — compactar el flujo y acoplar accesos (`CLOSED — estático/build; visual pendiente`)
 
 **Pregunta única:** ¿puede el layout final seguir las cajas visibles y mantener accesibles las referencias sin cubrir contenido?
 
@@ -89,3 +89,4 @@ Guardar F1–F3 y capturas verificables en `docs/plans/reference-panel-layout/`.
 - La inspección de solo código no considera que “último hijo en DOM” equivale a “elemento que determina el final visual”.
 - El diagnóstico desktop de #44 se reutiliza: allí los triggers ya eran `fixed`; el espacio principal venía del `transform` del tablero.
 - El comportamiento bajo 1200 px debe medirse aparte: los triggers pasan a `static` y sí añaden altura de flujo.
+- F2 deja 9.5 px horizontales calculados a 320 px; bajo 301 px predice cruce horizontal. F3 debe validar el dock frente a cartas bajas de 5/6 jugadores y decisiones, sin PASS visual previo.

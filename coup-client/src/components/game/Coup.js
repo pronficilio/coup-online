@@ -950,18 +950,20 @@ export default class Coup extends Component {
 
             {actionDecisionRail}
 
-            <PlayerBoard
-                players={this.state.players}
-                observerName={this.props.name}
-                observerInfluences={ownInfluences}
-                zoomDisabled={Boolean(this.state.gamePaused || this.state.pauseWaiting || decision || this.state.winner)}
-                currentPlayer={this.state.currentPlayer}
-                pendingDecisionSeats={this.state.pendingDecisionSeats}
-                responseAvailable={responseAvailable}
-                courtCount={this.state.courtCount}
-                reactionPresence={this.state.reactionPresence}
-            />
-            <ReferencePanel />
+            <div className="PlayerBoardLayout" data-player-count={this.state.players.length}>
+                <PlayerBoard
+                    players={this.state.players}
+                    observerName={this.props.name}
+                    observerInfluences={ownInfluences}
+                    zoomDisabled={Boolean(this.state.gamePaused || this.state.pauseWaiting || decision || this.state.winner)}
+                    currentPlayer={this.state.currentPlayer}
+                    pendingDecisionSeats={this.state.pendingDecisionSeats}
+                    responseAvailable={responseAvailable}
+                    courtCount={this.state.courtCount}
+                    reactionPresence={this.state.reactionPresence}
+                />
+                <ReferencePanel />
+            </div>
 
             {this.state.gamePaused && <div
                 ref={this.pauseOverlayRef}
