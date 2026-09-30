@@ -2,7 +2,7 @@
 
 **Veredicto:** `PASS_LIMITED` por revisión estática para anchos de **259 px en adelante**, con los roles actuales en español/inglés. No es un `PASS` visual ni de DOM.
 
-**Commit verificado:** `dcef853f221eec2f723bfb3593d46d441fb82419` (`fix(game-ui): align reference rail with player cards`). HEAD coincide con ese hash y el worktree estaba limpio.
+**Commit verificado inicialmente:** `dcef853f221eec2f723bfb3593d46d441fb82419` (`fix(game-ui): align reference rail with player cards`). Esa revisión quedó supersedida tras el feedback del propietario.
 
 ## Refutación estática
 
@@ -17,6 +17,16 @@ La reserva contempla hasta dos líneas para los nombres de rol actuales (`Embaja
 
 No hubo navegador/runtime durante F3. No se midieron `getBoundingClientRect()` ni `scrollHeight`, ni se verificaron visualmente sombras, stacking, labels, foco real, tooltips, EventLog, decisiones, modales, orientación o altura corta. Por ello el criterio de ≤16 px después del borde pintado sigue pendiente de DOM y walkthrough del propietario.
 
-El walkthrough debe revisar 2, 3, 5 y 6 jugadores; anchos 259/300/320/361/390/438/439/520/521/600/720/900/1024/1200 px; foco y tooltips con hover/teclado; asientos bajos con labels visibles; EventLog expandido, decisiones y cada modal; además de `getBoundingClientRect()` y `scrollHeight`.
+## Revalidación del DOM solicitado
+
+**Commit revalidado:** `f58a5b5f58e0a233e70e8d133a50f9244a297b85` (`fix(game-ui): render reference rail after observer seat`). **Veredicto:** `PASS_LIMITED` estático; el walkthrough visual/DOM continúa pendiente.
+
+- `PlayerBoardSeatAnchor--observer` es el containing block absoluto; recibe el centro del observer (x=50%, y=86%), usa el ancho explícito de la fila y `translate(-50%, -50%)`.
+- Dentro del ancla, el árbol renderiza primero `section.PlayerBoardSeat--observer` y enseguida `div.reference-panel__triggers` como hermanos directos. El section permanece en flujo normal y el alto del ancla sigue su contenido.
+- El rail usa `left: calc(100% + gap)` y `bottom: 0`, así que queda a la derecha y comparte el límite inferior del section mientras el ancla no agregue padding/border. El ancla tiene z-index 30; EventLog tiene z-index 40. No se encontró clipping en las reglas revisadas.
+- La geometría estática mantiene el resultado anterior desde 259 px; no se observó colisión vertical estática con los asientos bajos de 5/6 jugadores. No queda certificado el espacio horizontal ni las posiciones runtime en esas configuraciones.
+- Persisten los límites anteriores: bajo 259 px no se conserva el margen lateral de 5 px; una etiqueta fallback/traducción que exceda dos líneas puede superar la cota vertical.
+
+No se midieron `getBoundingClientRect()` ni `scrollHeight`. Para confirmar el criterio de ≤16 px, el walkthrough del propietario debe revisar 2, 3, 5 y 6 jugadores; anchos 259/300/320/361/390/438/439/520/521/600/720/900/1024/1200 px; foco y tooltips con hover/teclado; asientos bajos con labels visibles; EventLog expandido, decisiones y cada modal; además de `getBoundingClientRect()` y `scrollHeight`.
 
 La unidad queda `WAITING_USER`. No se afirma aprobación visual ni cobertura dinámica.

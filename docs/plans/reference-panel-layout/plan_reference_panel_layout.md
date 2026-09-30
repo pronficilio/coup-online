@@ -1,6 +1,6 @@
 # Plan — corregir el espacio bajo el tablero y ubicar las referencias
 
-**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + cota estática)`; F3 `PASS_LIMITED` estático en `dcef853` para anchos ≥259 px; walkthrough visual/DOM pendiente.
+**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + cota estática)`; F3 `PASS_LIMITED` estático revalidado en `f58a5b5` para anchos ≥259 px; walkthrough visual/DOM pendiente.
 **Issue:** https://github.com/pronficilio/coup-online/issues/72
 **Solicitud:** investigar el espacio en blanco debajo de las tarjetas y aprovechar el lateral libre para colocar los accesos de referencia a la altura del jugador.
 
@@ -53,7 +53,7 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 - **Commit:** requerido; `docs(plans): close issue 72 F1 layout diagnosis`.
 - **Validación:** revisión estática de selectores/cálculos; no añadir ni ejecutar tests.
 
-## F2 — compactar el flujo y acoplar accesos (`corrección del preview en curso`)
+## F2 — compactar el flujo y acoplar accesos (`corrección del preview aplicada; walkthrough pendiente`)
 
 **Pregunta única:** ¿puede el layout final seguir las cajas visibles y mantener accesibles las referencias sin cubrir contenido?
 
@@ -77,7 +77,7 @@ No cambiar lógica del servidor, reglas, tipos/opciones de decisión, comportami
 **Pregunta única:** ¿existe un viewport o conteo de jugadores donde el cambio vuelva a alargar la página, tape una carta/control o deje una referencia inaccesible?
 
 - **Verifier:** agente independiente del implementador. Debe intentar refutar la alineación, el alto de documento y la accesibilidad en 2, 3, 5 y 6 jugadores; desktop amplio, 1024 px y móvil (incluido alto corto); navegación por teclado, hover y apertura/cierre de cada referencia.
-- **Salida:** `report_issue_72_F3_verifier.md`. El verificador revisó `dcef853f221eec2f723bfb3593d46d441fb82419` y dio `PASS_LIMITED` estático desde 259 px con roles actuales es/en. Bajo 259 px no se conserva el margen lateral estático calculado.
+- **Salida:** `report_issue_72_F3_verifier.md`. El verificador revalidó `f58a5b5f58e0a233e70e8d133a50f9244a297b85` y dio `PASS_LIMITED` estático desde 259 px con roles actuales es/en, incluyendo la estructura section seguida por el div del rail. Bajo 259 px no se conserva el margen lateral estático calculado.
 - **Verificación propietaria pendiente:** no hay navegador/runtime disponible; solicitar walkthrough visual del preview y mediciones DOM antes de cerrar. No declarar cobertura dinámica ni el criterio de ≤16 px como verificados.
 - **Commit:** requerido para el reporte/veredicto; `docs(plans): record issue 72 final verification`.
 
@@ -94,3 +94,4 @@ Guardar F1–F3 y capturas verificables en `docs/plans/reference-panel-layout/`.
 - F3 inicial (`5e3369f`) halló y cerró estáticamente el clipping del foco y el riesgo de tooltip en 522–532 px: el anillo queda dentro del botón hasta 540 px y el primer tooltip queda limitado al viewport hasta ese ancho. Su `PASS_LIMITED` ≥263 px se supersedió cuando el preview cambió la estructura del layout.
 - El preview del propietario detectó tail residual porque el wrapper cuadrado seguía en su top de flujo mientras el hijo se trasladaba. La variante posterior desplaza el `margin-top` por los dos offsets, elimina el transform del hijo y ancla el rail como hijo absoluto del asiento observer, a la derecha de la fila calculada y alineado con su borde inferior. Este cambio deja obsoleto el anterior F3 `PASS_LIMITED` hasta una revalidación independiente; no hay aprobación visual/DOM.
 - La revalidación F3 de `dcef853` confirma estáticamente el clearance inferior de 12 px para roles actuales de hasta dos líneas, el encaje lateral desde 259 px y ausencia de cruce estático con asientos laterales bajos 5p/6p. Una etiqueta fallback o traducción más larga puede exceder la cota. No hay DOMRects ni walkthrough; verificar `scrollHeight` ≤16 px y controles en navegador con el propietario.
+- El propietario pidió mover literalmente `div.reference-panel__triggers` debajo de `section.PlayerBoardSeat`. `f58a5b5` los deja como hermanos inmediatos dentro de `.PlayerBoardSeatAnchor--observer`, con el div después del section; el ancla posicionada comparte su geometría para conservar la alineación a la derecha y abajo. La revisión F3 estática confirma esa estructura y mantiene `PASS_LIMITED` desde 259 px. Sin DOMRects ni walkthrough, `scrollHeight` ≤16 px continúa pendiente.
