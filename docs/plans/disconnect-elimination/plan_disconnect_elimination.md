@@ -3,7 +3,7 @@
 ## Estado vigente
 
 - Issue: [#75](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
-- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`; F2 `READY`; dueño: Ejecutor (Agente Alquimista), con reclamo registrado en el fork.
+- Estado operativo: `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático; F3 `PENDING` para Verifier independiente.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Verifier requerido: F3, después de F2.
 - Branch / worktree únicos: `issue/75-disconnect-elimination` / `.worktrees/issue-75-disconnect-elimination`.
@@ -72,7 +72,7 @@
 
 ### F2 — eliminar al jugador y continuar la partida
 
-- **Estado:** `READY`.
+- **Estado:** `CLOSED (PASS)` por revisión estática del diff; sin evidencia dinámica.
 - **Pregunta única:** ¿la implementación elimina el asiento desconectado y deja al resto con una partida válida en todos los contextos alcanzables?
 - **Entrada:** contrato cerrado en F1.
 - **Salida:** cambio server-side y actualización de proyección cliente si hace falta; reporte `docs/plans/disconnect-elimination/report_issue_75_F2.md`.
@@ -85,7 +85,7 @@
 - **Cierre previsto:** `fix(disconnect-elimination): issue 75 F2 CLOSED advance_f3`.
 - **Validación:** revisión estática del flujo y diff. No agregar ni ejecutar pruebas automatizadas en esta unidad.
 
-**Contrato F1 para decisiones afectadas:** en `running`, una desconexión antes de que el actor elija cancela su turno y avanza; si una acción ya declarada está en una ventana multi-asiento, la acción se cancela y avanza sin reembolso. Si el actor desconectado está en `prove_claim`, se registra `claim_not_proved` y la afirmación queda `failed`; `onConceded` solo reembolsa a un jugador vivo. Después de eliminar al actor, `loseInfluence` detecta `isDead`, no abre otra decisión y llama directamente a `onLost`, con lo que `money` permanece en 0 y el turno avanza. Si el asiento pierde influencia en `lose_influence`, la muerte satisface esa pérdida y ejecuta `onLost`; nunca se llama al resolver con `[]`. Si el dueño de `exchange` desconecta, se cancela el intercambio, se devuelven al mazo y se mezclan las cartas robadas para el pool; las influencias originales del jugador muerto siguen fuera del mazo. En ventanas multi-asiento se elimina el asiento de `allowed` y `responses`, y los vivos restantes resuelven normalmente. En `paused` recuperable también se quita de `resumeOwnerSeats`; los propietarios restantes conservan la autorización existente. Si ya no queda un propietario, se resuelve una ventana solo cuando todas las respuestas vivas ya están completas; en otro caso se cancela la acción actual y se avanza el turno. Una desconexión que deja un solo vivo usa el `gameover` y `g-gameOver` normal. Las pausas `pausedDecision === null` conservan su estado no reanudable previo.
+**Contrato F1 para decisiones afectadas:** en `running`, una desconexión antes de que el actor elija cancela su turno y avanza; si una acción ya declarada está en una ventana multi-asiento, la acción se cancela y avanza sin reembolso. Si el actor desconectado está en `prove_claim`, se registra `claim_not_proved` y la afirmación queda `failed`; `onConceded` solo reembolsa a un jugador vivo. Después de eliminar al actor, `loseInfluence` detecta `isDead`, no abre otra decisión y llama directamente a `onLost`, con lo que `money` permanece en 0 y el turno avanza. Si el actor de `currentAction` se desconecta durante una pérdida ya determinada que corresponde a otro asiento vivo, la decisión y pérdida de ese asiento continúan; el callback posterior cancela la acción del actor muerto en vez de continuarla. Si el asiento pierde influencia en `lose_influence`, la muerte satisface esa pérdida y ejecuta `onLost`; nunca se llama al resolver con `[]`. Si el dueño de `exchange` desconecta, se cancela el intercambio, se devuelven al mazo y se mezclan las cartas robadas para el pool; las influencias originales del jugador muerto siguen fuera del mazo. En ventanas multi-asiento se elimina el asiento de `allowed` y `responses`, y los vivos restantes resuelven normalmente. En `paused` recuperable también se quita de `resumeOwnerSeats`; los propietarios restantes conservan la autorización existente. Si ya no queda un propietario, se resuelve una ventana solo cuando todas las respuestas vivas ya están completas; en otro caso se cancela la acción actual y se avanza el turno. Al intentar `resume`, se buscan y eliminan repetidamente todos los asientos humanos sin socket antes de reactivar la decisión; si la decisión deja de ser reanudable, no se reactiva. Una desconexión que deja un solo vivo usa el `gameover` y `g-gameOver` normal. Las pausas `pausedDecision === null` conservan su estado no reanudable previo.
 
 ### F3 — revisión independiente FINAL
 

@@ -2,14 +2,16 @@
 
 **Issue/Ticket:** [#75 — continuar la partida si se desconecta un jugador con 3 o más participantes](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
 **Plan:** `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `READY`.
+**Estado del plan:** `ACTIVE`; F1 `CLOSED (PASS)`; F2 `CLOSED (PASS)` estático; F3 pendiente de Verifier independiente.
 **Modo de ejecución:** `FULL`.
 **Nivel de riesgo:** `HIGH`.
 **Política de verificación:** `FINAL` independiente.
-**Verifier requerido ahora:** no; requerido en F3 después del commit F2.
+**Verifier requerido ahora:** sí; ejecutar F3 tras identificar el commit F2.
 **Pregunta de falsificación:** ¿puede una intercalación entre desconexión, timeout, resume, respuesta humana/Codex y avance de turno dejar a los conectados sin una decisión válida, resolver una acción dos veces o reactivar una partida terminal?
-**Fase siguiente:** F2 — eliminar al jugador y continuar la partida según el contrato F1.
+**Fase completada:** F2 — eliminar al jugador y continuar la partida según el contrato F1. Siguiente: F3 — Verifier independiente.
 **Resultado F1:** matriz y decisión estática en `docs/plans/disconnect-elimination/report_issue_75_F1.md`. #46 implementó disolución terminal para el jugador vivo que se desconecta; #75 conserva esa regla para dos asientos.
+
+**Resultado F2:** implementación y matriz de evidencia estática en `docs/plans/disconnect-elimination/report_issue_75_F2.md`. No se ejecutaron pruebas automatizadas, build ni recorrido runtime. La pérdida de influencia ya determinada de otro asiento se conserva si muere el actor de la acción; el callback cancela esa acción sin continuarla. `resume()` procesa repetidamente todos los humanos sin socket antes de reactivar una pausa recuperable. La pausa previa no reanudable con `pausedDecision === null` sigue intacta.
 
 ## Documentos fuente
 
@@ -21,7 +23,7 @@
 ## Subtareas listas para ejecución
 
 1. **F1:** construir y documentar la matriz de desconexión por fase y rol de asiento; cerrar recuperación/cancelación de la decisión sin cambiar las reglas de reanudación de #26.
-2. **F2:** eliminar el asiento vivo desconectado para partidas con `players.length >= 3` y continuar la partida conforme a F1; preservar disolución para dos asientos.
+2. **F2 — completada:** eliminar el asiento vivo desconectado para partidas con `players.length >= 3` y continuar la partida conforme a F1; preservar disolución para dos asientos.
 3. **F3:** pedir Verifier independiente después del commit F2 para intentar refutar criterios 1–7.
 
 **Criterios de aceptación:** los numerados 1–8 en el plan canónico. El umbral cuenta asientos de jugador (incluidos los ya eliminados), no espectadores. La desconexión de un asiento muerto no altera la partida.

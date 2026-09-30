@@ -110,6 +110,7 @@ class CoupGame {
         this.stateVersion = 0
         this.activeDecision = null
         this.decisionTimer = null
+        this.pendingExchange = null
         this.codexRequests = new Map()
         this.publicHistory = []
         this.publicLogEvents = []
@@ -161,6 +162,7 @@ class CoupGame {
         this.clearDecisionTimer()
         this.activeDecision = null
         this.pausedDecision = null
+        this.pendingExchange = null
         this.gameNumber += 1
         this.stateVersion += 1
         this.phase = 'running'
@@ -419,7 +421,164 @@ class CoupGame {
     onDisconnect(socketID) {
         const player = this.players.find(candidate => candidate.socketID === socketID)
         if (!player || player.isDead || !['running', 'paused'].includes(this.phase)) return
-        this.dissolve(player.name)
+        if (this.players.length < 3) return this.dissolve(player.name)
+        this.eliminateDisconnectedPlayer(player)
+    }
+
+    emitDecisionClosed(decision) {
+        if (!decision || !decision.id || !(decision.allowed instanceof Map)) return
+        decision.allowed.forEach((_, actorKey) => {
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (!player || player.controller !== 'human') return
+            this.socketEmit(player.socketID, 'g-decisionClosed', {
+                decisionId: decision.id,
+                stateVersion: this.stateVersion
+            })
+        })
+    }
+
+    discardDecision(decision) {
+        this.clearDecisionTimer()
+        if (this.activeDecision === decision) this.activeDecision = null
+        if (this.pausedDecision === decision) this.pausedDecision = null
+        this.cancelCodexRequests('cancelled')
+        this.emitDecisionClosed(decision)
+        this.bumpVersion()
+    }
+
+    restoreExchangeDraws(seat) {
+        if (!this.pendingExchange || this.pendingExchange.seat !== seat) return false
+        this.deck.push(...this.pendingExchange.drawn)
+        this.deck = gameUtils.shuffleArray(this.deck, this.rng)
+        this.pendingExchange = null
+        return true
+    }
+
+    cancelActionAfterDisconnect(player, decision) {
+        const wasPaused = this.phase === 'paused'
+        this.restoreExchangeDraws(player.seat)
+        if (this.currentAction) {
+            this.currentAction.historyEntry.result = 'cancelled'
+            if (this.currentAction.claimHistoryEntry) this.currentAction.claimHistoryEntry.result = 'cancelled'
+        }
+        if (decision) this.discardDecision(decision)
+        else {
+            this.clearDecisionTimer()
+            this.cancelCodexRequests('cancelled')
+            this.bumpVersion()
+        }
+        this.currentAction = null
+        this.phase = 'running'
+        if (wasPaused) this.publicEmit('g-gameResumed', { stateVersion: this.stateVersion })
+        this.updatePlayers()
+        this.advanceTurn()
+        return true
+    }
+
+    continueAfterEliminatedDecision(decision, continuation) {
+        const wasPaused = this.phase === 'paused'
+        this.discardDecision(decision)
+        this.phase = 'running'
+        if (wasPaused) this.publicEmit('g-gameResumed', { stateVersion: this.stateVersion })
+        this.updatePlayers()
+        if (this.players.filter(player => !player.isDead).length <= 1) return this.advanceTurn()
+        continuation()
+        return true
+    }
+
+    finishAfterDisconnect(decision) {
+        this.clearDecisionTimer()
+        this.cancelCodexRequests('cancelled')
+        this.emitDecisionClosed(decision)
+        this.activeDecision = null
+        this.pausedDecision = null
+        this.currentAction = null
+        this.pendingExchange = null
+        this.phase = 'running'
+        this.advanceTurn()
+        return true
+    }
+
+    resumeCompletedPausedDecision(decision) {
+        this.pausedDecision = null
+        this.phase = 'running'
+        this.bumpVersion()
+        this.publicEmit('g-gameResumed', { stateVersion: this.stateVersion })
+        this.updatePlayers()
+        decision.resolve(Array.from(decision.responses.values()))
+        return true
+    }
+
+    eliminateDisconnectedPlayer(player) {
+        if (!player || player.isDead || !['running', 'paused'].includes(this.phase)) return false
+        const phaseBeforeDisconnect = this.phase
+        const decision = phaseBeforeDisconnect === 'running' ? this.activeDecision : this.pausedDecision
+        const actorKey = this.actorKey(player)
+        const participates = Boolean(decision && decision.allowed instanceof Map && decision.allowed.has(actorKey))
+
+        const lostInfluences = player.influences.slice()
+        player.revealedInfluences.push(...lostInfluences)
+        lostInfluences.forEach(card => this.addLog('influence_lost', {
+            actorSeat: player.seat,
+            role: String(card).toLowerCase()
+        }, { key: 'game.log.influenceLost' }))
+        player.influences = []
+        this.checkEliminated()
+        this.bumpVersion()
+
+        if (phaseBeforeDisconnect === 'paused' && !decision) {
+            this.updatePlayers()
+            return true
+        }
+
+        const disconnectedActionActor = this.currentAction && this.currentAction.actor === player.seat
+        const preservePendingInfluenceLoss = disconnectedActionActor
+            && decision && decision.type === 'lose_influence' && !participates
+
+        if (participates && decision.type === 'prove_claim' && decision.onSeatEliminated) {
+            return this.continueAfterEliminatedDecision(decision, decision.onSeatEliminated)
+        }
+        if (participates && decision.type === 'lose_influence' && decision.onSeatEliminated) {
+            return this.continueAfterEliminatedDecision(decision, decision.onSeatEliminated)
+        }
+        if (participates && decision.type === 'exchange') {
+            return this.cancelActionAfterDisconnect(player, decision)
+        }
+        if ((disconnectedActionActor && !preservePendingInfluenceLoss)
+            || (decision && decision.type === 'action' && this.currentPlayer === player.seat)) {
+            return this.cancelActionAfterDisconnect(player, decision)
+        }
+
+        if (!preservePendingInfluenceLoss && this.players.filter(candidate => !candidate.isDead).length <= 1) {
+            return this.finishAfterDisconnect(decision)
+        }
+
+        if (participates) {
+            decision.allowed.delete(actorKey)
+            decision.responses.delete(actorKey)
+        }
+
+        if (phaseBeforeDisconnect === 'paused' && decision) {
+            decision.resumeOwnerSeats = decision.resumeOwnerSeats.filter(seat => {
+                const owner = this.players[seat]
+                return owner && !owner.isDead
+            })
+            if (decision.resumeOwnerSeats.length === 0) {
+                if (decision.allowed.size === decision.responses.size) {
+                    return this.resumeCompletedPausedDecision(decision)
+                }
+                return this.cancelActionAfterDisconnect(player, decision)
+            }
+            this.updatePlayers()
+            return true
+        }
+
+        if (decision && decision.allowed.size === decision.responses.size) {
+            this.closeDecision()
+            return true
+        }
+        this.updatePlayers()
+        return true
     }
 
     dissolve(playerName) {
@@ -497,6 +656,7 @@ class CoupGame {
             responses: new Map(decision.responses),
             priorityFrom: decision.priorityFrom,
             resumeOwnerSeats,
+            onSeatEliminated: decision.onSeatEliminated,
             resolve: decision.resolve
         } : null
         this.bumpVersion()
@@ -591,7 +751,7 @@ class CoupGame {
         return { choiceId, label, value }
     }
 
-    openDecision({ type, title, description, seats, optionsFor, priorityFrom, resolve }) {
+    openDecision({ type, title, description, seats, optionsFor, priorityFrom, onSeatEliminated, resolve }) {
         if (this.phase !== 'running') return
         this.clearDecisionTimer()
         const allowed = new Map()
@@ -607,7 +767,7 @@ class CoupGame {
             resolve([])
             return
         }
-        this.activateDecision({ type, title, description, allowed, priorityFrom, resolve })
+        this.activateDecision({ type, title, description, allowed, priorityFrom, onSeatEliminated, resolve })
     }
 
     activateDecision(template) {
@@ -623,6 +783,7 @@ class CoupGame {
             allowed: template.allowed,
             responses: template.responses instanceof Map ? new Map(template.responses) : new Map(),
             priorityFrom: template.priorityFrom,
+            onSeatEliminated: template.onSeatEliminated,
             resolve: template.resolve
         }
         this.updatePlayers()
@@ -825,12 +986,20 @@ class CoupGame {
             this.rejectDecision(socketID, 'Only a player who did not answer this decision can resume it.')
             return false
         }
-        const disconnected = this.players.find(player => !player.isDead && player.controller === 'human'
-            && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
-        if (disconnected) {
-            this.rejectDecision(socketID, 'Every seat must still be connected to resume.')
-            this.dissolve(disconnected.name)
-            return false
+        while (true) {
+            const disconnected = this.players.find(player => !player.isDead && player.controller === 'human'
+                && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
+            if (!disconnected) break
+            if (this.players.length < 3) {
+                this.rejectDecision(socketID, 'Every seat must still be connected to resume.')
+                this.dissolve(disconnected.name)
+                return false
+            }
+            this.onDisconnect(disconnected.socketID)
+            if (this.phase !== 'paused' || !this.pausedDecision) {
+                this.rejectDecision(socketID, 'There is no timed-out decision to resume.')
+                return false
+            }
         }
         const decision = this.pausedDecision
         this.pausedDecision = null
@@ -1012,7 +1181,7 @@ class CoupGame {
                     }),
                     onConceded: () => {
                         action.historyEntry.result = 'failed'
-                        if (action.cost) this.players[action.actor].money += action.cost
+                        if (action.cost && !this.players[action.actor].isDead) this.players[action.actor].money += action.cost
                         this.updatePlayers()
                         this.loseInfluence(action.actor, () => this.advanceTurn())
                     }
@@ -1127,12 +1296,22 @@ class CoupGame {
             { kind: 'prove', card }
         ))
         choices.push(this.createChoice('concede', 'Do not prove; lose influence', { kind: 'concede' }))
+        const concede = () => {
+            if (historyEntry) historyEntry.result = 'failed'
+            this.addLog('claim_not_proved', {
+                actorSeat: claimant,
+                ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
+                ...(historyEntry && historyEntry.claimRole ? { claimRole: historyEntry.claimRole } : {})
+            }, { key: 'game.log.claimNotProved' })
+            onConceded()
+        }
         this.openDecision({
             type: 'prove_claim',
             title: 'Prove or concede',
             description,
             seats: [claimant],
             optionsFor: () => choices,
+            onSeatEliminated: concede,
             resolve: responses => {
                 const response = responses[0]
                 if (!response) return this.pause('Claimant did not resolve the challenge.')
@@ -1148,13 +1327,7 @@ class CoupGame {
                     this.updatePlayers()
                     onProved()
                 } else {
-                    if (historyEntry) historyEntry.result = 'failed'
-                    this.addLog('claim_not_proved', {
-                        actorSeat: claimant,
-                        ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
-                        ...(historyEntry && historyEntry.claimRole ? { claimRole: historyEntry.claimRole } : {})
-                    }, { key: 'game.log.claimNotProved' })
-                    onConceded()
+                    concede()
                 }
             }
         })
@@ -1174,11 +1347,20 @@ class CoupGame {
 
     loseInfluence(seat, onLost) {
         if (this.phase !== 'running') return
+        const continueAfterLoss = () => {
+            const action = this.currentAction
+            if (action && this.players[action.actor] && this.players[action.actor].isDead) {
+                action.historyEntry.result = 'cancelled'
+                this.currentAction = null
+                return this.advanceTurn()
+            }
+            return onLost()
+        }
         const player = this.players[seat]
         if (!player || player.isDead || player.influences.length === 0) {
             this.checkEliminated()
             this.updatePlayers()
-            return onLost()
+            return continueAfterLoss()
         }
         const options = player.influences.map((card, index) => this.createChoice(
             `lose:${index}`,
@@ -1191,6 +1373,7 @@ class CoupGame {
             description: 'The chosen card will be revealed and remain out of the Court deck.',
             seats: [seat],
             optionsFor: () => options,
+            onSeatEliminated: continueAfterLoss,
             resolve: responses => {
                 const response = responses[0]
                 if (!response) return this.pause('Influence loss was not resolved.')
@@ -1208,7 +1391,7 @@ class CoupGame {
                     result: player.isDead ? 'eliminated' : 'resolved'
                 })
                 this.updatePlayers()
-                onLost()
+                continueAfterLoss()
             }
         })
     }
@@ -1261,6 +1444,7 @@ class CoupGame {
     openExchange(seat, drawn) {
         const player = this.players[seat]
         const pool = player.influences.concat(drawn)
+        this.pendingExchange = { seat, drawn: drawn.slice() }
         const combinations = []
         const keepCount = player.influences.length
         const selectCombination = (start, selected) => {
@@ -1306,6 +1490,7 @@ class CoupGame {
                 player.influences = kept
                 this.deck.push(...returned)
                 this.deck = gameUtils.shuffleArray(this.deck, this.rng)
+                this.pendingExchange = null
                 this.updatePlayers()
                 this.logActionResult({ actor: seat, type: 'exchange', target: null }, 'resolved')
                 this.advanceTurn()

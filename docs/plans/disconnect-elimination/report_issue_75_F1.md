@@ -38,6 +38,10 @@ Un espectador no ocupa asiento de `players` y su desconexión no cambia el juego
 6. En una pausa recuperable, preservar `resumeOwnerSeats` menos el muerto. No transferir propiedad; si no hay propietario restante, resolver solo una ventana cuyas respuestas vivas ya estén completas; si la decisión aún requiere respuesta, cancelar la acción y avanzar. En `lose_influence`, usar el callback de pérdida. Una pausa no reanudable ya existente con `pausedDecision === null` permanece así, conforme a la decisión de alcance del Orquestador y #26.
 7. Todas las rutas de eliminación son idempotentes: una segunda desconexión de un asiento muerto no vuelve a emitir eliminación ni cambia el turno.
 
+## Aclaración de callback incorporada en F2
+
+La revisión del flujo concreto añadió un caso a la matriz: `currentAction.actor` puede desconectarse cuando `activeDecision.type === 'lose_influence'` pertenece a otro asiento vivo, por ejemplo cuando un retador probado pierde influencia tras una concesión del bloqueador. Esa pérdida ya está determinada y debe permanecer pendiente hasta resolverse. Su callback no puede reanudar la acción del actor muerto: al cerrar la pérdida, la acción se cancela y el turno avanza. La ruta se refleja en F2 y queda para falsificación independiente en F3.
+
 ## Límites de evidencia
 
 La inspección estática confirma emisores, consumidores y guardas existentes para decisiones, pausa, Codex y eventos de estado. No se validaron intercalaciones en runtime, proyección visual, temporizadores reales ni entrega Socket.IO; el Verifier FINAL de F3 debe intentar refutar los criterios 1–7. No se ejecutaron pruebas automatizadas, build ni recorrido dinámico.
