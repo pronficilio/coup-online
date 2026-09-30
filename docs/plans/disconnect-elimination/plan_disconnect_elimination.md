@@ -2,14 +2,14 @@
 
 ## Estado vigente
 
-- Issue: [#75](https://github.com/pronficilio/coup-online/issues/75), `OPEN`.
-- Estado operativo: `WAITING_ORCHESTRATOR`; F1, F2 y F3 `CLOSED (PASS)`; F3 fue `PASS` estático independiente sobre `17864e8`. PR [#81](https://github.com/pronficilio/coup-online/pull/81) abierta a `master`; falta completar revisión e integración.
+- Issue: [#75](https://github.com/pronficilio/coup-online/issues/75), `CLOSED`.
+- Estado operativo: `COMPLETED`; F1, F2 y F3 `CLOSED (PASS)`. PR [#81](https://github.com/pronficilio/coup-online/pull/81) integrada en `master` con merge commit `98e14cd356778dd0bbb346004a3340dbef854e31`.
 - Modo / riesgo / verificación: `FULL` / `HIGH` / `FINAL` independiente.
 - Verifier requerido: F3 `PASS` estático; no quedan checkpoints independientes pendientes.
 - Branch / worktree únicos: `issue/75-disconnect-elimination` / `.worktrees/issue-75-disconnect-elimination`.
 - Destino: `master` de `pronficilio/coup-online`; PR única #81.
 - Plan: `docs/plans/disconnect-elimination/plan_disconnect_elimination.md`.
-- Handoff: `docs/plans/active/issue_75_disconnect_elimination.md`.
+- Cierre: `docs/plans/completed/issue_75_disconnect_elimination.md`.
 - Bitácora append-only: `docs/plans/log/issue-75.jsonl`.
 
 ## Solicitud y objetivo
@@ -106,8 +106,8 @@
 - Una unidad, un branch, un worktree y una PR: `issue/75-disconnect-elimination` → `master`.
 - Worktree esperado: `.worktrees/issue-75-disconnect-elimination`.
 - No se observó branch local/remoto ni worktree con este nombre al preparar la unidad; el Ejecutor debe volver a comprobar el tracker y refs antes de reclamar/crear.
-- PR única: [#81](https://github.com/pronficilio/coup-online/pull/81), abierta hacia `master` y asociada solo a #75.
-- No se ejecutarán ni añadirán pruebas automatizadas porque el usuario pidió el cambio de comportamiento, no pruebas/verificación. Los reportes deben identificar esta limitación y no afirmar validación dinámica.
+- PR única: [#81](https://github.com/pronficilio/coup-online/pull/81), integrada a `master`; no se abrieron integraciones adicionales.
+- `git diff --check` pasó. GitHub no reportó checks configurados para la PR; no se ejecutaron pruebas, build ni runtime. La evidencia es estática e independiente según los reportes F1–F3.
 
 ## Riesgos y preguntas
 
@@ -123,5 +123,6 @@
 - 2026-09-30: F1 limita la recuperación pausada a `pausedDecision` presente; si ya era `null`, #75 conserva la pausa no reanudable de #26 y no reinicia ni reasigna esa decisión.
 - 2026-09-30: el primer F3 mostró que un blocker muerto no pertenece a `block_challenge.allowed`; F2 invalidó y descartó esa ventana al morir el blocker, y continúa sin bloqueo.
 - 2026-09-30: el Verifier reportó `FAIL` en `d9fad75` por un segundo hallazgo: resume multi-socket resolvía foreign aid antes de procesar al actor offline. Ambos hallazgos están en `report_issue_75_F3_checkpoint.md`; el commit `17864e8` prioriza `currentAction.actor`, `pendingBlock.blocker`, luego `currentAction.target`, y limpia ausentes tras el paso a `running`.
-- 2026-09-30: F3 se repitió independientemente sobre `17864e8` y obtuvo `PASS` estático. El Verifier no encontró otra refutación en blocker/actor/challenger/target offline, drenaje multi-socket, retorno de `resume()` ni terminalidad. El informe aclara que no hubo pruebas, build o runtime. Siguiente dueño: Orquestador para revisión del diff y PR.
-- 2026-09-30: el Orquestador abrió la PR única [#81](https://github.com/pronficilio/coup-online/pull/81) desde `issue/75-disconnect-elimination` a `master`; queda pendiente revisar sus checks y completar integración.
+- 2026-09-30: F3 se repitió independientemente sobre `17864e8` y obtuvo `PASS` estático. El Verifier no encontró otra refutación en blocker/actor/challenger/target offline, drenaje multi-socket, retorno de `resume()` ni terminalidad. El informe aclara que no hubo pruebas, build o runtime; el Orquestador revisó y completó la integración en PR #81.
+- 2026-09-30: el Orquestador abrió la PR única [#81](https://github.com/pronficilio/coup-online/pull/81) desde `issue/75-disconnect-elimination` a `master`; no se reportaron checks configurados y el merge state fue `CLEAN`.
+- 2026-09-30: la PR #81 se integró con merge commit `98e14cd356778dd0bbb346004a3340dbef854e31`; issue #75 se cerró después de verificar el merge.
