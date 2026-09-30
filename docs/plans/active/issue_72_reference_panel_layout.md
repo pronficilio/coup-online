@@ -1,6 +1,7 @@
 # Handoff Para Agente Ejecutor
 
 **Issue/Ticket:** https://github.com/pronficilio/coup-online/issues/72 (OPEN)
+**PR canónica:** https://github.com/pronficilio/coup-online/pull/74 (OPEN, DRAFT; base `master`)
 **Plan:** `docs/plans/reference-panel-layout/plan_reference_panel_layout.md`
 **Bitácora:** `docs/plans/log/issue-72.jsonl`
 **Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + revisión estática)`; F3 `CLOSED (PASS_LIMITED estático ≥263 px; walkthrough visual/DOM pendiente)`.
@@ -31,6 +32,7 @@
 5. F2 terminó en este branch/worktree; el reporte documenta el wrapper, las fórmulas del rail, build y `git diff --check`. No se añadieron ni ejecutaron pruebas automatizadas.
 6. Entrega a `WAITING_ORCHESTRATOR` para revisión; el Verifier independiente se invoca por separado en F3. No abrir PR, hacer merge ni cerrar issue desde el Ejecutor.
 7. F3 independiente sobre `5e3369f8de047f3883d116333ab8c9bfa3d9e609`: `PASS_LIMITED` estático para los anchos evaluados ≥263 px. Sin navegador, rectángulos DOM ni aprobación visual; se solicita walkthrough del propietario antes del cierre.
+8. PR canónica #74 abierta en draft contra `master`; issue actualizado con el veredicto y checklist de walkthrough: https://github.com/pronficilio/coup-online/issues/72#issuecomment-5903217562. Issue sigue `OPEN`/unidad `WAITING_USER` hasta esa comprobación.
 
 ## Criterios de aceptación
 
@@ -47,7 +49,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 - Una sola branch: `issue/72-reference-panel-layout`.
 - Un solo worktree: `.worktrees/issue-72-reference-panel-layout`.
-- Target: `master` del fork `pronficilio/coup-online`; una PR canónica para #72.
+- Target: `master` del fork `pronficilio/coup-online`; PR canónica #74 en draft.
 - Cada fase con cambios/evidencia persistente requiere commit. Mensajes previstos: `docs(plans): close issue 72 F1 layout diagnosis`; `fix(game-ui): reclaim space under board and dock reference controls`; `docs(plans): record issue 72 final verification`.
 - No editar upstream ni crear una segunda integración para la fase.
 

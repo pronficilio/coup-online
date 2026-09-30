@@ -24,6 +24,7 @@ El alto desplazable del documento debe seguir el borde visual inferior del table
 - Branch/worktree únicos: `issue/72-reference-panel-layout` / `.worktrees/issue-72-reference-panel-layout`.
 - Base confirmada: `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`.
 - Topología: una rama, un worktree y una PR hacia `master`.
+- PR canónica: [#74](https://github.com/pronficilio/coup-online/pull/74), `OPEN`/draft, pendiente de walkthrough visual del propietario.
 - Bitácora append-only: `docs/plans/log/issue-72.jsonl`.
 - Plan: esta ruta. Handoff activo: `docs/plans/active/issue_72_reference_panel_layout.md`.
 
