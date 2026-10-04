@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción sigue en `ce53c28`; staging aislado está activo; PR #15 está en borrador; F6 no se cierra hasta confirmar el flujo de juego y acordar el rollout/rollback.
+- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción sigue en `ce53c28`; staging aislado pasa las sondas de seguridad y recovery; PR #15 está en borrador y limpio; candidato `ff840d1` empaquetado/construido, no activado; falta partida completa y autorización de rollout.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -132,7 +132,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, origen permitido y rechazo de origen hostil en HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Dos clientes Socket.IO de staging recibieron `joinSuccess` al entrar al lobby por polling (prueba del Orquestador; no inició una partida ni confirmó WebSocket de extremo a extremo). Un reinicio de los dos contenedores de staging recuperó API `healthy`, web `Up`, home 200 y health 200. Falta acordar y ejecutar el rollout/rollback de producción. PR #15 continúa en borrador.
+El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, origen permitido y rechazo de origen hostil en HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Dos clientes Socket.IO de staging recibieron `joinSuccess` al entrar al lobby por polling (prueba del Orquestador; no inició una partida ni confirmó WebSocket de extremo a extremo). Un reinicio de los dos contenedores de staging recuperó API `healthy`, web `Up`, home 200 y health 200. El candidato de producción `ff840d1` está en `/opt/coup/releases/ff840d1` y sus imágenes están construidas, pero producción continúa con `ce53c28`. La reversión está documentada; volver a `ce53c28` reabre CORS, así que sería solo para recuperar disponibilidad. Falta validar el juego completo y la autorización para activar el candidato. PR #15 continúa en borrador.
 
 ## Fuentes
 

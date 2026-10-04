@@ -25,14 +25,46 @@ image tag from that SHA. The web image builds the React app with
 Docker network, and allows the Coup origin for HTTP and Socket.IO handshakes.
 Game rooms live in memory and are lost if the API container restarts.
 
-## Stop and rollback
+## Current release, rollout and rollback
 
-Keep the complete release directory and images to support rollback. To restore
-the previous release, run `docker compose up -d` from
-`/opt/coup/releases/1e4685f/deploy`; its Compose defaults select the original
-`1e4685f` images. New releases include a `.env` with their image tag. To stop
-the stack, run `docker compose down` from the active release's `deploy/`
-directory.
+Production currently runs `ce53c28` from
+`/opt/coup/releases/ce53c28/deploy`, with Compose project `deploy`. The issue
+#13 candidate is pinned to `ff840d1` in
+`/opt/coup/releases/ff840d1/deploy`; its images `coup-api:ff840d1` and
+`coup-web:ff840d1` have been built but are not running. Do not switch the
+production project until the owner approves the rollout.
+
+After approval, switch only the Coup Compose project with:
+
+```sh
+docker compose \
+  --project-directory /opt/coup/releases/ff840d1/deploy \
+  -p deploy \
+  --env-file /opt/coup/releases/ff840d1/deploy/.env \
+  -f /opt/coup/releases/ff840d1/deploy/docker-compose.yml \
+  up -d --wait
+```
+
+Then inspect `docker compose ps`, confirm API health, and repeat the HTTPS,
+allowed-origin, rejected-origin, polling and WebSocket probes against
+`coup.ejele.net`. Verify Mochila, Minecraft and the shared proxy remain up.
+
+To restore the currently deployed source if the candidate causes an availability
+failure, use the preserved `ce53c28` release directory and same Compose project:
+
+```sh
+docker compose \
+  --project-directory /opt/coup/releases/ce53c28/deploy \
+  -p deploy \
+  --env-file /opt/coup/releases/ce53c28/deploy/.env \
+  -f /opt/coup/releases/ce53c28/deploy/docker-compose.yml \
+  up -d --wait
+```
+
+This rollback restores the CORS behavior that F6 found open on `ce53c28`; use
+it only as a temporary availability recovery, then redeploy a fixed release.
+Do not remove release directories or images. `docker compose down` stops the
+stack and is not a rollback procedure.
 
 ## Shared Nginx and TLS
 

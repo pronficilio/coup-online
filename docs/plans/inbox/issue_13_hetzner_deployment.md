@@ -2,19 +2,19 @@
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
 - **Plan:** `docs/plans/active/issue_13_hetzner_deployment.md`
-- **Estado:** `IN_PROGRESS`; producción sigue en `ce53c28`; fix aislado en staging. Sondas de seguridad independientes pasan; dos clientes de prueba entraron al lobby; falta decidir y ejecutar rollout/rollback de producción.
+- **Estado:** `IN_PROGRESS`; producción sigue en `ce53c28`; fix aislado en staging. PR #15 publicado, draft y sin conflictos. Candidato `ff840d1` empaquetado y construido en `/opt/coup/releases/ff840d1`; falta partida completa y aprobación para activarlo.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** sí; revisión final independiente antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede un Origin hostil acceder a HTTP, polling o WebSocket de staging? ¿Un cliente válido completa una partida después del fix?
 - **Release vigente:** `ce53c28`, confirmado por el propietario como el único despliegue desde la apertura histórica de #13 y revalidado en el host el 2026-10-03. La antigua referencia `55be894` era histórica.
 - **Staging autorizado:** `st-coup.ejele.net` → `178.105.138.91`; DNS confirmado. Debe usar Compose/imagenes/certificado aislados; no publicar puertos de host ni incluir runner Codex.
 - **PR:** #15 está en borrador hacia `master`; no integrar todavía.
-- **Fase siguiente:** revisar el plan concreto de rollout/rollback y obtener decisión del propietario antes de modificar producción. No integrar ni desplegar a producción todavía.
-- **Por qué sigue:** el verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket en staging. Después, una sonda Node de dos clientes confirmó ambos `joinSuccess` en el lobby por polling; no inició una partida. El reporte independiente está en `docs/plans/active/report_issue_13_F6.md`. El rollback productivo requiere autorización específica.
+- **Fase siguiente:** confirmar una partida completa en staging; después activar el candidato solo con autorización explícita. Runbook concreto en `deploy/README.md`. No integrar ni desplegar a producción todavía.
+- **Por qué sigue:** el verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket en staging. Una sonda Node de dos clientes confirmó ambos `joinSuccess` en el lobby por polling, pero no inició una partida. El reporte independiente está en `docs/plans/active/report_issue_13_F6.md`. El rollback a `ce53c28` restaura el CORS abierto detectado; documentado solo como recuperación temporal de disponibilidad.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
-- **Subtarea pendiente:** confirmar juego real de dos clientes en staging y preparar revisión de rollout/rollback de producción.
+- **Subtarea pendiente:** confirmar juego real de dos clientes en staging; esperar aprobación explícita antes de activar el candidato preparado.
 - **Criterios de aceptación:** ver el plan, issue #13.
-- **Evidencia requerida:** DNS/certificado staging, SHA limpio basado en `ce53c28`, build, API/Socket.IO con origen allowed/disallowed, clientes válidos, restart staging y decisión de rollback. Ya confirmados: TLS/health/CORS/polling/WS por verificador; dos `joinSuccess` vía polling; renovación dry-run y timer activo; reinicio de contenedores staging por Orquestador con API healthy/web Up y health 200. Rollback productivo sigue pendiente de plan/autorización.
+- **Evidencia requerida:** DNS/certificado staging, SHA limpio basado en `ce53c28`, build, API/Socket.IO con origen allowed/disallowed, clientes válidos, restart staging y decisión de rollback. Ya confirmados: TLS/health/CORS/polling/WS por verificador; dos `joinSuccess` vía polling; renovación dry-run y timer activo; reinicio de contenedores staging por Orquestador con API healthy/web Up y health 200; Compose de producción valida y las imágenes `ff840d1` están construidas sin reemplazar contenedores. Falta partida completa y decisión del propietario para activar.
 - **Riesgos pendientes:** proxy compartido; rollback no probado; cuatro avisos moderados de npm en Socket.IO 2.x requieren migración mayor.
 - **Política de commits:** `COMMIT_AFTER_REVIEW` por fase técnica y `COMMIT_REQUIRED` en F6. Un solo branch/worktree/PR para el issue.
 - **Branch destino:** `issue/13-hetzner-deployment`.
