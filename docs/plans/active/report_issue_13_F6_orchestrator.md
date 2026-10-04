@@ -30,7 +30,10 @@ Tras desconectar a ambos clientes, se reinició solo `st-coup-api` para limpiar
 el estado en memoria de la partida temporal. El API volvió a `running healthy`.
 Después del reinicio, `https://st-coup.ejele.net/` y
 `/exists/healthcheck` respondieron 200. El healthcheck de producción también
-respondió 200 y sus contenedores continuaron con `ce53c28`.
+respondió 200. En ese momento, antes de la autorización posterior del
+propietario, sus contenedores continuaban con `ce53c28`.
 
-No se cambió el Compose de producción ni se modificó ningún otro servicio. No
-se ha activado el candidato de producción `ff840d1`.
+No se cambió el Compose de producción ni se modificó ningún otro servicio
+durante esta prueba. Posteriormente el propietario autorizó activar
+`ff840d1`; la activación y las sondas públicas están documentadas en el plan y
+en `report_issue_13_F6.md`.

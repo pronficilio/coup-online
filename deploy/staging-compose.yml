@@ -1,5 +1,5 @@
 services:
-  coup-api:
+  st-coup-api:
     container_name: st-coup-api
     build:
       context: ..
@@ -19,7 +19,7 @@ services:
     networks:
       - mochila_default
 
-  coup-web:
+  st-coup-web:
     container_name: st-coup-web
     build:
       context: ..

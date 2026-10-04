@@ -27,14 +27,17 @@ Game rooms live in memory and are lost if the API container restarts.
 
 ## Current release, rollout and rollback
 
-Production currently runs `ce53c28` from
-`/opt/coup/releases/ce53c28/deploy`, with Compose project `deploy`. The issue
-#13 candidate is pinned to `ff840d1` in
-`/opt/coup/releases/ff840d1/deploy`; its images `coup-api:ff840d1` and
-`coup-web:ff840d1` have been built but are not running. Do not switch the
-production project until the owner approves the rollout.
+Production currently runs `ff840d1` from
+`/opt/coup/releases/ff840d1/deploy`, with Compose project `deploy`. This is the
+issue #13 fix, based on the previously published `ce53c28`. The API and web
+containers were activated on 2026-10-04 and their production TLS, health,
+allowed/blocked-origin HTTP, polling, and WebSocket probes passed after
+staging's Docker service aliases were isolated. The Codex runner remains on its
+existing release. See `docs/plans/active/report_issue_13_F6.md` for probe
+results and `docs/plans/active/issue_13_hetzner_deployment.md` for the rollout
+record.
 
-After approval, switch only the Coup Compose project with:
+To activate a reviewed release, switch only the Coup Compose project with:
 
 ```sh
 docker compose \
@@ -135,6 +138,13 @@ then reload Nginx. The production certificate is not replaced. The dedicated
 `st-coup-certbot-renew.service` and `.timer` renew only the staging certificate
 and reload the proxy after successful renewal.
 
+The staging Compose service keys must remain uniquely named `st-coup-api` and
+`st-coup-web`. Production Nginx resolves `coup-api` and `coup-web` on the same
+Docker network; reusing those service keys in staging adds conflicting DNS
+aliases and can route production requests to staging. After fixing a staging
+Compose change, recreate only project `st-coup` and confirm its aliases remain
+unique before probing production.
+
 The staging API must allow only its configured browser origin for HTTP and
 Socket.IO. Verify an allowed staging client can create/join a room and upgrade
 polling to WebSocket, while an arbitrary Origin is rejected for HTTP, polling,
@@ -158,5 +168,9 @@ returned `200`. A separate Orchestrator smoke check connected two Socket.IO
 clients through polling with the staging Origin; both received `joinSuccess`,
 started a game, and received `g-updatePlayers` with two players. The independent
 WebSocket upgrade probe passed separately; these two clients stayed on polling.
-See `docs/plans/active/report_issue_13_F6_orchestrator.md`. Do not consider F6
-complete until the production candidate is approved, deployed and checked live.
+See `docs/plans/active/report_issue_13_F6_orchestrator.md`. Production is now on
+`ff840d1`, and all public origin-control probes passed after fixing the staging
+alias collision. The independent verifier still marks full F6 `BLOCKED` because
+it did not test a production game, restart, or rollback. The Orchestrator's
+staging game and restart evidence is recorded separately; a production rollback
+was not exercised.

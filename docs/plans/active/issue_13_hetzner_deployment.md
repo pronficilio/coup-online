@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción sigue en `ce53c28`; staging pasa sondas de seguridad, partida de dos jugadores y restart; PR #15 está en borrador y limpio; candidato `ff840d1` empaquetado/construido, no activado; falta el rollout autorizado y su verificación live.
+- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción activa en `ff840d1`; staging y sondas adversariales de producción pasan; staging confirmó partida de dos jugadores y recuperación tras restart; PR #15 sigue en borrador, abierto y limpio. F6 permanece pendiente de cierre formal: el verifier independiente no probó partida/restart/rollback en producción y rollback no se ensayó.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -34,8 +34,8 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Supuestos, preguntas y riesgos
 
-- **Paso inmediato:** confirmar el flujo de juego en el entorno aislado `st-coup.ejele.net`, después acordar y planear un rollout/rollback de producción. Preservar la versión publicada y los demás servicios hasta esa decisión.
-- **Versión desplegada aprobada por el propietario:** `ce53c28`, confirmada por el usuario y por inspección SSH el 2026-10-03. Esta confirmación reemplaza el supuesto histórico de `55be894`.
+- **Paso inmediato:** revisar la evidencia de despliegue y decidir si se completa la cobertura faltante de juego/restart en producción y la prueba de rollback antes de cerrar F6/issue. La producción ya ejecuta el fix `ff840d1`.
+- **Base previamente publicada:** `ce53c28`, confirmada por el usuario y por inspección SSH el 2026-10-03. Desde ella se preparó y desplegó `ff840d1`, aprobado por el usuario el 2026-10-04.
 - El server de esa revisión tenía dependencias vulnerables. El artefacto de producción actualiza solo dependencias compatibles por lockfile y restringe el origen CORS a `https://coup.ejele.net`; permanecen cuatro avisos moderados del stack Socket.IO 2.x, cuya remediación automática requeriría una migración mayor.
 - El árbol de build frontend reporta 81 advisories (incluye 35 high y 6 critical); el contenedor final de frontend contiene Nginx y archivos estáticos, no `node_modules`. Se requiere una actualización separada de esa toolchain.
 - El usuario compró `ejele.net`; los A/CNAME ya resuelven y los tres hosts validaron HTTP-01.
@@ -116,9 +116,9 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Pregunta:** ¿puede un origen arbitrario obtener acceso CORS o establecer Socket.IO, y sigue funcionando el juego válido tras bloquearlo?
 - **Verifier:** independiente; probó `st-coup.ejele.net` contra CORS HTTP/Socket.IO y WebSocket, además de TLS y health. No implementó fixes.
 - **Criterio de cierre:** producción acepta `https://coup.ejele.net`, rechaza origen ajeno en API, polling y WebSocket, y permite iniciar una partida; la instancia sobrevive restart. Mochila y Minecraft permanecen sanos; el procedimiento de rollback queda documentado y el riesgo de volver al CORS abierto se reconoce.
-- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: staging `PASS` en TLS, health, CORS HTTP, polling y WebSocket; su propia sonda de dos jugadores no completó el ACK por un problema de parser. La verificación funcional complementaria del Orquestador inició una partida de dos jugadores por polling y ambos recibieron `g-updatePlayers`; detalle en `docs/plans/active/report_issue_13_F6_orchestrator.md`. El upgrade WebSocket permitido sí pasó en la sonda independiente, no como upgrade de esos clientes. El fallo observado en producción el 2026-10-03 permanece como evidencia histórica; no se hizo rollout.
-- **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, imágenes/contendores únicos, sin puertos publicados ni runner Codex; certificado separado y timer propio. El API y web están healthy/Up tras reinicio de staging realizado el 2026-10-04; HTTPS y health volvieron a responder 200.
-- **PR:** #15 en borrador, listo para revisión pero no para integrar.
+- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: sondas públicas de producción `PASS` para TLS, health, CORS HTTP, polling y WebSocket. Su reporte completo sigue `BLOCKED` porque su alcance no probó una partida real, restart ni rollback en producción. En staging, el Orquestador inició una partida de dos jugadores por polling y ambos recibieron `g-updatePlayers`; el API de staging volvió a healthy tras restart. Véanse `docs/plans/active/report_issue_13_F6.md` y `docs/plans/active/report_issue_13_F6_orchestrator.md`.
+- **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, sin puertos publicados ni runner Codex; certificado separado y timer propio. Los nombres de servicio son `st-coup-api` y `st-coup-web`, únicos en la red compartida para evitar colisión con los alias `coup-api`/`coup-web` de producción. API y web están healthy/Up; sondas staging y juego de dos jugadores pasan.
+- **PR:** #15 en borrador, abierto y limpio; actualizado con el estado desplegado. No se ha integrado ni cerrado.
 - **Política de commit:** `COMMIT_REQUIRED`.
 - **Cierre previsto:** `docs(deploy): issue 13 F6 CLOSED deployment verified`.
 
@@ -129,11 +129,11 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 3. No instalar Caddy; mantener el Nginx compartido que ya ocupa 80/443.
 4. Preservar el catch-all/mochila-ip; el cambio añade un vhost dedicado de staging, con backup, `nginx -t` y reload validado.
 5. El stack de staging no publica puertos del host; Nginx enruta por la red externa existente.
-6. El usuario autorizó publicar PR #15 y preparar el candidato de producción; no autorizó aún reemplazar los contenedores activos. El paquete `ff840d1` se construyó por separado desde el release publicado `ce53c28`.
+6. El usuario autorizó publicar PR #15 y preparar el candidato; posteriormente autorizó activarlo. El paquete `ff840d1`, basado en el release publicado `ce53c28`, está activo en producción desde 2026-10-04.
 
 ## Estado actual / siguiente acción
 
-El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Una prueba complementaria inició una partida de staging con dos clientes Socket.IO por polling; ambos recibieron `g-updatePlayers` con dos jugadores. Se reinició `st-coup-api`, recuperó `healthy`, y staging home/health y producción health respondieron 200. El candidato de producción `ff840d1` está en `/opt/coup/releases/ff840d1` y sus imágenes están construidas, pero producción continúa con `ce53c28`. La reversión está documentada; volver a `ce53c28` restaura CORS abierto y sería solo recuperación temporal de disponibilidad. El siguiente paso es autorización para activar el candidato y verificación live. PR #15 continúa en borrador.
+Producción ejecuta `ff840d1` desde `/opt/coup/releases/ff840d1`; solo se recrearon los servicios Coup API/web. El runner Codex, Mochila, Minecraft y el proxy compartido permanecieron activos. Producción pasó TLS/home/health, CORS permitido y rechazo de origen arbitrario en preflight, Socket.IO polling y WebSocket. Una colisión de alias Docker entre staging y producción causó respuestas inconsistentes en sondas preliminares; se corrigió renombrando los servicios staging a `st-coup-api`/`st-coup-web`, recreando solo staging y repitiendo las sondas públicas secuencialmente, que pasaron. En staging, dos clientes iniciaron partida y recibieron `g-updatePlayers`; API volvió a healthy tras restart. El rollback a `ce53c28` está documentado pero no probado y restauraría CORS abierto, así que sería una recuperación temporal. PR #15 continúa abierto en borrador; no se hizo merge ni se cerró la issue. F6 requiere decisión sobre cobertura faltante antes del cierre formal.
 
 ## Fuentes
 
