@@ -122,6 +122,8 @@ HTTP preflight (`204`) and Socket.IO polling (`200`), plus WebSocket upgrade
 (`101`). Requests from `https://attacker.invalid` received `403` for HTTP and
 polling and `400 Origin not allowed` for WebSocket. Both stage containers were
 restarted; API returned to `healthy`, web stayed `Up`, and public home/health
-returned `200`. The independent verifier did not confirm two clients joining a
-real game, so do not consider F6 complete or roll this release into production
-until that path and the release/rollback plan are reviewed.
+returned `200`. A separate Orchestrator smoke check connected two Socket.IO
+clients through polling with the staging Origin; both received `joinSuccess`.
+It did not start a game or verify the clients' WebSocket upgrade end to end.
+Do not consider F6 complete or roll this release into production until gameplay
+and the release/rollback plan are reviewed.

@@ -2,19 +2,19 @@
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
 - **Plan:** `docs/plans/active/issue_13_hetzner_deployment.md`
-- **Estado:** `IN_PROGRESS`; producción sigue en `ce53c28`; fix aislado en staging. Sondas de seguridad independientes pasan; falta confirmar juego real y acordar rollout/rollback.
+- **Estado:** `IN_PROGRESS`; producción sigue en `ce53c28`; fix aislado en staging. Sondas de seguridad independientes pasan; dos clientes de prueba entraron al lobby; falta decidir y ejecutar rollout/rollback de producción.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** sí; revisión final independiente antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede un Origin hostil acceder a HTTP, polling o WebSocket de staging? ¿Un cliente válido completa una partida después del fix?
 - **Release vigente:** `ce53c28`, confirmado por el propietario como el único despliegue desde la apertura histórica de #13 y revalidado en el host el 2026-10-03. La antigua referencia `55be894` era histórica.
 - **Staging autorizado:** `st-coup.ejele.net` → `178.105.138.91`; DNS confirmado. Debe usar Compose/imagenes/certificado aislados; no publicar puertos de host ni incluir runner Codex.
 - **PR:** #15 está en borrador hacia `master`; no integrar todavía.
-- **Fase siguiente:** terminar F6 con una prueba de dos clientes en staging; documentar rollout/rollback revisables y decidir su autorización antes de modificar producción. No integrar ni desplegar a producción todavía.
-- **Por qué sigue:** el verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket en staging; no confirmó el flujo de dos jugadores. El reporte independiente está en `docs/plans/active/report_issue_13_F6.md`. El rollback productivo requiere autorización específica.
+- **Fase siguiente:** revisar el plan concreto de rollout/rollback y obtener decisión del propietario antes de modificar producción. No integrar ni desplegar a producción todavía.
+- **Por qué sigue:** el verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket en staging. Después, una sonda Node de dos clientes confirmó ambos `joinSuccess` en el lobby por polling; no inició una partida. El reporte independiente está en `docs/plans/active/report_issue_13_F6.md`. El rollback productivo requiere autorización específica.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
 - **Subtarea pendiente:** confirmar juego real de dos clientes en staging y preparar revisión de rollout/rollback de producción.
 - **Criterios de aceptación:** ver el plan, issue #13.
-- **Evidencia requerida:** DNS/certificado staging, SHA limpio basado en `ce53c28`, build, API/Socket.IO con origen allowed/disallowed, partida completa y restart staging. Ya confirmados: TLS/health/CORS/polling/WS por verificador; renovación dry-run y timer activo; reinicio de contenedores staging por Orquestador con API healthy/web Up y health 200. Rollback productivo sigue pendiente de plan/autorización.
+- **Evidencia requerida:** DNS/certificado staging, SHA limpio basado en `ce53c28`, build, API/Socket.IO con origen allowed/disallowed, clientes válidos, restart staging y decisión de rollback. Ya confirmados: TLS/health/CORS/polling/WS por verificador; dos `joinSuccess` vía polling; renovación dry-run y timer activo; reinicio de contenedores staging por Orquestador con API healthy/web Up y health 200. Rollback productivo sigue pendiente de plan/autorización.
 - **Riesgos pendientes:** proxy compartido; rollback no probado; cuatro avisos moderados de npm en Socket.IO 2.x requieren migración mayor.
 - **Política de commits:** `COMMIT_AFTER_REVIEW` por fase técnica y `COMMIT_REQUIRED` en F6. Un solo branch/worktree/PR para el issue.
 - **Branch destino:** `issue/13-hetzner-deployment`.
@@ -23,6 +23,6 @@
 - **Bitácora:** `docs/plans/log/issue-13.jsonl` (append-only).
 - **PR abierto:** #15, `issue/13-hetzner-deployment` → `master`, en borrador hasta completar F6.
 - **Secuencia de aislamiento:** reclamar en issue; volver a leer issue y descartar reclamo incompatible; usar el branch/worktree canónico ya preparado; registrar claim/worktree en log; commits de fase siempre en el mismo branch.
-- **Validaciones realizadas:** producción sigue en `ce53c28`; Mochila/Minecraft/proxy no se cambiaron. Staging `ff840d1` está arriba en Compose aislado. Verificador independiente: TLS/home/health 200; origen staging permitido para preflight 204, polling 200, WS 101; `attacker.invalid` rechazado con 403 en HTTP/polling y 400 en WS. Certbot renew dry-run pasó y timer está enabled. Orquestador reinició solo staging: API `healthy`, web `Up`, HTTPS/health 200. **Pendiente:** join real de dos jugadores y plan/decisión de rollback productivo.
+- **Validaciones realizadas:** producción sigue en `ce53c28`; Mochila/Minecraft/proxy no se cambiaron. Staging `ff840d1` está arriba en Compose aislado. Verificador independiente: TLS/home/health 200; origen staging permitido para preflight 204, polling 200, WS 101; `attacker.invalid` rechazado con 403 en HTTP/polling y 400 en WS. Orquestador conectó dos clientes vía polling con Origin de staging; ambos recibieron `joinSuccess` (no inició partida). Certbot renew dry-run pasó y timer está enabled. Orquestador reinició solo staging: API `healthy`, web `Up`, HTTPS/health 200. **Pendiente:** decisión de rollout/rollback productivo.
 - **Verifier:** su informe de staging está concluido con `BLOCKED` para cierre completo por juego no confirmado. No tocar producción. Una ronda posterior puede revisar reproducción del juego si se resuelve el obstáculo de cliente/ACK.
 - **Qué actualizar:** issue, plan, log y handoff con el veredicto final. La configuración live tiene copia original en `/opt/mochila/deploy/nginx.conf.bak-20260926`; no guardar secretos en Git.

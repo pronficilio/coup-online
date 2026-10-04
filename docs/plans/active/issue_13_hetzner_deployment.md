@@ -116,7 +116,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - **Pregunta:** ¿puede un origen arbitrario obtener acceso CORS o establecer Socket.IO, y sigue funcionando el juego válido tras bloquearlo?
 - **Verifier:** independiente; probó `st-coup.ejele.net` contra CORS HTTP/Socket.IO y WebSocket, además de TLS y health. No implementó fixes.
 - **Criterio de cierre:** staging acepta `https://st-coup.ejele.net`, rechaza origen ajeno en API, polling y WebSocket, y un cliente completa una partida; la instancia sobrevive restart. Coup producción, Mochila y Minecraft permanecen sanos; el rollout y rollback de producción quedan acordados y documentados antes de cerrar #13.
-- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: staging `PASS` en TLS, health, CORS HTTP, polling y WebSocket; F6 `BLOCKED` porque no confirmó dos jugadores. El fallo observado en producción el 2026-10-03 permanece como evidencia histórica; no se hizo rollout.
+- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: staging `PASS` en TLS, health, CORS HTTP, polling y WebSocket. Su intento de dos jugadores expiró por un problema de parser en la sonda, no atribuido al servicio. Después, el Orquestador conectó dos clientes Socket.IO con el Origin de staging y ambos recibieron `joinSuccess` por polling; esto confirma entrada a lobby, no el inicio de una partida ni el upgrade del cliente a WebSocket. El fallo observado en producción el 2026-10-03 permanece como evidencia histórica; no se hizo rollout.
 - **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, imágenes/contendores únicos, sin puertos publicados ni runner Codex; certificado separado y timer propio. El API y web están healthy/Up tras reinicio de staging realizado el 2026-10-04; HTTPS y health volvieron a responder 200.
 - **PR:** #15 en borrador, listo para revisión pero no para integrar.
 - **Política de commit:** `COMMIT_REQUIRED`.
@@ -132,7 +132,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, origen permitido y rechazo de origen hostil en HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Un reinicio de los dos contenedores de staging recuperó API `healthy`, web `Up`, home 200 y health 200. Falta confirmar juego real con dos clientes y acordar el rollout/rollback de producción. PR #15 continúa en borrador.
+El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, origen permitido y rechazo de origen hostil en HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Dos clientes Socket.IO de staging recibieron `joinSuccess` al entrar al lobby por polling (prueba del Orquestador; no inició una partida ni confirmó WebSocket de extremo a extremo). Un reinicio de los dos contenedores de staging recuperó API `healthy`, web `Up`, home 200 y health 200. Falta acordar y ejecutar el rollout/rollback de producción. PR #15 continúa en borrador.
 
 ## Fuentes
 
