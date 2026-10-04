@@ -7,6 +7,7 @@
 **Verifier requerido ahora:** no.
 **Branch/worktree/merge target:** `issue/82-counteraction-panel-sticky` / `.worktrees/issue-82-counteraction-panel-sticky` / `master`.
 **PR:** [#83](https://github.com/pronficilio/coup-online/pull/83), `OPEN` y `MERGEABLE`.
+**Tracker:** [comentario de cierre F1 y entrega al Orquestador](https://github.com/pronficilio/coup-online/issues/82#issuecomment-5982604168).
 **Bitácora:** `docs/plans/log/issue-82.jsonl`.
 **Siguiente dueño:** Orquestador.
 
