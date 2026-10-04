@@ -107,3 +107,21 @@ The staging API must allow only its configured browser origin for HTTP and
 Socket.IO. Verify an allowed staging client can create/join a room and upgrade
 polling to WebSocket, while an arbitrary Origin is rejected for HTTP, polling,
 and WebSocket. A release is not ready for production until these checks pass.
+
+### Staging snapshot (2026-10-04)
+
+The issue #13 fix is running as release `ff840d1` at
+`https://st-coup.ejele.net`. The stage API and web use separate containers and
+image tags, publish no host ports, and share only the existing Docker network
+with the public proxy. The stage certificate is separate; its systemd renewal
+timer is enabled, and Certbot `renew --dry-run --cert-name st-coup.ejele.net`
+passed.
+
+Independent F6 probes passed for TLS, home and health (`200`), the configured
+HTTP preflight (`204`) and Socket.IO polling (`200`), plus WebSocket upgrade
+(`101`). Requests from `https://attacker.invalid` received `403` for HTTP and
+polling and `400 Origin not allowed` for WebSocket. Both stage containers were
+restarted; API returned to `healthy`, web stayed `Up`, and public home/health
+returned `200`. The independent verifier did not confirm two clients joining a
+real game, so do not consider F6 complete or roll this release into production
+until that path and the release/rollback plan are reviewed.

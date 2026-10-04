@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; Coup y TLS están activos; PR #15 está en borrador; F6/verificación independiente e integración siguen pendientes.
+- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción sigue en `ce53c28`; staging aislado está activo; PR #15 está en borrador; F6 no se cierra hasta confirmar el flujo de juego y acordar el rollout/rollback.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -25,7 +25,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - El servidor accesible como `sqf-hetzner` es Debian 13, usuario remoto `root`, con Docker instalado y 17 GB libres en `/`. Node/NPM no están instalados en el host.
 - Docker publica Nginx en 80/443. Su config vive en `/opt/mochila/deploy/nginx.conf`; el original se respaldó como `/opt/mochila/deploy/nginx.conf.bak-20260926`. Nginx conserva el fallback al certificado `mochila-ip` y el upstream Mochila en 8080. El vhost de `ejele.net` usa el nuevo certificado SAN; `www` redirige al apex; `coup` enruta al frontend/API.
 - Coup usa backend Node en el puerto 8000 por defecto o `PORT`; cliente CRA obtiene URL del backend al compilar mediante `REACT_APP_BACKEND_URL`. Las rutas API son `/createNamespace` y `/exists/:namespace`, además de Socket.IO.
-- F6 confirmó que la aplicación activa respondía CORS abierto y que Socket.IO aceptaba/reflejaba un origen arbitrario. Se está corrigiendo la política en el código real de `server/index.js`; el overlay de producción antiguo se eliminó para que no reemplace el código actual al empaquetar.
+- F6 detectó CORS abierto y Socket.IO accesible desde un origen arbitrario en producción el 2026-10-03. La corrección está en `server/index.js`; el overlay de producción antiguo se eliminó para que no reemplace el código actual al empaquetar. El verificador confirmó en staging que HTTP, polling y WebSocket rechazan orígenes ajenos.
 - El usuario confirmó que el único despliegue hecho desde que se abrió #13 es el que sigue activo: `ce53c28`, en `/opt/coup/releases/ce53c28`. La referencia anterior a `55be894` era histórica y quedó obsoleta; no es una discrepancia del runtime.
 - GitHub no tenía una issue previa de despliegue. Issue #5 está cerrada; issue #6 permanece abierta.
 - El usuario confirmó que compró `ejele.net`. La IP pública efectiva del servidor se verificó desde el host y un servicio externo: `178.105.138.91`.
@@ -34,7 +34,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Supuestos, preguntas y riesgos
 
-- **Paso inmediato:** crear el entorno de staging aislado en `st-coup.ejele.net`; su A ya resuelve a `178.105.138.91`. Preservar producción, el registro raíz y los demás servicios.
+- **Paso inmediato:** confirmar el flujo de juego en el entorno aislado `st-coup.ejele.net`, después acordar y planear un rollout/rollback de producción. Preservar la versión publicada y los demás servicios hasta esa decisión.
 - **Versión desplegada aprobada por el propietario:** `ce53c28`, confirmada por el usuario y por inspección SSH el 2026-10-03. Esta confirmación reemplaza el supuesto histórico de `55be894`.
 - El server de esa revisión tenía dependencias vulnerables. El artefacto de producción actualiza solo dependencias compatibles por lockfile y restringe el origen CORS a `https://coup.ejele.net`; permanecen cuatro avisos moderados del stack Socket.IO 2.x, cuya remediación automática requeriría una migración mayor.
 - El árbol de build frontend reporta 81 advisories (incluye 35 high y 6 critical); el contenedor final de frontend contiene Nginx y archivos estáticos, no `node_modules`. Se requiere una actualización separada de esa toolchain.
@@ -114,10 +114,10 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 ### F6 — Verificación adversarial y cierre (`PENDING`)
 
 - **Pregunta:** ¿puede un origen arbitrario obtener acceso CORS o establecer Socket.IO, y sigue funcionando el juego válido tras bloquearlo?
-- **Verifier:** independiente; primero prueba `st-coup.ejele.net` y trata de falsar CORS HTTP/Socket.IO, upgrade WebSocket, juego y aislamiento; no implementa fixes.
-- **Criterio de cierre:** staging acepta solamente `https://st-coup.ejele.net`, un origen ajeno queda rechazado en API, polling y WebSocket, el cliente puede crear/unirse a una partida, Mochila/Minecraft/coup producción siguen sanos y la instancia supera restart. Después se agenda el rollout de producción y el rollback queda ensayado/documentado antes de cerrar #13.
-- **Estado del verifier:** primer reporte `FAIL` por CORS/Socket.IO (2026-10-03); el usuario aclaró `ce53c28` como release vigente, así que la referencia a `55be894` queda como documentación obsoleta, no como fallo del runtime.
-- **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, imágenes y contenedores únicos, sin puertos publicados ni runner Codex; certificado y timer propios.
+- **Verifier:** independiente; probó `st-coup.ejele.net` contra CORS HTTP/Socket.IO y WebSocket, además de TLS y health. No implementó fixes.
+- **Criterio de cierre:** staging acepta `https://st-coup.ejele.net`, rechaza origen ajeno en API, polling y WebSocket, y un cliente completa una partida; la instancia sobrevive restart. Coup producción, Mochila y Minecraft permanecen sanos; el rollout y rollback de producción quedan acordados y documentados antes de cerrar #13.
+- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: staging `PASS` en TLS, health, CORS HTTP, polling y WebSocket; F6 `BLOCKED` porque no confirmó dos jugadores. El fallo observado en producción el 2026-10-03 permanece como evidencia histórica; no se hizo rollout.
+- **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, imágenes/contendores únicos, sin puertos publicados ni runner Codex; certificado separado y timer propio. El API y web están healthy/Up tras reinicio de staging realizado el 2026-10-04; HTTPS y health volvieron a responder 200.
 - **PR:** #15 en borrador, listo para revisión pero no para integrar.
 - **Política de commit:** `COMMIT_REQUIRED`.
 - **Cierre previsto:** `docs(deploy): issue 13 F6 CLOSED deployment verified`.
@@ -132,7 +132,7 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Estado actual / siguiente acción
 
-El release público vigente es `ce53c28`; F6 encontró el fallo de CORS/Socket.IO y no se cierra todavía. `st-coup.ejele.net` ya resuelve al host, pero aún cae en el vhost por defecto y no tiene certificado SAN válido. Siguiente: corregir la política, desplegar en Compose aislado de staging, emitir certificado propio, validar origen permitido/denegado y juego real; después repetir F6 y preparar un rollout/rollback controlado de producción. PR #15 continúa en borrador.
+El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, origen permitido y rechazo de origen hostil en HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Un reinicio de los dos contenedores de staging recuperó API `healthy`, web `Up`, home 200 y health 200. Falta confirmar juego real con dos clientes y acordar el rollout/rollback de producción. PR #15 continúa en borrador.
 
 ## Fuentes
 
