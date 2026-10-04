@@ -155,7 +155,8 @@ HTTP preflight (`204`) and Socket.IO polling (`200`), plus WebSocket upgrade
 polling and `400 Origin not allowed` for WebSocket. Both stage containers were
 restarted; API returned to `healthy`, web stayed `Up`, and public home/health
 returned `200`. A separate Orchestrator smoke check connected two Socket.IO
-clients through polling with the staging Origin; both received `joinSuccess`.
-It did not start a game or verify the clients' WebSocket upgrade end to end.
-Do not consider F6 complete or roll this release into production until gameplay
-and the release/rollback plan are reviewed.
+clients through polling with the staging Origin; both received `joinSuccess`,
+started a game, and received `g-updatePlayers` with two players. The independent
+WebSocket upgrade probe passed separately; these two clients stayed on polling.
+See `docs/plans/active/report_issue_13_F6_orchestrator.md`. Do not consider F6
+complete until the production candidate is approved, deployed and checked live.

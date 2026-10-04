@@ -1,7 +1,7 @@
 # Issue #13 — Desplegar Coup Online en Hetzner
 
 - **Issue:** https://github.com/pronficilio/coup-online/issues/13
-- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción sigue en `ce53c28`; staging aislado pasa las sondas de seguridad y recovery; PR #15 está en borrador y limpio; candidato `ff840d1` empaquetado/construido, no activado; falta partida completa y autorización de rollout.
+- **Estado:** `IN_PROGRESS` — F0–F5 cerradas; producción sigue en `ce53c28`; staging pasa sondas de seguridad, partida de dos jugadores y restart; PR #15 está en borrador y limpio; candidato `ff840d1` empaquetado/construido, no activado; falta el rollout autorizado y su verificación live.
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 - **Branch / worktree:** `issue/13-hetzner-deployment` / `.worktrees/issue-13-hetzner-deployment`
 - **Integración:** un PR hacia `master`.
@@ -115,8 +115,8 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 - **Pregunta:** ¿puede un origen arbitrario obtener acceso CORS o establecer Socket.IO, y sigue funcionando el juego válido tras bloquearlo?
 - **Verifier:** independiente; probó `st-coup.ejele.net` contra CORS HTTP/Socket.IO y WebSocket, además de TLS y health. No implementó fixes.
-- **Criterio de cierre:** staging acepta `https://st-coup.ejele.net`, rechaza origen ajeno en API, polling y WebSocket, y un cliente completa una partida; la instancia sobrevive restart. Coup producción, Mochila y Minecraft permanecen sanos; el rollout y rollback de producción quedan acordados y documentados antes de cerrar #13.
-- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: staging `PASS` en TLS, health, CORS HTTP, polling y WebSocket. Su intento de dos jugadores expiró por un problema de parser en la sonda, no atribuido al servicio. Después, el Orquestador conectó dos clientes Socket.IO con el Origin de staging y ambos recibieron `joinSuccess` por polling; esto confirma entrada a lobby, no el inicio de una partida ni el upgrade del cliente a WebSocket. El fallo observado en producción el 2026-10-03 permanece como evidencia histórica; no se hizo rollout.
+- **Criterio de cierre:** producción acepta `https://coup.ejele.net`, rechaza origen ajeno en API, polling y WebSocket, y permite iniciar una partida; la instancia sobrevive restart. Mochila y Minecraft permanecen sanos; el procedimiento de rollback queda documentado y el riesgo de volver al CORS abierto se reconoce.
+- **Estado del verifier:** reporte independiente actualizado el 2026-10-04: staging `PASS` en TLS, health, CORS HTTP, polling y WebSocket; su propia sonda de dos jugadores no completó el ACK por un problema de parser. La verificación funcional complementaria del Orquestador inició una partida de dos jugadores por polling y ambos recibieron `g-updatePlayers`; detalle en `docs/plans/active/report_issue_13_F6_orchestrator.md`. El upgrade WebSocket permitido sí pasó en la sonda independiente, no como upgrade de esos clientes. El fallo observado en producción el 2026-10-03 permanece como evidencia histórica; no se hizo rollout.
 - **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, imágenes/contendores únicos, sin puertos publicados ni runner Codex; certificado separado y timer propio. El API y web están healthy/Up tras reinicio de staging realizado el 2026-10-04; HTTPS y health volvieron a responder 200.
 - **PR:** #15 en borrador, listo para revisión pero no para integrar.
 - **Política de commit:** `COMMIT_REQUIRED`.
@@ -129,10 +129,11 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 3. No instalar Caddy; mantener el Nginx compartido que ya ocupa 80/443.
 4. Preservar el catch-all/mochila-ip; el cambio añade un vhost dedicado de staging, con backup, `nginx -t` y reload validado.
 5. El stack de staging no publica puertos del host; Nginx enruta por la red externa existente.
+6. El usuario autorizó publicar PR #15 y preparar el candidato de producción; no autorizó aún reemplazar los contenedores activos. El paquete `ff840d1` se construyó por separado desde el release publicado `ce53c28`.
 
 ## Estado actual / siguiente acción
 
-El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, origen permitido y rechazo de origen hostil en HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Dos clientes Socket.IO de staging recibieron `joinSuccess` al entrar al lobby por polling (prueba del Orquestador; no inició una partida ni confirmó WebSocket de extremo a extremo). Un reinicio de los dos contenedores de staging recuperó API `healthy`, web `Up`, home 200 y health 200. El candidato de producción `ff840d1` está en `/opt/coup/releases/ff840d1` y sus imágenes están construidas, pero producción continúa con `ce53c28`. La reversión está documentada; volver a `ce53c28` reabre CORS, así que sería solo para recuperar disponibilidad. Falta validar el juego completo y la autorización para activar el candidato. PR #15 continúa en borrador.
+El release público vigente es `ce53c28`; no se modificó. El fix está desplegado solo en `st-coup.ejele.net`. El verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket; Certbot dry-run pasó y el timer está habilitado. Una prueba complementaria inició una partida de staging con dos clientes Socket.IO por polling; ambos recibieron `g-updatePlayers` con dos jugadores. Se reinició `st-coup-api`, recuperó `healthy`, y staging home/health y producción health respondieron 200. El candidato de producción `ff840d1` está en `/opt/coup/releases/ff840d1` y sus imágenes están construidas, pero producción continúa con `ce53c28`. La reversión está documentada; volver a `ce53c28` restaura CORS abierto y sería solo recuperación temporal de disponibilidad. El siguiente paso es autorización para activar el candidato y verificación live. PR #15 continúa en borrador.
 
 ## Fuentes
 
