@@ -25,8 +25,8 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 - El servidor accesible como `sqf-hetzner` es Debian 13, usuario remoto `root`, con Docker instalado y 17 GB libres en `/`. Node/NPM no están instalados en el host.
 - Docker publica Nginx en 80/443. Su config vive en `/opt/mochila/deploy/nginx.conf`; el original se respaldó como `/opt/mochila/deploy/nginx.conf.bak-20260926`. Nginx conserva el fallback al certificado `mochila-ip` y el upstream Mochila en 8080. El vhost de `ejele.net` usa el nuevo certificado SAN; `www` redirige al apex; `coup` enruta al frontend/API.
 - Coup usa backend Node en el puerto 8000 por defecto o `PORT`; cliente CRA obtiene URL del backend al compilar mediante `REACT_APP_BACKEND_URL`. Las rutas API son `/createNamespace` y `/exists/:namespace`, además de Socket.IO.
-- El código original abría CORS. El overlay de producción acota HTTP CORS y Socket.IO a `https://coup.ejele.net`.
-- El checkout local `master` quedó actualizado y limpio en `55be894`, igual a `origin/master`. Ese SHA se empaquetó desde `git archive` y se desplegó en `/opt/coup/releases/55be894`.
+- F6 confirmó que la aplicación activa respondía CORS abierto y que Socket.IO aceptaba/reflejaba un origen arbitrario. Se está corrigiendo la política en el código real de `server/index.js`; el overlay de producción antiguo se eliminó para que no reemplace el código actual al empaquetar.
+- El usuario confirmó que el único despliegue hecho desde que se abrió #13 es el que sigue activo: `ce53c28`, en `/opt/coup/releases/ce53c28`. La referencia anterior a `55be894` era histórica y quedó obsoleta; no es una discrepancia del runtime.
 - GitHub no tenía una issue previa de despliegue. Issue #5 está cerrada; issue #6 permanece abierta.
 - El usuario confirmó que compró `ejele.net`. La IP pública efectiva del servidor se verificó desde el host y un servicio externo: `178.105.138.91`.
 - Nameservers públicos: `ns19.domaincontrol.com` y `ns20.domaincontrol.com` (GoDaddy). Cloudflare y Google DNS confirman `coup.ejele.net` → `178.105.138.91` (TTL 600 s), la IP pública Hetzner.
@@ -34,8 +34,8 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ## Supuestos, preguntas y riesgos
 
-- **Paso inmediato:** ninguno para DNS; el A de `coup` ya está confirmado. Preservar el registro raíz y otros servicios.
-- **Versión aprobada/desplegada:** `55be894` (HEAD de `origin/master` al sincronizar). Sustituye el release inicial `1e4685f` solicitado previamente; el paquete moderno se construyó desde ese commit limpio.
+- **Paso inmediato:** crear el entorno de staging aislado en `st-coup.ejele.net`; su A ya resuelve a `178.105.138.91`. Preservar producción, el registro raíz y los demás servicios.
+- **Versión desplegada aprobada por el propietario:** `ce53c28`, confirmada por el usuario y por inspección SSH el 2026-10-03. Esta confirmación reemplaza el supuesto histórico de `55be894`.
 - El server de esa revisión tenía dependencias vulnerables. El artefacto de producción actualiza solo dependencias compatibles por lockfile y restringe el origen CORS a `https://coup.ejele.net`; permanecen cuatro avisos moderados del stack Socket.IO 2.x, cuya remediación automática requeriría una migración mayor.
 - El árbol de build frontend reporta 81 advisories (incluye 35 high y 6 critical); el contenedor final de frontend contiene Nginx y archivos estáticos, no `node_modules`. Se requiere una actualización separada de esa toolchain.
 - El usuario compró `ejele.net`; los A/CNAME ya resuelven y los tres hosts validaron HTTP-01.
@@ -113,23 +113,26 @@ No incluye comprar un dominio, cambiar nameservers, desplegar cambios sin commit
 
 ### F6 — Verificación adversarial y cierre (`PENDING`)
 
-- **Pregunta:** ¿hay una petición o fallo razonable que rompa el tráfico existente, filtre una versión distinta o impida el juego?
-- **Verifier:** independiente; intentará falsar aislamiento/rollback, rutas API, CORS, upgrade WebSocket, persistencia del servicio y TLS/vhost. No implementa fixes.
-- **Criterio de cierre:** veredicto `PASS`, pasos de rollback probados/documentados, versión y salud actual registradas, PR integrado a `master` y issue actualizada.
+- **Pregunta:** ¿puede un origen arbitrario obtener acceso CORS o establecer Socket.IO, y sigue funcionando el juego válido tras bloquearlo?
+- **Verifier:** independiente; primero prueba `st-coup.ejele.net` y trata de falsar CORS HTTP/Socket.IO, upgrade WebSocket, juego y aislamiento; no implementa fixes.
+- **Criterio de cierre:** staging acepta solamente `https://st-coup.ejele.net`, un origen ajeno queda rechazado en API, polling y WebSocket, el cliente puede crear/unirse a una partida, Mochila/Minecraft/coup producción siguen sanos y la instancia supera restart. Después se agenda el rollout de producción y el rollback queda ensayado/documentado antes de cerrar #13.
+- **Estado del verifier:** primer reporte `FAIL` por CORS/Socket.IO (2026-10-03); el usuario aclaró `ce53c28` como release vigente, así que la referencia a `55be894` queda como documentación obsoleta, no como fallo del runtime.
+- **Staging:** el usuario autorizó usar `st-coup.ejele.net`, cuyo A apunta a `178.105.138.91`. Compose separado `st-coup`, imágenes y contenedores únicos, sin puertos publicados ni runner Codex; certificado y timer propios.
 - **PR:** #15 en borrador, listo para revisión pero no para integrar.
 - **Política de commit:** `COMMIT_REQUIRED`.
 - **Cierre previsto:** `docs(deploy): issue 13 F6 CLOSED deployment verified`.
 
 ## Registro de decisiones
 
-1. El usuario pidió sincronizar el repo y publicar la versión moderna; se actualizó `master` mediante fast-forward a `55be894`, igual a `origin/master`, y ese commit se construyó con `git archive` y overlay de producción.
-2. No instalar Caddy; mantener el Nginx compartido que ya ocupa 80/443.
-3. Preservar el catch-all/mochila-ip y añadir hosts nominales solo tras backup y `nginx -t`.
-4. El stack de Coup no publica ports de host; Nginx enruta por la red externa existente.
+1. El usuario confirmó el 2026-10-03 que `ce53c28` es el último despliegue y release intencional desde la apertura histórica de #13; no se considera que la app deba retroceder a `55be894`.
+2. El usuario aprobó usar `st-coup.ejele.net` como staging reutilizable. El A record resuelve al mismo host `178.105.138.91`; Coup producción permanece en el vhost e imagen actuales.
+3. No instalar Caddy; mantener el Nginx compartido que ya ocupa 80/443.
+4. Preservar el catch-all/mochila-ip; el cambio añade un vhost dedicado de staging, con backup, `nginx -t` y reload validado.
+5. El stack de staging no publica puertos del host; Nginx enruta por la red externa existente.
 
 ## Estado actual / siguiente acción
 
-F0–F5 cerradas. Coup está actualizado a `55be894` en `https://coup.ejele.net`; Mochila está en `https://ejele.net`. El certificado SAN cubre `www.ejele.net` y su redirección va al apex. Renovación automática está instalada y probada. PR #15 está en borrador; F6 requiere revisión independiente y probar/documentar rollback antes de integrar/cerrar la issue.
+El release público vigente es `ce53c28`; F6 encontró el fallo de CORS/Socket.IO y no se cierra todavía. `st-coup.ejele.net` ya resuelve al host, pero aún cae en el vhost por defecto y no tiene certificado SAN válido. Siguiente: corregir la política, desplegar en Compose aislado de staging, emitir certificado propio, validar origen permitido/denegado y juego real; después repetir F6 y preparar un rollout/rollback controlado de producción. PR #15 continúa en borrador.
 
 ## Fuentes
 

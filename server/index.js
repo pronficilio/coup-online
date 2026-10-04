@@ -6,11 +6,26 @@ const { openLobby } = require('./game/lobby')
 const { CodexRunnerClient } = require('./ai/codex-client')
 const { createDisableMarker } = require('./ai/codex-disable-marker')
 const utilities = require('./utilities/utilities')
+const { isAllowedOrigin } = require('./utilities/origin-policy')
 
 const app = express()
-app.use(cors())
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000'
+app.use((req, res, next) => {
+    const origin = req.get('Origin')
+    if (origin && !isAllowedOrigin(origin, allowedOrigin)) {
+        return res.status(403).json({ error: 'origin_not_allowed' })
+    }
+    next()
+})
+app.use(cors({ origin: allowedOrigin }))
 const server = http.createServer(app)
 const io = require('socket.io')(server)
+io.origins((origin, callback) => {
+    if (!isAllowedOrigin(origin, allowedOrigin)) {
+        return callback('Origin not allowed', false)
+    }
+    callback(null, true)
+})
 const port = 8000
 const namespaces = {}
 const codexClient = new CodexRunnerClient()

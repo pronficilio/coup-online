@@ -73,3 +73,37 @@ successful renewal.
 Keep each release source under a separate directory or archive so rollback
 uses the matching source and image tag. This project must not publish ports 80
 or 443; those belong to Mochila's shared Nginx proxy.
+
+## Staging at `st-coup.ejele.net`
+
+Staging runs as a separate Compose project on the existing `mochila_default`
+network. Its containers and image tags are separate from production, publish
+no host ports, and route only from the `st-coup.ejele.net` Nginx virtual host.
+Do not add the Codex runner overlay to staging unless that feature is under test.
+
+Package the exact reviewed source commit, then create a private `.env` in the
+staging release directory with its short revision and staging hostname:
+
+```sh
+deploy/package-release.sh <reviewed-sha> /opt/coup/staging/<short-sha>
+cd /opt/coup/staging/<short-sha>/deploy
+cat > .env <<'EOF'
+COUP_REVISION=<short-sha>
+CORS_ORIGIN=https://st-coup.ejele.net
+REACT_APP_BACKEND_URL=https://st-coup.ejele.net
+EOF
+docker compose -p st-coup -f staging-compose.yml up -d --build --wait
+docker compose -p st-coup -f staging-compose.yml ps
+```
+
+Issue a separate certificate for `st-coup.ejele.net` using the existing
+Certbot volume and HTTP-01 webroot. Install the matching staging virtual host
+from `nginx-hetzner-final.conf`, run `docker exec mochila-proxy-1 nginx -t`,
+then reload Nginx. The production certificate is not replaced. The dedicated
+`st-coup-certbot-renew.service` and `.timer` renew only the staging certificate
+and reload the proxy after successful renewal.
+
+The staging API must allow only its configured browser origin for HTTP and
+Socket.IO. Verify an allowed staging client can create/join a room and upgrade
+polling to WebSocket, while an arbitrary Origin is rejected for HTTP, polling,
+and WebSocket. A release is not ready for production until these checks pass.

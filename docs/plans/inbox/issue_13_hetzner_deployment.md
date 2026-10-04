@@ -6,15 +6,15 @@
 - **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
 - **Verifier requerido ahora:** sí; revisión final independiente antes de integrar/cerrar.
 - **Pregunta de falsificación:** ¿puede una petición al hostname nuevo alterar el enrutamiento/certificado existente o impedir el upgrade de Socket.IO?
-- **Versión aprobada/desplegada:** SHA `55be894`, sincronizado con `origin/master` en el checkout raíz limpio.
-- **Despliegue activo:** release `55be894` en `/opt/coup/releases/55be894`; API `healthy`; Coup responde 200 en `https://coup.ejele.net` y sirve `main.3e4eee39.js`. Release anterior `1e4685f` sigue disponible para rollback. Mochila `https://ejele.net` responde 200; www redirige al apex. Cert SAN válido hasta 2026-12-25 y renovación automática probada.
+- **Release vigente:** `ce53c28`, confirmado por el propietario como el único despliegue desde la apertura histórica de #13 y revalidado en el host el 2026-10-03. La antigua referencia `55be894` era histórica.
+- **Staging autorizado:** `st-coup.ejele.net` → `178.105.138.91`; DNS confirmado. Debe usar Compose/imagenes/certificado aislados; no publicar puertos de host ni incluir runner Codex.
 - **PR:** #15 está en borrador hacia `master`; no integrar todavía.
-- **Fase siguiente:** F6 — verificar de forma independiente aislamiento, rollback, CORS/API/WebSocket, coexistencia Mochila/Minecraft y TLS; después integrar PR según veredicto.
-- **Por qué sigue:** el despliegue y TLS están operativos, pero falta el verifier separado y confirmar/documentar rollback. El checkout raíz permanece sucio y no fue usado.
+- **Fase siguiente:** F6 en staging — corregir y verificar CORS HTTP y Socket.IO con origen exacto `https://st-coup.ejele.net`; probar cliente, juego, WebSocket, salud, restart y coexistencia. Repetir verificación independiente antes de integrar.
+- **Por qué sigue:** F6 detectó CORS abierto y Socket.IO aceptando un origen arbitrario. El primer reporte independiente está en `docs/plans/active/report_issue_13_F6.md`. El rollback productivo requiere autorización específica.
 - **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
 - **Subtarea pendiente:** F6: falsificar de forma independiente el aislamiento/rollback y las rutas/API/WebSocket/TLS, usando los datos de la sección «Validaciones realizadas» del plan.
 - **Criterios de aceptación:** ver el plan, issue #13.
-- **Evidencia requerida:** resolución DNS del A, SHA de release, resultado de build, pruebas API/Socket.IO, estado de servicios previos antes/después, comprobación post-restart, evidencia HTTPS/WebSocket, rollback.
+- **Evidencia requerida:** DNS/certificado staging, SHA limpio basado en `ce53c28`, build, API/Socket.IO con origen allowed/disallowed, partida completa, servicios previos, restart staging y ensayo de rollback.
 - **Riesgos pendientes:** proxy compartido; rollback no probado; cuatro avisos moderados de npm en Socket.IO 2.x requieren migración mayor.
 - **Política de commits:** `COMMIT_AFTER_REVIEW` por fase técnica y `COMMIT_REQUIRED` en F6. Un solo branch/worktree/PR para el issue.
 - **Branch destino:** `issue/13-hetzner-deployment`.
