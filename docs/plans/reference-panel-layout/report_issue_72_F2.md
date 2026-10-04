@@ -1,6 +1,6 @@
 # Issue #72 — F2: caja de flujo y anclaje a cartas propias
 
-**Estado:** corrección del preview implementada; build y diff-check correctos; F3 revalidado estáticamente en `f58a5b5`; walkthrough DOM/visual pendiente.
+**Estado:** propietario aprobó en preview la estructura DOM final; build exit 0 y diff-check correctos; revalidación F3 independiente del diff actual pendiente.
 **Branch:** `issue/72-reference-panel-layout`
 **Base:** `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`
 
@@ -8,11 +8,11 @@
 
 La revisión del propietario confirmó que el tablero pintado estaba desplazado dentro de una caja cuadrada que seguía empezando en su coordenada de flujo original. Ahora `.PlayerBoardLayout` desplaza su `margin-top` por `--player-board-transform-y` y `--player-board-five-seat-y`; `.PlayerBoardContainer` ya no aplica ese transform. Así el borde superior y el final de la caja cuadrada siguen la misma posición que el tablero pintado, incluido el ajuste de cinco jugadores. El wrapper deja 12 px bajo el tablero y suma únicamente el desbordamiento positivo calculado del section observer cuando su fila de cartas sobresale de la caja. Hasta 720 px las dos variables valen cero y se conserva el margen superior original de 50 px.
 
-El `div.reference-panel__triggers` es hermano inmediato y posterior al `section.PlayerBoardSeat--observer`, dentro de `.PlayerBoardSeatAnchor--observer`. El ancla posicionada declara el mismo ancho real de la fila de cartas (`2 * clamp(76px, 10.4vw, 134px) + 5px` en desktop y `2 * clamp(58px, 15.5vw, 82px) + 5px` en mobile) y su altura sigue la del section en flujo normal. El rail usa `left: calc(100% + gap)` y `bottom: 0`: queda a la derecha de la fila y comparte exactamente su borde inferior, incluso cuando varía la altura de las etiquetas. En desktop el rail tiene botones de 52 px, gap de 8 px y ancho total de 172 px; entre 521–531 px baja a botones de 48 px/ancho total 160 px. De 439–520 px usa grilla 2×2 de 52 px, gap10 y caja de 114 px; entre 361–438 px, botones de 44 px/gap2 y caja de 90 px. Hasta 360 px, el tamaño es `clamp(28px, calc(25vw - 36.75px), 44px)` y la grilla ocupa `2 * tamaño + 2px`.
+La configuración que había en `f58a5b5` montaba el `div.reference-panel__triggers` después del section observer dentro de `.PlayerBoardSeatAnchor--observer`; el rail usaba `left: calc(100% + gap)` y `bottom: 0`. Esa ubicación fue reemplazada por el ajuste siguiente tras el nuevo feedback del propietario.
 
 ReactModal continúa creando los diálogos en `document.body`; mover el rail a hermano del section no cambia el comportamiento de los modales. Los botones conservan sus acciones y `aria-label`. El tooltip visual está oculto hasta 520 px; de 521–600 px el primero se ancla al borde izquierdo del botón y se limita a `100vw - 12px`. El anillo de foco se dibuja dentro del botón hasta 600 px.
 
-## Geometría estática y límites
+## Geometría de la versión anterior (supersedida por el ajuste siguiente)
 
 - Entre 532–731 px, la fila desktop de tamaño mínimo mide 157 px. El rail empieza en `(W + 157)/2 + 6px`; con sus 172 px deja 9.5 px al borde del viewport a W=532. Por encima de ese rango crece lentamente con `clamp(76px, 10.4vw, 134px)`, mientras el margen viewport aumenta.
 - Entre 521–531, la misma fila de 157 px precede a un rail de 160 px separado por 6 px; el margen derecho está entre 16 y 21 px.
@@ -24,10 +24,19 @@ ReactModal continúa creando los diálogos en `document.body`; mover el rail a h
 
 La revalidación F3 independiente de `f58a5b5` confirma estáticamente que `.PlayerBoardSeatAnchor--observer` es el containing block, el section queda en flujo normal y el div del rail es su hermano inmediato posterior. El ancla tiene z-index 30; el rail comparte el borde inferior del section y no se observó clipping estático. EventLog está en z-index 40. La revisión no encontró colisión vertical estática con asientos bajos 5p/6p, aunque no certifica posiciones dinámicas ni choques horizontales. Bajo 259 px ya no se conserva el margen lateral de 5 px y una etiqueta de más de dos líneas podría superar el clearance. No hubo navegador/DOMRects: no se afirma aprobación visual ni se da por verificado el criterio de ≤16 px de scroll.
 
+## Ajuste DOM final aprobado por el propietario (2026-10-03)
+
+- `div.reference-panel__triggers` es hijo directo de `.PlayerBoardContainer`, después de `.PlayerBoardSeatAnchor--observer` y justo antes de la última `section.PlayerBoardSeat`. No está dentro del ancla. El preview de esta estructura quedó aprobado por el propietario.
+- `.PlayerBoardSeatAnchor--observer` se conserva para posicionar la tarjeta del observador; la sección de asiento activo recibe una ref para medirla, sin condicionar el orden del rail en el DOM.
+- `ReferencePanel.css` ya no usa `left: calc(100% + ...)`. Un layout effect mide los rectángulos del tablero, el asiento actual, los otros asientos, sus headers/cartas y Court. Prueba posiciones dentro del tablero con 12 px de borde, evita intersecciones con 4 px de separación de asientos y 8 px de Court, y selecciona la opción despejada más cercana al lateral/borde inferior del asiento activo.
+- El rail conserva el ancho `max-content` y las grillas responsive; ahora ese ancho no determina su coordenada x. El posicionador mantiene la caja del rail dentro del cuadrado del tablero para no generar scroll horizontal. Si no se encuentra ninguna caja libre, el fallback la mantiene dentro del tablero pero podría solaparse; la revisión estática independiente de esta nueva variante sigue pendiente.
+- `PlayerBoardLayout` conserva 12 px más el exceso positivo estimado del section observer, porque sus cartas/labels aún pueden sobresalir del cuadrado aunque el rail no lo haga.
+- El propietario aprobó el DOM/preview. No se guardaron mediciones de `scrollWidth` ni una matriz completa de jugadores/anchos; F3 independiente debe revisar el diff final antes de cerrar la unidad.
+
 ## Validación
 
 - `npm run build` en `coup-client/`: exit 0, `Compiled with warnings`. Avisa Browserslist/caniuse-lite desactualizado, `logo` y `Link` sin uso en `src/App.js`, `fs.F_OK` deprecated y dos parse errors de `postcss-calc` para unidades `dvh` en las reglas de tamaño de modales preexistentes (`66.6667dvh`/`133.3333dvh` en `ReferencePanel.css:214/220`; estas declaraciones no se cambiaron).
 - `git diff --check`: sin errores.
 - No se añaden ni ejecutan tests automatizados.
-- `f58a5b5` vuelve a compilar con exit 0 / `Compiled with warnings`; `git diff --check` pasó. El bundle servido en el preview de 4072 contiene el ancla y la estructura `[section, reference-panel__triggers]`.
+- La versión DOM aprobada vuelve a compilar con exit 0 / `Compiled with warnings`; `git diff --check` pasó. El front de desarrollo responde en 4072 y el backend en 18000.
 - No hubo browser/DOMRects en F3: siguen pendientes scrollHeight, walkthrough visual y confirmación del propietario sobre los viewports/jugadores críticos.

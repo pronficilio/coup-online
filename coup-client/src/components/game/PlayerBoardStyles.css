@@ -2,7 +2,7 @@
 .PlayerBoardLayout {
     --player-board-transform-y: min(-40px, calc(108px - 15vh - min(14vw, 126px)));
     --player-board-five-seat-y: 0px;
-    /* Half-height estimate: 30px header + 7px margin + max 2-line label + 3px gap + half card; subtract 14% below center. */
+    /* The observer section can extend past the square when its role labels wrap. */
     --player-board-observer-flow-clearance: max(0px, calc(39.36px + clamp(55.88px, 7.647vw, 98.53px) - min(14vw, 126px)));
     position: relative;
     width: min(100%, 900px);
@@ -23,6 +23,8 @@
 }
 
 .PlayerBoardContainer {
+    --player-board-observer-card-width: clamp(76px, 10.4vw, 134px);
+    --player-board-observer-row-width: calc(var(--player-board-observer-card-width) + var(--player-board-observer-card-width) + 5px);
     position: absolute;
     inset: 0;
     isolation: isolate;
@@ -253,24 +255,21 @@
     transform: translate(-50%, -50%);
 }
 
-/* The references anchor to the exact two-card row and its section bottom. */
+.PlayerBoardSeat--observer {
+    width: var(--player-board-observer-row-width);
+    max-width: none;
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+}
+
 .PlayerBoardSeatAnchor--observer {
-    --player-board-observer-card-width: clamp(76px, 10.4vw, 134px);
-    --player-board-observer-row-width: calc(var(--player-board-observer-card-width) + var(--player-board-observer-card-width) + 5px);
     z-index: 30;
     width: var(--player-board-observer-row-width);
     max-width: none;
     position: absolute;
     transform: translate(-50%, -50%);
-}
-
-.PlayerBoardSeat--observer {
-    position: relative;
-    left: auto;
-    top: auto;
-    width: var(--player-board-observer-row-width);
-    max-width: none;
-    transform: none;
 }
 
 .PlayerBoardSeatHeader {
@@ -666,8 +665,9 @@
         width: clamp(58px, 15.5vw, 82px);
     }
 
-    .PlayerBoardSeatAnchor--observer {
+    .PlayerBoardContainer {
         --player-board-observer-card-width: clamp(58px, 15.5vw, 82px);
+        --player-board-observer-row-width: calc(var(--player-board-observer-card-width) + var(--player-board-observer-card-width) + 5px);
     }
 
     .PlayerBoardSeatName {
@@ -967,8 +967,8 @@
 }
 
 @media only screen and (max-width: 520px) {
-    /* Mobile uses an 18px header, 3px margin and the same max 2-line-label/gap estimate. */
     .PlayerBoardLayout {
+        /* Mobile header is 18px; bound one influence label to two lines. */
         --player-board-observer-flow-clearance: max(0px, calc(31.36px + clamp(42.65px, 11.397vw, 60.3px) - 14vw));
     }
 }

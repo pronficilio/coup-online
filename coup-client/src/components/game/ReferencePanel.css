@@ -5,10 +5,13 @@
     gap: 8px;
     position: absolute;
     z-index: 30;
-    top: auto;
-    left: calc(100% + var(--reference-panel-side-gap, 6px));
-    bottom: 0;
+    top: 12px;
+    left: 12px;
+    right: auto;
+    bottom: auto;
     width: max-content;
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
     margin: 0;
 }
 
@@ -120,7 +123,6 @@
         --reference-panel-compact-trigger-size: clamp(28px, calc(25vw - 36.75px), 44px);
         grid-template-columns: repeat(2, var(--reference-panel-compact-trigger-size));
         gap: 2px;
-        left: calc(100% + 6px);
     }
 
     .reference-panel__trigger {

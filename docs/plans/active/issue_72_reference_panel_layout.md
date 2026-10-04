@@ -4,15 +4,15 @@
 **PR canónica:** https://github.com/pronficilio/coup-online/pull/74 (OPEN, DRAFT; base `master`)
 **Plan:** `docs/plans/reference-panel-layout/plan_reference_panel_layout.md`
 **Bitácora:** `docs/plans/log/issue-72.jsonl`
-**Estado:** `WAITING_USER`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; F2 `CLOSED (build + cota estática)`; F3 `PASS_LIMITED` estático revalidado en `f58a5b5` para anchos ≥259 px.
+**Estado:** `WAITING_INDEPENDENT_F3`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; el propietario aprobó en preview la ubicación DOM final. F3 independiente aún debe revisar este diff.
 **Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente en F3.
-**Verifier requerido ahora:** no; F3 independiente revisó `f58a5b5`. Falta el walkthrough/DOM del propietario antes de cerrar la unidad.
+**Verifier requerido ahora:** sí; revalidar la ubicación ligada al asiento activo y la prevención de colisiones en móvil. Falta además el walkthrough/DOM del propietario antes de cerrar la unidad.
 **Pregunta de falsificación:** ¿alguna combinación de ancho/alto y jugadores deja espacio de flujo por los transforms, triggers estáticos bajo 1200 px, solapamiento con contenido o acceso perdido a un trigger?
 
 ## Estado de fases
 
 - F1 está documentada en `docs/plans/reference-panel-layout/report_issue_72_F1.md`. Reutiliza la medición desktop de #44 y evalúa aritméticamente las expresiones CSS por breakpoint. No hay navegador local ni rectángulos dinámicos <1200 px; no se afirman métricas de DOM para esos tamaños.
-- F2 mueve el `margin-top` del wrapper por ambos offsets y elimina el transform del hijo. En `f58a5b5`, `div.reference-panel__triggers` es hermano inmediato y posterior a `section.PlayerBoardSeat--observer`, dentro del ancla posicionada que comparte su geometría; así queda a la derecha de la fila y alineado abajo. El margen inferior reserva solo el exceso positivo del section y deja 12 px según la cota de una etiqueta de hasta dos líneas. El dock narrow adapta targets y mantiene foco visible dentro del botón; bajo 521 px se oculta solo el tooltip visual y el primer tooltip se limita al viewport hasta 600 px.
+- F2 conserva el ajuste de flujo del tablero y `.PlayerBoardSeatAnchor--observer`. `div.reference-panel__triggers` es hijo directo de `.PlayerBoardContainer`, después del ancla observer y justo antes de la última `section.PlayerBoardSeat`. Su coordenada se calcula con rectángulos del asiento activo y se limita al tablero; el CSS no usa `left: calc(100% + ...)`. El propietario aprobó esta estructura en el preview el 2026-10-03.
 
 ## Documentos fuente
 
@@ -36,6 +36,7 @@
 9. Preview del propietario pidió corregir el top de flujo del wrapper y mover el rail a la derecha de la fila propia, alineando abajo. El commit `dcef853` retira el transform del hijo, traslada margin-top por los offsets base/5p, ancla el panel dentro del asiento observer y reserva solo su desbordamiento vertical calculado.
 10. F3 independiente revisó `dcef853`: `PASS_LIMITED` estático para anchos ≥259 px con roles actuales es/en. No hubo browser/DOMRects; `scrollHeight` y el criterio ≤16 px quedaron pendientes del propietario.
 11. El propietario indicó colocar literalmente `div.reference-panel__triggers` debajo de `section.PlayerBoardSeat`. `f58a5b5` implementa ambos como hermanos inmediatos dentro del ancla del observer, con el div después del section. La nueva revisión F3 mantiene `PASS_LIMITED` estático desde 259 px; DOMRects, scrollHeight y walkthrough visual siguen pendientes. Evidencia: `docs/plans/reference-panel-layout/report_issue_72_F3_verifier.md`.
+12. El propietario reportó que la estructura aún no correspondía. Aclaró que el panel debe ser hijo directo de `.PlayerBoardContainer`, entre `.PlayerBoardSeatAnchor` y la última `section.PlayerBoardSeat`. Se restauró el ancla observer; el panel se inserta justo antes de la última sección y sigue midiendo/posicionándose respecto al asiento activo. El propietario aprobó el preview; F3 independiente del diff final sigue pendiente.
 
 ## Criterios de aceptación
 
@@ -45,7 +46,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 - F1: `docs/plans/reference-panel-layout/report_issue_72_F1.md` con geometría/causas por breakpoint.
 - F2: `docs/plans/reference-panel-layout/report_issue_72_F2.md`; build del cliente, `git diff --check`, visual walkthrough en 2, 3, 5 y 6 jugadores en desktop y móvil o límites reproducibles documentados.
-- F3: `docs/plans/reference-panel-layout/report_issue_72_F3_verifier.md` independiente sobre `f58a5b5`; resultado `PASS_LIMITED` estático, walkthrough del propietario pendiente.
+- F3: `docs/plans/reference-panel-layout/report_issue_72_F3_verifier.md`; el `PASS_LIMITED` en `f58a5b5` no cubre el DOM final. La aprobación visual/DOM del propietario ya se recibió; falta revalidación independiente de este diff.
 - No agregar ni ejecutar pruebas automatizadas. No declarar aprobación visual si solo hay revisión estática.
 
 ## Topología y commits
@@ -58,7 +59,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 ## Riesgos y bloqueo
 
-Riesgo medio: F3 estático no predice cruces desde 259 px con roles actuales, pero no certifica sombras, stacking, colisiones reales en 5/6p, Event Log/decisiones, tooltips con idiomas largos ni `scrollHeight` ≤16 px. El walkthrough/DOM del propietario sigue pendiente. Bajo 259 px el ancho mínimo de targets no conserva el margen estático; una etiqueta de más de dos líneas podría exceder el clearance.
+Riesgo medio: F3 estático no predice cruces desde 259 px con roles actuales, pero no certifica sombras, stacking, colisiones reales en 5/6p, Event Log/decisiones, tooltips con idiomas largos ni `scrollHeight` ≤16 px. El propietario aprobó la posición y el DOM del preview; la medición de scroll y la revalidación F3 independiente siguen pendientes. Bajo 259 px el ancho mínimo de targets no conserva el margen estático; una etiqueta de más de dos líneas podría exceder el clearance.
 
 ## Actualizaciones del ejecutor
 
