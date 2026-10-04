@@ -69,7 +69,12 @@ export default class ReferencePanel extends Component {
             && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         return (
-            <div className="reference-panel__triggers" role="group" aria-label={t('referencePanel.group.label')}>
+            <div
+                className="reference-panel__triggers"
+                role="group"
+                aria-label={t('referencePanel.group.label')}
+                style={this.props.style}
+            >
                 {references.map((reference) => {
                     const isOpen = openReference === reference.key;
                     const label = t(reference.labelKey);
