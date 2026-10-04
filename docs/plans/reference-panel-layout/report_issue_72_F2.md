@@ -1,6 +1,6 @@
 # Issue #72 — F2: caja de flujo y anclaje a cartas propias
 
-**Estado:** propietario aprobó en preview la estructura DOM final; build exit 0 y diff-check correctos; revalidación F3 independiente del diff actual pendiente.
+**Estado:** propietario aprobó en preview la estructura DOM final y dispensó F3 independiente para merge/cierre; build exit 0 y diff-check correctos. No se declara PASS F3 para el diff final.
 **Branch:** `issue/72-reference-panel-layout`
 **Base:** `origin/master@ce53c286155c054bc4c50defeb5ec19cc04fd5fb`
 
@@ -31,7 +31,7 @@ La revalidación F3 independiente de `f58a5b5` confirma estáticamente que `.Pla
 - `ReferencePanel.css` ya no usa `left: calc(100% + ...)`. Un layout effect mide los rectángulos del tablero, el asiento actual, los otros asientos, sus headers/cartas y Court. Prueba posiciones dentro del tablero con 12 px de borde, evita intersecciones con 4 px de separación de asientos y 8 px de Court, y selecciona la opción despejada más cercana al lateral/borde inferior del asiento activo.
 - El rail conserva el ancho `max-content` y las grillas responsive; ahora ese ancho no determina su coordenada x. El posicionador mantiene la caja del rail dentro del cuadrado del tablero para no generar scroll horizontal. Si no se encuentra ninguna caja libre, el fallback la mantiene dentro del tablero pero podría solaparse; la revisión estática independiente de esta nueva variante sigue pendiente.
 - `PlayerBoardLayout` conserva 12 px más el exceso positivo estimado del section observer, porque sus cartas/labels aún pueden sobresalir del cuadrado aunque el rail no lo haga.
-- El propietario aprobó el DOM/preview. No se guardaron mediciones de `scrollWidth` ni una matriz completa de jugadores/anchos; F3 independiente debe revisar el diff final antes de cerrar la unidad.
+- El propietario aprobó el DOM/preview y dispensó explícitamente una nueva revisión F3 al autorizar merge/cierre. No se guardaron mediciones de `scrollWidth` ni una matriz completa de jugadores/anchos; no se declara PASS F3 para el diff final.
 
 ## Validación
 

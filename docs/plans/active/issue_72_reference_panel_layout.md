@@ -4,9 +4,9 @@
 **PR canónica:** https://github.com/pronficilio/coup-online/pull/74 (OPEN, DRAFT; base `master`)
 **Plan:** `docs/plans/reference-panel-layout/plan_reference_panel_layout.md`
 **Bitácora:** `docs/plans/log/issue-72.jsonl`
-**Estado:** `WAITING_INDEPENDENT_F3`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; el propietario aprobó en preview la ubicación DOM final. F3 independiente aún debe revisar este diff.
-**Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL` independiente en F3.
-**Verifier requerido ahora:** sí; revalidar la ubicación ligada al asiento activo y la prevención de colisiones en móvil. Falta además el walkthrough/DOM del propietario antes de cerrar la unidad.
+**Estado:** `OWNER_APPROVED_COMPLETION`; F1 `CLOSED (PASS limitado a atribución estática + evidencia desktop previa)`; el propietario aprobó el preview y autorizó merge/cierre dispensando F3 independiente. F3 no se declara PASS.
+**Modo / riesgo / verificación:** `FULL` / `MEDIUM` / `FINAL`; F3 independiente dispensado explícitamente por el propietario para el merge/cierre.
+**Verifier requerido ahora:** no; el propietario aprobó el DOM del preview y autorizó cerrar sin veredicto F3 nuevo.
 **Pregunta de falsificación:** ¿alguna combinación de ancho/alto y jugadores deja espacio de flujo por los transforms, triggers estáticos bajo 1200 px, solapamiento con contenido o acceso perdido a un trigger?
 
 ## Estado de fases
@@ -46,7 +46,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 - F1: `docs/plans/reference-panel-layout/report_issue_72_F1.md` con geometría/causas por breakpoint.
 - F2: `docs/plans/reference-panel-layout/report_issue_72_F2.md`; build del cliente, `git diff --check`, visual walkthrough en 2, 3, 5 y 6 jugadores en desktop y móvil o límites reproducibles documentados.
-- F3: `docs/plans/reference-panel-layout/report_issue_72_F3_verifier.md`; el `PASS_LIMITED` en `f58a5b5` no cubre el DOM final. La aprobación visual/DOM del propietario ya se recibió; falta revalidación independiente de este diff.
+- F3: el `PASS_LIMITED` en `f58a5b5` no cubre el DOM final. El propietario dispensó explícitamente una nueva revisión independiente al autorizar merge/cierre; no se afirma PASS para el diff final.
 - No agregar ni ejecutar pruebas automatizadas. No declarar aprobación visual si solo hay revisión estática.
 
 ## Topología y commits
@@ -59,7 +59,7 @@ Los criterios completos están en el plan y en la issue #72. En particular: máx
 
 ## Riesgos y bloqueo
 
-Riesgo medio: F3 estático no predice cruces desde 259 px con roles actuales, pero no certifica sombras, stacking, colisiones reales en 5/6p, Event Log/decisiones, tooltips con idiomas largos ni `scrollHeight` ≤16 px. El propietario aprobó la posición y el DOM del preview; la medición de scroll y la revalidación F3 independiente siguen pendientes. Bajo 259 px el ancho mínimo de targets no conserva el margen estático; una etiqueta de más de dos líneas podría exceder el clearance.
+Riesgo medio: el propietario aprobó la posición y el DOM del preview y autorizó el merge/cierre sin F3 independiente nuevo. No se certifican sombras, stacking, colisiones reales en 5/6p, tooltips con idiomas largos ni `scrollHeight` ≤16 px; bajo 259 px el ancho mínimo de targets no conserva el margen estático y una etiqueta de más de dos líneas podría exceder el clearance. No se declara PASS F3 para el diff final.
 
 ## Actualizaciones del ejecutor
 
