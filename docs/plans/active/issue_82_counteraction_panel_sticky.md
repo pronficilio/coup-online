@@ -2,14 +2,15 @@
 
 **Issue:** [#82 — ajustar el título y la posición del panel de contraacciones](https://github.com/pronficilio/coup-online/issues/82), `OPEN`.
 **Plan:** `docs/plans/counteraction-panel-sticky/plan_counteraction_panel_sticky.md`.
-**Estado:** unidad `ACTIVE`; F1 `CLOSED`.
+**Estado:** unidad `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Verifier requerido ahora:** no.
 **Branch/worktree/merge target:** `issue/82-counteraction-panel-sticky` / `.worktrees/issue-82-counteraction-panel-sticky` / `master`.
+**PR:** [#83](https://github.com/pronficilio/coup-online/pull/83), `OPEN` y `MERGEABLE`.
 **Bitácora:** `docs/plans/log/issue-82.jsonl`.
-**Siguiente dueño:** Agente Alquimista (publicar branch y abrir PR).
+**Siguiente dueño:** Orquestador.
 
-## F1 cerrada — preparando la PR canónica
+## F1 cerrada — PR #83 abierta para revisión del Orquestador
 
 El claim se publicó y releyó en [la issue #82](https://github.com/pronficilio/coup-online/issues/82#issuecomment-5982324120); la issue sigue `OPEN`, sin reclamo incompatible ni PR candidata. La branch `issue/82-counteraction-panel-sticky` y el worktree `.worktrees/issue-82-counteraction-panel-sticky` se crearon desde `origin/master` en `02bcf3e` y se verificaron limpios.
 
@@ -21,10 +22,10 @@ El plan, el handoff y la bitácora están dentro del worktree, y el commit de co
 
 **Revisión visual:** no disponible en este entorno, que no tiene binario de navegador ni herramienta de preview local; no se declara PASS visual. La revisión estática confirmó el clamp desktop y las separaciones geométricas anteriores. El código/reglas específicos de móvil no cambiaron, pero no se comprobó visualmente en navegador.
 
-**Commit de cierre F1:** `fix(counteraction-panel): issue 82 F1 CLOSED ready_review`.
+**Commit de cierre F1:** [`986ccb2c226de1a058a971efa64489dc4db99db7`](https://github.com/pronficilio/coup-online/commit/986ccb2c226de1a058a971efa64489dc4db99db7), `fix(counteraction-panel): issue 82 F1 CLOSED ready_review`.
 
 **Pregunta de falsificación:** al desplazarse en escritorio con una decisión activa, ¿el rail sale del viewport o se solapa con el registro de eventos? ¿El layout móvil difiere del estado previo?
 
 ## Secuencia de integración
 
-Una branch `issue/82-counteraction-panel-sticky`, un worktree `.worktrees/issue-82-counteraction-panel-sticky` y una sola PR hacia `master` para #82. Tras abrir la PR, actualiza issue/plan/handoff/log a `WAITING_ORCHESTRATOR` con URL y número. No fusiones ni cierres la unidad.
+La PR canónica única es [#83](https://github.com/pronficilio/coup-online/pull/83) hacia `master`. La issue #82 permanece `OPEN`; no se fusionó ni cerró.

@@ -3,10 +3,10 @@
 ## Estado y clasificación
 
 - Unidad: [issue #82](https://github.com/pronficilio/coup-online/issues/82).
-- Estado: `ACTIVE`; F1 `CLOSED`.
+- Estado: `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
 - Modo / riesgo / verificación: `LIGHT` / `LOW` / `NONE`.
 - Razón: cambio pequeño y reversible de copy, CSS y posicionamiento del panel.
-- Siguiente dueño: Agente Alquimista (publicar branch y abrir PR).
+- Siguiente dueño: Orquestador.
 
 ## Solicitud y objetivo
 
@@ -53,5 +53,5 @@ Al desplazarse en escritorio durante una decisión activa, ¿el rail desaparece 
 - Target: `master` de `pronficilio/coup-online`.
 - Handoff: `docs/plans/active/issue_82_counteraction_panel_sticky.md`.
 - Bitácora append-only: `docs/plans/log/issue-82.jsonl`.
-- Se espera una sola PR hacia `master`.
+- PR única: [#83](https://github.com/pronficilio/coup-online/pull/83), `OPEN`, base `master`.
 - La revisión visual manual no estuvo disponible: este entorno no tiene navegador ni preview local accesible; no se declara PASS visual.
