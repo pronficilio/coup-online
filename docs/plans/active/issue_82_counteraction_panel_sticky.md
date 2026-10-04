@@ -2,16 +2,16 @@
 
 **Issue:** [#82 — ajustar el título y la posición del panel de contraacciones](https://github.com/pronficilio/coup-online/issues/82), `OPEN`.
 **Plan:** `docs/plans/counteraction-panel-sticky/plan_counteraction_panel_sticky.md`.
-**Estado:** unidad `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
+**Estado:** unidad `WAITING_USER`; F1 `CLOSED`.
 **Modo / riesgo / verificación:** `LIGHT` / `LOW` / `NONE`.
 **Verifier requerido ahora:** no.
 **Branch/worktree/merge target:** `issue/82-counteraction-panel-sticky` / `.worktrees/issue-82-counteraction-panel-sticky` / `master`.
 **PR:** [#83](https://github.com/pronficilio/coup-online/pull/83), `OPEN` y `MERGEABLE`.
 **Tracker:** [comentario de cierre F1 y entrega al Orquestador](https://github.com/pronficilio/coup-online/issues/82#issuecomment-5982604168).
 **Bitácora:** `docs/plans/log/issue-82.jsonl`.
-**Siguiente dueño:** Orquestador.
+**Siguiente dueño:** Propietario, para autorizar o rechazar la integración de la PR #83.
 
-## F1 cerrada — PR #83 abierta para revisión del Orquestador
+## F1 cerrada — revisión del Orquestador PASS; merge pendiente de autorización
 
 El claim se publicó y releyó en [la issue #82](https://github.com/pronficilio/coup-online/issues/82#issuecomment-5982324120); la issue sigue `OPEN`, sin reclamo incompatible ni PR candidata. La branch `issue/82-counteraction-panel-sticky` y el worktree `.worktrees/issue-82-counteraction-panel-sticky` se crearon desde `origin/master` en `02bcf3e` y se verificaron limpios.
 
@@ -26,6 +26,13 @@ El plan, el handoff y la bitácora están dentro del worktree, y el commit de co
 **Commit de cierre F1:** [`986ccb2c226de1a058a971efa64489dc4db99db7`](https://github.com/pronficilio/coup-online/commit/986ccb2c226de1a058a971efa64489dc4db99db7), `fix(counteraction-panel): issue 82 F1 CLOSED ready_review`.
 
 **Pregunta de falsificación:** al desplazarse en escritorio con una decisión activa, ¿el rail sale del viewport o se solapa con el registro de eventos? ¿El layout móvil difiere del estado previo?
+
+## Revisión del Orquestador
+
+- Veredicto de integración: `PASS` para el diff revisado y sus criterios estáticos. La PR corresponde a #82, usa el branch canónico y apunta a `master`; GitHub la reporta `MERGEABLE` y no muestra checks configurados.
+- Falsificación: el ancla se limita a `top >= 15px`; los anchos 721–1023 y 1024–1100 dejan 15 px respecto de `.EventLogPanel`, y desde 1101 px el ancho máximo de 620 px conserva esa separación. La rama móvil no cambia sus reglas ni su cálculo de coordenadas.
+- Límites: el build pasó con warnings preexistentes; no se añadieron ni ejecutaron pruebas automatizadas. Sin navegador/preview no se declara aprobación visual.
+- Estado: `WAITING_USER` hasta recibir autorización explícita para fusionar la PR #83. La issue permanece abierta.
 
 ## Secuencia de integración
 

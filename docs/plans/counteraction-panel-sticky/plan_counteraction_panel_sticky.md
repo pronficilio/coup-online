@@ -3,10 +3,10 @@
 ## Estado y clasificación
 
 - Unidad: [issue #82](https://github.com/pronficilio/coup-online/issues/82).
-- Estado: `WAITING_ORCHESTRATOR`; F1 `CLOSED`.
+- Estado: `WAITING_USER`; F1 `CLOSED`.
 - Modo / riesgo / verificación: `LIGHT` / `LOW` / `NONE`.
 - Razón: cambio pequeño y reversible de copy, CSS y posicionamiento del panel.
-- Siguiente dueño: Orquestador.
+- Siguiente dueño: Propietario, para autorizar o rechazar la integración de la PR #83.
 
 ## Solicitud y objetivo
 
@@ -55,3 +55,4 @@ Al desplazarse en escritorio durante una decisión activa, ¿el rail desaparece 
 - Bitácora append-only: `docs/plans/log/issue-82.jsonl`.
 - PR única: [#83](https://github.com/pronficilio/coup-online/pull/83), `OPEN`, base `master`.
 - La revisión visual manual no estuvo disponible: este entorno no tiene navegador ni preview local accesible; no se declara PASS visual.
+- El Orquestador revisó el diff, la topología, la evidencia de build y la geometría estática: `PASS` para integrar. La PR #83 está `MERGEABLE`; la unidad espera autorización explícita del propietario antes de fusionar.
