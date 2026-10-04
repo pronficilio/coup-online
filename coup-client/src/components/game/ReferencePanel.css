@@ -1,12 +1,18 @@
 .reference-panel__triggers {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
-    gap: 10px;
-    position: fixed;
+    gap: 8px;
+    position: absolute;
     z-index: 30;
-    right: 22px;
-    bottom: 20px;
+    top: 12px;
+    left: 12px;
+    right: auto;
+    bottom: auto;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    box-sizing: border-box;
+    margin: 0;
 }
 
 .reference-panel__trigger,
@@ -25,6 +31,7 @@
 .reference-panel__trigger {
     position: relative;
     display: inline-flex;
+    box-sizing: border-box;
     width: 52px;
     height: 52px;
     min-width: 48px;
@@ -88,11 +95,85 @@
     outline-offset: 2px;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 520px) {
     .reference-panel__triggers {
-        position: static;
-        width: max-content;
-        margin: 8px 12px 12px auto;
+        display: grid;
+        grid-template-columns: repeat(2, 52px);
+        gap: 10px;
+    }
+}
+
+@media (min-width: 361px) and (max-width: 438px) {
+    .reference-panel__triggers {
+        --reference-panel-side-gap: 8px;
+        grid-template-columns: repeat(2, 44px);
+        gap: 2px;
+    }
+
+    .reference-panel__trigger {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 360px) {
+    .reference-panel__triggers {
+        --reference-panel-compact-trigger-size: clamp(28px, calc(25vw - 36.75px), 44px);
+        grid-template-columns: repeat(2, var(--reference-panel-compact-trigger-size));
+        gap: 2px;
+    }
+
+    .reference-panel__trigger {
+        width: var(--reference-panel-compact-trigger-size);
+        height: var(--reference-panel-compact-trigger-size);
+        min-width: var(--reference-panel-compact-trigger-size);
+        min-height: var(--reference-panel-compact-trigger-size);
+    }
+
+    .reference-panel__icon {
+        width: min(25px, calc(var(--reference-panel-compact-trigger-size) - 6px));
+        height: min(25px, calc(var(--reference-panel-compact-trigger-size) - 6px));
+    }
+}
+
+@media (min-width: 521px) and (max-width: 531px) {
+    .reference-panel__triggers {
+        gap: 8px;
+    }
+
+    .reference-panel__trigger {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+    }
+}
+
+@media (max-width: 600px) {
+    .reference-panel__trigger:first-child .reference-panel__tooltip {
+        left: 0;
+        right: auto;
+        max-width: calc(100vw - 12px);
+        box-sizing: border-box;
+        white-space: normal;
+        transform: translate(0, 3px);
+    }
+
+    .reference-panel__trigger:first-child:hover .reference-panel__tooltip,
+    .reference-panel__trigger:first-child:focus-visible .reference-panel__tooltip {
+        transform: translate(0, 0);
+    }
+
+    .reference-panel__trigger:focus-visible {
+        outline-offset: -3px;
+    }
+}
+
+@media (max-width: 520px) {
+    .reference-panel__tooltip {
+        display: none;
     }
 }
 
