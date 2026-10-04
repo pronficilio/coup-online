@@ -1,6 +1,6 @@
 # Coup Online
 
-This project is an online port of the card game Coup. It is currently hosted at [here](https://www.chickenkoup.com/).
+This project is an online port of the card game Coup. Try the current version at [coup.ejele.net](https://coup.ejele.net); the original project is at [chickenkoup.com](https://www.chickenkoup.com/).
 
 Perfect to play with friends during quarantine c:
 ## About the project
@@ -39,6 +39,10 @@ In the client, there is an event log showing all players the last 4 actions to h
 ### Garbage Collection
 
 A script is run to destroy game instances that have 0 connections.
+
+### Temporary Codex AI players
+
+This branch includes an experimental, temporary integration that adds GPT-6 Luna seats through a separately isolated Codex runner. See the [setup and operations guide](docs/codex-ai-players/README.md) before enabling it; Codex App Server is experimental and this POC is not a production service.
 
 
 ### Chicken Drumstick Emoji

@@ -1,438 +1,1354 @@
 const gameUtils = require('./utils')
-const constants = require("../utilities/constants");
+const constants = require('../utilities/constants')
+const crypto = require('node:crypto')
+const { RULESET_VERSION, projectPublicEvent } = require('../ai/codex-protocol')
+const { actionLabel } = require('../i18n')
 
-class CoupGame{
+const EFFORTS = new Set(['low', 'medium', 'high'])
+const ACTION_COSTS = { coup: 7, assassinate: 3 }
 
-    constructor(players, gameSocket) {
-        this.nameSocketMap = gameUtils.buildNameSocketMap(players);
-        this.nameIndexMap = gameUtils.buildNameIndexMap(players);
-        this.players = gameUtils.buildPlayers(players);
-        this.gameSocket = gameSocket;
-        this.currentPlayer = 0;
-        this.deck = gameUtils.buildDeck();
-        this.winner = '';
-        this.actions = constants.Actions;
-        this.counterActions = constants.CounterActions;
-        this.isChallengeBlockOpen = false; // if listening for challeng or block votes
-        this.isRevealOpen = false; // if listening for what influence player will reveal
-        this.isChooseInfluenceOpen = false; // if listening for what influence to lose
-        this.isExchangeOpen = false; // if listening for result of ambassador exchange;
-        this.votes = 0;
+const ROLE_BY_ACTION = {
+    tax: constants.CardNames.DUKE,
+    assassinate: constants.CardNames.ASSASSIN,
+    exchange: constants.CardNames.AMBASSADOR,
+    steal: constants.CardNames.CAPTAIN
+}
+
+const BLOCKS = {
+    foreign_aid: [{ id: 'duke', role: constants.CardNames.DUKE }],
+    assassinate: [{ id: 'contessa', role: constants.CardNames.CONTESSA }],
+    steal: [
+        { id: 'ambassador', role: constants.CardNames.AMBASSADOR },
+        { id: 'captain', role: constants.CardNames.CAPTAIN }
+    ]
+}
+
+const DEFAULT_TIMEOUT_MS = 120000
+
+const EVENT_TYPES = new Set([
+    'action_declared', 'action_result', 'challenge_started', 'block_declared',
+    'block_challenge_started', 'claim_proved', 'claim_not_proved',
+    'influence_lost', 'player_eliminated'
+])
+
+const REACTION_OPTIONS = Object.freeze({
+    support: Object.freeze(['like', 'bravo', 'laugh', 'skeptical']),
+    aggressive: Object.freeze(['surprise', 'thinking', 'dislike', 'secret']),
+    challenge: Object.freeze(['thinking', 'skeptical', 'surprise', 'bravo']),
+    block: Object.freeze(['like', 'bravo', 'skeptical', 'surprise']),
+    proved: Object.freeze(['bravo', 'surprise', 'secret', 'like']),
+    failed: Object.freeze(['surprise', 'laugh', 'skeptical', 'dislike']),
+    loss: Object.freeze(['surprise', 'dislike', 'thinking']),
+    exchange: Object.freeze(['thinking', 'secret', 'like']),
+    blocked: Object.freeze(['like', 'bravo', 'skeptical', 'surprise']),
+    emptySteal: Object.freeze(['surprise', 'thinking', 'skeptical', 'dislike'])
+})
+
+function reactionsForEvent(event) {
+    const { type, data = {} } = event
+    if (type === 'action_declared') {
+        if (data.action === 'exchange') return REACTION_OPTIONS.exchange
+        if (data.action === 'coup' || data.action === 'assassinate') return REACTION_OPTIONS.aggressive
+        return REACTION_OPTIONS.support
     }
-
-    resetGame(startingPlayer = 0) {
-        this.currentPlayer = startingPlayer;
-        this.isChallengeBlockOpen = false;
-        this.isRevealOpen = false;
-        this.isChooseInfluenceOpen = false;
-        this.isExchangeOpen = false;
-        this.aliveCount = this.players.length;
-        this.votes = 0;
-        this.deck = gameUtils.buildDeck();
-        for(let i = 0; i < this.players.length; i++) {
-            this.players[i].money = 2;
-            this.players[i].influences = [this.deck.pop(), this.deck.pop()];
-            this.players[i].isDead = false;
-        }
+    if (type === 'action_result') {
+        if (data.action === 'exchange') return REACTION_OPTIONS.exchange
+        if (data.result === 'blocked') return REACTION_OPTIONS.blocked
+        if (data.action === 'steal' && data.amount === 0) return REACTION_OPTIONS.emptySteal
+        return REACTION_OPTIONS.support
     }
+    if (type === 'challenge_started' || type === 'block_challenge_started') return REACTION_OPTIONS.challenge
+    if (type === 'block_declared') return REACTION_OPTIONS.block
+    if (type === 'claim_proved') return REACTION_OPTIONS.proved
+    if (type === 'claim_not_proved') return REACTION_OPTIONS.failed
+    if (type === 'influence_lost' || type === 'player_eliminated') return REACTION_OPTIONS.loss
+    return []
+}
 
-    listen() {
-
-        this.players.map(x => {
-            const socket = this.gameSocket.sockets[x.socketID];
-            let bind = this
-            socket.on('g-playAgain', () => {
-                if(bind.isPlayAgainOpen){
-                    bind.isPlayAgainOpen = false;
-                    this.resetGame(Math.floor(Math.random() * (this.players.length)));
-                    this.updatePlayers();
-                    this.playTurn() 
-                }
-            })
-            socket.on('g-deductCoins', (res) => {
-                //res.amount res.source
-                console.log('deducting ' + res.amount + ' coins from ' + res.source )
-                const sourceIndex = bind.nameIndexMap[res.source];
-                bind.players[sourceIndex].money -= res.amount;
-                bind.updatePlayers();
-
-            })
-            socket.on('g-actionDecision', (res) => {
-                console.log(108, res)
-                // res.action.target, res.action.action, res.action.source
-                // console.log(bind.actions, res.action.action)
-                if(bind.actions[res.action.action].isChallengeable) {
-                    bind.openChallenge(res.action, (bind.actions[res.action.action].blockableBy.length > 0))
-                } else if(res.action.action == 'foreign_aid') {
-                    bind.isChallengeBlockOpen = true;
-                    bind.gameSocket.emit("g-openBlock", res.action);
-                } else {
-                    bind.applyAction(res.action)
-                }
-            })
-            socket.on('g-challengeDecision', (res) => {
-                console.log(120, res)
-                // res.action.action, res.action.target, res.action.source, res.challengee, res.challenger, res.isChallenging
-                if(bind.isChallengeBlockOpen) {
-                    if(res.isChallenging) {
-                        bind.closeChallenge();
-                        //TODO reveal
-                        // reveal(action, counterAction, challengee, challenger, isBlock)
-                        bind.gameSocket.emit("g-addLog", `${res.challenger} challenged ${res.challengee}`)
-                        bind.reveal(res.action, null, res.challengee, res.challenger, false);
-                    } else if(bind.votes+1 == bind.aliveCount-1) {
-                        //then it is a pass
-                        bind.closeChallenge();
-                        bind.applyAction(res.action);
-                    } else {
-                        bind.votes += 1;
-                    }
-                }
-            });
-            socket.on('g-blockChallengeDecision', (res) => {
-                console.log(137, res)
-                // res.counterAction, res.prevAction, res.challengee, res.challenger, res.isChallenging
-                if(bind.isChallengeBlockOpen) {
-                    if(res.isChallenging) {
-                        bind.closeChallenge();
-                        bind.gameSocket.emit("g-addLog", `${res.challenger} challenged ${res.challengee}'s block`)
-                        bind.reveal(res.prevAction, res.counterAction, res.challengee, res.challenger, true);
-                    } else if(bind.votes+1 == bind.aliveCount-1) {
-                        //then it is a pass
-                        bind.closeChallenge();
-                        bind.nextTurn();
-                    } else {
-                        bind.votes += 1;
-                    }
-                }
-            });
-            socket.on('g-blockDecision', (res) => {
-                console.log(154, res)
-                // res.prevAction.action, res.prevAction.target, res.prevAction.source, res.counterAction, res.blockee, res.blocker, res.isBlocking
-                if(bind.isChallengeBlockOpen) {
-                    if(res.isBlocking) {
-                        bind.closeChallenge();
-                        bind.gameSocket.emit("g-addLog", `${res.blocker} blocked ${res.blockee}`)
-                        bind.openBlockChallenge(res.counterAction, res.blockee, res.prevAction);
-                    } else if(bind.votes+1 == bind.aliveCount-1) {
-                        //then it is a pass
-                        bind.closeChallenge();
-                        bind.applyAction(res.action);
-                    } else {
-                        bind.votes += 1;
-                    }
-                }
-            });
-            socket.on('g-revealDecision', (res) => {
-                console.log(171, res)
-                console.log(res.isBlock)
-                //if isBlock, prevaction should contain the prev action
-                //if isBlock is false, prevaction is action
-                // res.revealedCard, prevaction, counterAction, challengee, challenger, isBlock
-                const challengeeIndex = bind.nameIndexMap[res.challengee];
-                const challengerIndex = bind.nameIndexMap[res.challenger];
-                if(bind.isRevealOpen) {
-                    bind.isRevealOpen = false;
-                    if(res.isBlock) { //block challenge (for example, a captain blocking a steal or a contessa blocking an assasinate)
-                        if(res.revealedCard == res.counterAction.claim || (res.counterAction.counterAction == 'block_steal' && (res.revealedCard == 'ambassador' || res.revealedCard =='captain'))) { //challenge failed
-                            bind.gameSocket.emit("g-addLog", `${res.challenger}'s challenge on ${res.challengee}'s block failed`)
-                            for(let i = 0; i < bind.players[challengeeIndex].influences.length; i++) { //revealed card needs to be replaced
-                                if(bind.players[challengeeIndex].influences[i] == res.revealedCard) {
-                                    bind.deck.push(bind.players[challengeeIndex].influences[i]);
-                                    bind.deck = gameUtils.shuffleArray(bind.deck);
-                                    bind.players[challengeeIndex].influences.splice(i,1);
-                                    bind.players[challengeeIndex].influences.push(bind.deck.pop());
-                                    break;
-                                }
-                            }
-                            bind.updatePlayers();
-                            bind.isChooseInfluenceOpen = true;
-                            bind.gameSocket.to(bind.nameSocketMap[res.challenger]).emit('g-chooseInfluence');
-                            bind.nextTurn();
-                        } else { //challenge succeeded
-                            bind.gameSocket.emit("g-addLog", `${res.challenger}'s challenge on ${res.challengee}'s block succeeded`)
-                            bind.gameSocket.emit("g-addLog", `${res.challengee} lost their ${res.revealedCard}`)
-                            for(let i = 0; i < bind.players[challengeeIndex].influences.length; i++) {
-                                if(bind.players[challengeeIndex].influences[i] == res.revealedCard) {
-                                    bind.deck.push(bind.players[challengeeIndex].influences[i]);
-                                    bind.deck = gameUtils.shuffleArray(bind.deck);
-                                    bind.players[challengeeIndex].influences.splice(i,1);
-                                    break;
-                                }
-                            }
-                            console.log(res.prevAction)
-                            bind.applyAction(res.prevAction);
-                        }
-                    } else { //normal challenge
-                        if(res.revealedCard == bind.actions[res.prevAction.action].influence) { // challenge failed
-                            console.log("CHALLENGE: " + res.revealedCard + " " + bind.actions[res.prevAction.action].influence);
-                            bind.gameSocket.emit("g-addLog", `${res.challenger}'s challenge on ${res.challengee} failed`)
-                            for(let i = 0; i < bind.players[challengeeIndex].influences.length; i++) { //revealed card needs to be replaced
-                                if(bind.players[challengeeIndex].influences[i] == res.revealedCard) {
-                                    bind.deck.push(bind.players[challengeeIndex].influences[i]);
-                                    bind.deck = gameUtils.shuffleArray(bind.deck);
-                                    bind.players[challengeeIndex].influences.splice(i,1);
-                                    bind.players[challengeeIndex].influences.push(bind.deck.pop());
-                                    break;
-                                }
-                            }
-
-                            if (res.revealedCard == 'assassin' && res.prevAction.target == res.challenger 
-                                && bind.players[challengerIndex].influences.length == 2) {
-                                bind.deck.push(bind.players[challengeeIndex].influences[0]);
-                                bind.deck = gameUtils.shuffleArray(bind.deck);
-                                bind.players[challengerIndex].influences.splice(0, 1);
-                            }
-                            bind.updatePlayers();
-                            bind.isChooseInfluenceOpen = true;
-                            bind.gameSocket.to(bind.nameSocketMap[res.challenger]).emit('g-chooseInfluence');
-                            bind.applyAction(res.prevAction);
-                        } else { // challenge succeeded
-                            bind.gameSocket.emit("g-addLog", `${res.challenger}'s challenge on ${res.challengee} succeeded`)
-                            bind.gameSocket.emit("g-addLog", `${res.challengee} lost their ${res.revealedCard}`)
-                            for(let i = 0; i < bind.players[challengeeIndex].influences.length; i++) { // 
-                                if(bind.players[challengeeIndex].influences[i] == res.revealedCard) {
-                                    bind.deck.push(bind.players[challengeeIndex].influences[i]);
-                                    bind.deck = gameUtils.shuffleArray(bind.deck);
-                                    bind.players[challengeeIndex].influences.splice(i,1);
-                                    break;
-                                }
-                            }
-                            bind.nextTurn();
-                        }
-                    }
-                }
-            });
-            socket.on('g-chooseInfluenceDecision', (res) => {
-                console.log(211, res)
-                // res.influence, res.playerName
-                const playerIndex = bind.nameIndexMap[res.playerName];
-                if(bind.isChooseInfluenceOpen) {
-                    bind.gameSocket.emit("g-addLog", `${res.playerName} lost their ${res.influence}`)
-                    for(let i = 0; i < bind.players[playerIndex].influences.length; i++) {
-                        if(bind.players[playerIndex].influences[i] == res.influence) {
-                            bind.deck.push(bind.players[playerIndex].influences[i]);
-                            bind.deck = gameUtils.shuffleArray(bind.deck);
-                            bind.players[playerIndex].influences.splice(i,1);
-                            break;
-                        }
-                    }
-                    bind.isChooseInfluenceOpen = false;
-                    bind.nextTurn();
-                }
-            })
-            socket.on('g-chooseExchangeDecision', (res) => {
-                console.log(228, res)
-                // res.playerName, res.kept, res.putBack = ["influence","influence"]
-                const playerIndex = bind.nameIndexMap[res.playerName];
-                if(bind.isExchangeOpen) {
-                    bind.players[playerIndex].influences = res.kept;
-                    bind.deck.push(res.putBack[0]);
-                    bind.deck.push(res.putBack[1]);
-                    bind.deck = gameUtils.shuffleArray(bind.deck);
-                    bind.isExchangeOpen = false;
-                    bind.nextTurn();
-                }
-            })
-        })
+function cloneLogEvent(event) {
+    return {
+        ...event,
+        data: { ...event.data },
+        translation: { key: event.translation.key, params: { ...event.translation.params } },
+        reactions: event.reactions.slice()
     }
+}
 
-    updatePlayers() {// when players die
-        this.gameSocket.emit('g-updatePlayers', gameUtils.exportPlayers(JSON.parse(JSON.stringify(this.players))));
-    }
+function decisionTimeoutFromEnv() {
+    const value = Number(process.env.DECISION_TIMEOUT_MS)
+    return Number.isFinite(value) && value > 0 ? value : DEFAULT_TIMEOUT_MS
+}
 
-    reveal(action, counterAction, challengee, challenger, isBlock) {
-        //if isBlock, action should contain the prev action
-        //if isBlock is false, counterAction is null and action is the action being challenged
-        const res = {
-            action: action,
-            counterAction: counterAction,
-            challengee: challengee,
-            challenger: challenger,
-            isBlock: isBlock
-        }
-        console.log(258, res)
-        console.log(this.nameSocketMap)
-        console.log(challengee)
-        this.isRevealOpen = true;
-        this.gameSocket.to(this.nameSocketMap[res.challengee]).emit("g-chooseReveal", res);
-    }
-
-    closeChallenge() {
-        this.isChallengeBlockOpen = false;
-        this.votes = 0;
-        this.gameSocket.emit("g-closeChallenge");
-        this.gameSocket.emit("g-closeBlock");
-        this.gameSocket.emit("g-closeBlockChallenge");
-    }
-
-    openChallenge(action, isBlockable) {
-        console.log(264, action)
-        this.isChallengeBlockOpen = true;
-        if(isBlockable && action.target != null) {
-            let targetIndex = 0;
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == action.target) {
-                    targetIndex = i;
-                    break;
-                }
-            }
-            console.log(this.players[targetIndex].socketID)
-            this.gameSocket.to(this.players[targetIndex].socketID).emit("g-openBlock", action);
-        }
-        this.gameSocket.emit("g-openChallenge", action);
-    }
-
-    openBlockChallenge(counterAction, blockee, prevAction) {
-        //blockClaim is the character that the blockee claims to be blocking with
-        this.isChallengeBlockOpen = true;
-        this.gameSocket.emit("g-openBlockChallenge", {
-            counterAction: counterAction,
-            prevAction: prevAction
-        });
-    }
-
-    applyAction(action) {
-        console.log(this.players)
-        console.log(action)
-        let logTarget = '';
-
-        if(action.target) {
-            logTarget = ` on ${action.target}`;
-        }
-        this.gameSocket.emit("g-addLog", `${action.source} used ${action.action}${logTarget}`)
-        const execute = action.action;
-        const target = action.target;
-        const source = action.source;
-        if(execute == 'income') {
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == source) {
-                    this.players[i].money+=1;
-                    break;
-                }
-            }
-            this.nextTurn();
-        }else if(execute == 'foreign_aid') {
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == source) {
-                    this.players[i].money+=2;
-                    break;
-                }
-            }
-            this.nextTurn();
-        }else if(execute == 'coup') {
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == target) {
-                    this.isChooseInfluenceOpen = true;
-                    this.gameSocket.to(this.nameSocketMap[target]).emit('g-chooseInfluence');
-                    break;
-                }
-            }
-            // no nextTurn() because it is called in "on chooseInfleunceDecision"
-        }else if(execute == 'tax') {
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == source) {
-                    this.players[i].money+=3;
-                    break;
-                }
-            }
-            this.nextTurn();
-        }else if(execute == 'assassinate') {
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == target) {
-                    this.isChooseInfluenceOpen = true;
-                    this.gameSocket.to(this.nameSocketMap[target]).emit('g-chooseInfluence');
-                    break;
-                }
-            }
-            // no nextTurn() because it is called in "on chooseInfleunceDecision"
-        }else if(execute == 'exchange') {
-            const drawTwo = [this.deck.pop(), this.deck.pop()]
-            this.isExchangeOpen = true;
-            this.gameSocket.to(this.nameSocketMap[source]).emit('g-openExchange', drawTwo);
-             // no nextTurn() because it is called in "on chooseExchangeDecision"
-        }else if(execute == 'steal') {
-            let stolen = 0;
-            for(let i = 0; i < this.players.length; i++) {
-                console.log(348, this.players[i].name, target)
-                if(this.players[i].name == target) {
-                    if(this.players[i].money >= 2) {
-                        this.players[i].money-=2;
-                        stolen = 2;
-                    }else if(this.players[i].money == 1) {
-                        this.players[i].money-=1;
-                        stolen = 1;
-                    }else{//no money stolen
-
-                    }
-                    break;
-                }
-            }
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].name == source) {
-                    this.players[i].money+= stolen;
-                    break;
-                }
-            }
-            this.nextTurn();
-        }else {
-            console.log('ERROR ACTION NOT FOUND');
-        }
-        
-    }
-
-    nextTurn() {
-        console.log(!this.isChallengeBlockOpen, !this.isChooseInfluenceOpen, !this.isExchangeOpen, !this.isRevealOpen)
-        if(!this.isChallengeBlockOpen && !this.isChooseInfluenceOpen && !this.isExchangeOpen && !this.isRevealOpen){
-        this.players.forEach(x => {
-            console.log(x.influences)
-            if(x.influences.length == 0 && !x.isDead) {// player is dead
-                this.gameSocket.emit("g-addLog", `${x.name} is out!`)
-                this.aliveCount-=1;
-                x.isDead = true;
-                x.money = 0;
-            }
-        });
-        this.updatePlayers();
-        if(this.aliveCount == 1) {
-            let winner = null
-            for(let i = 0; i < this.players.length; i++) {
-                if(this.players[i].influences.length > 0) {
-                    winner = this.players[i].name; 
-                }
-            }
-            this.isPlayAgainOpen = true;
-            this.gameSocket.emit('g-gameOver', winner);
-            //GAME END
-        } else {
-            do {
-                this.currentPlayer+=1;
-                this.currentPlayer%=this.players.length;
-            } while(this.players[this.currentPlayer].isDead == true);
-            this.playTurn();
-        }
-      }
-    }
-
-    playTurn() {
-        this.gameSocket.emit("g-updateCurrentPlayer", this.players[this.currentPlayer].name);
-        console.log(this.players[this.currentPlayer].socketID)
-        this.gameSocket.to(this.players[this.currentPlayer].socketID).emit('g-chooseAction');
-    }
-
-    onChooseAction(action) {
-        console.log('action', action)
+class CoupGame {
+    constructor(players, gameSocket, options = {}) {
+        this.gameSocket = gameSocket
+        this.rng = typeof options.rng === 'function' ? options.rng : Math.random
+        this.decisionTimeoutMs = Number.isFinite(options.decisionTimeoutMs) && options.decisionTimeoutMs > 0
+            ? options.decisionTimeoutMs
+            : decisionTimeoutFromEnv()
+        this.codexClient = options.codexClient || null
+        this.isCodexDisabled = typeof options.isCodexDisabled === 'function' ? options.isCodexDisabled : () => false
+        this.spectatorSocketIDs = Array.isArray(options.spectatorSocketIDs) ? options.spectatorSocketIDs.slice() : []
+        const colors = ['#73C373', '#7AB8D3', '#DD6C75', '#8C6CE6', '#EA9158', '#CB8F8F']
+        this.players = players.map((player, index) => ({
+            seat: index,
+            name: String(player.name || '').trim(),
+            controller: player.controller === 'codex' ? 'codex' : 'human',
+            effort: EFFORTS.has(player.effort) ? player.effort : 'medium',
+            socketID: player.controller === 'codex' ? null : player.socketID,
+            money: 0,
+            influences: [],
+            revealedInfluences: [],
+            isDead: false,
+            color: colors[index % colors.length]
+        }))
+        this.leaderSocketID = options.leaderSocketID || (this.players.length ? this.players[0].socketID : null)
+        this.currentPlayer = 0
+        this.deck = []
+        this.gameNumber = 0
+        this.decisionSerial = 0
+        this.stateVersion = 0
+        this.activeDecision = null
+        this.decisionTimer = null
+        this.codexRequests = new Map()
+        this.publicHistory = []
+        this.publicLogEvents = []
+        this.logEventsByID = new Map()
+        this.reactionsByEvent = new Map()
+        this.reactionRequestsBySeat = new Map()
+        this.reactionPresenceBySeat = new Map()
+        this.logEventSerial = 0
+        this.turnNumber = 0
+        this.matchID = crypto.randomBytes(16).toString('hex')
+        this.phase = 'lobby'
+        this.previousWinner = null
+        this.winner = null
+        this.currentAction = null
     }
 
     start() {
-        this.resetGame();
-        this.listen();
-        this.updatePlayers();
-        console.log('Game has started');
+        if (this.phase !== 'lobby') return false
+        if (this.players.length < 2 || this.players.length > 6) return false
+        const connectedHumanIDs = this.players.filter(player => player.controller === 'human').map(player => player.socketID)
+        const connectedIDs = new Set([...connectedHumanIDs, ...this.spectatorSocketIDs].filter(Boolean))
+        connectedIDs.forEach(socketID => {
+            const socket = this.gameSocket.sockets && this.gameSocket.sockets[socketID]
+            if (!socket) return
+            if (this.seatForSocket(socketID) >= 0) {
+                socket.on('g-submitDecision', envelope => this.submitDecision(socketID, envelope))
+                socket.on('disconnect', () => this.onDisconnect(socketID))
+            }
+            socket.on('g-reactToEvent', payload => this.reactToEvent(socketID, payload))
+            socket.on('g-requestEventLogState', payload => this.requestEventLogState(socketID, payload))
+            socket.on('g-playAgain', payload => this.playAgain(socketID, payload))
+            socket.on('g-resume', payload => this.resume(socketID, payload))
+        })
+        this.resetGame()
+        this.phase = 'running'
+        const disconnected = this.players.find(player => player.controller === 'human'
+            && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
+        if (disconnected) {
+            this.dissolve(disconnected.name)
+            return false
+        }
+        this.updatePlayers()
+        this.emitEventLogStateToAll()
         this.playTurn()
-        //deal cards to each player
+        return true
     }
-    
+
+    resetGame() {
+        this.clearDecisionTimer()
+        this.activeDecision = null
+        this.pausedDecision = null
+        this.gameNumber += 1
+        this.stateVersion += 1
+        this.phase = 'running'
+        this.winner = null
+        this.currentAction = null
+        this.publicHistory = []
+        this.publicLogEvents = []
+        this.logEventsByID.clear()
+        this.reactionsByEvent.clear()
+        this.reactionRequestsBySeat.clear()
+        this.reactionPresenceBySeat.clear()
+        this.logEventSerial = 0
+        this.turnNumber = 0
+        this.matchID = crypto.randomBytes(16).toString('hex')
+        this.deck = gameUtils.buildDeck(this.rng)
+
+        if (Number.isInteger(this.previousWinner) && this.previousWinner >= 0 && this.previousWinner < this.players.length) {
+            this.currentPlayer = this.previousWinner
+        } else {
+            this.currentPlayer = Math.floor(this.rng() * this.players.length)
+        }
+
+        this.players.forEach(player => {
+            player.money = 2
+            player.influences = [this.deck.pop(), this.deck.pop()]
+            player.revealedInfluences = []
+            player.isDead = false
+        })
+        if (this.players.length === 2) {
+            this.players[this.currentPlayer].money = 1
+        }
+    }
+
+    socketEmit(socketID, event, payload) {
+        if (this.gameSocket && typeof this.gameSocket.to === 'function') {
+            this.gameSocket.to(socketID).emit(event, payload)
+        }
+    }
+
+    publicEmit(event, payload) {
+        if (this.gameSocket && typeof this.gameSocket.emit === 'function') {
+            this.gameSocket.emit(event, payload)
+        }
+    }
+
+    updatePlayers() {
+        const pendingDecisionSeats = this.unansweredDecisionSeats(this.activeDecision)
+        const publicPlayers = this.players.map(player => ({
+            name: player.name,
+            controller: player.controller,
+            ...(player.controller === 'codex' ? { effort: player.effort } : {}),
+            money: player.money,
+            color: player.color,
+            isDead: player.isDead,
+            influenceCount: player.influences.length,
+            revealedInfluences: player.revealedInfluences.slice()
+        }))
+        this.players.filter(player => player.controller === 'human').forEach(player => {
+            this.socketEmit(player.socketID, 'g-updatePlayers', {
+                players: publicPlayers,
+                ownInfluences: player.influences.slice(),
+                courtCount: this.deck.length,
+                currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
+                pendingDecisionSeats,
+                phase: this.phase,
+                stateVersion: this.stateVersion
+            })
+        })
+        this.spectatorSocketIDs.forEach(socketID => this.socketEmit(socketID, 'g-updatePlayers', {
+            players: publicPlayers,
+            ownInfluences: [],
+            courtCount: this.deck.length,
+            currentPlayer: this.players[this.currentPlayer] ? this.players[this.currentPlayer].name : null,
+            pendingDecisionSeats,
+            phase: this.phase,
+            stateVersion: this.stateVersion,
+            spectator: true
+        }))
+    }
+
+    addLog(type, data, translation) {
+        if (!EVENT_TYPES.has(type) || !data || !translation || typeof translation.key !== 'string') {
+            throw new TypeError('Event log entries require a known type, public data, and a translation key.')
+        }
+        const event = {
+            id: `${this.matchID}-event-${++this.logEventSerial}`,
+            type,
+            turn: Math.max(1, this.turnNumber),
+            data: { ...data },
+            translation: { key: translation.key, params: { ...translation.params } },
+            reactions: []
+        }
+        event.reactions = reactionsForEvent(event).slice()
+        this.publicLogEvents.push(event)
+        this.logEventsByID.set(event.id, event)
+        this.publicEmit('g-addLog', cloneLogEvent(event))
+        return event
+    }
+
+    reactionCounts(eventID) {
+        const selections = this.reactionsByEvent.get(eventID)
+        const counts = {}
+        if (selections) selections.forEach(reaction => {
+            counts[reaction] = (counts[reaction] || 0) + 1
+        })
+        return counts
+    }
+
+    eventLogSnapshot(socketID) {
+        const seat = this.seatForSocket(socketID)
+        const isSpectator = this.spectatorSocketIDs.includes(socketID)
+        if (seat < 0 && !isSpectator) return null
+        return {
+            matchId: this.matchID,
+            events: this.publicLogEvents.map(cloneLogEvent),
+            reactionCounts: this.publicLogEvents.map(event => ({
+                eventId: event.id,
+                counts: this.reactionCounts(event.id)
+            })),
+            ownReactions: seat < 0 ? [] : this.publicLogEvents.reduce((selected, event) => {
+                const reaction = this.reactionsByEvent.get(event.id)?.get(seat)
+                if (reaction) selected.push({ eventId: event.id, reaction })
+                return selected
+            }, [])
+        }
+    }
+
+    requestEventLogState(socketID, payload) {
+        if (payload !== undefined) {
+            this.socketEmit(socketID, 'g-reactionRejected', { requestId: null, reason: 'invalid_payload' })
+            return false
+        }
+        const state = this.eventLogSnapshot(socketID)
+        if (!state) return false
+        this.socketEmit(socketID, 'g-eventLogState', state)
+        return true
+    }
+
+    emitEventLogStateToAll() {
+        const socketIDs = new Set([
+            ...this.players.filter(player => player.controller === 'human').map(player => player.socketID),
+            ...this.spectatorSocketIDs
+        ])
+        socketIDs.forEach(socketID => {
+            const state = this.eventLogSnapshot(socketID)
+            if (state) this.socketEmit(socketID, 'g-eventLogState', state)
+        })
+    }
+
+    rejectReaction(socketID, requestId, reason) {
+        this.socketEmit(socketID, 'g-reactionRejected', {
+            requestId: typeof requestId === 'string' ? requestId : null,
+            reason
+        })
+        return false
+    }
+
+    emitReactionState(socketID, seat, eventID, requestId) {
+        this.publicEmit('g-reactionCounts', { eventId: eventID, counts: this.reactionCounts(eventID) })
+        this.socketEmit(socketID, 'g-reactionOwn', {
+            eventId: eventID,
+            reaction: this.reactionsByEvent.get(eventID)?.get(seat) || null,
+            requestId
+        })
+    }
+
+    reactToEvent(socketID, payload) {
+        const seat = this.seatForSocket(socketID)
+        const validObject = payload && typeof payload === 'object' && !Array.isArray(payload)
+            && Object.keys(payload).length === 3
+            && Object.prototype.hasOwnProperty.call(payload, 'eventId')
+            && Object.prototype.hasOwnProperty.call(payload, 'reaction')
+            && Object.prototype.hasOwnProperty.call(payload, 'requestId')
+        if (!validObject
+            || typeof payload.eventId !== 'string' || payload.eventId.length > 128
+            || typeof payload.reaction !== 'string'
+            || typeof payload.requestId !== 'string' || !payload.requestId.length || payload.requestId.length > 128) {
+            return this.rejectReaction(socketID, payload && payload.requestId, 'invalid_payload')
+        }
+        if (seat < 0 || this.phase === 'lobby') {
+            return this.rejectReaction(socketID, payload.requestId, 'ineligible_actor')
+        }
+        const event = this.logEventsByID.get(payload.eventId)
+        if (!event) return this.rejectReaction(socketID, payload.requestId, 'unknown_event')
+        if (!event.reactions.includes(payload.reaction)) {
+            return this.rejectReaction(socketID, payload.requestId, 'reaction_not_allowed')
+        }
+
+        let seenRequests = this.reactionRequestsBySeat.get(seat)
+        if (!seenRequests) {
+            seenRequests = new Map()
+            this.reactionRequestsBySeat.set(seat, seenRequests)
+        }
+        if (seenRequests.has(payload.requestId)) {
+            const priorRequest = seenRequests.get(payload.requestId)
+            if (priorRequest.eventId !== event.id || priorRequest.reaction !== payload.reaction) {
+                return this.rejectReaction(socketID, payload.requestId, 'duplicate_request_id')
+            }
+            this.emitReactionState(socketID, seat, event.id, payload.requestId)
+            return true
+        }
+        seenRequests.set(payload.requestId, { eventId: event.id, reaction: payload.reaction })
+
+        let selections = this.reactionsByEvent.get(event.id)
+        if (!selections) {
+            selections = new Map()
+            this.reactionsByEvent.set(event.id, selections)
+        }
+        const current = selections.get(seat)
+        if (current === payload.reaction) {
+            selections.delete(seat)
+            if (selections.size === 0) this.reactionsByEvent.delete(event.id)
+            const presence = this.reactionPresenceBySeat.get(seat)
+            if (presence && presence.eventId === event.id) {
+                this.reactionPresenceBySeat.delete(seat)
+                this.publicEmit('g-reactionPresence', { seat, reaction: null })
+            }
+        } else {
+            selections.set(seat, payload.reaction)
+            this.reactionPresenceBySeat.set(seat, { eventId: event.id, reaction: payload.reaction })
+            this.publicEmit('g-reactionPresence', { seat, reaction: payload.reaction })
+        }
+        this.emitReactionState(socketID, seat, event.id, payload.requestId)
+        return true
+    }
+
+    addHistory(event) {
+        const entry = { turn: Math.max(1, this.turnNumber), ...event }
+        this.publicHistory.push(entry)
+        if (this.publicHistory.length > 120) this.publicHistory.shift()
+        return entry
+    }
+
+    actorKey(player) {
+        return player.controller === 'codex' ? `codex:${player.seat}` : player.socketID
+    }
+
+    cancelCodexRequests(code = 'cancelled') {
+        this.codexRequests.forEach(controller => {
+            controller.abort(Object.assign(new Error(code), { code }))
+        })
+        this.codexRequests.clear()
+    }
+
+    bumpVersion() {
+        this.stateVersion += 1
+    }
+
+    clearDecisionTimer() {
+        if (this.decisionTimer) {
+            clearTimeout(this.decisionTimer)
+            this.decisionTimer = null
+        }
+    }
+
+    onDisconnect(socketID) {
+        const player = this.players.find(candidate => candidate.socketID === socketID)
+        if (!player || player.isDead || !['running', 'paused'].includes(this.phase)) return
+        this.dissolve(player.name)
+    }
+
+    dissolve(playerName) {
+        if (!['running', 'paused'].includes(this.phase)) return false
+        this.phase = 'dissolved'
+        this.bumpVersion()
+        this.cancelCodexRequests('cancelled')
+        this.clearDecisionTimer()
+        this.activeDecision = null
+        this.pausedDecision = null
+        this.currentAction = null
+        this.updatePlayers()
+        this.publicEmit('g-gameDissolved', {
+            playerName: String(playerName || ''),
+            stateVersion: this.stateVersion
+        })
+        return true
+    }
+
+    unansweredDecisionSeats(decision) {
+        if (!decision || !(decision.allowed instanceof Map) || !(decision.responses instanceof Map)) return []
+        const seats = []
+        decision.allowed.forEach((_, actorKey) => {
+            if (decision.responses.has(actorKey)) return
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (player && !player.isDead) seats.push(player.seat)
+        })
+        return seats
+    }
+
+    unansweredHumanSeats(decision) {
+        if (!decision || !(decision.allowed instanceof Map) || !(decision.responses instanceof Map)) return []
+        const seats = []
+        decision.allowed.forEach((_, actorKey) => {
+            if (decision.responses.has(actorKey)) return
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (player && player.controller === 'human') seats.push(player.seat)
+        })
+        return seats
+    }
+
+    emitGamePaused(cause) {
+        const ownerSeats = new Set(this.pausedDecision ? this.pausedDecision.resumeOwnerSeats : [])
+        const recoverable = ownerSeats.size > 0
+        const base = { cause, stateVersion: this.stateVersion }
+        this.players.filter(player => player.controller === 'human').forEach(player => {
+            const isOwner = ownerSeats.has(player.seat)
+            this.socketEmit(player.socketID, 'g-gamePaused', {
+                ...base,
+                showOverlay: !recoverable || isOwner,
+                canResume: recoverable && isOwner,
+                waitingForOwner: recoverable && !isOwner
+            })
+        })
+        this.spectatorSocketIDs.forEach(socketID => this.socketEmit(socketID, 'g-gamePaused', {
+            ...base,
+            showOverlay: !recoverable,
+            canResume: false,
+            waitingForOwner: recoverable
+        }))
+    }
+
+    pause(cause, { recoverable = false } = {}) {
+        if (this.phase !== 'running') return
+        const decision = this.activeDecision
+        const resumeOwnerSeats = recoverable ? this.unansweredHumanSeats(decision) : []
+        this.cancelCodexRequests('cancelled')
+        this.clearDecisionTimer()
+        this.activeDecision = null
+        this.pausedDecision = recoverable && decision && resumeOwnerSeats.length ? {
+            type: decision.type,
+            title: decision.title,
+            description: decision.description,
+            allowed: decision.allowed,
+            responses: new Map(decision.responses),
+            priorityFrom: decision.priorityFrom,
+            resumeOwnerSeats,
+            resolve: decision.resolve
+        } : null
+        this.bumpVersion()
+        this.phase = 'paused'
+        this.emitGamePaused(cause)
+        this.updatePlayers()
+    }
+
+    rejectDecision(socketID, reason) {
+        this.socketEmit(socketID, 'g-decisionRejected', { reason })
+    }
+
+    logActionResult(action, result, details = {}) {
+        const data = {
+            actorSeat: action.actor,
+            action: action.type,
+            result,
+            ...(action.target == null ? {} : { targetSeat: action.target }),
+            ...details
+        }
+        const key = action.type === 'exchange'
+            ? 'game.log.exchangeResolved'
+            : (result === 'blocked' ? 'game.log.actionBlocked' : 'game.log.actionResult')
+        return this.addLog('action_result', data, { key })
+    }
+
+    isEnvelope(envelope) {
+        if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope)) return false
+        const keys = Object.keys(envelope).sort()
+        return keys.length === 3 && keys[0] === 'choiceId' && keys[1] === 'decisionId' && keys[2] === 'stateVersion'
+            && typeof envelope.decisionId === 'string'
+            && typeof envelope.choiceId === 'string'
+            && Number.isInteger(envelope.stateVersion)
+    }
+
+    submitDecision(socketID, envelope) {
+        const seat = this.seatForSocket(socketID)
+        if (seat < 0) {
+            this.rejectDecision(socketID, 'This socket does not control a player seat.')
+            return false
+        }
+        return this.submitChoice(seat, envelope, socketID)
+    }
+
+    submitChoice(seat, envelope, socketID = null) {
+        if (!this.isEnvelope(envelope)) {
+            if (socketID) this.rejectDecision(socketID, 'Expected decisionId, stateVersion, and choiceId only.')
+            return false
+        }
+        const decision = this.activeDecision
+        if (this.phase !== 'running' || !decision) {
+            if (socketID) this.rejectDecision(socketID, 'There is no active decision.')
+            return false
+        }
+        if (envelope.decisionId !== decision.id || envelope.stateVersion !== decision.stateVersion) {
+            if (socketID) this.rejectDecision(socketID, 'Decision is stale or belongs to another phase.')
+            return false
+        }
+        const player = this.players[seat]
+        const actorKey = player && this.actorKey(player)
+        const allowed = decision.allowed.get(actorKey)
+        if (!allowed) {
+            if (socketID) this.rejectDecision(socketID, 'This seat is not eligible for this decision.')
+            return false
+        }
+        const choice = allowed.get(envelope.choiceId)
+        if (!choice) {
+            if (socketID) this.rejectDecision(socketID, 'Choice is not available to this seat.')
+            return false
+        }
+        const prior = decision.responses.get(actorKey)
+        if (prior) {
+            if (prior.choiceId === envelope.choiceId) {
+                if (socketID) this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
+                return true
+            }
+            if (socketID) this.rejectDecision(socketID, 'A different choice was already submitted.')
+            return false
+        }
+        decision.responses.set(actorKey, { choiceId: envelope.choiceId, choice, seat })
+        if (socketID) this.socketEmit(socketID, 'g-decisionAccepted', { decisionId: decision.id, choiceId: envelope.choiceId })
+        if (decision.responses.size === decision.allowed.size) this.closeDecision()
+        else this.updatePlayers()
+        return true
+    }
+
+    seatForSocket(socketID) {
+        return this.players.findIndex(player => player.controller === 'human' && player.socketID === socketID)
+    }
+
+    createChoice(choiceId, label, value) {
+        return { choiceId, label, value }
+    }
+
+    openDecision({ type, title, description, seats, optionsFor, priorityFrom, resolve }) {
+        if (this.phase !== 'running') return
+        this.clearDecisionTimer()
+        const allowed = new Map()
+        const eligibleSeats = seats.filter(seat => this.players[seat] && !this.players[seat].isDead)
+        eligibleSeats.forEach(seat => {
+            const player = this.players[seat]
+            const choices = optionsFor(seat)
+            const choiceMap = new Map(choices.map(choice => [choice.choiceId, choice]))
+            allowed.set(this.actorKey(player), choiceMap)
+        })
+        if (!allowed.size) {
+            this.bumpVersion()
+            resolve([])
+            return
+        }
+        this.activateDecision({ type, title, description, allowed, priorityFrom, resolve })
+    }
+
+    activateDecision(template) {
+        this.clearDecisionTimer()
+        this.bumpVersion()
+        const id = `game-${this.matchID}-${this.gameNumber}-decision-${++this.decisionSerial}`
+        this.activeDecision = {
+            id,
+            stateVersion: this.stateVersion,
+            type: template.type,
+            title: template.title,
+            description: template.description,
+            allowed: template.allowed,
+            responses: template.responses instanceof Map ? new Map(template.responses) : new Map(),
+            priorityFrom: template.priorityFrom,
+            resolve: template.resolve
+        }
+        this.updatePlayers()
+        template.allowed.forEach((choices, actorKey) => {
+            if (this.activeDecision.responses.has(actorKey)) return
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (!player) return
+            if (player.controller === 'human') {
+                const firstChoice = choices.values().next().value
+                this.socketEmit(player.socketID, 'g-decision', {
+                    decisionId: id,
+                    stateVersion: this.stateVersion,
+                    type: template.type,
+                    title: template.title,
+                    description: template.description,
+                    deadlineMs: this.decisionTimeoutMs,
+                    ...(template.type === 'exchange' && firstChoice && firstChoice.poolSlots
+                        ? { poolSlots: firstChoice.poolSlots.map(({ role, original }) => ({ role, original })) }
+                        : {}),
+                    options: Array.from(choices.values()).map(({ choiceId, label, roles }) => template.type === 'exchange'
+                        ? { choiceId, roles: [...roles] }
+                        : { choiceId, label })
+                })
+            }
+        })
+        this.decisionTimer = setTimeout(() => {
+            if (this.activeDecision && this.activeDecision.id === id) {
+                this.pause(`${template.type} decision timed out.`, { recoverable: true })
+            }
+        }, this.decisionTimeoutMs)
+        if (this.decisionTimer && typeof this.decisionTimer.unref === 'function') this.decisionTimer.unref()
+        template.allowed.forEach((_, actorKey) => {
+            if (this.activeDecision.responses.has(actorKey)) return
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (player && player.controller === 'codex') this.requestCodexDecision(player, this.activeDecision)
+        })
+    }
+
+    codexOption(choice, decisionType) {
+        const value = choice.value || {}
+        const option = { choiceId: choice.choiceId }
+        if (value.action) {
+            option.kind = 'action'
+            option.action = value.action
+            if (value.target != null) option.targetSeat = value.target
+            option.cost = ACTION_COSTS[value.action] || 0
+        } else if (value.kind === 'challenge') {
+            option.kind = 'challenge'
+        } else if (value.kind === 'block') {
+            option.kind = 'block'
+            option.role = String(value.role).toLowerCase()
+        } else if (value.kind === 'prove') {
+            option.kind = 'prove_claim'
+            option.role = String(value.card).toLowerCase()
+        } else if (value.kind === 'lose') {
+            option.kind = 'lose_influence'
+            option.role = String(value.card).toLowerCase()
+        } else if (value.kind === 'exchange') {
+            option.kind = 'exchange'
+            option.keep = value.keep.map(role => String(role).toLowerCase())
+        } else {
+            option.kind = 'pass'
+        }
+        if (decisionType === 'challenge' || decisionType === 'block_challenge') {
+            if (option.kind === 'pass') option.kind = 'pass'
+        }
+        return option
+    }
+
+    codexObservation(player, decision) {
+        const observation = {
+            seat: player.seat,
+            decisionType: decision.type,
+            publicState: {
+                currentSeat: this.currentPlayer,
+                players: this.players.map(candidate => ({
+                    seat: candidate.seat,
+                    coins: candidate.money,
+                    alive: !candidate.isDead,
+                    influenceCount: candidate.influences.length,
+                    revealedRoles: candidate.revealedInfluences.map(role => String(role).toLowerCase())
+                }))
+            },
+            ownInfluences: player.influences.map(role => String(role).toLowerCase()),
+            history: this.publicHistory.slice(),
+            options: Array.from(decision.allowed.get(this.actorKey(player)).values())
+                .map(choice => this.codexOption(choice, decision.type))
+        }
+        const event = this.publicLogEvents.at(-1)
+        const projectedEvent = event && event.reactions.length ? projectPublicEvent(event) : null
+        if (event && projectedEvent) {
+            const countsByReaction = Object.fromEntries(event.reactions.map(reaction => [reaction, 0]))
+            const selections = this.reactionsByEvent.get(event.id)
+            if (selections) selections.forEach((reaction, seat) => {
+                if (seat !== player.seat && Object.prototype.hasOwnProperty.call(countsByReaction, reaction)) {
+                    countsByReaction[reaction] += 1
+                }
+            })
+            observation.reactionOpportunity = {
+                eventId: event.id,
+                event: projectedEvent,
+                allowedReactions: event.reactions.slice(),
+                countsByReaction
+            }
+        }
+        return observation
+    }
+
+    applyCodexReaction(player, opportunity, candidate) {
+        if (!player || player.controller !== 'codex' || !opportunity
+            || !candidate || typeof candidate !== 'object' || Array.isArray(candidate)
+            || Object.keys(candidate).length !== 2
+            || !Object.prototype.hasOwnProperty.call(candidate, 'eventId')
+            || !Object.prototype.hasOwnProperty.call(candidate, 'emoji')
+            || candidate.eventId !== opportunity.eventId || typeof candidate.emoji !== 'string'
+            || !opportunity.allowedReactions.includes(candidate.emoji)) return false
+        const event = this.logEventsByID.get(opportunity.eventId)
+        if (!event || !event.reactions.includes(candidate.emoji)) return false
+
+        let selections = this.reactionsByEvent.get(event.id)
+        const current = selections && selections.get(player.seat)
+        if (current === candidate.emoji) return true
+        if (!selections) {
+            selections = new Map()
+            this.reactionsByEvent.set(event.id, selections)
+        }
+        selections.set(player.seat, candidate.emoji)
+        this.reactionPresenceBySeat.set(player.seat, { eventId: event.id, reaction: candidate.emoji })
+        this.publicEmit('g-reactionPresence', { seat: player.seat, reaction: candidate.emoji })
+        this.publicEmit('g-reactionCounts', { eventId: event.id, counts: this.reactionCounts(event.id) })
+        return true
+    }
+
+    requestCodexDecision(player, decision) {
+        if (!this.codexClient || this.isCodexDisabled()) {
+            this.pause('Codex is disabled or unavailable. Re-enable it from the server before resuming or recreating the game.')
+            return
+        }
+        const controller = new AbortController()
+        const requestKey = `${decision.id}:${player.seat}`
+        this.codexRequests.set(requestKey, controller)
+        const startedAt = Date.now()
+        const observation = this.codexObservation(player, decision)
+        const reactionOpportunity = observation.reactionOpportunity || null
+        Promise.resolve().then(() => this.codexClient.choose({
+            decisionId: decision.id,
+            stateVersion: decision.stateVersion,
+            effort: player.effort,
+            observation,
+            signal: controller.signal
+        })).then(result => {
+            this.codexRequests.delete(requestKey)
+            if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id
+                || this.activeDecision.stateVersion !== decision.stateVersion) return
+            if (!result || result.decisionId !== decision.id || result.stateVersion !== decision.stateVersion
+                || result.rulesVersion !== RULESET_VERSION) {
+                return this.pause('Codex returned a stale or invalid decision.')
+            }
+            const accepted = this.submitChoice(player.seat, {
+                decisionId: result.decisionId,
+                stateVersion: result.stateVersion,
+                choiceId: result.choiceId
+            })
+            if (!accepted) this.pause('Codex returned an unavailable choice.')
+            else {
+                if (reactionOpportunity && result.reaction) {
+                    this.applyCodexReaction(player, reactionOpportunity, result.reaction)
+                }
+                this.publicEmit('g-codexActivity', { seat: player.seat, effort: player.effort, durationMs: Date.now() - startedAt })
+            }
+        }).catch(error => {
+            this.codexRequests.delete(requestKey)
+            if (this.phase !== 'running' || !this.activeDecision || this.activeDecision.id !== decision.id) return
+            if (error && error.code === 'cancelled') return
+            const reason = error && ['disabled', 'codex_disabled'].includes(error.code)
+                ? 'Codex was disabled by a player.'
+                : 'Codex could not complete this decision. Check its login, usage limit, and runner, then resume or recreate the game.'
+            this.pause(reason)
+        })
+    }
+
+    disableCodex() {
+        this.cancelCodexRequests('disabled')
+        if (this.phase === 'running' && this.players.some(player => player.controller === 'codex')) {
+            this.pause('Codex was disabled by a player. The owner must re-enable it on the server before starting a new AI decision.')
+        }
+    }
+
+    resume(socketID, payload) {
+        if (this.phase !== 'paused' || payload !== undefined) {
+            this.rejectDecision(socketID, 'There is no timed-out decision to resume.')
+            return false
+        }
+        if (!this.pausedDecision) {
+            this.rejectDecision(socketID, 'This pause cannot be resumed; recreate the game.')
+            return false
+        }
+        const requesterSeat = this.seatForSocket(socketID)
+        if (requesterSeat < 0 || !this.pausedDecision.resumeOwnerSeats.includes(requesterSeat)) {
+            this.rejectDecision(socketID, 'Only a player who did not answer this decision can resume it.')
+            return false
+        }
+        const disconnected = this.players.find(player => !player.isDead && player.controller === 'human'
+            && (!this.gameSocket.sockets || !this.gameSocket.sockets[player.socketID]))
+        if (disconnected) {
+            this.rejectDecision(socketID, 'Every seat must still be connected to resume.')
+            this.dissolve(disconnected.name)
+            return false
+        }
+        const decision = this.pausedDecision
+        this.pausedDecision = null
+        this.phase = 'running'
+        this.activateDecision(decision)
+        this.updatePlayers()
+        this.publicEmit('g-gameResumed', { stateVersion: this.stateVersion })
+        return true
+    }
+
+    closeDecision() {
+        const decision = this.activeDecision
+        if (!decision) return
+        this.clearDecisionTimer()
+        this.activeDecision = null
+        this.bumpVersion()
+        decision.allowed.forEach((_, actorKey) => {
+            const player = this.players.find(candidate => this.actorKey(candidate) === actorKey)
+            if (!player || player.controller !== 'human') return
+            this.socketEmit(player.socketID, 'g-decisionClosed', {
+                decisionId: decision.id,
+                stateVersion: this.stateVersion
+            })
+        })
+        this.updatePlayers()
+        const responses = Array.from(decision.responses.values())
+        decision.resolve(responses)
+    }
+
+    nextInPriorityOrder(fromSeat, eligibleSeats) {
+        const eligible = new Set(eligibleSeats)
+        const result = []
+        for (let offset = 1; offset <= this.players.length; offset += 1) {
+            const seat = (fromSeat + offset) % this.players.length
+            if (eligible.has(seat)) result.push(seat)
+        }
+        return result
+    }
+
+    openWindow({ type, title, description, seats, anchor, optionForSeat, resolve }) {
+        const eligibleSeats = seats.filter(seat => !this.players[seat].isDead)
+        this.openDecision({
+            type,
+            title,
+            description,
+            seats: eligibleSeats,
+            priorityFrom: anchor,
+            optionsFor: seat => [
+                this.createChoice('pass', 'Pass', { kind: 'pass' }),
+                ...optionForSeat(seat)
+            ],
+            resolve: responses => {
+                const orderedSeats = this.nextInPriorityOrder(anchor, eligibleSeats)
+                const bySeat = new Map(responses.map(response => [response.seat, response]))
+                const selected = orderedSeats
+                    .map(seat => bySeat.get(seat))
+                    .find(response => response && response.choice.value.kind !== 'pass') || null
+                resolve(selected)
+            }
+        })
+    }
+
+    playTurn() {
+        if (this.phase !== 'running') return
+        const player = this.players[this.currentPlayer]
+        if (!player || player.isDead) return this.advanceTurn()
+        this.turnNumber += 1
+        this.publicEmit('g-updateCurrentPlayer', player.name)
+        const choices = this.actionChoices(this.currentPlayer)
+        this.openDecision({
+            type: 'action',
+            title: 'Choose an action',
+            description: `${player.name}, choose your action.`,
+            seats: [this.currentPlayer],
+            optionsFor: () => choices,
+            resolve: responses => {
+                const response = responses[0]
+                if (!response) return this.pause('The active player did not choose an action.')
+                this.beginAction(response.choice.value)
+            }
+        })
+    }
+
+    actionChoices(actorSeat) {
+        const player = this.players[actorSeat]
+        const aliveTargets = this.players.filter(target => !target.isDead && target.seat !== actorSeat)
+        const targets = action => aliveTargets.map(target => this.createChoice(
+            `${action}:${target.seat}`,
+            `${this.actionLabel(action)} — ${target.name}`,
+            { action, target: target.seat }
+        ))
+        if (player.money >= 10) return targets('coup')
+        const choices = [
+            this.createChoice('income', 'Income (+1 coin)', { action: 'income' }),
+            this.createChoice('foreign_aid', 'Foreign aid (+2 coins)', { action: 'foreign_aid' }),
+            this.createChoice('tax', 'Tax (+3 coins; Duke)', { action: 'tax' }),
+            this.createChoice('exchange', 'Exchange (Ambassador)', { action: 'exchange' }),
+            ...targets('steal')
+        ]
+        if (player.money >= 3) choices.push(...targets('assassinate'))
+        if (player.money >= 7) choices.push(...targets('coup'))
+        return choices
+    }
+
+    actionLabel(action) {
+        return ({ income: 'Income', foreign_aid: 'Foreign aid', coup: 'Coup', tax: 'Tax', assassinate: 'Assassinate', exchange: 'Exchange', steal: 'Steal' })[action] || action
+    }
+
+    beginAction(choice) {
+        const actor = this.currentPlayer
+        const action = { type: choice.action, actor, target: choice.target == null ? null : choice.target }
+        const cost = action.type === 'coup' ? 7 : (action.type === 'assassinate' ? 3 : 0)
+        if (cost && this.players[actor].money < cost) return this.playTurn()
+        if (action.type !== 'coup' && this.players[actor].money >= 10) return this.playTurn()
+        if (action.target != null && (!this.players[action.target] || this.players[action.target].isDead || action.target === actor)) return this.playTurn()
+        action.cost = cost
+        action.historyEntry = this.addHistory({
+            type: 'action',
+            actorSeat: actor,
+            action: action.type,
+            ...(action.target == null ? {} : { targetSeat: action.target }),
+            result: 'resolved'
+        })
+        this.currentAction = action
+        if (cost) this.players[actor].money -= cost
+        const logKey = action.target == null ? 'game.log.actionUsed' : 'game.log.actionUsedTarget'
+        this.addLog('action_declared', {
+            actorSeat: actor,
+            action: action.type,
+            ...(action.target == null ? {} : { targetSeat: action.target }),
+            ...(ROLE_BY_ACTION[action.type] ? { claimRole: String(ROLE_BY_ACTION[action.type]).toLowerCase() } : {})
+        }, { key: logKey })
+        this.updatePlayers()
+        const claim = ROLE_BY_ACTION[action.type]
+        if (!claim) return this.afterActionClaim(action)
+        action.claimHistoryEntry = this.addHistory({
+            type: 'claim',
+            actorSeat: action.actor,
+            action: action.type,
+            claimRole: String(claim).toLowerCase(),
+            result: 'resolved'
+        })
+        this.openChallengeWindow(action, claim)
+    }
+
+    openChallengeWindow(action, role) {
+        const challengerSeats = this.players.filter(player => !player.isDead && player.seat !== action.actor).map(player => player.seat)
+        this.openWindow({
+            type: 'challenge',
+            title: 'Challenge or pass',
+            description: `${this.players[action.actor].name} claims ${role} for ${this.actionLabel(action.type)}.`,
+            seats: challengerSeats,
+            anchor: action.actor,
+            optionForSeat: () => [this.createChoice('challenge', 'Challenge', { kind: 'challenge' })],
+            resolve: selected => {
+                if (!selected) return this.afterActionClaim(action)
+                action.claimHistoryEntry.result = 'challenged'
+                this.addHistory({
+                    type: 'challenge', actorSeat: selected.seat, targetSeat: action.actor,
+                    action: action.type, claimRole: String(role).toLowerCase(), result: 'challenged'
+                })
+                this.addLog('challenge_started', {
+                    actorSeat: selected.seat,
+                    targetSeat: action.actor,
+                    action: action.type,
+                    claimRole: String(role).toLowerCase()
+                }, { key: 'game.log.challengeStarted' })
+                this.openProofDecision({
+                    claimant: action.actor,
+                    challenger: selected.seat,
+                    roles: [role],
+                    historyEntry: action.claimHistoryEntry,
+                    description: `${this.players[action.actor].name} must prove the ${role} claim.`,
+                    onProved: () => this.loseInfluence(selected.seat, () => {
+                        if (action.type === 'assassinate' && selected.seat === action.target) {
+                            return this.resolveAction(action)
+                        }
+                        this.afterActionClaim(action)
+                    }),
+                    onConceded: () => {
+                        action.historyEntry.result = 'failed'
+                        if (action.cost) this.players[action.actor].money += action.cost
+                        this.updatePlayers()
+                        this.loseInfluence(action.actor, () => this.advanceTurn())
+                    }
+                })
+            }
+        })
+    }
+
+    afterActionClaim(action) {
+        if (this.phase !== 'running') return
+        if (BLOCKS[action.type]) return this.openBlockWindow(action)
+        this.resolveAction(action)
+    }
+
+    openBlockWindow(action) {
+        let eligible
+        if (action.type === 'foreign_aid') {
+            eligible = this.players.filter(player => !player.isDead && player.seat !== action.actor).map(player => player.seat)
+        } else {
+            eligible = this.players[action.target] && !this.players[action.target].isDead ? [action.target] : []
+        }
+        this.openWindow({
+            type: 'block',
+            title: 'Block or pass',
+            description: action.type === 'foreign_aid'
+                ? `${this.players[action.actor].name} takes foreign aid; any other active player may block with the Duke.`
+                : `${this.players[action.target].name} may block ${this.actionLabel(action.type)}.`,
+            seats: eligible,
+            anchor: action.actor,
+            optionForSeat: () => BLOCKS[action.type].map(block => this.createChoice(
+                `block:${block.id}`,
+                `Block with ${block.role}`,
+                { kind: 'block', role: block.role }
+            )),
+            resolve: selected => {
+                if (!selected) {
+                    action.historyEntry.result = 'resolved'
+                    return this.resolveAction(action)
+                }
+                const block = { action, blocker: selected.seat, role: selected.choice.value.role }
+                block.historyEntry = this.addHistory({
+                    type: 'block', actorSeat: block.blocker, targetSeat: action.actor,
+                    action: action.type, claimRole: String(block.role).toLowerCase(), result: 'resolved'
+                })
+                this.addLog('block_declared', {
+                    actorSeat: block.blocker,
+                    targetSeat: action.actor,
+                    action: action.type,
+                    claimRole: String(block.role).toLowerCase()
+                }, { key: 'game.log.blockDeclared' })
+                this.challengeBlock(block)
+            }
+        })
+    }
+
+    challengeBlock(block) {
+        const challengers = this.players.filter(player => !player.isDead && player.seat !== block.blocker).map(player => player.seat)
+        this.openWindow({
+            type: 'block_challenge',
+            title: 'Challenge or pass',
+            description: `${this.players[block.blocker].name} claims ${block.role} to block.`,
+            seats: challengers,
+            anchor: block.blocker,
+            optionForSeat: () => [this.createChoice('challenge', 'Challenge', { kind: 'challenge' })],
+            resolve: selected => {
+                if (!selected) {
+                    block.historyEntry.result = 'resolved'
+                    block.action.historyEntry.result = 'blocked'
+                    if (block.action.type === 'foreign_aid') {
+                        this.logActionResult(block.action, 'blocked', { blockerSeat: block.blocker, amount: 0 })
+                    }
+                    return this.advanceTurn()
+                }
+                block.historyEntry.result = 'challenged'
+                this.addHistory({
+                    type: 'block_challenge', actorSeat: selected.seat, targetSeat: block.blocker,
+                    action: block.action.type, claimRole: String(block.role).toLowerCase(), result: 'challenged'
+                })
+                this.addLog('block_challenge_started', {
+                    actorSeat: selected.seat,
+                    targetSeat: block.blocker,
+                    action: block.action.type,
+                    claimRole: String(block.role).toLowerCase()
+                }, { key: 'game.log.blockChallengeStarted' })
+                this.openProofDecision({
+                    claimant: block.blocker,
+                    challenger: selected.seat,
+                    roles: block.role === constants.CardNames.CAPTAIN || block.role === constants.CardNames.AMBASSADOR
+                        ? [constants.CardNames.CAPTAIN, constants.CardNames.AMBASSADOR]
+                        : [block.role],
+                    historyEntry: block.historyEntry,
+                    description: `${this.players[block.blocker].name} must prove the blocking claim.`,
+                    onProved: () => {
+                        block.action.historyEntry.result = 'blocked'
+                        if (block.action.type === 'foreign_aid') {
+                            this.logActionResult(block.action, 'blocked', { blockerSeat: block.blocker, amount: 0 })
+                        }
+                        this.loseInfluence(selected.seat, () => this.advanceTurn())
+                    },
+                    onConceded: () => this.loseInfluence(block.blocker, () => this.resolveAction(block.action))
+                })
+            }
+        })
+    }
+
+    openProofDecision({ claimant, challenger, roles, historyEntry, description, onProved, onConceded }) {
+        const player = this.players[claimant]
+        const heldRoles = player.influences.filter(card => roles.includes(card))
+        const choices = heldRoles.map((card, index) => this.createChoice(
+            `prove:${card}:${index}`,
+            `Show ${card}`,
+            { kind: 'prove', card }
+        ))
+        choices.push(this.createChoice('concede', 'Do not prove; lose influence', { kind: 'concede' }))
+        this.openDecision({
+            type: 'prove_claim',
+            title: 'Prove or concede',
+            description,
+            seats: [claimant],
+            optionsFor: () => choices,
+            resolve: responses => {
+                const response = responses[0]
+                if (!response) return this.pause('Claimant did not resolve the challenge.')
+                if (response.choice.value.kind === 'prove') {
+                    const provenCard = response.choice.value.card
+                    if (historyEntry) historyEntry.result = 'proved'
+                    this.addLog('claim_proved', {
+                        actorSeat: claimant,
+                        ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
+                        role: String(provenCard).toLowerCase()
+                    }, { key: 'game.log.claimProved' })
+                    this.returnProvenInfluence(claimant, provenCard)
+                    this.updatePlayers()
+                    onProved()
+                } else {
+                    if (historyEntry) historyEntry.result = 'failed'
+                    this.addLog('claim_not_proved', {
+                        actorSeat: claimant,
+                        ...(historyEntry && historyEntry.action ? { action: historyEntry.action } : {}),
+                        ...(historyEntry && historyEntry.claimRole ? { claimRole: historyEntry.claimRole } : {})
+                    }, { key: 'game.log.claimNotProved' })
+                    onConceded()
+                }
+            }
+        })
+    }
+
+    returnProvenInfluence(seat, card) {
+        const player = this.players[seat]
+        const index = player.influences.indexOf(card)
+        if (index < 0) return false
+        player.influences.splice(index, 1)
+        this.deck.push(card)
+        this.deck = gameUtils.shuffleArray(this.deck, this.rng)
+        const replacement = this.deck.pop()
+        if (replacement) player.influences.push(replacement)
+        return true
+    }
+
+    loseInfluence(seat, onLost) {
+        if (this.phase !== 'running') return
+        const player = this.players[seat]
+        if (!player || player.isDead || player.influences.length === 0) {
+            this.checkEliminated()
+            this.updatePlayers()
+            return onLost()
+        }
+        const options = player.influences.map((card, index) => this.createChoice(
+            `lose:${index}`,
+            `Reveal and lose ${card}`,
+            { kind: 'lose', card, index }
+        ))
+        this.openDecision({
+            type: 'lose_influence',
+            title: 'Choose an influence to lose',
+            description: 'The chosen card will be revealed and remain out of the Court deck.',
+            seats: [seat],
+            optionsFor: () => options,
+            resolve: responses => {
+                const response = responses[0]
+                if (!response) return this.pause('Influence loss was not resolved.')
+                const cardIndex = this.players[seat].influences.indexOf(response.choice.value.card)
+                if (cardIndex < 0) return this.pause('Influence changed during a loss decision.')
+                const [card] = this.players[seat].influences.splice(cardIndex, 1)
+                player.revealedInfluences.push(card)
+                this.addLog('influence_lost', {
+                    actorSeat: seat,
+                    role: String(card).toLowerCase()
+                }, { key: 'game.log.influenceLost' })
+                this.checkEliminated()
+                this.addHistory({
+                    type: 'influence_loss', actorSeat: seat, revealedRole: String(card).toLowerCase(),
+                    result: player.isDead ? 'eliminated' : 'resolved'
+                })
+                this.updatePlayers()
+                onLost()
+            }
+        })
+    }
+
+    checkEliminated() {
+        this.players.forEach(player => {
+            if (!player.isDead && player.influences.length === 0) {
+                player.isDead = true
+                player.money = 0
+                this.addLog('player_eliminated', {
+                    actorSeat: player.seat
+                }, { key: 'game.log.playerEliminated' })
+            }
+        })
+    }
+
+    resolveAction(action) {
+        if (this.phase !== 'running') return
+        const actor = this.players[action.actor]
+        const target = action.target == null ? null : this.players[action.target]
+        if (action.type === 'income') {
+            actor.money += 1
+            this.logActionResult(action, 'resolved', { amount: 1 })
+        } else if (action.type === 'foreign_aid') {
+            actor.money += 2
+            this.logActionResult(action, 'resolved', { amount: 2 })
+        } else if (action.type === 'tax') {
+            actor.money += 3
+            this.logActionResult(action, 'resolved', { amount: 3 })
+        }
+        else if (action.type === 'steal' && target && !target.isDead) {
+            const amount = Math.min(2, target.money)
+            target.money -= amount
+            actor.money += amount
+            this.logActionResult(action, 'resolved', { amount })
+        } else if ((action.type === 'coup' || action.type === 'assassinate') && target && !target.isDead) {
+            action.historyEntry.result = 'resolved'
+            return this.loseInfluence(action.target, () => this.advanceTurn())
+        } else if (action.type === 'exchange') {
+            action.historyEntry.result = 'resolved'
+            const drawn = [this.deck.pop(), this.deck.pop()].filter(Boolean)
+            this.updatePlayers()
+            return this.openExchange(action.actor, drawn)
+        }
+        if (action.historyEntry.result !== 'blocked') action.historyEntry.result = 'resolved'
+        this.updatePlayers()
+        this.advanceTurn()
+    }
+
+    openExchange(seat, drawn) {
+        const player = this.players[seat]
+        const pool = player.influences.concat(drawn)
+        const combinations = []
+        const keepCount = player.influences.length
+        const selectCombination = (start, selected) => {
+            if (selected.length === keepCount) {
+                combinations.push(selected)
+                return
+            }
+            for (let index = start; index < pool.length; index += 1) {
+                selectCombination(index + 1, selected.concat(index))
+            }
+        }
+        selectCombination(0, [])
+        const options = []
+        const seenRoleSets = new Set()
+        const poolSlots = pool.map((role, index) => ({
+            role: String(role).toLowerCase(),
+            original: index < keepCount
+        }))
+        combinations.forEach(keptIndices => {
+            const kept = keptIndices.map(poolIndex => pool[poolIndex])
+            const roles = kept.map(card => String(card).toLowerCase()).sort()
+            const signature = JSON.stringify(roles)
+            if (seenRoleSets.has(signature)) return
+            seenRoleSets.add(signature)
+            const label = `Keep ${kept.join(' and ')}`
+            const choice = this.createChoice(`exchange:${options.length}`, label, { kind: 'exchange', keptIndices, keep: kept })
+            choice.roles = roles
+            choice.poolSlots = poolSlots
+            options.push(choice)
+        })
+        this.openDecision({
+            type: 'exchange',
+            title: `Choose ${keepCount === 1 ? 'one influence' : 'two influences'} to keep`,
+            description: `Keep exactly ${keepCount} ${keepCount === 1 ? 'influence' : 'influences'} from your current cards and the two private Court draws.`,
+            seats: [seat],
+            optionsFor: () => options,
+            resolve: responses => {
+                const response = responses[0]
+                if (!response) return this.pause('Exchange was not resolved.')
+                const keptIndices = new Set(response.choice.value.keptIndices)
+                const kept = pool.filter((card, index) => keptIndices.has(index))
+                const returned = pool.filter((card, index) => !keptIndices.has(index))
+                player.influences = kept
+                this.deck.push(...returned)
+                this.deck = gameUtils.shuffleArray(this.deck, this.rng)
+                this.updatePlayers()
+                this.logActionResult({ actor: seat, type: 'exchange', target: null }, 'resolved')
+                this.advanceTurn()
+            }
+        })
+    }
+
+    advanceTurn() {
+        if (this.phase !== 'running') return
+        this.currentAction = null
+        this.checkEliminated()
+        this.bumpVersion()
+        this.updatePlayers()
+        const alive = this.players.filter(player => !player.isDead)
+        if (alive.length <= 1) {
+            const winner = alive[0]
+            if (!winner) return this.pause('No active player remains.')
+            this.phase = 'gameover'
+            this.activeDecision = null
+            this.previousWinner = winner.seat
+            this.winner = winner.name
+            this.publicEmit('g-gameOver', winner.name)
+            if (this.leaderSocketID) this.socketEmit(this.leaderSocketID, 'g-canPlayAgain', true)
+            this.updatePlayers()
+            return
+        }
+        do {
+            this.currentPlayer = (this.currentPlayer + 1) % this.players.length
+        } while (this.players[this.currentPlayer].isDead)
+        this.playTurn()
+    }
+
+    playAgain(socketID, payload) {
+        if (socketID !== this.leaderSocketID || this.phase !== 'gameover' || payload !== undefined) {
+            this.rejectDecision(socketID, 'Only the current lobby leader can restart after game over.')
+            return false
+        }
+        this.resetGame()
+        this.updatePlayers()
+        this.emitEventLogStateToAll()
+        this.playTurn()
+        return true
+    }
 }
 
-module.exports = CoupGame;
+module.exports = CoupGame

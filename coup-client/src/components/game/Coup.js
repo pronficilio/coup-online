@@ -1,370 +1,989 @@
-import React, { Component } from 'react'
-import ActionDecision from './ActionDecision';
-import ChallengeDecision from './ChallengeDecision';
-import BlockChallengeDecision from './BlockChallengeDecision';
-import PlayerBoard from './PlayerBoard';
-import RevealDecision from './RevealDecision';
-import BlockDecision from './BlockDecision';
-import ChooseInfluence from './ChooseInfluence';
-import ExchangeInfluences from './ExchangeInfluences';
-import './CoupStyles.css';
-import EventLog from './EventLog';
-import ReactModal from 'react-modal';
-import CheatSheetModal from '../CheatSheetModal';
-import RulesModal from '../RulesModal';
+import React, { Component, createRef } from 'react'
+import { createPortal } from 'react-dom'
+import PlayerBoard from './PlayerBoard'
+import './CoupStyles.css'
+import EventLog from './EventLog'
+import TurnFavicon from './TurnFavicon'
+import ReferencePanel from './ReferencePanel'
+import ExchangeDecisionPanel from './ExchangeDecisionPanel'
+import { t } from '../../i18n'
+import { lobbyError } from '../../i18n/lobby'
+
+const RESPONSE_WINDOW_TYPES = new Set(['challenge', 'block', 'block_challenge'])
+const REACTION_PRESENCE_MS = 3500
+const REACTION_PRESENCE_FADE_MS = 180
+const REACTION_PRESENCE_REACTIONS = new Set([
+    'like', 'bravo', 'laugh', 'skeptical', 'surprise', 'thinking', 'dislike', 'secret'
+])
+
+function eventLogExpandedByDefault() {
+    return !(typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 720px)').matches)
+}
+
+const ACTION_KEYS = {
+    income: 'income',
+    foreign_aid: 'foreignAid',
+    coup: 'coup',
+    tax: 'tax',
+    assassinate: 'assassinate',
+    exchange: 'exchange',
+    steal: 'steal'
+}
+
+const ACTION_ROWS = [
+    { action: 'income', blockers: [], reward: 1 },
+    { action: 'foreign_aid', blockers: ['duke'], reward: 2 },
+    { action: 'coup', blockers: [], cost: 7, target: true },
+    { action: 'tax', declaredRole: 'duke', blockers: [], reward: 3 },
+    { action: 'assassinate', declaredRole: 'assassin', blockers: ['contessa'], cost: 3, target: true },
+    { action: 'exchange', declaredRole: 'ambassador', blockers: [], free: true },
+    { action: 'steal', declaredRole: 'captain', blockers: ['ambassador', 'captain'], amount: 2, target: true }
+]
+
+const ACTION_ROW_KEYS = new Set(ACTION_ROWS.map(({ action }) => action))
+
+const ROLE_KEYS = {
+    duke: 'duke',
+    captain: 'captain',
+    assassin: 'assassin',
+    contessa: 'contessa',
+    ambassador: 'ambassador'
+}
+
+const DECISION_TITLE_KEYS = {
+    action: 'game.decision.title.action',
+    challenge: 'game.decision.title.challenge',
+    block: 'game.decision.title.block',
+    block_challenge: 'game.decision.title.challenge',
+    prove_claim: 'game.decision.title.prove',
+    lose_influence: 'game.decision.title.loseInfluence',
+    exchange: 'game.decision.title.exchange'
+}
+
+function roleName(role) {
+    const key = ROLE_KEYS[String(role || '').toLowerCase()]
+    return key ? t(`game.roles.${key}`) : t('game.roles.unknown')
+}
+
+function actionName(action) {
+    const normalized = String(action || '').toLowerCase().replace(/\s+/g, '_')
+    const key = ACTION_KEYS[normalized]
+    return key ? t(`game.actions.${key}.label`) : t('game.actions.unknown')
+}
+
+function decisionDescription(decision, currentPlayer, ownInfluenceCount) {
+    if (!decision) return ''
+    if (decision.type === 'action') {
+        const match = decision.description.match(/^(.+), choose your action\.$/)
+        return t('game.decision.description.action', { playerName: match ? match[1] : currentPlayer })
+    }
+    if (decision.type === 'challenge') {
+        const match = decision.description.match(/^(.+) claims (.+) for (.+)\.$/)
+        return match
+            ? t('game.decision.description.challenge', { playerName: match[1], roleLabel: roleName(match[2]), actionLabel: actionName(match[3]) })
+            : t('game.decision.description.generic')
+    }
+    if (decision.type === 'block') {
+        const foreignAid = decision.description.match(/^(.+) takes foreign aid;/)
+        if (foreignAid) return t('game.decision.description.blockForeignAid', { playerName: foreignAid[1], roleLabel: roleName('duke') })
+        const match = decision.description.match(/^(.+) may block (.+)\.$/)
+        return match
+            ? t('game.decision.description.block', { playerName: match[1], actionLabel: actionName(match[2]) })
+            : t('game.decision.description.generic')
+    }
+    if (decision.type === 'block_challenge') {
+        const match = decision.description.match(/^(.+) claims (.+) to block\.$/)
+        return match
+            ? t('game.decision.description.blockChallenge', { playerName: match[1], roleLabel: roleName(match[2]) })
+            : t('game.decision.description.generic')
+    }
+    if (decision.type === 'prove_claim') {
+        const blockMatch = decision.description.match(/^(.+) must prove the blocking claim\.$/)
+        if (blockMatch) return t('game.decision.description.proveBlock', { playerName: blockMatch[1] })
+        const match = decision.description.match(/^(.+) must prove the (.+) claim\.$/)
+        return match
+            ? t('game.decision.description.proveClaim', { playerName: match[1], roleLabel: roleName(match[2]) })
+            : t('game.decision.description.generic')
+    }
+    if (decision.type === 'lose_influence') return t('game.decision.description.loseInfluence')
+    if (decision.type === 'exchange') return t('game.decision.description.exchange', { count: ownInfluenceCount })
+    return t('game.decision.description.generic')
+}
+
+function decisionFollowup(decision) {
+    if (!decision) return ''
+    const key = {
+        action: 'action',
+        challenge: 'challenge',
+        block: 'block',
+        block_challenge: 'blockChallenge',
+        prove_claim: 'proveClaim',
+        lose_influence: 'loseInfluence'
+    }[decision.type]
+    return key ? t(`game.decision.followup.${key}`) : ''
+}
+
+function actionOptionLabel(action) {
+    const key = ACTION_KEYS[action]
+    return key ? t(`game.decision.action.option.${key}`) : t('game.decision.option.unknown')
+}
+
+function actionOptionGroups(options) {
+    const groups = new Map(ACTION_ROWS.map(({ action }) => [action, []]))
+    options.forEach(option => {
+        const action = String(option.choiceId || '').split(':')[0]
+        if (ACTION_ROW_KEYS.has(action)) groups.get(action).push(option)
+    })
+    return groups
+}
+
+function unavailableActionReason(action, options, money) {
+    if (options.length > 0) return ''
+    if (money >= 10 && action !== 'coup') return t('game.actions.error.coupRequired')
+
+    const cost = action === 'coup' ? 7 : action === 'assassinate' ? 3 : null
+    if (cost !== null && money < cost) {
+        return t('game.actions.error.insufficientFundsAction', { cost, actionLabel: actionName(action) })
+    }
+
+    return t('game.actions.error.unavailable')
+}
+
+function actionPrice(actionRow) {
+    if (actionRow.free) return t('game.actions.price.free')
+    if (actionRow.cost !== undefined) return t('game.actions.price.cost', { cost: actionRow.cost })
+    if (actionRow.reward !== undefined) {
+        return actionRow.reward === 1
+            ? t('game.actions.price.reward.single')
+            : t('game.actions.price.reward.plural', { amount: actionRow.reward })
+    }
+    if (actionRow.amount !== undefined) return t('game.actions.price.amount', { amount: actionRow.amount })
+    return ''
+}
+
+function localizeOptionLabel(option, decision) {
+    const choiceId = String(option.choiceId || '')
+    if (choiceId === 'pass') return t('game.common.pass')
+    if (choiceId === 'challenge') return t('game.challenge.button')
+    if (decision.type === 'action') {
+        const targetSeparator = ' — '
+        const action = choiceId.split(':')[0]
+        if (choiceId.includes(':')) {
+            const englishAction = ({ coup: 'Coup', steal: 'Steal', assassinate: 'Assassinate' })[action]
+            const prefix = `${englishAction}${targetSeparator}`
+            const targetName = option.label.startsWith(prefix) ? option.label.slice(prefix.length) : ''
+            return t('game.decision.action.target', { actionLabel: actionName(action), targetName })
+        }
+        return actionOptionLabel(action)
+    }
+    if (choiceId.startsWith('block:')) return t('game.decision.option.block', { roleLabel: roleName(choiceId.slice(6)) })
+    if (choiceId.startsWith('prove:')) return t('game.decision.option.prove', { roleLabel: roleName(choiceId.split(':')[1]) })
+    if (choiceId === 'concede') return t('game.decision.option.concede')
+    if (choiceId.startsWith('lose:')) {
+        const match = option.label.match(/^Reveal and lose (.+)$/)
+        return t('game.decision.option.lose', { roleLabel: roleName(match && match[1]) })
+    }
+    if (choiceId.startsWith('exchange:')) {
+        const roles = option.label.replace(/^Keep /, '').split(' and ').map(roleName)
+        return t('game.decision.option.keep', { roles: roles.join(' y ') })
+    }
+    return t('game.decision.option.unknown')
+}
+
+function targetName(option, action) {
+    const actionEnglish = ({ coup: 'Coup', steal: 'Steal', assassinate: 'Assassinate' })[action]
+    const label = String(option.label || '')
+    const prefix = `${actionEnglish} — `
+    return actionEnglish && label.startsWith(prefix) ? label.slice(prefix.length) : label
+}
+
+const DECISION_ERROR_KEYS = {
+    'This socket does not control a player seat.': 'game.decision.error.notPlayer',
+    'Expected decisionId, stateVersion, and choiceId only.': 'game.decision.error.invalidEnvelope',
+    'There is no active decision.': 'game.decision.error.noActiveDecision',
+    'Decision is stale or belongs to another phase.': 'game.decision.error.stale',
+    'This seat is not eligible for this decision.': 'game.decision.error.ineligible',
+    'Choice is not available to this seat.': 'game.decision.error.choiceUnavailable',
+    'A different choice was already submitted.': 'game.decision.error.alreadySubmitted',
+    'Only a player who did not answer this decision can resume it.': 'game.decision.error.timeoutOwnerOnlyResume',
+    'There is no timed-out decision to resume.': 'game.decision.error.noTimedOutDecision',
+    'This pause cannot be resumed; recreate the game.': 'game.decision.error.cannotResume',
+    'Every seat must still be connected to resume.': 'game.decision.error.seatsDisconnected',
+    'Only the current lobby leader can restart after game over.': 'game.decision.error.leaderOnlyRestart'
+}
+
+function decisionError(reason) {
+    return t(DECISION_ERROR_KEYS[reason] || 'game.decision.rejected')
+}
 
 export default class Coup extends Component {
-
     constructor(props) {
         super(props)
-    
         this.state = {
-             action: null,
-             blockChallengeRes: null,
-             players: [],
-             boardPlayers: [],
-             playerIndex: null,
-             currentPlayer: '',
-             isChooseAction: false,
-             revealingRes: null,
-             blockingAction: null,
-             isChoosingInfluence: false,
-             exchangeInfluence: null,
-             error: '',
-             winner: '',
-             playAgain: null,
-             logs: [],
-             isDead: false,
-             waiting: true,
-             disconnected: false
+            players: [],
+            ownInfluences: [],
+            courtCount: null,
+            currentPlayer: '',
+            pendingDecisionSeats: [],
+            decision: null,
+            actionTarget: null,
+            submitted: false,
+            submittedChoiceId: null,
+            decisionError: '',
+            gamePaused: false,
+            canResume: false,
+            resumePending: false,
+            pauseWaiting: false,
+            winner: '',
+            dissolved: false,
+            disconnectedPlayer: '',
+            canPlayAgain: false,
+            disconnected: false,
+            codexDisabled: Boolean(props.codexDisabled),
+            actionRailPosition: null,
+            decisionPanelExpanded: true,
+            eventLogExpanded: eventLogExpandedByDefault(),
+            reactionPresence: {}
         }
-        const bind = this;
+        this.pauseOverlayRef = createRef()
+        this.decisionSectionRef = createRef()
+        this.eventLogRef = createRef()
+        this.eventLogResizeObserver = null
+        this.eventLogRailMotion = null
+        this.resumeRequestPending = false
+        this.pauseReturnFocus = null
+        this.actionSubmissionLock = false
+        this.actionRowRefs = Object.fromEntries(ACTION_ROWS.map(({ action }) => [action, React.createRef()]))
+        this.firstActionTargetRef = React.createRef()
+        this.actionRailAnchorRef = React.createRef()
+        this.reactionPresenceTimers = new Map()
+        this.reactionPresenceSerial = 0
 
-        this.playAgainButton = <>
-        <br></br>
-        <button className="startGameButton" onClick={() => {
-            this.props.socket.emit('g-playAgain');
-        }}>Play Again</button>
-        </>
-
-        this.props.socket.on('disconnect', reason => {
-            this.setState({ disconnected: true });
+        const socket = this.props.socket
+        socket.on('g-reactionPresence', this.handleReactionPresence)
+        socket.on('disconnect', () => this.setState({ disconnected: true }))
+        socket.on('g-updatePlayers', snapshot => {
+            if (!snapshot || !Array.isArray(snapshot.players)) return
+            this.setState({
+                players: snapshot.players,
+                ownInfluences: Array.isArray(snapshot.ownInfluences) ? snapshot.ownInfluences : [],
+                courtCount: Number.isFinite(snapshot.courtCount) ? snapshot.courtCount : null,
+                currentPlayer: snapshot.currentPlayer || this.state.currentPlayer,
+                pendingDecisionSeats: Array.isArray(snapshot.pendingDecisionSeats)
+                    ? snapshot.pendingDecisionSeats.filter(Number.isInteger)
+                    : []
+            })
         })
-
-        this.props.socket.on('g-gameOver', (winner) => {
-            bind.setState({ winner: `${winner} Wins!`, isChooseAction: false })
-            bind.setState({playAgain: bind.playAgainButton})
+        socket.on('g-updateCurrentPlayer', currentPlayer => this.setState({ currentPlayer }))
+        socket.on('g-decision', decision => {
+            if (this.state.dissolved || this.state.winner) return
+            this.actionSubmissionLock = false
+            this.setState(state => ({
+                decision,
+                actionTarget: null,
+                submitted: false,
+                submittedChoiceId: null,
+                decisionError: state.gamePaused ? state.decisionError : '',
+                actionRailPosition: null,
+                decisionPanelExpanded: true
+            }), () => {
+                if (this.decisionSectionRef.current) this.decisionSectionRef.current.focus({ preventScroll: true })
+            })
         })
-        this.props.socket.on('g-updatePlayers', (players) => {
-            bind.setState({playAgain: null})
-            bind.setState({winner: null})
-            const boardPlayers = players;
-            const activePlayers = players.filter(x => !x.isDead);
-            let playerIndex = null;
-            for(let i = 0; i < activePlayers.length; i++) {
-                console.log(activePlayers[i].name, this.props.name)
-                if(activePlayers[i].name === this.props.name) {
-                    playerIndex = i;
-                    break;
-                }
-            }
-            if(playerIndex == null) {
-                this.setState({ isDead: true, isChooseAction: false })
-            }else {
-                this.setState({ isDead: false})
-            }
-            console.log(playerIndex)
-            bind.setState({playerIndex, players: activePlayers, boardPlayers});
-            
-        });
-        this.props.socket.on('g-updateCurrentPlayer', (currentPlayer) => {
-            console.log('currentPlayer: ', currentPlayer)
-            bind.setState({
-                currentPlayer,
-                isChooseAction: currentPlayer === bind.props.name ? bind.state.isChooseAction : false
-            });
-        });
-        this.props.socket.on('g-addLog', (log) => {
-            let splitLog=  log.split(' ');
-            let coloredLog = [];
-            coloredLog = splitLog.map((item, index) => {
-                let found = null
-                bind.state.players.forEach(player => {
-                    if(item === player.name){
-                        found = <b style={{color: player.color}}>{player.name} </b>;
-                    }
+        socket.on('g-decisionClosed', closed => {
+            if (this.state.decision && closed.decisionId === this.state.decision.decisionId) {
+                this.actionSubmissionLock = false
+                this.setState({
+                    decision: null,
+                    actionTarget: null,
+                    submitted: false,
+                    submittedChoiceId: null,
+                    actionRailPosition: null,
+                    decisionPanelExpanded: true
                 })
-                if(found){
-                    return found;
-                }
-                return <>{item+' '}</>
+            }
+        })
+        socket.on('g-decisionAccepted', accepted => {
+            if (this.state.decision && accepted.decisionId === this.state.decision.decisionId) {
+                this.setState({ submitted: true, decisionError: '' })
+            }
+        })
+        socket.on('g-decisionRejected', rejection => {
+            this.actionSubmissionLock = false
+            const rejectedResume = this.state.gamePaused
+            if (rejectedResume) this.resumeRequestPending = false
+            this.setState(state => ({
+                submitted: false,
+                submittedChoiceId: null,
+                decisionError: decisionError(rejection && rejection.reason ? rejection.reason : ''),
+                resumePending: rejectedResume ? false : state.resumePending
+            }))
+        })
+        socket.on('g-gamePaused', paused => {
+            if (this.state.dissolved || this.state.winner) return
+            this.actionSubmissionLock = false
+            const showOverlay = !paused || paused.showOverlay !== false
+            if (showOverlay && !this.state.gamePaused && typeof document !== 'undefined') {
+                this.pauseReturnFocus = document.activeElement
+            }
+            this.resumeRequestPending = false
+            this.setState({
+                decision: null,
+                actionTarget: null,
+                submitted: false,
+                submittedChoiceId: null,
+                gamePaused: showOverlay,
+                canResume: showOverlay && Boolean(paused && paused.canResume),
+                resumePending: false,
+                pauseWaiting: Boolean(paused && paused.waitingForOwner),
+                decisionError: '',
+                actionRailPosition: null,
+                decisionPanelExpanded: true
+            }, () => {
+                if (showOverlay && this.pauseOverlayRef.current) this.pauseOverlayRef.current.focus({ preventScroll: true })
             })
-            bind.state.logs = [...bind.state.logs, coloredLog]
-            bind.setState({logs :bind.state.logs})
         })
-        this.props.socket.on('g-chooseAction', () => {
-            const isLocalLivePlayer = bind.state.playerIndex != null && !bind.state.isDead
-            bind.setState({
-                isChooseAction: isLocalLivePlayer && bind.state.currentPlayer === bind.props.name
-            })
-        });
-        this.props.socket.on('g-openExchange', (drawTwo) => {
-            let influences = [...bind.state.players[bind.state.playerIndex].influences, ...drawTwo];
-            bind.setState({ exchangeInfluence: influences });
-        })
-        this.props.socket.on('g-openChallenge', (action) => {
-            if(this.state.isDead) {
-                return
-            }
-            if(action.source !== bind.props.name) {
-               bind.setState({ action }) 
-            } else {
-                bind.setState({ action: null }) 
-            }
-        });
-        this.props.socket.on('g-openBlockChallenge', (blockChallengeRes) => {
-            if(this.state.isDead) {
-                return
-            }
-            if(blockChallengeRes.counterAction.source !== bind.props.name) {
-               bind.setState({ blockChallengeRes }) 
-            } else {
-                bind.setState({ blockChallengeRes: null }) 
-            }
-        });
-        this.props.socket.on('g-openBlock', (action) => {
-            if(this.state.isDead) {
-                return
-            }
-            if(action.source !== bind.props.name) {
-                bind.setState({ blockingAction: action })
-             } else {
-                 bind.setState({ blockingAction: null }) 
-             }
-        });
-        this.props.socket.on('g-chooseReveal', (res) => {
-            console.log(res)
-            bind.setState({ revealingRes: res});
-        });
-        this.props.socket.on('g-chooseInfluence', () => {
-            bind.setState({ isChoosingInfluence: true });
-        });
-        this.props.socket.on('g-closeChallenge', () => {
-            bind.setState({ action: null });
-        });
-        this.props.socket.on('g-closeBlock', () => {
-            bind.setState({ blockingAction: null });
-        });
-        this.props.socket.on('g-closeBlockChallenge', () => {
-            bind.setState({ blockChallengeRes: null });
-        });
-    }
-
-    deductCoins = (amount) => {
-        let res = {
-            source: this.props.name,
-            amount: amount
-        }
-        this.props.socket.emit('g-deductCoins', res);
-    }
-
-    doneAction = () => {
-        this.setState({ 
-            isChooseAction: false
-        })
-    }
-    doneChallengeBlockingVote = () => {
-        this.setState({ action: null }); //challemge
-        this.setState({ blockChallengeRes: null}); //challenge a block
-        this.setState({ blockingAction: null }); //block
-    }
-    closeOtherVotes = (voteType) => {
-        if(voteType === 'challenge') {
-            this.setState({ blockChallengeRes: null}); //challenge a block
-            this.setState({ blockingAction: null }); //block
-        }else if(voteType === 'block') {
-            this.setState({ action: null }); //challemge
-            this.setState({ blockChallengeRes: null}); //challenge a block
-        }else if(voteType === 'challenge-block') {
-            this.setState({ action: null }); //challemge
-            this.setState({ blockingAction: null }); //block
-        }
-    }
-    doneReveal = () => {
-        this.setState({ revealingRes: null });
-    }
-    doneChooseInfluence = () => {
-        this.setState({ isChoosingInfluence: false })
-    }
-    doneExchangeInfluence = () => {
-        this.setState({ exchangeInfluence: null })
-    }
-    pass = () => {
-        if(this.state.action != null) { //challengeDecision
-            let res = {
-                isChallenging: false,
-                action: this.state.action
-            }
-            console.log(res)
-            this.props.socket.emit('g-challengeDecision', res);
-        }else if(this.state.blockChallengeRes != null) { //BlockChallengeDecision
-            let res = {
-                isChallenging: false
-            }
-            console.log(res)
-            this.props.socket.emit('g-blockChallengeDecision', res);
-        }else if(this.state.blockingAction !== null) { //BlockDecision
-            const res = {
-                action: this.state.blockingAction,
-                isBlocking: false
-            }
-            console.log(res)
-            this.props.socket.emit('g-blockDecision', res)
-        }
-        this.doneChallengeBlockingVote();
-    }
-
-    influenceColorMap = {
-        duke: '#D55DC7',
-        captain: '#80C6E5',
-        assassin: '#2B2B2B',
-        contessa: '#E35646',
-        ambassador: '#B4CA1F'
-    }
-    
-    render() {
-        let actionDecision = null
-        let currentPlayer = null
-        let revealDecision = null
-        let challengeDecision = null
-        let blockChallengeDecision = null
-        let chooseInfluenceDecision = null
-        let blockDecision = null
-        let influences = null
-        let pass = null
-        let coins = null
-        let exchangeInfluences = null
-        let playAgain = null
-        let isWaiting = true
-        let waiting = null
-        const canChooseAction = this.state.isChooseAction
-            && this.state.playerIndex != null
-            && !this.state.isDead
-            && this.state.currentPlayer === this.props.name
-        if(canChooseAction) {
-            isWaiting = false;
-            actionDecision = <ActionDecision key={`${this.props.name}-${this.state.currentPlayer}`} doneAction={this.doneAction} deductCoins={this.deductCoins} name={this.props.name} socket={this.props.socket} money={this.state.players[this.state.playerIndex].money} players={this.state.players}></ActionDecision>
-        }
-        if(this.state.currentPlayer) {
-            currentPlayer = <p aria-live="polite" aria-atomic="true">It is <b>{this.state.currentPlayer}</b>'s turn</p>
-        }
-        if(this.state.revealingRes) {
-            isWaiting = false;
-            revealDecision = <RevealDecision doneReveal={this.doneReveal} name ={this.props.name} socket={this.props.socket} res={this.state.revealingRes} influences={this.state.players.filter(x => x.name === this.props.name)[0].influences}></RevealDecision>
-        }
-        if(this.state.isChoosingInfluence) {
-            isWaiting = false;
-            chooseInfluenceDecision = <ChooseInfluence doneChooseInfluence={this.doneChooseInfluence} name ={this.props.name} socket={this.props.socket} influences={this.state.players.filter(x => x.name === this.props.name)[0].influences}></ChooseInfluence>
-        }
-        if(this.state.action != null || this.state.blockChallengeRes != null || this.state.blockingAction !== null){
-            pass = <button onClick={() => this.pass()}>Pass</button>
-        }
-        if(this.state.action != null) {
-            isWaiting = false;
-            challengeDecision = <ChallengeDecision closeOtherVotes={this.closeOtherVotes} doneChallengeVote={this.doneChallengeBlockingVote} name={this.props.name} action={this.state.action} socket={this.props.socket} ></ChallengeDecision>
-        }
-        if(this.state.exchangeInfluence) {
-            isWaiting = false;
-            exchangeInfluences = <ExchangeInfluences doneExchangeInfluence={this.doneExchangeInfluence} name={this.props.name} influences={this.state.exchangeInfluence} socket={this.props.socket}></ExchangeInfluences>
-        }
-        if(this.state.blockChallengeRes != null) {
-            isWaiting = false;
-            blockChallengeDecision = <BlockChallengeDecision closeOtherVotes={this.closeOtherVotes} doneBlockChallengeVote={this.doneChallengeBlockingVote} name={this.props.name} prevAction={this.state.blockChallengeRes.prevAction} counterAction={this.state.blockChallengeRes.counterAction} socket={this.props.socket} ></BlockChallengeDecision>
-        }
-        if(this.state.blockingAction !== null) {
-            isWaiting = false;
-            blockDecision = <BlockDecision closeOtherVotes={this.closeOtherVotes} doneBlockVote={this.doneChallengeBlockingVote} name={this.props.name} action={this.state.blockingAction} socket={this.props.socket} ></BlockDecision>
-        }
-        if(this.state.playerIndex != null && !this.state.isDead) {
-            influences = <>
-            <p>Your Influences</p>
-                {this.state.players[this.state.playerIndex].influences.map((influence, index) => {
-                    return  <div key={index} className="InfluenceUnitContainer">
-                                <span className="circle" style={{backgroundColor: `${this.influenceColorMap[influence]}`}}></span>
-                                <br></br>
-                                <h3>{influence}</h3>
-                            </div>
-                    })
+        socket.on('g-gameResumed', () => {
+            if (this.state.dissolved || this.state.winner) return
+            this.resumeRequestPending = false
+            this.setState({
+                gamePaused: false,
+                canResume: false,
+                resumePending: false,
+                pauseWaiting: false,
+                decisionError: ''
+            }, () => {
+                if (typeof document === 'undefined') return
+                const returnFocus = this.pauseReturnFocus
+                this.pauseReturnFocus = null
+                if (returnFocus && returnFocus !== document.body && document.contains(returnFocus)) {
+                    returnFocus.focus({ preventScroll: true })
+                } else if (this.decisionSectionRef.current) {
+                    this.decisionSectionRef.current.focus({ preventScroll: true })
                 }
-            </>
-            
-            coins = <p>Coins: {this.state.players[this.state.playerIndex].money}</p>
+            })
+        })
+        socket.on('g-gameOver', winner => {
+            if (this.state.dissolved) return
+            this.actionSubmissionLock = false
+            this.setState({
+                winner: String(winner || ''),
+                decision: null,
+                actionTarget: null,
+                submitted: false,
+                submittedChoiceId: null,
+                gamePaused: false,
+                canResume: false,
+                resumePending: false,
+                pauseWaiting: false,
+                actionRailPosition: null,
+                decisionPanelExpanded: true
+            })
+        })
+        socket.on('g-gameDissolved', result => {
+            if (this.state.dissolved || this.state.winner) return
+            this.actionSubmissionLock = false
+            this.resumeRequestPending = false
+            this.setState({
+                dissolved: true,
+                disconnectedPlayer: String((result && result.playerName) || ''),
+                decision: null,
+                actionTarget: null,
+                submitted: false,
+                submittedChoiceId: null,
+                decisionError: '',
+                gamePaused: false,
+                canResume: false,
+                resumePending: false,
+                pauseWaiting: false,
+                canPlayAgain: false,
+                actionRailPosition: null,
+                decisionPanelExpanded: true
+            })
+        })
+        socket.on('g-canPlayAgain', () => this.setState({ canPlayAgain: true }))
+        socket.on('startRejected', reason => this.setState({ decisionError: t('lobby.error.startRejected', { reason: lobbyError(reason) }) }))
+        socket.on('codexDisabled', status => this.setState({
+            codexDisabled: Boolean(status && status.disabled)
+        }))
+    }
+
+    componentDidMount() {
+        if (typeof window !== 'undefined') window.addEventListener('resize', this.handleActionRailResize)
+        const eventLogPanel = this.eventLogRef.current && this.eventLogRef.current.panelRef.current
+        if (eventLogPanel && typeof ResizeObserver !== 'undefined') {
+            this.eventLogResizeObserver = new ResizeObserver(this.updateExpandedEventLogRailTop)
+            this.eventLogResizeObserver.observe(eventLogPanel)
         }
-        if(isWaiting && !this.state.isDead) {
-            waiting = <p>Waiting for other players...</p>
+        this.updateExpandedEventLogRailTop()
+        if ((this.isActionRailDecision(this.state.decision) || this.hasReplayAction()) && !this.state.actionRailPosition) {
+            const position = this.measureActionRailPosition()
+            if (position) this.setState({ actionRailPosition: position })
         }
-        if(this.state.disconnected) {
-            return (
-                <div className="GameContainer">
-                    <div className="GameHeader">
-                        <div className="PlayerInfo">
-                            <p>You are: {this.props.name}</p>
-                            {coins}
-                        </div>
-                        <RulesModal/>
-                        <CheatSheetModal/>
-                    </div>
-                    <p>You have been disconnected :c</p>
-                    <p>Please recreate the game.</p>
-                    <p>Sorry for the inconvenience (シ_ _)シ</p>
-                </div>
+    }
+
+    handleEventLogExpandedChange = expanded => {
+        if (this.state.eventLogExpanded === expanded) return
+        const isMobile = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(max-width: 720px)').matches
+        const rail = isMobile && this.decisionSectionRef.current
+        const previousRailRect = rail ? rail.getBoundingClientRect() : null
+        this.setState({ eventLogExpanded: expanded }, () => {
+            this.animateEventLogRailPosition(previousRailRect)
+        })
+    }
+
+    animateEventLogRailPosition = previousRect => {
+        const rail = this.decisionSectionRef.current
+        if (this.eventLogRailMotion) {
+            this.eventLogRailMotion.cancel()
+            this.eventLogRailMotion = null
+        }
+        if (!rail || !previousRect || typeof rail.animate !== 'function') return
+        const reduceMotion = typeof window !== 'undefined'
+            && typeof window.matchMedia === 'function'
+            && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        if (reduceMotion) return
+
+        const nextRect = rail.getBoundingClientRect()
+        const offsetY = previousRect.top - nextRect.top
+        if (Math.abs(offsetY) < 1) return
+        const animation = rail.animate([
+            { transform: `translateY(${offsetY}px)` },
+            { transform: 'translateY(0)' }
+        ], {
+            duration: 140,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        })
+        this.eventLogRailMotion = animation
+        animation.onfinish = () => {
+            if (this.eventLogRailMotion === animation) this.eventLogRailMotion = null
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const decision = this.state.decision
+        const previousDecision = prevState.decision
+        const railVisible = this.isActionRailDecision(decision) || this.hasReplayAction()
+        const previousRailVisible = this.isActionRailDecision(previousDecision)
+            || Boolean(prevState.winner && prevState.canPlayAgain && this.props.isLeader)
+        if (railVisible && (!previousRailVisible || !this.state.actionRailPosition)) {
+            const position = this.measureActionRailPosition()
+            if (position) this.setState({ actionRailPosition: position })
+        }
+        this.updateExpandedEventLogRailTop()
+    }
+
+    componentWillUnmount() {
+        if (typeof window !== 'undefined') window.removeEventListener('resize', this.handleActionRailResize)
+        if (this.eventLogResizeObserver) this.eventLogResizeObserver.disconnect()
+        if (this.eventLogRailMotion) this.eventLogRailMotion.cancel()
+        const socket = this.props.socket
+        if (typeof socket.off === 'function') socket.off('g-reactionPresence', this.handleReactionPresence)
+        else if (typeof socket.removeListener === 'function') socket.removeListener('g-reactionPresence', this.handleReactionPresence)
+        for (const seat of this.reactionPresenceTimers.keys()) this.clearReactionPresenceTimer(seat)
+    }
+
+    clearReactionPresenceTimer = seat => {
+        const timers = this.reactionPresenceTimers.get(seat)
+        if (!timers) return
+        if (timers.expireTimer !== null) clearTimeout(timers.expireTimer)
+        if (timers.removeTimer !== null) clearTimeout(timers.removeTimer)
+        this.reactionPresenceTimers.delete(seat)
+    }
+
+    handleReactionPresence = payload => {
+        if (!payload || !Number.isInteger(payload.seat) || payload.seat < 0 || payload.seat > 5) return
+        const { seat, reaction } = payload
+        if (reaction !== null && (typeof reaction !== 'string' || !REACTION_PRESENCE_REACTIONS.has(reaction))) return
+
+        this.clearReactionPresenceTimer(seat)
+        if (reaction === null) {
+            this.setState(state => {
+                if (!state.reactionPresence[seat]) return null
+                const reactionPresence = { ...state.reactionPresence }
+                delete reactionPresence[seat]
+                return { reactionPresence }
+            })
+            return
+        }
+
+        const token = ++this.reactionPresenceSerial
+        const timers = { expireTimer: null, removeTimer: null, token }
+        this.reactionPresenceTimers.set(seat, timers)
+        this.setState(state => ({
+            reactionPresence: {
+                ...state.reactionPresence,
+                [seat]: { reaction, token, fading: false }
+            }
+        }))
+
+        timers.expireTimer = setTimeout(() => {
+            this.setState(state => {
+                const current = state.reactionPresence[seat]
+                if (!current || current.token !== token) return null
+                return {
+                    reactionPresence: {
+                        ...state.reactionPresence,
+                        [seat]: { ...current, fading: true }
+                    }
+                }
+            })
+            timers.removeTimer = setTimeout(() => {
+                if (this.reactionPresenceTimers.get(seat) !== timers) return
+                this.reactionPresenceTimers.delete(seat)
+                this.setState(state => {
+                    const current = state.reactionPresence[seat]
+                    if (!current || current.token !== token) return null
+                    const reactionPresence = { ...state.reactionPresence }
+                    delete reactionPresence[seat]
+                    return { reactionPresence }
+                })
+            }, REACTION_PRESENCE_FADE_MS)
+        }, REACTION_PRESENCE_MS)
+    }
+
+    measureActionRailPosition = () => {
+        if (typeof window === 'undefined' || typeof document === 'undefined') return null
+
+        let anchor = this.actionRailAnchorRef.current
+        if (!anchor) {
+            anchor = Array.from(document.querySelectorAll('.ActionDecisionAnchorProbe')).find(element =>
+                !element.closest('.ActionDecisionRail')
             )
         }
-        return (
-            <div className="GameContainer">
-                <div className="GameHeader">
-                    <div className="PlayerInfo">
-                        <p>You are: {this.props.name}</p>
-                        {coins}
+
+        if (anchor) {
+            const rect = anchor.getBoundingClientRect()
+            const scrollX = window.scrollX || window.pageXOffset || 0
+            const scrollY = window.scrollY || window.pageYOffset || 0
+            return { left: rect.left + scrollX, top: rect.top + scrollY }
+        }
+
+        return this.state.actionRailPosition
+    }
+
+    updateExpandedEventLogRailTop = () => {
+        const panel = this.eventLogRef.current && this.eventLogRef.current.panelRef.current
+        const rail = this.decisionSectionRef.current
+        if (!panel || !rail) return
+        rail.style.setProperty('--event-log-expanded-top', `${panel.getBoundingClientRect().bottom + 15}px`)
+    }
+
+    isActionRailDecision = decision => Boolean(decision)
+
+    hasReplayAction = () => Boolean(this.state.winner && this.state.canPlayAgain && this.props.isLeader)
+
+    handleActionRailResize = () => {
+        this.updateExpandedEventLogRailTop()
+        if (!this.isActionRailDecision(this.state.decision) && !this.hasReplayAction()) return
+        this.setState({ actionRailPosition: this.measureActionRailPosition() })
+    }
+
+    toggleDecisionPanel = () => this.setState(state => ({
+        decisionPanelExpanded: !state.decisionPanelExpanded
+    }))
+
+    renderDecisionPanelHeader = (titleId, bodyId) => {
+        const expanded = this.state.decisionPanelExpanded
+        return <header className="DecisionActionPanelHeader">
+            <h2 id={titleId} className="ActionDecisionTitle">{t('game.decision.panelTitle')}</h2>
+            <button
+                className="DecisionPanelToggle"
+                type="button"
+                aria-expanded={expanded}
+                aria-controls={bodyId}
+                aria-label={t(expanded ? 'game.decision.collapsePanel' : 'game.decision.expandPanel')}
+                onClick={this.toggleDecisionPanel}
+            >{expanded ? '−' : '+'}</button>
+        </header>
+    }
+
+    submitChoice = option => {
+        const { decision, submitted } = this.state
+        if (!decision || submitted) return
+        this.props.socket.emit('g-submitDecision', {
+            decisionId: decision.decisionId,
+            stateVersion: decision.stateVersion,
+            choiceId: option.choiceId
+        })
+        this.setState({ submitted: true, submittedChoiceId: option.choiceId, decisionError: '' })
+    }
+
+    submitActionChoice = option => {
+        const { decision, submitted } = this.state
+        if (this.actionSubmissionLock || !decision || decision.type !== 'action' || submitted) return
+        if (!Array.isArray(decision.options) || !decision.options.includes(option)) return
+        this.actionSubmissionLock = true
+        this.submitChoice(option)
+    }
+
+    openActionTargets = action => {
+        const decision = this.state.decision
+        if (!decision || decision.type !== 'action' || this.state.submitted || this.actionSubmissionLock) return
+        const options = actionOptionGroups(Array.isArray(decision.options) ? decision.options : []).get(action) || []
+        if (options.length === 0) return
+        this.setState({ actionTarget: action, decisionError: '' }, () => {
+            if (this.firstActionTargetRef.current) this.firstActionTargetRef.current.focus()
+        })
+    }
+
+    cancelActionTargets = () => {
+        const action = this.state.actionTarget
+        if (!action || this.state.submitted) return
+        this.setState({ actionTarget: null }, () => {
+            const actionRow = this.actionRowRefs[action]
+            if (actionRow && actionRow.current) actionRow.current.focus()
+        })
+    }
+
+    handleActionDecisionKeyDown = event => {
+        if (event.key === 'Escape' && this.state.actionTarget && !this.state.submitted) {
+            event.preventDefault()
+            this.cancelActionTargets()
+        }
+    }
+
+    renderActionDecision(decision, money) {
+        const optionsByAction = actionOptionGroups(Array.isArray(decision.options) ? decision.options : [])
+        const targetAction = this.state.actionTarget
+        const submitted = this.state.submitted || this.state.gamePaused
+        const panelExpanded = this.state.decisionPanelExpanded
+        const selectedTargets = targetAction ? (optionsByAction.get(targetAction) || []) : []
+        const selectedActionRow = ACTION_ROWS.find(({ action }) => action === targetAction)
+
+        return <section
+            className={`ActionDecision DecisionActionPanel${panelExpanded ? '' : ' DecisionActionPanel--collapsed'}`}
+            onKeyDown={this.handleActionDecisionKeyDown}
+            aria-labelledby="action-decision-title"
+        >
+            {this.renderDecisionPanelHeader('action-decision-title', 'action-decision-panel-body')}
+            <div id="action-decision-panel-body" className="DecisionActionPanelBody" aria-hidden={!panelExpanded}>
+            <p className="DecisionPanelSubtitle">
+                {targetAction ? t('game.actions.chooseTarget') : t('game.decision.title.action')}
+            </p>
+            <p className="DecisionPanelFollowup">{decisionFollowup(decision)}</p>
+            {targetAction
+                ? <p className="DecisionActionPrompt">{selectedActionRow ? t(`game.actions.${ACTION_KEYS[targetAction]}.description`) : ''}</p>
+                : <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>}
+
+            {targetAction ? <>
+                <div className="DecisionActionTargets" role="group" aria-label={t('game.actions.chooseTarget')}>
+                    {selectedTargets.map((option, index) => <button
+                        className="DecisionActionTarget"
+                        key={option.choiceId}
+                        type="button"
+                        ref={index === 0 ? this.firstActionTargetRef : null}
+                        disabled={submitted}
+                        aria-label={localizeOptionLabel(option, decision)}
+                        onClick={() => this.submitActionChoice(option)}
+                    >{targetName(option, targetAction)}</button>)}
+                </div>
+                <button
+                    className="DecisionActionCancel"
+                    type="button"
+                    disabled={submitted}
+                    onClick={this.cancelActionTargets}
+                >{t('game.actions.cancel')}</button>
+            </> : <div className="DecisionActionRows" role="group" aria-label={t('game.actions.turnTitle')}>
+                {ACTION_ROWS.map((actionRow, index) => {
+                    const { action, blockers, declaredRole } = actionRow
+                    const options = optionsByAction.get(action) || []
+                    const available = options.length > 0
+                    const hasNextAvailableAction = ACTION_ROWS.slice(index + 1).some(({ action: nextAction }) =>
+                        (optionsByAction.get(nextAction) || []).length > 0
+                    )
+                    const showDivider = available && hasNextAvailableAction
+                    const unavailableReason = unavailableActionReason(action, options, money)
+                    const actionId = `decision-action-${action}`
+                    const actionPriceLabel = actionPrice(actionRow)
+                    const isTargetAction = Boolean(actionRow.target)
+                    const detailIds = `${actionId}-description${declaredRole || blockers.length ? ` ${actionId}-roles` : ''}${available ? '' : ` ${actionId}-hint`}`
+                    const content = <>
+                        <span className="DecisionActionContent">
+                            <span className="DecisionActionHeading">
+                                <span id={`${actionId}-label`} className="DecisionActionLabel">{actionName(action)}</span>
+                                {declaredRole && <span className={`ActionRoleChip ActionRoleChip--declared ActionRoleChip--${declaredRole}`}>{roleName(declaredRole)}</span>}
+                            </span>
+                            <span className="DecisionActionMetaGroup">
+                                <span id={`${actionId}-description`} className="DecisionActionDescription">{t(`game.actions.${ACTION_KEYS[action]}.description`)}</span>
+                                {blockers.length > 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta">
+                                    <span className="ActionMetaLabel">{t('game.actions.blockedBy')}</span>
+                                    {blockers.map(role => <span className={`ActionRoleChip ActionRoleChip--blocker ActionRoleChip--${role}`} key={role}>{roleName(role)}</span>)}
+                                </span>}
+                                {declaredRole && blockers.length === 0 && <span id={`${actionId}-roles`} className="DecisionActionMeta DecisionActionMeta--unblockable">{t('game.actions.unblockable')}</span>}
+                                {!available && <span id={`${actionId}-hint`} className="DecisionActionHint" role="note">{unavailableReason}</span>}
+                            </span>
+                        </span>
+                        <span id={`${actionId}-price`} className={`ActionPrice${actionRow.free ? ' ActionPrice--free' : ''}`} aria-label={actionPriceLabel}>
+                            {actionRow.free
+                                ? actionPriceLabel
+                                : <span className="ActionPriceAmount">{actionRow.cost !== undefined ? actionRow.cost : actionRow.reward !== undefined ? `+${actionRow.reward}` : actionRow.amount}<span className="ActionCoin" aria-hidden="true">⚜</span></span>}
+                        </span>
+                    </>
+
+                    const actionRowElement = <div className="DecisionActionEntry" key={action}>
+                        <button
+                            className={`DecisionActionRow${available ? '' : ' DecisionActionRow--disabled'}`}
+                            type="button"
+                            ref={this.actionRowRefs[action]}
+                            aria-labelledby={`${actionId}-label`}
+                            aria-describedby={`${detailIds ? `${detailIds} ` : ''}${actionId}-price`}
+                            aria-disabled={available ? undefined : 'true'}
+                            disabled={available && submitted}
+                            onClick={available ? (isTargetAction
+                                ? () => this.openActionTargets(action)
+                                : () => this.submitActionChoice(options[0])) : undefined}
+                        >{content}</button>
+                        {showDivider && <span className="DecisionActionDivider" aria-hidden="true" />}
                     </div>
-                    <div className="CurrentPlayer">
-                        {currentPlayer}
-                    </div>
-                    <RulesModal/>
-                    <CheatSheetModal/>
-                    <EventLog logs={this.state.logs}></EventLog>
-                </div>
-                <div className="InfluenceSection">
-                    {influences}
-                </div>
-                <div className="TurnTableShell">
-                    <PlayerBoard
-                        players={this.state.boardPlayers}
-                        observerName={this.props.name}
-                        currentPlayer={this.state.currentPlayer}
-                    />
-                    <aside
-                        className={`TurnActionPanel ${canChooseAction ? 'TurnActionPanel--active' : 'TurnActionPanel--inactive'}`}
-                        aria-label="Your turn actions"
-                        aria-hidden={!canChooseAction}
-                    >
-                        {actionDecision}
-                    </aside>
-                </div>
-                <div className="DecisionsSection">
-                    {waiting}
-                    {revealDecision}
-                    {chooseInfluenceDecision}
-                    {exchangeInfluences}
-                    {challengeDecision}
-                    {blockChallengeDecision}
-                    {blockDecision}
-                    {pass}
-                    {playAgain}
-                </div>
-                <b>{this.state.winner}</b>
-                {this.state.playAgain}
+                    return available ? actionRowElement : null
+                })}
+            </div>}
+            {this.state.submitted && <p>{t('game.decision.sent')}</p>}
+            {this.state.decisionError && <p className="ActionError" role="alert">{this.state.decisionError}</p>}
             </div>
+        </section>
+    }
+
+    renderChoiceDecision(decision) {
+        const submitted = this.state.submitted || this.state.gamePaused
+        const panelExpanded = this.state.decisionPanelExpanded
+        const compact = RESPONSE_WINDOW_TYPES.has(decision.type)
+        const titleKey = DECISION_TITLE_KEYS[decision.type] || 'game.decision.title.generic'
+        const title = t(titleKey, {
+            count: this.state.ownInfluences.length,
+            influenceLabel: this.state.ownInfluences.length === 1
+                ? t('game.influence.singular')
+                : t('game.influence.plural')
+        })
+
+        return <section
+            className={`ActionDecision DecisionActionPanel ResponseDecisionPanel${compact ? ' DecisionActionPanel--compact' : ''}${panelExpanded ? '' : ' DecisionActionPanel--collapsed'}`}
+            data-decision-type={decision.type}
+            aria-labelledby="choice-decision-panel-title"
+        >
+            {this.renderDecisionPanelHeader('choice-decision-panel-title', 'choice-decision-panel-body')}
+            <div id="choice-decision-panel-body" className="DecisionActionPanelBody" aria-hidden={!panelExpanded}>
+            <p className="DecisionPanelSubtitle">{title}</p>
+            <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>
+            {decisionFollowup(decision) && <p className="DecisionPanelFollowup">{decisionFollowup(decision)}</p>}
+            <div className="DecisionOptions" role="group" aria-label={title}>
+                {(Array.isArray(decision.options) ? decision.options : []).map(option => {
+                    const selected = this.state.submittedChoiceId === option.choiceId
+                    return <button
+                        key={option.choiceId}
+                        className={`DecisionOption${selected ? ' DecisionOption--selected' : ''}`}
+                        type="button"
+                        disabled={submitted}
+                        aria-pressed={selected}
+                        onClick={() => this.submitChoice(option)}
+                    >{localizeOptionLabel(option, decision)}</button>
+                })}
+            </div>
+            {this.state.submitted && <p className="ExchangeDecisionStatus" role="status">{t('game.decision.sent')}</p>}
+            {this.state.decisionError && <p className="ActionError" role="alert">{this.state.decisionError}</p>}
+            </div>
+        </section>
+    }
+
+    renderGameOverDecision() {
+        const panelExpanded = this.state.decisionPanelExpanded
+        return <section className={`ActionDecision DecisionActionPanel GameOverDecisionPanel${panelExpanded ? '' : ' DecisionActionPanel--collapsed'}`} aria-labelledby="game-over-panel-title">
+            {this.renderDecisionPanelHeader('game-over-panel-title', 'game-over-panel-body')}
+            <div id="game-over-panel-body" className="DecisionActionPanelBody" aria-hidden={!panelExpanded}>
+            <p className="DecisionPanelSubtitle">{t('game.result.winner', { playerName: this.state.winner })}</p>
+            <button className="DecisionOption DecisionOption--primary" type="button" onClick={this.playAgain}>
+                {t('game.playAgain')}
+            </button>
+            </div>
+        </section>
+    }
+
+    playAgain = () => {
+        if (this.state.canPlayAgain && this.props.isLeader) {
+            this.setState({ canPlayAgain: false, winner: '' })
+            this.props.socket.emit('g-playAgain')
+        }
+    }
+
+    resumeGame = () => {
+        if (!this.state.canResume || this.resumeRequestPending) return
+        this.resumeRequestPending = true
+        this.setState({ resumePending: true, decisionError: '' }, () => {
+            this.props.socket.emit('g-resume')
+        })
+    }
+
+    trapPauseFocus = event => {
+        if (event.key !== 'Tab') return
+        const dialog = event.currentTarget
+        const focusable = Array.from(dialog.querySelectorAll(
+            'button:not(:disabled):not([aria-disabled="true"]), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'
+        ))
+        if (!focusable.length) {
+            event.preventDefault()
+            dialog.focus()
+            return
+        }
+
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        const active = document.activeElement
+        if (event.shiftKey && (active === first || active === dialog)) {
+            event.preventDefault()
+            last.focus()
+        } else if (!event.shiftKey && (active === last || active === dialog)) {
+            event.preventDefault()
+            first.focus()
+        }
+    }
+
+    emergencyStopCodex = () => {
+        this.props.socket.emit('emergencyStopCodex')
+    }
+
+    render() {
+        const me = this.state.players.find(player => player.name === this.props.name)
+        const decision = this.state.decision
+        const actionDecision = decision && decision.type === 'action'
+        const exchangeDecision = decision && decision.type === 'exchange'
+        const railDecision = Boolean(decision)
+        const canPlayAgain = Boolean(this.state.winner && this.state.canPlayAgain && this.props.isLeader)
+        const actionRailVisible = railDecision || canPlayAgain
+        const ownInfluences = this.state.ownInfluences
+        const responseWindowOpen = Boolean(
+            decision &&
+            RESPONSE_WINDOW_TYPES.has(decision.type) &&
+            Array.isArray(decision.options) &&
+            decision.options.length > 0 &&
+            !this.state.gamePaused &&
+            !this.props.isSpectator
         )
+        const responseAvailable = responseWindowOpen && !this.state.submitted
+        const isMyActiveTurn = Boolean(
+            this.props.name &&
+            !this.props.isSpectator &&
+            this.state.currentPlayer === this.props.name &&
+            !this.state.gamePaused &&
+            !this.state.pauseWaiting &&
+            !this.state.winner &&
+            !this.state.dissolved &&
+            !this.state.disconnected
+        )
+        if (this.state.disconnected) {
+            return <div className="GameContainer">
+                <div className="GameHeader"><p>{t('game.player.identity', { playerName: this.props.name })}</p></div>
+                <p>{t('game.disconnect.notice')} {t('game.disconnect.recreate')}</p>
+            </div>
+        }
+
+        if (this.state.dissolved) {
+            return <div className="GameContainer" role="status" aria-live="polite">
+                <h1>{t('game.dissolved.title')}</h1>
+                <p>{t('game.dissolved.message', { playerName: this.state.disconnectedPlayer })}</p>
+            </div>
+        }
+
+        const railPosition = this.state.actionRailPosition
+        const actionRailStyle = railPosition
+            ? { left: `${railPosition.left}px`, top: `${railPosition.top}px` }
+            : undefined
+        const actionRailClassName = `ActionDecisionRail${this.state.eventLogExpanded ? ' ActionDecisionRail--event-log-expanded' : ''}`
+        const actionDecisionRail = actionRailVisible && typeof document !== 'undefined'
+            ? createPortal(<div
+                ref={this.decisionSectionRef}
+                tabIndex="-1"
+                className={actionRailClassName}
+                style={actionRailStyle}
+                aria-live="polite"
+            >
+                {decision
+                    ? actionDecision
+                        ? this.renderActionDecision(decision, me && Number.isFinite(me.money) ? me.money : 0)
+                        : exchangeDecision
+                            ? <ExchangeDecisionPanel
+                                decision={decision}
+                                keepCount={ownInfluences.length}
+                                submitted={this.state.submitted}
+                                paused={this.state.gamePaused}
+                                error={this.state.decisionError}
+                                onChoose={this.submitChoice}
+                                panelHeader={this.renderDecisionPanelHeader('exchange-decision-title', 'exchange-decision-panel-body')}
+                                panelExpanded={this.state.decisionPanelExpanded}
+                            />
+                            : this.renderChoiceDecision(decision)
+                    : this.renderGameOverDecision()}
+            </div>, document.body)
+            : null
+
+        return <div className="GameContainer" data-player-count={this.state.players.length}>
+            <TurnFavicon isMyTurn={isMyActiveTurn} />
+            <div className="GameHeader">
+                <div className="DecisionsSection" aria-live="polite">
+                    {this.state.pauseWaiting && <p className="GameStatusMessage" role="status">{t('game.pause.generic')}</p>}
+                    {!decision && !this.state.winner && !this.state.gamePaused && !this.state.pauseWaiting && <p className="GameStatusMessage">{t('game.waiting')}</p>}
+                    {this.state.winner && <p className="GameStatusMessage"><b>{t('game.result.winner', { playerName: this.state.winner })}</b></p>}
+                </div>
+                {actionRailVisible && <div
+                    ref={this.actionRailAnchorRef}
+                    className="ActionDecisionAnchorProbe"
+                    aria-hidden="true"
+                />}
+                {this.props.isCodexAuthorized && <button
+                    type="button"
+                    className="GameUtilityControl"
+                    onClick={this.emergencyStopCodex}
+                    disabled={this.state.codexDisabled}
+                >{this.state.codexDisabled ? t('lobby.ai.emergency.disabled') : t('lobby.ai.emergency.stop')}</button>}
+                <EventLog
+                    ref={this.eventLogRef}
+                    socket={this.props.socket}
+                    players={this.state.players}
+                    decisionRailOpen={Boolean(railDecision)}
+                    onExpandedChange={this.handleEventLogExpandedChange}
+                />
+            </div>
+
+            {actionDecisionRail}
+
+            <PlayerBoard
+                players={this.state.players}
+                observerName={this.props.name}
+                observerInfluences={ownInfluences}
+                zoomDisabled={Boolean(this.state.gamePaused || this.state.pauseWaiting || decision || this.state.winner)}
+                currentPlayer={this.state.currentPlayer}
+                pendingDecisionSeats={this.state.pendingDecisionSeats}
+                responseAvailable={responseAvailable}
+                courtCount={this.state.courtCount}
+                reactionPresence={this.state.reactionPresence}
+            />
+            <ReferencePanel />
+
+            {this.state.gamePaused && <div
+                ref={this.pauseOverlayRef}
+                className="PauseOverlay"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="PauseOverlayTitle"
+                tabIndex="-1"
+                onKeyDown={this.trapPauseFocus}
+            >
+                <section className="PauseDialog">
+                    <h2 id="PauseOverlayTitle">{t('game.pause.title')}</h2>
+                    {this.state.canResume && <button
+                        type="button"
+                        className="PauseResumeButton"
+                        disabled={this.state.resumePending}
+                        aria-disabled={this.state.resumePending}
+                        onClick={this.resumeGame}
+                    >{t('game.resume')}</button>}
+                    {this.state.decisionError && <p className="PauseError" role="alert">{this.state.decisionError}</p>}
+                </section>
+            </div>}
+        </div>
     }
 }

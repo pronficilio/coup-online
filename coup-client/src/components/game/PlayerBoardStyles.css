@@ -3,8 +3,155 @@
     isolation: isolate;
     width: min(100%, 900px);
     aspect-ratio: 1;
-    margin: 12px auto;
+    margin: 50px auto 12px;
     box-sizing: border-box;
+    transform: translateY(min(-40px, calc(108px - 15vh - min(14vw, 126px))));
+}
+
+/* A five-seat ring tops out at 20.88% instead of the 14% used by the other layouts. */
+.PlayerBoardContainer[data-player-count="5"] {
+    translate: 0 -6.88%;
+}
+
+@media only screen and (min-width: 521px) and (max-width: 1023px) {
+    .PlayerBoardContainer {
+        transform: translateY(min(-40px, calc(100px - 22vh - min(14vw, 126px))));
+    }
+}
+
+@media only screen and (min-width: 521px) and (max-width: 1199px) {
+    .PlayerBoardSeat[data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(124px - 14.8vw), 47px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"],
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] {
+        width: clamp(96px, 20vw, 116px);
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatHeader,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatNameText,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatName,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatName {
+        gap: 3px;
+        padding: 2px 4px;
+        font-size: 0.58rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardCoinIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardCoinIcon {
+        flex-basis: 12px;
+        width: 12px;
+        height: 12px;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerBoardSeatCoins,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatCoins {
+        gap: 2px;
+        min-height: 22px;
+        padding: 2px 4px;
+        font-size: 0.58rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] .PlayerInfluenceEntry,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: clamp(38px, 4.5vw, 44px);
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(102px - 4.8vw), 77px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"]:not([data-seat-upper-right="true"]) {
+        translate: -3vw 0;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) {
+        width: 140px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] {
+        width: 100px;
+        translate: -30px 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerInfluenceEntry {
+        width: 46px;
+    }
+}
+
+@media only screen and (min-width: 521px) and (max-width: 1023px) {
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] {
+        width: 78px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(102px - 4.8vw), 77px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: clamp(34px, 4.3vw, 38px);
+    }
+}
+
+@media only screen and (min-width: 1024px) and (max-width: 1199px) {
+    .PlayerBoardSeat[data-player-count="5"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(438px - 40vw), 28px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] {
+        width: 78px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        translate: -clamp(0px, calc(510px - 40vw), 100px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: 36px;
+    }
+}
+
+@media only screen and (max-width: 520px) {
+    .PlayerBoardContainer {
+        transform: translateY(min(-40px, calc(80px - 22vh - 14vw)));
+    }
 }
 
 .GameContainer {
@@ -42,19 +189,44 @@
 }
 
 .PlayerBoardDeck {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+    filter:
+        drop-shadow(1px 4px 1px rgba(0, 0, 0, 0.34))
+        drop-shadow(3px 8px 2px rgba(0, 0, 0, 0.22))
+        drop-shadow(0 13px 5px rgba(0, 0, 0, 0.15));
+}
+
+.PlayerBoardCourt {
     position: absolute;
     z-index: 2;
     top: 50%;
     left: 50%;
     width: clamp(68px, 16%, 120px);
-    height: auto;
-    object-fit: contain;
-    pointer-events: none;
     transform: translate(-50%, -50%);
-    filter:
-        drop-shadow(1px 4px 1px rgba(0, 0, 0, 0.34))
-        drop-shadow(3px 8px 2px rgba(0, 0, 0, 0.22))
-        drop-shadow(0 13px 5px rgba(0, 0, 0, 0.15));
+}
+
+.PlayerBoardCourtCount {
+    position: absolute;
+    bottom: calc(100% + 7px);
+    left: 50%;
+    min-width: max-content;
+    padding: 4px 8px;
+    transform: translateX(-50%);
+    border: 1px solid rgba(91, 69, 42, 0.25);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.17);
+    color: #3f3427;
+    font-size: clamp(0.7rem, 1.5vw, 0.88rem);
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
 }
 
 .PlayerBoardSeat {
@@ -102,6 +274,94 @@
     line-height: 1.15;
     text-align: left;
     white-space: nowrap;
+}
+
+.PlayerBoardReactionBubble {
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    right: calc(100% + 5px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 26px;
+    box-sizing: border-box;
+    transform: translateY(-50%);
+    border: 1px solid rgba(91, 69, 42, 0.3);
+    border-radius: 10px;
+    background: #fffdf8;
+    box-shadow: 0 3px 9px rgba(25, 19, 12, 0.25);
+    color: #25211b;
+    font-family: system-ui, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1;
+    pointer-events: none;
+    animation: PlayerBoardReactionArrive 190ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.PlayerBoardReactionBubble::after {
+    position: absolute;
+    top: 50%;
+    right: -5px;
+    width: 0;
+    height: 0;
+    transform: translateY(-50%);
+    border: 4px solid transparent;
+    border-left-color: #fffdf8;
+    content: '';
+}
+
+.PlayerBoardReactionBubble > span {
+    display: inline-block;
+    transform: scale(0.72);
+    animation: PlayerBoardReactionEmojiArrive 190ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardReactionBubble {
+    top: -3px;
+    right: auto;
+    left: calc(100% + 5px);
+    transform: translateY(-100%);
+}
+
+.PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardReactionBubble::after {
+    top: auto;
+    right: auto;
+    bottom: -7px;
+    left: 5px;
+    transform: none;
+    border-top-color: #fffdf8;
+    border-right-color: transparent;
+    border-left-color: transparent;
+}
+
+.PlayerBoardReactionBubble--fading {
+    animation: PlayerBoardReactionDepart 180ms ease-in both;
+}
+
+.PlayerBoardReactionBubble--fading > span {
+    animation: PlayerBoardReactionEmojiDepart 180ms ease-in both;
+}
+
+@keyframes PlayerBoardReactionArrive {
+    from { opacity: 0; filter: blur(2px); }
+    to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes PlayerBoardReactionDepart {
+    from { opacity: 1; filter: blur(0); }
+    to { opacity: 0; filter: blur(2px); }
+}
+
+@keyframes PlayerBoardReactionEmojiArrive {
+    from { transform: scale(0.72); }
+    to { transform: scale(1); }
+}
+
+@keyframes PlayerBoardReactionEmojiDepart {
+    from { transform: scale(1); }
+    to { transform: scale(0.82); }
 }
 
 .PlayerBoardPlayerIcon {
@@ -155,16 +415,37 @@
     gap: 5px;
 }
 
+.PlayerInfluenceEntry {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: clamp(76px, 10.4vw, 134px);
+}
+
+.PlayerInfluenceRoleLabel {
+    width: 100%;
+    box-sizing: border-box;
+    color: #28231e;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
 .PlayerBoardSeat--current .PlayerBoardSeatInfluences {
     gap: 5px;
 }
 
-.PlayerBoardSeat--current .PlayerBoardSeatName {
+.PlayerBoardSeat--pending .PlayerBoardSeatName,
+.PlayerBoardSeat--respondable .PlayerBoardSeatName {
     background: #d8223b;
     box-shadow: inset 0 0 9px 2px rgba(255, 25, 48, 0.7), 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.PlayerBoardSeat--current .PlayerBoardSeatName::after {
+.PlayerBoardSeat--pending .PlayerBoardSeatName::after,
+.PlayerBoardSeat--respondable .PlayerBoardSeatName::after {
     content: '';
     position: absolute;
     z-index: 2;
@@ -204,11 +485,47 @@
     border-width: 1px;
 }
 
+.PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceEntry {
+    width: clamp(48px, 5.2vw, 70px);
+}
+
 .PlayerInfluenceSlot--face {
     padding: 0;
     background: #fff;
     color: #252525;
     text-transform: capitalize;
+}
+
+.PlayerInfluenceSlot--interactive {
+    padding: 0;
+    font: inherit;
+    cursor: zoom-in;
+    transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .PlayerInfluenceSlot--interactive:hover {
+        z-index: 4;
+        transform: translateY(-2px);
+        border-color: #554128;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.38);
+    }
+}
+
+.PlayerInfluenceSlot--interactive:focus-visible {
+    z-index: 5;
+    outline: 3px solid #1976d2;
+    outline-offset: 3px;
+}
+
+.PlayerInfluenceSlot--interactive:disabled {
+    cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .PlayerInfluenceSlot--interactive {
+        transition: none;
+    }
 }
 
 .PlayerInfluenceImage {
@@ -234,6 +551,35 @@
     border-style: dashed;
     border-color: #c8c8c8;
     background: #f4f4f4;
+}
+
+.PlayerInfluenceSlot--lost .PlayerInfluenceLostOverlay {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 3px;
+    border-radius: 5px;
+    background: rgba(120, 120, 120, 0.73);
+    box-sizing: border-box;
+}
+
+.PlayerInfluenceLostMarker {
+    display: inline-flex;
+    width: 1.35em;
+    height: 1.35em;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    background: rgba(40, 40, 40, 0.82);
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+    text-shadow: 0 1px 2px #000;
 }
 
 .PlayerBoardSeat--current .PlayerInfluenceSlot:not(.PlayerInfluenceSlot--inactive) {
@@ -278,11 +624,32 @@
         width: clamp(58px, 15.5vw, 82px);
     }
 
+    .PlayerBoardCourtCount {
+        padding: 3px 7px;
+        font-size: 0.68rem;
+    }
+
+    .PlayerBoardSeat--observer .PlayerInfluenceEntry {
+        width: clamp(58px, 15.5vw, 82px);
+    }
+
     .PlayerBoardSeatName {
         gap: 3px;
         padding: 1px 4px;
         font-size: 0.52rem;
         line-height: 1;
+    }
+
+    .PlayerBoardReactionBubble {
+        right: calc(100% + 3px);
+        width: 23px;
+        height: 22px;
+        border-radius: 8px;
+        font-size: 0.78rem;
+    }
+
+    .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardReactionBubble {
+        left: calc(100% + 3px);
     }
 
     .PlayerBoardPlayerIcon {
@@ -308,6 +675,14 @@
         width: clamp(29px, 9vw, 42px);
         height: auto;
         aspect-ratio: 0.68;
+    }
+
+    .PlayerBoardSeat:not(.PlayerBoardSeat--observer) .PlayerInfluenceEntry {
+        width: clamp(29px, 9vw, 42px);
+    }
+
+    .PlayerInfluenceRoleLabel {
+        font-size: 1.1rem;
     }
 
     .PlayerBoardSeat[data-seat-header-edge="left"] .PlayerBoardSeatHeader {
@@ -344,5 +719,210 @@
 
     .PlayerBoardSeat[data-seat-upper-side="true"] {
         translate: 0 -24px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) {
+        width: clamp(86px, 25vw, 100px);
+        translate: -5vw 0;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatName {
+        font-size: 0.58rem;
+        gap: 3px;
+        padding: 2px 4px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardCoinIcon {
+        flex-basis: 11px;
+        width: 11px;
+        height: 11px;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatCoins {
+        gap: 1px;
+        min-height: 16px;
+        padding: 1px 3px;
+        font-size: 0.5rem;
+    }
+
+    .PlayerBoardSeat[data-seat-upper-center="true"]:not([data-player-count="5"]) .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-right="true"] {
+        width: clamp(58px, 18vw, 70px);
+        translate: calc(-40vw + 45px) 12px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"]:not([data-seat-upper-right="true"]) {
+        width: clamp(58px, 18vw, 70px);
+        translate: calc(-17vw + 39px) 12px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] {
+        width: clamp(64px, calc(17vw + 10px), 76px);
+        translate: calc(-37.9vw + 77px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-center="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerInfluenceEntry {
+        width: clamp(26px, 8.2vw, 32px);
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatHeader {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatName {
+        gap: 2px;
+        padding: 1px 2px;
+        font-size: 0.48rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardCoinIcon {
+        flex-basis: 10px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatCoins {
+        gap: 1px;
+        min-height: 16px;
+        padding: 1px 2px;
+        font-size: 0.48rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardSeatName {
+        gap: 1px;
+        padding: 1px;
+        font-size: 0.45rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="6"][data-seat-upper-side="true"] .PlayerBoardCoinIcon {
+        flex-basis: 9px;
+        width: 9px;
+        height: 9px;
+    }
+
+    /* Reserve the fixed upper-right Event Log area on a five-seat mobile table. */
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] {
+        translate: calc(-22.29vw - 22px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerBoardSeatHeader {
+        width: clamp(57px, calc(16.4vw + 5px), 81px);
+        box-sizing: border-box;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerBoardSeatName {
+        min-width: 0;
+        max-width: 100%;
+        padding-right: 2px;
+        padding-left: 2px;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerBoardPlayerIcon,
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerBoardCoinIcon {
+        flex-basis: 10px;
+        width: 10px;
+        height: 10px;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerBoardSeatCoins {
+        min-height: 16px;
+        padding: 1px 3px;
+        font-size: 0.5rem;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerInfluenceSlot,
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="2"] .PlayerInfluenceEntry {
+        width: clamp(26px, 8.2vw, 38px);
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="3"] {
+        translate: clamp(-30px, calc(-61px + 8.5vw), -18px) 0;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="3"] .PlayerBoardSeatHeader {
+        width: clamp(62px, calc(8.5vw + 38.5px), 84px);
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="3"] .PlayerBoardSeatName {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="3"] .PlayerBoardSeatNameText {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        white-space: normal;
+    }
+
+    .PlayerBoardSeat[data-player-count="5"] .PlayerBoardSeatName::after {
+        box-shadow:
+            0 0 4px 1px rgba(255, 35, 68, 0.9),
+            0 0 7px 1px rgba(255, 18, 55, 0.56);
+    }
+
+    .PlayerBoardSeat[data-player-count="5"] .PlayerInfluenceSlot:not(.PlayerInfluenceSlot--inactive)::after {
+        box-shadow:
+            0 0 4px 1px rgba(255, 35, 68, 0.9),
+            0 0 7px 1px rgba(255, 18, 55, 0.56);
+    }
+}
+
+@media only screen and (max-width: 300px) {
+    .PlayerBoardSeat[data-player-count="5"][data-seat-index="3"] {
+        translate: -34px 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .PlayerBoardReactionBubble,
+    .PlayerBoardReactionBubble--fading,
+    .PlayerBoardReactionBubble > span,
+    .PlayerBoardReactionBubble--fading > span {
+        animation-duration: 1ms;
+    }
+}
+
+@media only screen and (max-width: 720px) {
+    .PlayerBoardContainer {
+        transform: none;
+        translate: none;
     }
 }

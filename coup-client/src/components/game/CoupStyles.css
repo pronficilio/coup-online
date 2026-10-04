@@ -1,17 +1,4 @@
-.PlayerInfo {
-    text-align: left;
-    position: absolute;
-    left: 10px;
-    top: 10px;
-    border: 2px solid #707070;
-    border-radius: 5px;
-    line-height: 40%;
-    width: fit-content;
-    padding-left: 10px;
-    padding-right: 20px;
-}
-
-.Rules, .CheatSheet {
+.Rules {
   cursor: pointer;
   text-align: left;
   position: absolute;
@@ -44,29 +31,7 @@
   justify-content: center;
 }
 
-.CheatSheet {
-  top: 110px;
-}
-
-.CheatSheetModal {
-  outline: none;
-  position: absolute;
-  top: 100px;
-  left: 5px;
-  right: 5px;
-  padding-top: 10px;
-  padding-left: 5px;
-  padding-right:5px;
-  background-color: #FFFFFF;
-}
-
-.CheatSheetContainer img {
-    margin-top: 5px;
-    width: 100%;
-    height: auto;
-}
-
-.Rules p, .HomeRules p, .CheatSheet p{
+.Rules p, .HomeRules p{
   font-size: 12px;
   margin: 8px;
   /* margin: 0; */
@@ -155,43 +120,13 @@
   stroke: none;
 }
 
-.InfluenceSection {
-    background-color: #F2F2F2;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    /* width: 300px; */
-    display: inline-block;
-}
-
-.InfluenceSection p{
-    text-align: center;
-}
-
-.InfluenceSection h3{
-    text-align: center;
-}
-
-.InfluenceUnitContainer {
-    width: 110px;
-    text-align: center;
-    margin-left: 15px;
-    margin-right: 15px;
-    line-height: 30%;
-    display: inline-block;
-}
-
-.CurrentPlayer {
-    text-align: right;
-    position: absolute;
-    right: 15px;
-    top: 5px;
-}
-
 .EventLogContainer {
     border-right: 2px solid #707070;
     /* border-left: 0px; */
     padding-right: 5px;
     padding-left: 5px;
+    box-sizing: border-box;
+    width: clamp(88px, calc(14vw + 38px), 180px);
     position: absolute;
     font-size: 12px;
     right: 15px;
@@ -203,11 +138,13 @@
     overflow-y: scroll;
     height: 9VH;
     padding-right: 3px;
+    overflow-wrap: anywhere;
 }
 .EventLogTitle {
     margin: 0;
     margin-bottom: 5px;
 }
+
 .bold {
     font-weight: bold;
 }
@@ -218,6 +155,7 @@
     -o-animation: fadeIn ease 1s;
     -ms-animation: fadeIn ease 1s;
   }
+
   @keyframes fadeIn {
     0% {
       opacity:0;
@@ -272,28 +210,139 @@
     text-align: center;
 }
 
-.circle {
-    height: 30px;
-    width: 30px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-  }
-.DecisionsSection button {
-    min-width: 100px;
-    height: 30px;
-    border-radius: 5px;
-    font-family: 'Muli', sans-serif;
-    background-color: #BCBCBC;
-    border: none;
-    color: white;
-    margin: 20px;
-    margin-bottom: 0px;
-    text-align: left;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 12px;
+.GameStatusMessage {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 35rem;
+    margin: 0 auto;
+    padding: 14px 20px;
+    border: 1px solid rgba(126, 91, 45, 0.3);
+    border-left: 4px solid #c29443;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fffdf8 0%, #f5ecdc 100%);
+    box-shadow: 0 8px 24px rgba(49, 36, 23, 0.16), 0 2px 6px rgba(49, 36, 23, 0.08);
+    color: #382e23;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(0.92rem, 1.15vw, 1.08rem);
+    font-weight: 600;
+    line-height: 1.4;
+    text-align: center;
+    overflow-wrap: anywhere;
 }
+
+.DecisionsSection {
+    position: fixed;
+    z-index: 39;
+    top: 15px;
+    left: 50%;
+    width: min(42rem, calc(100vw - 742px));
+    transform: translateX(-50%);
+}
+
+@media only screen and (min-width: 721px) and (max-width: 1024px) {
+    .DecisionsSection {
+        left: calc((100vw - 355px) / 2);
+        width: min(42rem, calc(100vw - 386px));
+    }
+}
+
+@media only screen and (max-width: 720px) {
+    .DecisionsSection {
+        position: static;
+        width: min(42rem, calc(100vw - 24px));
+        margin: 12px auto;
+        transform: none;
+    }
+}
+
+.PauseOverlay {
+    position: fixed;
+    z-index: 2001;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: clamp(16px, 4vw, 32px);
+    background: rgba(12, 18, 23, 0.78);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    color: #fff;
+}
+
+.PauseOverlay:focus {
+    outline: none;
+}
+
+.PauseDialog {
+    width: min(100%, 560px);
+    box-sizing: border-box;
+    margin: auto;
+    padding: clamp(24px, 5vw, 40px);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 16px;
+    background: #182630;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.38);
+    text-align: left;
+}
+
+.PauseDialog h2 {
+    margin: 0;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.65rem, 5vw, 2.15rem);
+    line-height: 1.15;
+}
+
+.PauseDialog .PauseResumeButton {
+    min-width: 180px;
+    min-height: 48px;
+    height: auto;
+    margin: 18px 0 4px;
+    padding: 12px 20px;
+    border: 2px solid #f4c96a;
+    border-radius: 8px;
+    background: #f4c96a;
+    color: #1b242a;
+    cursor: pointer;
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    text-align: center;
+    transition: background-color 140ms ease, color 140ms ease;
+}
+
+.PauseDialog .PauseResumeButton:hover:not([aria-disabled="true"]) {
+    background: #ffda88;
+}
+
+.PauseDialog .PauseResumeButton[aria-disabled="true"] {
+    cursor: wait;
+    opacity: 0.78;
+}
+
+.PauseDialog .PauseResumeButton:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 4px;
+}
+
+.PauseDialog .PauseError {
+    margin: 18px 0 0;
+    padding: 12px 14px;
+    border-left: 4px solid #ff8c82;
+    border-radius: 4px;
+    background: rgba(119, 27, 30, 0.48);
+    color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .PauseDialog .PauseResumeButton {
+        transition: none;
+    }
+}
+
 #captain {
     background-color: #80C6E5;
 }
@@ -324,11 +373,6 @@
 #ambassador-color {
   color: #B4CA1F;
 }
-.DecisionTitle {
-    text-align: left;
-    margin-left: 22px;
-}
-
 .ActionDecision {
     box-sizing: border-box;
     width: 100%;
@@ -751,6 +795,7 @@
 @media (prefers-reduced-motion: reduce) {
     .ActionButton,
     .TargetButton,
+    .DecisionOption,
     .TurnActionPanel,
     .TurnActionPanel .ActionConfirmButton,
     .TurnActionPanel .ActionCancelButton {
@@ -769,30 +814,13 @@
       padding-left: 0px;
       padding-right: 0px;
     }
-    .PlayerInfo {
-      left: 10VW;
-      top: 5VH;
-    }
-    .CurrentPlayer {
-        text-align: right;
-        position: absolute;
-        right: 10VW;
-        top: 5VH;
-    }
     .Rules{
       left: 10VW;
       top: 17VH;
     }
-    .CheatSheet{
+    .ActionDecisionAnchorProbe {
       left: 10VW;
       top: 22VH;
-    }
-    .CheatSheetModal {
-      position: absolute;
-      top: 40px;
-      left: 40px;
-      right: 40px;
-      background-color: #FFFFFF;
     }
     .EventLogContainer {
         text-align: right;
@@ -803,12 +831,727 @@
     .GameHeader {
         height: 15VH;
     }
-    .DecisionTitle {
-        margin-left: 10VW;
-    }
-    .DecisionButtonsContainer  {
-        text-align: center;
-        width: 80%;
-        margin-left: 10%;
-    }
   }
+
+@media only screen and (max-width: 720px) {
+    .GameHeader {
+        display: flex;
+        height: auto;
+        min-height: 22vh;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .GameHeader:has(.EventLogPanel--expanded) {
+        min-height: max(22vh, calc(min(38vh, 38dvh, 320px) + 12px));
+    }
+}
+
+.DecisionActionPanel {
+    box-sizing: border-box;
+    width: min(620px, calc(100vw - 24px));
+    margin: 12px auto;
+    padding: 15px 16px 16px;
+    border: 1px solid #d8c9b1;
+    border-radius: 13px;
+    background: linear-gradient(145deg, #fbf5e9 0%, #f6eedf 100%);
+    box-shadow: 0 7px 20px rgba(51, 35, 19, 0.2);
+    color: #211d18;
+    text-align: left;
+}
+
+.DecisionPanelSubtitle {
+    margin: 9px 2px 4px;
+    color: #443b30;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.DecisionPanelFollowup {
+    margin: 4px 2px 11px;
+    color: #5a4d40;
+    font-size: 0.88rem;
+    line-height: 1.3;
+}
+
+.DecisionOptions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.DecisionOption {
+    min-width: 100px;
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 1px solid #9b8871;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.82);
+    color: #352b21;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 140ms ease, background-color 140ms ease, color 140ms ease;
+}
+
+.DecisionOption:hover:not(:disabled) {
+    border-color: #7e2029;
+    background: #f4e8df;
+}
+
+.DecisionOption:focus-visible {
+    outline: 3px solid #efb84c;
+    outline-offset: 3px;
+}
+
+.DecisionOption:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.DecisionOption--selected,
+.DecisionOption--selected:disabled {
+    border-color: #8c202b;
+    background: #a92a36;
+    color: #fff;
+    opacity: 1;
+}
+
+.DecisionOption--primary {
+    margin-top: 10px;
+}
+
+.GameUtilityControl {
+    position: absolute;
+    z-index: 41;
+    top: 8px;
+    right: 10px;
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid #8d1d27;
+    border-radius: 6px;
+    background: #9e202b;
+    color: #fff;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.GameUtilityControl:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.ExchangeDecisionPanel .ActionDecisionTitle {
+    margin: 0;
+    padding: 0 0 10px;
+    border-bottom: 1px solid #d8c9b1;
+    color: #211d18;
+    font-size: 1.38rem;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.ExchangePoolCards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 14px 0 12px;
+}
+
+.ExchangePoolCard {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 5px 3px 7px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #211d18;
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 140ms ease, transform 140ms ease;
+}
+
+.ExchangePoolCard:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.78);
+    transform: translateY(-2px);
+}
+
+.ExchangePoolCard:focus-visible,
+.ExchangeKeepSubmit:focus-visible {
+    outline: 3px solid #efb84c;
+    outline-offset: 3px;
+}
+
+.ExchangePoolCard:disabled {
+    cursor: wait;
+}
+
+.ExchangePoolCardImage {
+    position: relative;
+    display: block;
+    width: clamp(48px, 7.2vw, 66px);
+    aspect-ratio: 2 / 3;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(38, 28, 18, 0.24);
+}
+
+.ExchangePoolCardImage img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: contain;
+}
+
+.ExchangePoolCard--selected .ExchangePoolCardImage::before {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    inset: 0;
+    border-radius: 5px;
+    box-shadow: inset 0 0 10px 2px rgba(255, 25, 48, 0.7);
+    pointer-events: none;
+}
+
+.ExchangePoolCard--selected .ExchangePoolCardImage::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    inset: -3px;
+    border: 2px solid rgba(255, 255, 255, 0.98);
+    border-radius: 8px;
+    box-shadow:
+        0 0 6px 1px rgba(255, 35, 68, 0.9),
+        0 0 15px 4px rgba(255, 18, 55, 0.56),
+        0 0 25px 7px rgba(255, 18, 55, 0.22);
+    pointer-events: none;
+}
+
+.ExchangePoolCardLabel {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.ExchangePoolCardSource {
+    color: #655b4f;
+    font-size: 0.7rem;
+    line-height: 1.1;
+}
+
+.ExchangeKeepSubmit {
+    display: block;
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #7e2029;
+    border-radius: 9px;
+    background: #a92a36;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+}
+
+.ExchangeKeepSubmit:hover:not(:disabled) {
+    background: #8f1f2a;
+}
+
+.ExchangeKeepSubmit:disabled {
+    cursor: wait;
+    opacity: 0.62;
+}
+
+.ExchangeDecisionStatus {
+    margin: 12px 0 0;
+    color: #443b30;
+    font-weight: 700;
+}
+
+@media (max-width: 420px) {
+    .ExchangePoolCards {
+        gap: 3px;
+    }
+
+    .ExchangePoolCardImage {
+        width: clamp(46px, 16vw, 62px);
+    }
+
+    .ExchangePoolCardLabel {
+        font-size: 0.78rem;
+    }
+
+    .ExchangePoolCardSource {
+        font-size: 0.63rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ExchangePoolCard {
+        transition: none;
+    }
+}
+
+.DecisionActionPanel .ActionDecisionTitle {
+    min-width: 0;
+    flex: 1 1 auto;
+    margin: 0;
+    padding: 0;
+    border-bottom: 0;
+    color: #211d18;
+    font-size: 1.38rem;
+    line-height: 1.15;
+    text-align: left;
+}
+
+.DecisionActionPanelHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d8c9b1;
+}
+
+.DecisionPanelToggle {
+    display: inline-flex;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    color: #211d18;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: background-color 140ms ease, border-color 140ms ease, transform 140ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.DecisionPanelToggle:hover {
+    transform: scale(1.04);
+    border-color: #d8c9b1;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.DecisionPanelToggle:focus-visible {
+    outline: 3px solid #a96819;
+    outline-offset: 2px;
+}
+
+.DecisionActionPanel--collapsed .DecisionActionPanelBody {
+    display: none;
+}
+
+.DecisionActionPrompt {
+    margin: 10px 2px 12px;
+    color: #443b30;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.98rem;
+    line-height: 1.3;
+    text-align: left;
+}
+
+.DecisionActionMetaGroup {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.DecisionActionRows {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    padding: 2px 4px 4px;
+}
+
+.DecisionActionEntry {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.DecisionActionDivider {
+    display: block;
+    height: 1px;
+    flex: 0 0 1px;
+    margin: 1px 14px;
+    background: #dfd3c0;
+    pointer-events: none;
+}
+
+.DecisionActionPanel .DecisionActionRow {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 72px;
+    height: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+    padding: 9px 11px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background-color: transparent;
+    color: #211d18;
+    cursor: pointer;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: left;
+    text-decoration: none;
+    white-space: normal;
+    transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, color 140ms ease;
+    -webkit-tap-highlight-color: rgba(192, 130, 29, 0.2);
+    touch-action: manipulation;
+}
+
+.DecisionActionContent {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.DecisionActionHeading {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+}
+
+.DecisionActionLabel {
+    color: inherit;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.16rem;
+    font-variant: small-caps;
+    font-weight: 700;
+    line-height: 1.15;
+    text-transform: uppercase;
+    transition: font-size 120ms ease;
+}
+
+.DecisionActionDescription {
+    display: block;
+    color: #302a22;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.96rem;
+    line-height: 1.25;
+}
+
+.DecisionActionMeta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 2px;
+}
+
+.DecisionActionMeta--unblockable {
+    display: block;
+    color: #50473c;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.9rem;
+    line-height: 1.2;
+}
+
+.DecisionActionRow .ActionPrice {
+    margin: 0;
+    flex: 0 0 82px;
+}
+
+.DecisionActionRow:hover:not(.DecisionActionRow--disabled):not(:disabled),
+.DecisionActionRow:focus-visible:not(.DecisionActionRow--disabled) {
+    border-color: #d79b29;
+    background-color: rgba(246, 190, 74, 0.28);
+    box-shadow: inset 0 0 0 1px rgba(255, 249, 220, 0.95), 0 2px 8px rgba(132, 84, 14, 0.16);
+    color: #241b10;
+}
+
+.DecisionActionRow:focus-visible,
+.DecisionActionTarget:focus-visible,
+.DecisionActionCancel:focus-visible {
+    outline: 3px solid #a96819;
+    outline-offset: 2px;
+}
+
+.DecisionActionRow:active:not(.DecisionActionRow--disabled):not(:disabled),
+.DecisionActionTarget:active:not(:disabled),
+.DecisionActionCancel:active:not(:disabled) {
+    background-color: rgba(227, 166, 51, 0.36);
+}
+
+.DecisionActionPanel .DecisionActionRow--disabled {
+    border-color: #ddd1c0;
+    background-color: rgba(255, 255, 255, 0.18);
+    background-image: repeating-linear-gradient(135deg, rgba(117, 99, 77, 0.065) 0, rgba(117, 99, 77, 0.065) 5px, transparent 5px, transparent 11px);
+    color: #696257;
+    cursor: not-allowed;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
+}
+
+.DecisionActionRow--disabled .DecisionActionDescription,
+.DecisionActionRow--disabled .DecisionActionMeta--unblockable,
+.DecisionActionRow--disabled .ActionMetaLabel {
+    color: #696257;
+}
+
+.DecisionActionRow--disabled .ActionRoleChip {
+    filter: grayscale(0.62);
+}
+
+.DecisionActionRow--disabled .ActionPrice {
+    border-color: #d4cbbd;
+    background: rgba(224, 218, 207, 0.55);
+    color: #625d55;
+    filter: grayscale(0.75);
+}
+
+.DecisionActionHint {
+    display: block;
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 5px;
+    padding: 5px 10px;
+    border: 1px solid #1b1713;
+    border-radius: 8px;
+    background: #2b241d;
+    box-shadow: 0 3px 7px rgba(42, 28, 14, 0.28);
+    color: #fff4df;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.25;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 140ms ease;
+}
+
+.DecisionActionHint::before {
+    position: absolute;
+    top: -6px;
+    left: 14px;
+    width: 0;
+    height: 0;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #2b241d;
+    border-left: 5px solid transparent;
+    content: '';
+}
+
+.DecisionActionRow--disabled:hover .DecisionActionHint,
+.DecisionActionRow--disabled:focus-visible .DecisionActionHint {
+    opacity: 1;
+}
+
+.DecisionActionRow:disabled {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.DecisionActionTargets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.DecisionActionPanel .DecisionActionTarget,
+.DecisionActionPanel .DecisionActionCancel {
+    box-sizing: border-box;
+    min-width: 110px;
+    min-height: 44px;
+    height: auto;
+    margin: 0;
+    padding: 9px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+    touch-action: manipulation;
+}
+
+.DecisionActionPanel .DecisionActionTarget {
+    border: 1px solid #6f5133;
+    background: #6f5133;
+    color: #fff;
+}
+
+.DecisionActionPanel .DecisionActionTarget:hover:not(:disabled) {
+    border-color: #8a633d;
+    background: #8a633d;
+}
+
+.DecisionActionPanel .DecisionActionCancel {
+    border: 1px solid #8e795e;
+    background: rgba(255, 255, 255, 0.74);
+    color: #433727;
+}
+
+.DecisionActionPanel .DecisionActionCancel:hover:not(:disabled) {
+    border-color: #6f5133;
+    background: #efe4d2;
+}
+
+.DecisionActionTarget:disabled,
+.DecisionActionCancel:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+@media only screen and (max-width: 560px) {
+    .DecisionActionPanel {
+        width: calc(100vw - 18px);
+        margin: 9px auto;
+        padding: 12px 10px;
+    }
+
+    .DecisionActionRows {
+        padding-right: 2px;
+        padding-left: 2px;
+    }
+
+    .DecisionActionPanel .DecisionActionRow {
+        min-height: 68px;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .DecisionActionLabel {
+        font-size: 1.04rem;
+    }
+
+    .DecisionActionDescription {
+        font-size: 0.91rem;
+    }
+
+    .DecisionActionRow .ActionPrice {
+        flex-basis: 68px;
+        min-height: 38px;
+        padding: 4px;
+        font-size: 0.98rem;
+    }
+
+    .DecisionActionRow .ActionCoin {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+@media (hover: none), (pointer: coarse) {
+    .DecisionActionHint {
+        opacity: 1;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .DecisionActionPanel .DecisionActionRow,
+    .DecisionActionPanel .DecisionActionLabel,
+    .DecisionActionPanel .DecisionActionTarget,
+    .DecisionActionPanel .DecisionActionCancel,
+    .DecisionPanelToggle,
+    .DecisionActionHint,
+    .ActionDecisionRail .DecisionActionPanel {
+        transition: none;
+    }
+}
+
+.ActionDecisionRail {
+    position: absolute;
+    z-index: 40;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: min(620px, calc(100vw - 20px));
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.ActionDecisionAnchorProbe {
+    position: absolute;
+    left: 10px;
+    top: 110px;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.ActionDecisionRail .DecisionActionPanel {
+    position: static;
+    width: 100%;
+    max-height: calc(100vh - 166px);
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    transition: width 160ms ease;
+}
+
+@media (max-width: 720px) {
+    .ActionDecisionRail.ActionDecisionRail--event-log-expanded {
+        position: fixed;
+        top: max(
+            var(--event-log-expanded-top, 0px),
+            max(150px, env(safe-area-inset-top, 0px))
+        ) !important;
+        right: 10px;
+        left: 10px !important;
+        width: auto;
+    }
+
+    .ActionDecisionRail--event-log-expanded .DecisionActionPanel {
+        max-height: min(23vh, 23dvh, 194px);
+    }
+}
+
+@media only screen and (min-width: 721px) {
+    .DecisionActionPanel.DecisionActionPanel--compact .DecisionActionLabel {
+        font-size: 0.812rem;
+    }
+
+    .ActionDecisionRail .DecisionActionPanel.DecisionActionPanel--compact {
+        width: 50%;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    .ActionDecisionRail {
+        width: min(620px, calc(100vw - 10vw - 24px));
+    }
+
+    .ActionDecisionRail .DecisionActionPanel {
+        max-height: min(calc(100vh - 22vh - 52px), 760px);
+    }
+}
