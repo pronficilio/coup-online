@@ -22,29 +22,31 @@ The package script records the full source SHA in `RELEASE_SHA` and sets the
 image tag from that SHA. The web image builds the React app with
 `REACT_APP_BACKEND_URL` set to
 `https://coup.ejele.net`. The API uses Node 24, listens on port 8000 inside the
-Docker network, and allows the Coup origin for HTTP and Socket.IO handshakes.
+Docker network, and allows the configured Coup Origin or same-origin Referer
+for Socket.IO handshakes. Explicitly foreign origins are rejected; requests
+with neither Origin nor Referer are rejected for Socket.IO.
 Game rooms live in memory and are lost if the API container restarts.
 
 ## Current release, rollout and rollback
 
-Production currently runs `ff840d1` from
-`/opt/coup/releases/ff840d1/deploy`, with Compose project `deploy`. This is the
-issue #13 fix, based on the previously published `ce53c28`. The API and web
-containers were activated on 2026-10-04 and their production TLS, health,
-allowed/blocked-origin HTTP, polling, and WebSocket probes passed after
-staging's Docker service aliases were isolated. The Codex runner remains on its
-existing release. See `docs/plans/active/report_issue_13_F6.md` for probe
-results and `docs/plans/active/issue_13_hetzner_deployment.md` for the rollout
-record.
+Production currently runs `070c14f` from
+`/opt/coup/releases/070c14f/deploy`, with Compose project `deploy`. This
+release includes the current fork `master` at `02bcf3e` and fixes the Socket.IO
+same-origin Referer check that blocked browser polling in `ff840d1`. The API
+and web containers were activated on 2026-10-05. TLS, home, health, same-origin
+Referer polling/WebSocket, allowed-Origin polling, and hostile Origin/Referer
+probes passed afterward. The Codex runner remains on its existing release. See
+`docs/plans/active/report_issue_13_F6.md` for independent probes and
+`docs/plans/active/issue_13_hetzner_deployment.md` for the rollout record.
 
 To activate a reviewed release, switch only the Coup Compose project with:
 
 ```sh
 docker compose \
-  --project-directory /opt/coup/releases/ff840d1/deploy \
+  --project-directory /opt/coup/releases/070c14f/deploy \
   -p deploy \
-  --env-file /opt/coup/releases/ff840d1/deploy/.env \
-  -f /opt/coup/releases/ff840d1/deploy/docker-compose.yml \
+  --env-file /opt/coup/releases/070c14f/deploy/.env \
+  -f /opt/coup/releases/070c14f/deploy/docker-compose.yml \
   up -d --wait
 ```
 
@@ -146,31 +148,28 @@ Compose change, recreate only project `st-coup` and confirm its aliases remain
 unique before probing production.
 
 The staging API must allow only its configured browser origin for HTTP and
-Socket.IO. Verify an allowed staging client can create/join a room and upgrade
+Socket.IO. For Socket.IO 2.5, same-origin browser polling can send a Referer URL
+instead of Origin; compare its parsed `URL.origin` to the configured origin.
+Verify an allowed staging client can create/join a room and upgrade
 polling to WebSocket, while an arbitrary Origin is rejected for HTTP, polling,
 and WebSocket. A release is not ready for production until these checks pass.
 
-### Staging snapshot (2026-10-04)
+### Staging snapshot (2026-10-05)
 
-The issue #13 fix is running as release `ff840d1` at
+The issue #13 fix is running as release `070c14f` at
 `https://st-coup.ejele.net`. The stage API and web use separate containers and
 image tags, publish no host ports, and share only the existing Docker network
 with the public proxy. The stage certificate is separate; its systemd renewal
 timer is enabled, and Certbot `renew --dry-run --cert-name st-coup.ejele.net`
 passed.
 
-Independent F6 probes passed for TLS, home and health (`200`), the configured
-HTTP preflight (`204`) and Socket.IO polling (`200`), plus WebSocket upgrade
-(`101`). Requests from `https://attacker.invalid` received `403` for HTTP and
-polling and `400 Origin not allowed` for WebSocket. Both stage containers were
-restarted; API returned to `healthy`, web stayed `Up`, and public home/health
-returned `200`. A separate Orchestrator smoke check connected two Socket.IO
-clients through polling with the staging Origin; both received `joinSuccess`,
-started a game, and received `g-updatePlayers` with two players. The independent
-WebSocket upgrade probe passed separately; these two clients stayed on polling.
-See `docs/plans/active/report_issue_13_F6_orchestrator.md`. Production is now on
-`ff840d1`, and all public origin-control probes passed after fixing the staging
-alias collision. The independent verifier still marks full F6 `BLOCKED` because
-it did not test a production game, restart, or rollback. The Orchestrator's
-staging game and restart evidence is recorded separately; a production rollback
+Independent probes passed for TLS/home/health, allowed Origin and same-origin
+Referer, and rejection of hostile Origin/Referer plus the case where both are
+absent. A two-client polling game started with no Origin header and the staging
+Referer; both clients received `g-updatePlayers`. The API was restarted to clear
+the temporary game and returned healthy; web stayed up. See
+`docs/plans/active/report_issue_13_F6.md` and
+`docs/plans/active/report_issue_13_F6_orchestrator.md`. Production now runs
+`070c14f`; its API recovered healthy during rollout and its same-origin
+Referer polling/WebSocket and hostile-origin probes passed. Production rollback
 was not exercised.
