@@ -1,6 +1,6 @@
 # Plan — resolver ventanas al quedar determinado el resultado (#77)
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 recheck `PASS` AC1–AC8; unidad `ACTIVE`, pendiente de revisión de integración.
+**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 post-sync `PASS` AC1–AC8 en `15c239c`; unidad `ACTIVE`, PR pendiente de publicación para revisión de integración.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/77
 **Solicitud:** reducir la espera en desafíos/bloqueos en partidas sin IA.
 **Objetivo operativo:** cerrar una ventana tan pronto como las respuestas recibidas ya determinan la misma opción ganadora por prioridad de asiento que la implementación actual.
@@ -9,10 +9,10 @@
 **Handoff:** `docs/plans/inbox/issue_77_decision_window_performance.md`.
 **Bitácora append-only:** `docs/plans/log/issue-77.jsonl`.
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
-**Verifier requerido:** F3, por transición concurrente y regla de juego.
+**Verifier requerido:** F3 independiente, por transición concurrente y regla de juego; repetido tras integrar base compartida.
 **Branch / worktree / destino:** `issue/77-decision-window-performance` / `.worktrees/issue-77-decision-window-performance` / `master`.
 **Integración:** una PR para #77.
-**Siguiente dueño:** Agente Alquimista después de reclamar #77.
+**Siguiente dueño:** Orquestación para revisión de integración.
 
 ## Hechos, incógnitas y contrato conservado
 
@@ -75,7 +75,7 @@ F2 se cerró en `7aea6e4` con la cobertura registrada abajo. F3 la devolvió ún
 - **Avanzar:** Verifier intenta refutar AC1–AC8 del issue; `PASS` habilita revisión de integración.
 - **Pivotar:** corregir un contraejemplo reproduciéndolo con la permutación exacta.
 - **Retorno anterior:** F2 cubrió y ejecutó la secuencia Codex pendiente → cierre humano por prefijo → resultado Codex obsoleto tras el `FAIL` inicial de AC8.
-- **Recheck independiente:** `report_issue_77_F3_recheck_verifier.md` emite `PASS` AC1–AC8 sobre `4d8be42`. El primer `FAIL` se conserva en `report_issue_77_F3_verifier.md`; no se repitió la corrida porque F2 recheck ya registra la regresión pasando y las tres fallas ajenas.
+- **Recheck independiente:** `report_issue_77_F3_recheck_verifier.md` emite `PASS` AC1–AC8 sobre `4d8be42`. Después del merge requerido con la base, se repitió F3 sobre `15c239c`; el reporte post-sync vuelve a emitir `PASS` AC1–AC8. La ejecución focalizada registra 19/22 y la suite server 49/52, con las mismas tres fallas conocidas fuera del alcance. El primer `FAIL` se conserva como historial.
 - **Repetir:** una ronda de refutación después del fix.
 - **Bloquear:** falta Verifier independiente o evidencia de equivalencia.
 - **Commit:** `COMMIT_REQUIRED`; resultado registrado en el reporte de recheck, bitácora, plan y handoff. F3 `PASS` habilita revisión de integración por Orquestación; no abre PR automáticamente. Un nuevo `FAIL` devolvería el caso correspondiente a F2.

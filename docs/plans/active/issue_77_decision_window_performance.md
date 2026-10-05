@@ -2,9 +2,9 @@
 
 **Issue:** [#77 — reducir esperas en votaciones cuando el resultado ya está determinado](https://github.com/pronficilio/coup-online/issues/77), `OPEN`.
 **Plan:** `docs/plans/decision-window-performance/plan_decision_window_performance.md`.
-**Estado:** unidad `ACTIVE`; F2 `CLOSED`; F3 recheck `PASS` AC1–AC8; pendiente de revisión de integración por Orquestación.
+**Estado:** unidad `ACTIVE`; F2 `CLOSED`; F3 post-sync `PASS` AC1–AC8 sobre `15c239c`; PR pendiente de publicación para revisión de integración por Orquestación.
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
-**Verifier:** F3 independiente completado; reporte inicial y recheck preservados en `docs/plans/decision-window-performance/`.
+**Verifier:** F3 independiente post-sync completado; reportes inicial, recheck y post-sync preservados en `docs/plans/decision-window-performance/`.
 **Branch / worktree / merge target:** `issue/77-decision-window-performance` / `.worktrees/issue-77-decision-window-performance` / `master`.
 **Bitácora:** `docs/plans/log/issue-77.jsonl`.
 **Dueño actual:** Orquestación (revisión de integración tras F3 `PASS`).
@@ -13,7 +13,7 @@
 
 F1 está `CLOSED`; reporte y matriz en `docs/plans/decision-window-performance/report_issue_77_F1.md`.
 
-F2 implementó el cierre en `7aea6e4`; F3 inicial devolvió AC8 por falta de una regresión Codex (`9006853`). F2 agregó y ejecutó el caso pendiente → cierre humano anticipado → respuesta Codex con envelope viejo. La repetición independiente F3 sobre `4d8be42` emite `PASS` AC1–AC8; evidencia en `docs/plans/decision-window-performance/report_issue_77_F3_recheck_verifier.md`. La corrida focalizada de F2 recheck reporta 19 aprobadas y tres fallas ajenas; no se repitió. Unidad queda pendiente de revisión de integración. No se abrió PR.
+F2 implementó el cierre en `7aea6e4`; F3 inicial devolvió AC8 por falta de una regresión Codex (`9006853`). F2 agregó y ejecutó el caso pendiente → cierre humano anticipado → respuesta Codex con envelope viejo. El recheck independiente sobre `4d8be42` emitió `PASS` AC1–AC8. Después se integró `origin/master@615b3a4` con merge `15c239c`; la revisión F3 independiente se repitió sobre ese hash exacto y vuelve a emitir `PASS` AC1–AC8. La prueba focalizada `node test/coup.test.js` reporta 19 aprobadas y tres fallas ajenas ya documentadas. La suite completa del servidor reporta 49 aprobadas y las mismas tres fallas. PR pendiente de publicación para revisión de integración.
 
 ## Contrato que no se negocia en F2
 
@@ -24,6 +24,6 @@ F2 implementó el cierre en `7aea6e4`; F3 inicial devolvió AC8 por falta de una
 
 ## Reclamo y validación
 
-Issue reclamado en `pronficilio/coup-online`, asignado a `pronficilio`; branch/worktree verificados en `.worktrees/issue-77-decision-window-performance`; handoff movido de `inbox/` a `active/`. F3 recheck `PASS`; Orquestación puede revisar integración. El `FAIL` F3 previo permanece documentado como historial.
+Issue reclamado en `pronficilio/coup-online`, asignado a `pronficilio`; branch/worktree verificados en `.worktrees/issue-77-decision-window-performance`; handoff movido de `inbox/` a `active/`. F3 post-sync `PASS`; Orquestación puede revisar integración. El `FAIL` F3 inicial permanece documentado como historial.
 
 **Pregunta de falsificación:** si el asiento anterior que falta contesta con un voto no `pass`, ¿puede cambiar al ganador que el criterio anticipado ya resolvió?
