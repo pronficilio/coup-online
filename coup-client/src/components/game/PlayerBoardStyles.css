@@ -1,21 +1,42 @@
-.PlayerBoardContainer {
+/* Keep the flow box on the same translated origin as the painted board. */
+.PlayerBoardLayout {
+    --player-board-transform-y: min(-40px, calc(108px - 15vh - min(14vw, 126px)));
+    --player-board-five-seat-y: 0px;
+    /* The observer section can extend past the square when its role labels wrap. */
+    --player-board-observer-flow-clearance: max(0px, calc(39.36px + clamp(55.88px, 7.647vw, 98.53px) - min(14vw, 126px)));
     position: relative;
-    isolation: isolate;
     width: min(100%, 900px);
     aspect-ratio: 1;
-    margin: 50px auto 12px;
+    margin: calc(50px + var(--player-board-transform-y) + var(--player-board-five-seat-y)) auto calc(12px + var(--player-board-observer-flow-clearance));
     box-sizing: border-box;
-    transform: translateY(min(-40px, calc(108px - 15vh - min(14vw, 126px))));
 }
 
-/* A five-seat ring tops out at 20.88% instead of the 14% used by the other layouts. */
-.PlayerBoardContainer[data-player-count="5"] {
-    translate: 0 -6.88%;
+/* The five-seat ring is shifted independently by 6.88% of the square board. */
+.PlayerBoardLayout[data-player-count="5"] {
+    --player-board-five-seat-y: -6.88vw;
+}
+
+@media only screen and (min-width: 901px) {
+    .PlayerBoardLayout[data-player-count="5"] {
+        --player-board-five-seat-y: -61.92px;
+    }
+}
+
+.PlayerBoardContainer {
+    --player-board-observer-card-width: clamp(76px, 10.4vw, 134px);
+    --player-board-observer-row-width: calc(var(--player-board-observer-card-width) + var(--player-board-observer-card-width) + 5px);
+    position: absolute;
+    inset: 0;
+    isolation: isolate;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    box-sizing: border-box;
 }
 
 @media only screen and (min-width: 521px) and (max-width: 1023px) {
-    .PlayerBoardContainer {
-        transform: translateY(min(-40px, calc(100px - 22vh - min(14vw, 126px))));
+    .PlayerBoardLayout {
+        --player-board-transform-y: min(-40px, calc(100px - 22vh - min(14vw, 126px)));
     }
 }
 
@@ -148,12 +169,6 @@
     }
 }
 
-@media only screen and (max-width: 520px) {
-    .PlayerBoardContainer {
-        transform: translateY(min(-40px, calc(80px - 22vh - 14vw)));
-    }
-}
-
 .GameContainer {
     position: relative;
     isolation: isolate;
@@ -237,6 +252,23 @@
     box-sizing: border-box;
     color: #252525;
     text-align: center;
+    transform: translate(-50%, -50%);
+}
+
+.PlayerBoardSeat--observer {
+    width: var(--player-board-observer-row-width);
+    max-width: none;
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+}
+
+.PlayerBoardSeatAnchor--observer {
+    z-index: 30;
+    width: var(--player-board-observer-row-width);
+    max-width: none;
+    position: absolute;
     transform: translate(-50%, -50%);
 }
 
@@ -633,6 +665,11 @@
         width: clamp(58px, 15.5vw, 82px);
     }
 
+    .PlayerBoardContainer {
+        --player-board-observer-card-width: clamp(58px, 15.5vw, 82px);
+        --player-board-observer-row-width: calc(var(--player-board-observer-card-width) + var(--player-board-observer-card-width) + 5px);
+    }
+
     .PlayerBoardSeatName {
         gap: 3px;
         padding: 1px 4px;
@@ -921,8 +958,17 @@
 }
 
 @media only screen and (max-width: 720px) {
-    .PlayerBoardContainer {
-        transform: none;
-        translate: none;
+    .PlayerBoardLayout {
+        --player-board-transform-y: 0px;
+        --player-board-five-seat-y: 0px;
+        margin-top: 50px;
+        margin-bottom: calc(12px + var(--player-board-observer-flow-clearance));
+    }
+}
+
+@media only screen and (max-width: 520px) {
+    .PlayerBoardLayout {
+        /* Mobile header is 18px; bound one influence label to two lines. */
+        --player-board-observer-flow-clearance: max(0px, calc(31.36px + clamp(42.65px, 11.397vw, 60.3px) - 14vw));
     }
 }

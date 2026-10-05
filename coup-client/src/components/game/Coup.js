@@ -558,9 +558,13 @@ export default class Coup extends Component {
 
         if (anchor) {
             const rect = anchor.getBoundingClientRect()
-            const scrollX = window.scrollX || window.pageXOffset || 0
-            const scrollY = window.scrollY || window.pageYOffset || 0
-            return { left: rect.left + scrollX, top: rect.top + scrollY }
+            const isMobileViewport = typeof window.matchMedia === 'function'
+                ? window.matchMedia('(max-width: 720px)').matches
+                : window.innerWidth <= 720
+            const scrollX = isMobileViewport ? window.scrollX || window.pageXOffset || 0 : 0
+            const scrollY = isMobileViewport ? window.scrollY || window.pageYOffset || 0 : 0
+            const top = isMobileViewport ? rect.top + scrollY : Math.max(rect.top, 15)
+            return { left: rect.left + scrollX, top }
         }
 
         return this.state.actionRailPosition
@@ -587,16 +591,22 @@ export default class Coup extends Component {
         decisionPanelExpanded: !state.decisionPanelExpanded
     }))
 
-    renderDecisionPanelHeader = (titleId, bodyId) => {
+    renderDecisionPanelHeader = (titleId, bodyId, counteractions = false) => {
         const expanded = this.state.decisionPanelExpanded
+        const titleKey = counteractions
+            ? 'game.decision.counteractions.panelTitle'
+            : 'game.decision.panelTitle'
+        const toggleLabelKey = counteractions
+            ? `game.decision.counteractions.${expanded ? 'collapsePanel' : 'expandPanel'}`
+            : `game.decision.${expanded ? 'collapsePanel' : 'expandPanel'}`
         return <header className="DecisionActionPanelHeader">
-            <h2 id={titleId} className="ActionDecisionTitle">{t('game.decision.panelTitle')}</h2>
+            <h2 id={titleId} className="ActionDecisionTitle">{t(titleKey)}</h2>
             <button
                 className="DecisionPanelToggle"
                 type="button"
                 aria-expanded={expanded}
                 aria-controls={bodyId}
-                aria-label={t(expanded ? 'game.decision.collapsePanel' : 'game.decision.expandPanel')}
+                aria-label={t(toggleLabelKey)}
                 onClick={this.toggleDecisionPanel}
             >{expanded ? '−' : '+'}</button>
         </header>
@@ -766,7 +776,7 @@ export default class Coup extends Component {
             data-decision-type={decision.type}
             aria-labelledby="choice-decision-panel-title"
         >
-            {this.renderDecisionPanelHeader('choice-decision-panel-title', 'choice-decision-panel-body')}
+            {this.renderDecisionPanelHeader('choice-decision-panel-title', 'choice-decision-panel-body', compact)}
             <div id="choice-decision-panel-body" className="DecisionActionPanelBody" aria-hidden={!panelExpanded}>
             <p className="DecisionPanelSubtitle">{title}</p>
             <p className="DecisionActionPrompt">{decisionDescription(decision, this.state.currentPlayer, this.state.ownInfluences.length)}</p>
@@ -950,18 +960,20 @@ export default class Coup extends Component {
 
             {actionDecisionRail}
 
-            <PlayerBoard
-                players={this.state.players}
-                observerName={this.props.name}
-                observerInfluences={ownInfluences}
-                zoomDisabled={Boolean(this.state.gamePaused || this.state.pauseWaiting || decision || this.state.winner)}
-                currentPlayer={this.state.currentPlayer}
-                pendingDecisionSeats={this.state.pendingDecisionSeats}
-                responseAvailable={responseAvailable}
-                courtCount={this.state.courtCount}
-                reactionPresence={this.state.reactionPresence}
-            />
-            <ReferencePanel />
+            <div className="PlayerBoardLayout" data-player-count={this.state.players.length}>
+                <PlayerBoard
+                    players={this.state.players}
+                    observerName={this.props.name}
+                    observerInfluences={ownInfluences}
+                    zoomDisabled={Boolean(this.state.gamePaused || this.state.pauseWaiting || decision || this.state.winner)}
+                    currentPlayer={this.state.currentPlayer}
+                    pendingDecisionSeats={this.state.pendingDecisionSeats}
+                    responseAvailable={responseAvailable}
+                    courtCount={this.state.courtCount}
+                    reactionPresence={this.state.reactionPresence}
+                    referencePanel={<ReferencePanel />}
+                />
+            </div>
 
             {this.state.gamePaused && <div
                 ref={this.pauseOverlayRef}

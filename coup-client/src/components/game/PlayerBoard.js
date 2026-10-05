@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import courtDeckImage from '../../assets/deck.webp'
 import dukeImage from '../../assets/characters/duque.webp'
 import captainImage from '../../assets/characters/capitan.webp'
@@ -135,12 +135,15 @@ function renderInfluenceSlot(player, isObserver, observerInfluences, slotIndex, 
 export default function PlayerBoard(props) {
     const [zoomedCard, setZoomedCard] = useState(null)
     const [zoomOpen, setZoomOpen] = useState(false)
+    const [referencePanelPosition, setReferencePanelPosition] = useState({ left: 12, top: 12 })
     const boardRef = useRef(null)
+    const currentSeatRef = useRef(null)
     const zoomedCardRef = useRef(null)
     const zoomSessionRef = useRef(0)
     zoomedCardRef.current = zoomedCard
     const players = Array.isArray(props.players) ? props.players : EMPTY_PLAYERS
     const seats = getPlayerBoardSeats(players, props.observerName)
+    const currentSeatExists = seats.some(({ player }) => player.name === props.currentPlayer)
     const observerInfluences = Array.isArray(props.observerInfluences) ? props.observerInfluences : []
     const zoomDisabled = Boolean(props.zoomDisabled)
     const pendingDecisionSeats = new Set(Array.isArray(props.pendingDecisionSeats)
@@ -179,6 +182,163 @@ export default function PlayerBoard(props) {
         setZoomedCard(null)
     }
 
+    useLayoutEffect(() => {
+        if (!props.referencePanel || !currentSeatExists) return undefined
+
+        const updateReferencePanelPosition = () => {
+            const board = boardRef.current
+            const currentSeat = currentSeatRef.current
+            const panel = board && board.querySelector('.reference-panel__triggers')
+            if (!board || !currentSeat || !panel) return
+
+            const boardRect = board.getBoundingClientRect()
+            const seatRect = currentSeat.getBoundingClientRect()
+            const panelRect = panel.getBoundingClientRect()
+            const boardWidth = boardRect.width
+            const boardHeight = boardRect.height
+            const panelWidth = panelRect.width
+            const panelHeight = panelRect.height
+            if (!boardWidth || !boardHeight || !panelWidth || !panelHeight) return
+
+            const edge = 12
+            const gap = 6
+            const seatLeft = seatRect.left - boardRect.left
+            const seatRight = seatRect.right - boardRect.left
+            const seatTop = seatRect.top - boardRect.top
+            const seatBottom = seatRect.bottom - boardRect.top
+            const preferredRight = seatRight + gap
+            const preferredLeft = seatLeft - gap - panelWidth
+            const maxLeft = Math.max(edge, boardWidth - panelWidth - edge)
+            const maxTop = Math.max(edge, boardHeight - panelHeight - edge)
+            const clamp = (value, min, max) => Math.min(Math.max(value, min), max)
+            const preferredTop = seatBottom - panelHeight
+            const preferredSide = seatLeft + (seatRect.width / 2) <= boardWidth / 2
+                ? preferredRight
+                : preferredLeft
+            const candidates = []
+            const addCandidate = (left, top) => {
+                candidates.push({
+                    left: clamp(left, edge, maxLeft),
+                    top: clamp(top, edge, maxTop)
+                })
+            }
+
+            // Keep desktop beside the current seat first; then try above/below placements on mobile.
+            addCandidate(preferredRight, preferredTop)
+            addCandidate(preferredLeft, preferredTop)
+
+            const seatCenterX = seatLeft + seatRect.width / 2
+            const horizontalAnchors = [
+                seatLeft,
+                seatRight - panelWidth,
+                seatCenterX - panelWidth / 2,
+                edge,
+                maxLeft
+            ]
+            const verticalAnchors = [
+                seatTop - panelHeight - gap,
+                seatBottom + gap,
+                edge,
+                maxTop
+            ]
+            verticalAnchors.forEach(top => horizontalAnchors.forEach(left => addCandidate(left, top)))
+
+            // Include interior positions for dense 5/6-seat mobile boards.
+            const step = 8
+            for (let top = edge; top <= maxTop; top += step) {
+                for (let left = edge; left <= maxLeft; left += step) {
+                    candidates.push({ left, top })
+                }
+            }
+
+            const obstacles = Array.from(board.querySelectorAll('.PlayerBoardSeat')).flatMap(element => (
+                [element, element.querySelector('.PlayerBoardSeatHeader'), element.querySelector('.PlayerBoardSeatInfluences')]
+            )).filter(Boolean).map(element => {
+                const rect = element.getBoundingClientRect()
+                return {
+                    left: rect.left - boardRect.left,
+                    right: rect.right - boardRect.left,
+                    top: rect.top - boardRect.top,
+                    bottom: rect.bottom - boardRect.top,
+                    clearance: 4
+                }
+            })
+            const court = board.querySelector('.PlayerBoardCourt')
+            const courtCount = board.querySelector('.PlayerBoardCourtCount')
+            ;[court, courtCount].filter(Boolean).forEach(element => {
+                const rect = element.getBoundingClientRect()
+                obstacles.push({
+                    left: rect.left - boardRect.left,
+                    right: rect.right - boardRect.left,
+                    top: rect.top - boardRect.top,
+                    bottom: rect.bottom - boardRect.top,
+                    clearance: 8
+                })
+            })
+
+            const isClear = ({ left, top }) => {
+                if (left < edge || top < edge || left + panelWidth > boardWidth - edge || top + panelHeight > boardHeight - edge) {
+                    return false
+                }
+                return obstacles.every(obstacle => (
+                    left + panelWidth <= obstacle.left - obstacle.clearance
+                    || left >= obstacle.right + obstacle.clearance
+                    || top + panelHeight <= obstacle.top - obstacle.clearance
+                    || top >= obstacle.bottom + obstacle.clearance
+                ))
+            }
+
+            const desiredLeft = clamp(preferredSide, edge, maxLeft)
+            const desiredTop = clamp(preferredTop, edge, maxTop)
+            let position = null
+            let bestScore = Infinity
+            candidates.forEach(candidate => {
+                if (!isClear(candidate)) return
+                const score = Math.abs(candidate.left - desiredLeft) * 2
+                    + Math.abs(candidate.top - desiredTop)
+                if (score < bestScore) {
+                    bestScore = score
+                    position = candidate
+                }
+            })
+            // In a fully packed board there may be no clear rectangle; keep the controls inside the square.
+            const left = position ? position.left : clamp(preferredSide, edge, maxLeft)
+            const top = position ? position.top : clamp(preferredTop, edge, maxTop)
+            setReferencePanelPosition(previous => (
+                Math.abs(previous.left - left) < 0.5 && Math.abs(previous.top - top) < 0.5
+                    ? previous
+                    : { left, top }
+            ))
+        }
+
+        updateReferencePanelPosition()
+        window.addEventListener('resize', updateReferencePanelPosition)
+
+        let resizeObserver
+        if (typeof ResizeObserver !== 'undefined') {
+            resizeObserver = new ResizeObserver(updateReferencePanelPosition)
+            if (boardRef.current) resizeObserver.observe(boardRef.current)
+            if (boardRef.current) {
+                boardRef.current.querySelectorAll('.PlayerBoardSeat, .PlayerBoardCourt, .PlayerBoardCourtCount, .reference-panel__triggers')
+                    .forEach(element => resizeObserver.observe(element))
+            }
+        }
+
+        return () => {
+            window.removeEventListener('resize', updateReferencePanelPosition)
+            if (resizeObserver) resizeObserver.disconnect()
+        }
+    }, [currentSeatExists, players, props.currentPlayer, props.referencePanel])
+
+    const referencePanel = props.referencePanel && React.isValidElement(props.referencePanel)
+        ? React.cloneElement(props.referencePanel, {
+            style: {
+                left: `${referencePanelPosition.left}px`,
+                top: `${referencePanelPosition.top}px`
+            }
+        })
+        : props.referencePanel
+
     return (
         <div ref={boardRef} tabIndex="-1" className="PlayerBoardContainer" data-player-count={players.length} role="group" aria-label={t('game.playerBoard.label')}>
             <div className="PlayerBoardCenter" aria-hidden="true" />
@@ -193,7 +353,8 @@ export default function PlayerBoard(props) {
                     draggable="false"
                 />
             </div>
-            {seats.map(({ player, seatIndex, left, top, isObserver }) => {
+            {!seats.length && referencePanel}
+            {seats.map(({ player, seatIndex, left, top, isObserver }, index) => {
                 const isCurrentPlayer = player.name === props.currentPlayer
                 const isRespondable = isObserver && props.responseAvailable
                 const serverSeat = players.findIndex(candidate => candidate.name === player.name)
@@ -216,9 +377,9 @@ export default function PlayerBoard(props) {
                     isRespondable ? 'PlayerBoardSeat--respondable' : ''
                 ].filter(Boolean).join(' ')
 
-                return <section
+                const seat = <section
                     className={seatClassName}
-                    key={player.name}
+                    ref={isCurrentPlayer ? currentSeatRef : undefined}
                     data-seat-index={seatIndex}
                     data-seat-edge={seatEdge}
                     data-seat-header-edge={left <= 20 ? 'left' : left >= 80 ? 'right' : undefined}
@@ -236,8 +397,8 @@ export default function PlayerBoard(props) {
                     data-respondable={isRespondable ? 'true' : 'false'}
                     aria-current={isCurrentPlayer ? 'true' : undefined}
                     style={{
-                        left: `${left}%`,
-                        top: `${top}%`,
+                        left: isObserver ? undefined : `${left}%`,
+                        top: isObserver ? undefined : `${top}%`,
                         '--player-color': player.color
                     }}
                 >
@@ -294,7 +455,27 @@ export default function PlayerBoard(props) {
                         )}
                     </div>
                 </section>
+
+                if (isObserver) {
+                    return <div
+                        className="PlayerBoardSeatAnchor PlayerBoardSeatAnchor--observer"
+                        key={player.name}
+                        style={{ left: `${left}%`, top: `${top}%` }}
+                    >
+                        {seat}
+                    </div>
+                }
+
+                if (index === seats.length - 1) {
+                    return <React.Fragment key={`last-seat-with-reference-panel-${player.name}`}>
+                        {referencePanel}
+                        {React.cloneElement(seat, { key: player.name })}
+                    </React.Fragment>
+                }
+
+                return React.cloneElement(seat, { key: player.name })
             })}
+            {seats.length === 1 && referencePanel}
             <OwnCardZoom
                 open={zoomOpen}
                 sessionId={zoomedCard && zoomedCard.sessionId}
