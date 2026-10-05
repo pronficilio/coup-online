@@ -3,10 +3,10 @@
 ## Estado y clasificación
 
 - Unidad: [issue #82](https://github.com/pronficilio/coup-online/issues/82).
-- Estado: `WAITING_USER`; F1 `CLOSED`.
+- Estado: `COMPLETED`; F1 `CLOSED`.
 - Modo / riesgo / verificación: `LIGHT` / `LOW` / `NONE`.
 - Razón: cambio pequeño y reversible de copy, CSS y posicionamiento del panel.
-- Siguiente dueño: Propietario, para autorizar o rechazar la integración de la PR #83.
+- Siguiente dueño: ninguno; integración y cierre verificados por el Orquestador.
 
 ## Solicitud y objetivo
 
@@ -51,8 +51,10 @@ Al desplazarse en escritorio durante una decisión activa, ¿el rail desaparece 
 - Branch: `issue/82-counteraction-panel-sticky`.
 - Worktree: `.worktrees/issue-82-counteraction-panel-sticky`.
 - Target: `master` de `pronficilio/coup-online`.
-- Handoff: `docs/plans/active/issue_82_counteraction_panel_sticky.md`.
+- Cierre: `docs/plans/completed/issue_82_counteraction_panel_sticky.md`.
 - Bitácora append-only: `docs/plans/log/issue-82.jsonl`.
-- PR única: [#83](https://github.com/pronficilio/coup-online/pull/83), `OPEN`, base `master`.
+- PR única: [#83](https://github.com/pronficilio/coup-online/pull/83), `MERGED` a `master` el 2026-10-05.
+- Merge commit: `ff43940af0702d8c6e14ef1998a4a749d4dc2209`.
 - La revisión visual manual no estuvo disponible: este entorno no tiene navegador ni preview local accesible; no se declara PASS visual.
-- El Orquestador revisó el diff, la topología, la evidencia de build y la geometría estática: `PASS` para integrar. La PR #83 está `MERGEABLE`; la unidad espera autorización explícita del propietario antes de fusionar.
+- El Orquestador revisó el diff, la topología, la evidencia de build y la geometría estática: `PASS` para integrar. La PR #83 y el commit de merge están verificados en `master`.
+- La issue #82 quedó `CLOSED` después de la integración verificada.
