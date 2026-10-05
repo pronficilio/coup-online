@@ -1,0 +1,28 @@
+# Handoff para Agente Ejecutor
+
+- **Issue:** https://github.com/pronficilio/coup-online/issues/13
+- **Plan:** `docs/plans/active/issue_13_hetzner_deployment.md`
+- **Estado:** `IN_PROGRESS`; producción activa en `070c14f` (incluye `origin/master@02bcf3e`); PR #15 abierto, draft y limpio. Se corrigió la falla reproducida: namespace 200, Socket.IO polling 403 por comparación literal del Referer same-origin. Staging pasó matriz adversarial, partida de dos jugadores sin Origin y restart. Producción pasó la matriz pública y API/web healthy tras rollout. Falta prueba del bundle en navegador y decisión formal de cierre/rollback; rollback no se ha probado.
+- **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL`.
+- **Verifier requerido ahora:** sí; revisión final independiente antes de integrar/cerrar.
+- **Pregunta de falsificación:** ¿puede un Origin hostil acceder a HTTP, polling o WebSocket de staging? ¿Un cliente válido completa una partida después del fix?
+- **Releases:** `ce53c28` fue el release previamente publicado; `ff840d1` se activó primero 2026-10-04, pero fallaba Socket.IO same-origin. `070c14f` (rama sincronizada con master, fix Referer) está activo en producción desde 2026-10-05. `55be894` era referencia histórica.
+- **Staging autorizado:** `st-coup.ejele.net` → `178.105.138.91`; DNS confirmado. Debe usar Compose/imagenes/certificado aislados; no publicar puertos de host ni incluir runner Codex.
+- **PR:** #15 está en borrador hacia `master`; no integrar todavía.
+- **Fase siguiente:** pedir al propietario que recargue y confirme creación/inicio desde el bundle de producción actualizado; después decidir cierre formal. Staging ya cubrió juego/restart; producción se reinició durante rollout y quedó saludable. No se ha ensayado rollback porque la revisión anterior reabre la vulnerabilidad. No hacer merge/cierre sin indicación del propietario.
+- **Por qué sigue:** el verificador independiente confirmó TLS, health, CORS HTTP, polling y WebSocket en staging. La prueba complementaria del Orquestador inició partida con dos clientes por polling y recibió `g-updatePlayers` con dos jugadores; el detalle está en `docs/plans/active/report_issue_13_F6_orchestrator.md`. El rollback a `ce53c28` restaura CORS abierto y está documentado solo como recuperación temporal de disponibilidad.
+- **Fuentes:** el plan de arriba, issue #13, README, `server/index.js`, `CreateGame.js`, `JoinGame.js`, inventario remoto en el plan.
+- **Subtarea pendiente:** confirmación del flujo en navegador real y decisión de cierre; no falta activar el release.
+- **Criterios de aceptación:** ver el plan, issue #13.
+- **Evidencia requerida:** DNS/certificado, build, API/Socket.IO permitido/rechazado, partida, restart y estrategia reversible. Ya confirmados: build y deploy de `070c14f`; staging y producción pasan la matriz Origin/Referer, TLS/health; juego real de dos clientes en staging; staging API restart healthy; production API/web healthy tras rollout; Mochila/Minecraft/proxy/runner activos; Certbot dry-run/timer staging. Rollback a `ce53c28` está documentado, no probado y reabre CORS. Falta prueba/confirmación del bundle React por navegador real.
+- **Riesgos pendientes:** proxy compartido; rollback no probado; cuatro avisos moderados de npm en Socket.IO 2.x requieren migración mayor.
+- **Política de commits:** `COMMIT_AFTER_REVIEW` por fase técnica y `COMMIT_REQUIRED` en F6. Un solo branch/worktree/PR para el issue.
+- **Branch destino:** `issue/13-hetzner-deployment`.
+- **Worktree destino:** `.worktrees/issue-13-hetzner-deployment`.
+- **Merge target:** `master`.
+- **Bitácora:** `docs/plans/log/issue-13.jsonl` (append-only).
+- **PR abierto:** #15, `issue/13-hetzner-deployment` → `master`, en borrador hasta completar F6.
+- **Secuencia de aislamiento:** reclamar en issue; volver a leer issue y descartar reclamo incompatible; usar el branch/worktree canónico ya preparado; registrar claim/worktree en log; commits de fase siempre en el mismo branch.
+- **Validaciones realizadas:** producción `070c14f`; home/TLS/health 200; polling same-origin Referer 200, allowed Origin 200, hostiles 403, sin ambos headers 403; WebSocket same-origin/allowed 101 y hostiles/sin headers 400. Verificador independiente pasó misma matriz en prod/staging y flujo de dos jugadores en staging. En staging API volvió healthy tras restart; producción API/web healthy tras rollout. Mochila/Minecraft/proxy/runner activos. La creación fallaba en `ff840d1` porque Socket.IO 2.5 usa Referer como fallback y se comparaba el URL completo; `070c14f` normaliza `URL.origin`. **Pendiente:** prueba o confirmación del usuario en navegador y cierre formal. Rollback sin ensayar; `ce53c28` reabre CORS.
+- **Verifier:** su reporte independiente queda `BLOCKED` para cierre total: sus sondas públicas de producción pasan, pero su alcance no ejecutó juego, restart deliberado ni rollback en producción. La evidencia funcional y de restart de staging está en `docs/plans/active/report_issue_13_F6_orchestrator.md`. Producción sí fue activada con autorización explícita.
+- **Qué actualizar:** issue, plan, log y handoff con el veredicto final. La configuración live tiene copia original en `/opt/mochila/deploy/nginx.conf.bak-20260926`; no guardar secretos en Git.

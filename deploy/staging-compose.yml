@@ -1,0 +1,36 @@
+services:
+  st-coup-api:
+    container_name: st-coup-api
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.server
+    image: st-coup-api:${COUP_REVISION:-staging}
+    environment:
+      NODE_ENV: production
+      PORT: "8000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://st-coup.ejele.net}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8000/exists/healthcheck').then(r => { if (!r.ok) process.exit(1) }).catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - mochila_default
+
+  st-coup-web:
+    container_name: st-coup-web
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.client
+      args:
+        REACT_APP_BACKEND_URL: ${REACT_APP_BACKEND_URL:-https://st-coup.ejele.net}
+    image: st-coup-web:${COUP_REVISION:-staging}
+    restart: unless-stopped
+    networks:
+      - mochila_default
+
+networks:
+  mochila_default:
+    external: true

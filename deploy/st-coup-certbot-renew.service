@@ -1,0 +1,10 @@
+[Unit]
+Description=Renew the st-coup.ejele.net Let's Encrypt certificate
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker run --rm -v /opt/mochila/certbot:/etc/letsencrypt certbot/certbot:latest renew --cert-name st-coup.ejele.net
+ExecStartPost=/usr/bin/docker exec mochila-proxy-1 nginx -t
+ExecStartPost=/usr/bin/docker exec mochila-proxy-1 nginx -s reload
