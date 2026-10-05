@@ -1,6 +1,6 @@
 # Plan — resolver ventanas al quedar determinado el resultado (#77)
 
-**Estado:** `ACTIVE`; F1 `CLOSED`; F2 `CLOSED`; F3 post-sync `PASS` AC1–AC8 en `15c239c`; unidad `ACTIVE`, PR pendiente de publicación para revisión de integración.
+**Estado:** `WAITING_ORCHESTRATOR`; F1 `CLOSED`; F2 `CLOSED`; F3 post-sync `PASS` AC1–AC8 en `15c239c`; [PR #84](https://github.com/pronficilio/coup-online/pull/84) abierta para revisión de integración.
 **Issue canónico:** https://github.com/pronficilio/coup-online/issues/77
 **Solicitud:** reducir la espera en desafíos/bloqueos en partidas sin IA.
 **Objetivo operativo:** cerrar una ventana tan pronto como las respuestas recibidas ya determinan la misma opción ganadora por prioridad de asiento que la implementación actual.
@@ -11,7 +11,7 @@
 **Modo / riesgo / verificación:** `FULL` / `HIGH` / `FINAL` independiente.
 **Verifier requerido:** F3 independiente, por transición concurrente y regla de juego; repetido tras integrar base compartida.
 **Branch / worktree / destino:** `issue/77-decision-window-performance` / `.worktrees/issue-77-decision-window-performance` / `master`.
-**Integración:** una PR para #77.
+**Integración:** una PR para #77, [#84](https://github.com/pronficilio/coup-online/pull/84).
 **Siguiente dueño:** Orquestación para revisión de integración.
 
 ## Hechos, incógnitas y contrato conservado
